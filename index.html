@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WordLink — Learn to Read</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdf6ec;
+    --accent1: #f4845f;
+    --accent2: #4a90d9;
+    --accent3: #5cb85c;
+    --accent4: #f0b429;
+    --purple: #9b6fd4;
+    --teal: #2baa8a;
+    --dark: #2d2a26;
+    --mid: #7a6f65;
+    --light: #e8ddd2;
+    --shadow: 0 4px 20px rgba(0,0,0,0.10);
+    --radius: 18px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(244,132,95,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(74,144,217,0.08) 0%, transparent 50%);
+  }
+
+  /* ── HEADER ── */
+  header { text-align: center; padding: 30px 20px 10px; }
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    color: var(--accent1); letter-spacing: 1px; line-height: 1;
+  }
+  header h1 span { color: var(--accent2); }
+  header p { margin-top: 6px; font-size: 0.97rem; color: var(--mid); font-weight: 600; }
+
+  /* ── TOP NAV ── */
+  .top-nav {
+    display: flex; justify-content: center; gap: 8px;
+    margin: 20px auto 0; padding: 0 12px; flex-wrap: wrap;
+    max-width: 820px;
+  }
+  .nav-tab {
+    font-family: 'Fredoka One', cursive; font-size: 0.98rem;
+    padding: 10px 20px; border-radius: 36px; border: 2.5px solid var(--light);
+    background: white; color: var(--mid); cursor: pointer;
+    transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    white-space: nowrap;
+  }
+  .nav-tab:hover:not(.active) { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,0.12); }
+  .nav-tab.sec-alphabet.active  { background: var(--teal);    color: white; border-color: var(--teal);    box-shadow: 0 4px 14px rgba(43,170,138,0.4); }
+  .nav-tab.sec-sounds.active    { background: var(--accent2); color: white; border-color: var(--accent2); box-shadow: 0 4px 14px rgba(74,144,217,0.4); }
+  .nav-tab.sec-words1.active    { background: var(--accent1); color: white; border-color: var(--accent1); box-shadow: 0 4px 14px rgba(244,132,95,0.4); }
+  .nav-tab.sec-words2.active    { background: var(--purple);  color: white; border-color: var(--purple);  box-shadow: 0 4px 14px rgba(155,111,212,0.4); }
+
+  /* ── SECTION PAGES ── */
+  .section-page { display: none; }
+  .section-page.active { display: block; }
+
+  /* ════════════════════════════════
+     SECTION 1 — ALPHABET
+  ════════════════════════════════ */
+  .sec-intro {
+    text-align: center; max-width: 520px; margin: 20px auto 0;
+    padding: 0 16px; color: var(--mid); font-size: 0.93rem; font-weight: 600; line-height: 1.6;
+  }
+
+  .alpha-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    gap: 10px; max-width: 720px; margin: 18px auto 40px; padding: 0 16px;
+  }
+
+  .alpha-card {
+    background: white; border-radius: 14px; border: 2.5px solid var(--light);
+    padding: 14px 8px 10px; text-align: center; cursor: pointer;
+    transition: all 0.18s; box-shadow: 0 2px 8px rgba(0,0,0,0.07); user-select: none;
+  }
+  .alpha-card:hover { transform: translateY(-4px); box-shadow: 0 7px 18px rgba(0,0,0,0.12); border-color: var(--teal); }
+  .alpha-card.playing {
+    background: linear-gradient(135deg,#e8faf5,#c8f0e4);
+    border-color: var(--teal); transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 22px rgba(43,170,138,0.3);
+  }
+  .alpha-card.vowel { border-color: #b4d0f4; }
+  .alpha-card.vowel:hover { border-color: var(--accent2); }
+  .alpha-card.vowel.playing { background: linear-gradient(135deg,#eef5ff,#d6e8ff); border-color: var(--accent2); box-shadow: 0 8px 22px rgba(74,144,217,0.3); }
+
+  .alpha-letter { font-family: 'Fredoka One', cursive; font-size: 2.4rem; line-height: 1; color: var(--teal); }
+  .alpha-card.vowel .alpha-letter { color: var(--accent2); }
+  .alpha-name { font-size: 0.78rem; font-weight: 700; color: var(--mid); margin-top: 4px; }
+
+  /* ════════════════════════════════
+     SECTION 2 — LETTER SOUNDS
+  ════════════════════════════════ */
+  .sounds-wrap {
+    max-width: 680px; margin: 22px auto 40px; padding: 0 16px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+
+  .letter-block {
+    background: white; border-radius: var(--radius);
+    border: 2px solid var(--light); box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    overflow: hidden;
+  }
+
+  .letter-block-header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px 20px 12px; border-bottom: 2px solid var(--light);
+  }
+
+  .letter-block-letter {
+    font-family: 'Fredoka One', cursive; font-size: 3rem; line-height: 1;
+    color: var(--teal); min-width: 48px; text-align: center;
+  }
+  .letter-block.vowel .letter-block-letter { color: var(--accent2); }
+
+  .letter-block-letter.tappable {
+    cursor: pointer; border-radius: 12px; padding: 4px 8px; transition: all 0.18s;
+  }
+  .letter-block-letter.tappable:hover {
+    background: linear-gradient(135deg,#e8faf5,#c8f0e4);
+    transform: scale(1.08); box-shadow: 0 4px 12px rgba(43,170,138,0.25);
+  }
+  .letter-block.vowel .letter-block-letter.tappable:hover {
+    background: linear-gradient(135deg,#eef5ff,#d6e8ff);
+    box-shadow: 0 4px 12px rgba(74,144,217,0.25);
+  }
+  .letter-block-letter.tappable.playing {
+    background: linear-gradient(135deg,#e8faf5,#c8f0e4);
+    transform: scale(1.1); box-shadow: 0 6px 18px rgba(43,170,138,0.35);
+  }
+  .letter-block.vowel .letter-block-letter.tappable.playing {
+    background: linear-gradient(135deg,#eef5ff,#d6e8ff);
+    box-shadow: 0 6px 18px rgba(74,144,217,0.35);
+  }
+
+  .letter-block-desc { flex: 1; }
+  .letter-block-desc h3 { font-family: 'Fredoka One', cursive; font-size: 1.05rem; color: var(--dark); margin-bottom: 2px; }
+  .letter-block-desc p { font-size: 0.83rem; color: var(--mid); font-weight: 600; line-height: 1.5; }
+
+  .sound-group { padding: 14px 20px 16px; }
+  .sound-group + .sound-group {
+    border-top: 2px dashed var(--light);
+    background: linear-gradient(135deg, #fffdf0, #fff8e0);
+  }
+
+  .sound-group-label {
+    font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1.5px; color: var(--mid); margin-bottom: 10px;
+  }
+  .sound-group + .sound-group .sound-group-label { color: var(--accent4); }
+
+  .sound-note {
+    font-size: 0.78rem; color: var(--mid); font-weight: 600;
+    font-style: italic; margin-top: 8px;
+  }
+
+  .example-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .example-pill {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
+    padding: 7px 18px; border-radius: 30px;
+    border: 2px solid var(--light); background: var(--bg);
+    color: var(--dark); cursor: pointer; transition: all 0.16s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .example-pill:hover {
+    background: var(--teal); color: white; border-color: var(--teal);
+    transform: translateY(-2px); box-shadow: 0 5px 14px rgba(43,170,138,0.3);
+  }
+  .letter-block.vowel .example-pill:hover {
+    background: var(--accent2); border-color: var(--accent2);
+    box-shadow: 0 5px 14px rgba(74,144,217,0.3);
+  }
+  .sound-group + .sound-group .example-pill:hover {
+    background: var(--accent4); border-color: var(--accent4);
+    box-shadow: 0 5px 14px rgba(240,180,41,0.35); color: white;
+  }
+  .example-pill.playing {
+    background: var(--teal); color: white; border-color: var(--teal);
+    transform: scale(1.06); box-shadow: 0 5px 14px rgba(43,170,138,0.35);
+  }
+  .letter-block.vowel .example-pill.playing { background: var(--accent2); border-color: var(--accent2); }
+  .sound-group + .sound-group .example-pill.playing { background: var(--accent4); border-color: var(--accent4); }
+  .pill-emoji { font-size: 1.3em; line-height: 1; }
+
+  /* ════════════════════════════════
+     SHARED WORD PRONUNCIATION STYLES
+  ════════════════════════════════ */
+  .family-selector {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+    max-width: 780px; margin: 20px auto 0; padding: 0 16px;
+  }
+  .family-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1rem; padding: 8px 18px;
+    border-radius: 30px; border: 2.5px solid transparent;
+    background: white; color: var(--mid); cursor: pointer;
+    transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .family-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.12); }
+  .family-btn.active { color: white; transform: translateY(-2px); }
+  #wp1-selector .family-btn.active { background: var(--accent1); border-color: var(--accent1); box-shadow: 0 5px 15px rgba(244,132,95,0.35); }
+  #wp2-selector-wrap .family-btn.active { background: var(--purple); border-color: var(--purple); box-shadow: 0 5px 15px rgba(155,111,212,0.35); }
+
+  .main-card { max-width: 600px; margin: 22px auto; padding: 0 16px 40px; }
+
+  .family-title { font-family: 'Fredoka One', cursive; font-size: 1.25rem; color: var(--mid); text-align: center; margin-bottom: 22px; letter-spacing: 1px; }
+  .family-title strong { font-size: 1.55rem; }
+  #wp1-page .family-title strong { color: var(--accent2); }
+  #wp2-page .family-title strong { color: var(--purple); }
+
+  .word-display {
+    background: white; border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 30px 26px 24px; text-align: center; position: relative; overflow: hidden; border: 2px solid var(--light);
+  }
+  .word-display::before { content:''; position:absolute; top:0; left:0; right:0; height:5px; }
+  #wp1-page .word-display::before { background: linear-gradient(90deg, var(--accent1), var(--accent4), var(--accent2)); }
+  #wp2-page .word-display::before { background: linear-gradient(90deg, var(--purple), var(--accent2), var(--accent3)); }
+
+  .word-emoji-display { font-size: 3.5rem; line-height: 1; margin-bottom: 10px; min-height: 1.2em; }
+
+  .letter-tiles { display:flex; justify-content:center; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
+  .tile {
+    width:68px; height:78px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fredoka One',cursive; font-size:2.6rem; line-height:1;
+    box-shadow:0 4px 0 rgba(0,0,0,0.12), 0 6px 14px rgba(0,0,0,0.08);
+    transition:transform 0.15s; animation:tilePop 0.35s cubic-bezier(0.34,1.56,0.64,1) both; cursor:pointer;
+  }
+  .tile.beginning { background:linear-gradient(135deg,#fff7f0,#ffe4d6); color:var(--accent1); border:2.5px solid #f4c5b4; }
+  .tile.ending    { background:linear-gradient(135deg,#eef5ff,#d6e8ff); color:var(--accent2); border:2.5px solid #b4d0f4; }
+  .tile.digraph   { background:linear-gradient(135deg,#f5f0ff,#e8d6ff); color:var(--purple);  border:2.5px solid #d4b4f4; }
+  .tile:hover { transform:translateY(-4px); }
+
+  @keyframes tilePop {
+    from { transform:scale(0.5) translateY(20px); opacity:0; }
+    to   { transform:scale(1) translateY(0);      opacity:1; }
+  }
+
+  .tile-labels { display:flex; justify-content:center; gap:8px; margin-bottom:8px; }
+  .tile-label-item { width:68px; text-align:center; font-size:0.68rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; }
+  .tile-label-item.bl { color:var(--accent1); }
+  .tile-label-item.el { color:var(--accent2); }
+  .tile-label-item.dg { color:var(--purple); }
+
+  .audio-btn {
+    color:white; border:none; border-radius:50px; padding:12px 32px;
+    font-family:'Nunito',sans-serif; font-size:1.05rem; font-weight:800;
+    cursor:pointer; display:inline-flex; align-items:center; gap:10px;
+    transition:all 0.15s; margin-bottom:6px;
+  }
+  #wp1-page .audio-btn { background:linear-gradient(135deg,var(--accent1),#e06840); box-shadow:0 4px 0 rgba(200,80,40,0.4),0 6px 18px rgba(244,132,95,0.3); }
+  #wp2-page .audio-btn { background:linear-gradient(135deg,var(--purple),#7a4fbf);  box-shadow:0 4px 0 rgba(100,50,170,0.4),0 6px 18px rgba(155,111,212,0.3); }
+  .audio-btn:hover { transform:translateY(-2px); }
+  .audio-btn:active { transform:translateY(2px); }
+  .audio-btn.speaking { animation:pulse 0.6s ease-in-out infinite alternate; }
+  @keyframes pulse { from{filter:brightness(1);} to{filter:brightness(1.15);} }
+
+  .nav-row { display:flex; gap:12px; justify-content:center; margin-top:20px; align-items:center; }
+  .wp-nav-btn {
+    background:white; border:2.5px solid var(--light); color:var(--dark);
+    border-radius:50px; padding:10px 22px; font-family:'Nunito',sans-serif;
+    font-size:1rem; font-weight:700; cursor:pointer; display:inline-flex;
+    align-items:center; gap:8px; transition:all 0.15s; box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  }
+  .wp-nav-btn:hover:not(:disabled) { background:var(--dark); color:white; border-color:var(--dark); transform:translateY(-2px); }
+  .wp-nav-btn:disabled { opacity:0.35; cursor:not-allowed; }
+  .word-counter { font-size:0.95rem; font-weight:700; color:var(--mid); min-width:60px; text-align:center; }
+
+  .hint-box { background:linear-gradient(135deg,#f0faf0,#e0f5e0); border:2px solid #b8e8b8; border-radius:var(--radius); padding:15px 18px; margin-top:22px; display:flex; align-items:flex-start; gap:12px; }
+  .hint-icon { font-size:1.5rem; flex-shrink:0; margin-top:2px; }
+  .hint-box p { font-size:0.9rem; color:#2a5a2a; font-weight:600; line-height:1.6; }
+  .hint-box p strong { color:var(--accent1); }
+
+  .speed-row { display:flex; align-items:center; justify-content:center; gap:10px; margin-top:14px; flex-wrap:wrap; }
+  .speed-label { font-size:0.8rem; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; }
+  .speed-btns { display:flex; gap:6px; }
+  .speed-opt { padding:5px 13px; border-radius:20px; border:2px solid var(--light); background:white; font-family:'Nunito',sans-serif; font-weight:700; font-size:0.8rem; cursor:pointer; color:var(--mid); transition:all 0.15s; }
+  .speed-opt.active { background:var(--accent2); color:white; border-color:var(--accent2); }
+
+  .word-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:10px; margin-top:24px; }
+  .word-chip { background:white; border:2px solid var(--light); border-radius:12px; padding:10px 8px; text-align:center; cursor:pointer; transition:all 0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+  .word-chip:hover { transform:translateY(-3px); box-shadow:0 6px 16px rgba(0,0,0,0.1); }
+  #wp1-page .word-chip:hover   { border-color:var(--accent1); }
+  #wp1-page .word-chip.current { background:linear-gradient(135deg,#fff4f0,#ffe8df); border-color:var(--accent1); box-shadow:0 4px 14px rgba(244,132,95,0.25); }
+  #wp2-page .word-chip:hover   { border-color:var(--purple); }
+  #wp2-page .word-chip.current { background:linear-gradient(135deg,#f5f0ff,#ead6ff); border-color:var(--purple); box-shadow:0 4px 14px rgba(155,111,212,0.25); }
+  .chip-beginning { font-family:'Fredoka One',cursive; font-size:1.4rem; color:var(--accent1); }
+  .chip-ending    { font-family:'Fredoka One',cursive; font-size:1.4rem; color:var(--accent2); }
+  .chip-whole     { font-family:'Fredoka One',cursive; font-size:1.4rem; color:var(--purple); }
+  .chip-emoji     { font-size:1.5em; display:block; margin-top:3px; line-height:1; }
+  .chip-audio     { font-size:0.66rem; color:var(--mid); margin-top:2px; }
+
+  .trophy-msg { text-align:center; padding:22px; display:none; }
+  .trophy-msg.show { display:block; animation:fadeIn 0.5s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:scale(0.8);} to{opacity:1;transform:scale(1);} }
+  .trophy-msg h2 { font-family:'Fredoka One',cursive; font-size:2rem; color:var(--accent4); margin-bottom:6px; }
+  .trophy-msg p { color:var(--mid); font-weight:600; }
+
+  .cat-divider { max-width:780px; margin:26px auto 0; padding:0 16px; display:flex; align-items:center; gap:14px; }
+  .cat-divider hr { flex:1; border:none; border-top:2px solid var(--light); }
+  .cat-pill { font-family:'Fredoka One',cursive; font-size:0.88rem; color:white; background:var(--purple); border-radius:20px; padding:5px 16px; white-space:nowrap; }
+
+  footer { text-align:center; padding:18px; font-size:0.85rem; color:var(--mid); font-weight:600; border-top:2px solid var(--light); margin-top:12px; }
+  footer strong { color:var(--accent1); }
+
+  @media (max-width:480px) {
+    .nav-tab { font-size:0.85rem; padding:8px 14px; }
+    .tile { width:58px; height:68px; font-size:2.1rem; }
+    .alpha-grid { grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); }
+    .alpha-letter { font-size:2rem; }
+    .letter-block-letter { font-size:2.4rem; }
+  }
+
+  /* ════════════════════════════════
+     PRACTICE BUTTON (top of sections)
+  ════════════════════════════════ */
+  .practice-bar {
+    text-align: center; margin: 18px auto 0; padding: 0 16px;
+  }
+  .practice-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
+    padding: 11px 28px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, #ff7eb3, #e040a0);
+    color: white; cursor: pointer;
+    box-shadow: 0 4px 0 rgba(180,20,100,0.35), 0 6px 18px rgba(224,64,160,0.3);
+    transition: all 0.18s; display: inline-flex; align-items: center; gap: 9px;
+  }
+  .practice-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(180,20,100,0.35), 0 10px 22px rgba(224,64,160,0.35); }
+  .practice-btn:active { transform: translateY(2px); }
+
+  /* ════════════════════════════════
+     PRACTICE OVERLAY / PAGE
+  ════════════════════════════════ */
+  .practice-overlay {
+    display: none; position: fixed; inset: 0;
+    background: var(--bg); z-index: 100; overflow-y: auto;
+    padding: 0 0 40px;
+  }
+  .practice-overlay.active { display: block; }
+
+  .practice-header {
+    background: linear-gradient(135deg, #ff7eb3, #e040a0);
+    padding: 18px 20px 16px; display: flex; align-items: center;
+    gap: 14px; position: sticky; top: 0; z-index: 10;
+    box-shadow: 0 4px 16px rgba(224,64,160,0.3);
+  }
+  .practice-back {
+    background: rgba(255,255,255,0.25); border: none; border-radius: 50%;
+    width: 40px; height: 40px; font-size: 1.3rem; color: white;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background 0.15s;
+  }
+  .practice-back:hover { background: rgba(255,255,255,0.4); }
+  .practice-header-text { color: white; }
+  .practice-header-text h2 { font-family: 'Fredoka One', cursive; font-size: 1.4rem; line-height: 1; }
+  .practice-header-text p { font-size: 0.82rem; font-weight: 600; opacity: 0.88; margin-top: 3px; }
+
+  .practice-body { max-width: 580px; margin: 0 auto; padding: 24px 16px 0; }
+
+  /* Step indicator */
+  .practice-step-info {
+    text-align: center; margin-bottom: 20px;
+  }
+  .practice-step-info .step-counter {
+    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    color: var(--mid); letter-spacing: 1px;
+  }
+  .practice-progress {
+    height: 6px; background: var(--light); border-radius: 10px;
+    margin: 8px auto 0; max-width: 300px; overflow: hidden;
+  }
+  .practice-progress-fill {
+    height: 100%; border-radius: 10px;
+    background: linear-gradient(90deg, #ff7eb3, #e040a0);
+    transition: width 0.4s ease;
+  }
+
+  /* Word display card in practice */
+  .practice-card {
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow); border: 2px solid var(--light);
+    padding: 28px 24px 24px; text-align: center; position: relative; overflow: hidden;
+  }
+  .practice-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:5px;
+    background: linear-gradient(90deg, #ff7eb3, #e040a0, #ff7eb3);
+  }
+  .practice-word-emoji { font-size: 3rem; line-height: 1; margin-bottom: 10px; min-height: 1.1em; }
+  .practice-word {
+    font-family: 'Fredoka One', cursive; font-size: 3.2rem;
+    color: var(--dark); letter-spacing: 2px; margin-bottom: 6px;
+  }
+  .practice-word-label {
+    font-size: 0.78rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1.5px; color: var(--mid); margin-bottom: 20px;
+  }
+
+  /* Phase banners */
+  .phase-banner {
+    font-family: 'Fredoka One', cursive; font-size: 0.92rem;
+    padding: 7px 18px; border-radius: 24px; display: inline-block;
+    margin-bottom: 18px; letter-spacing: 0.5px;
+  }
+  .phase-listen  { background: #e8f5ff; color: var(--accent2); border: 2px solid #b4d8f8; }
+  .phase-record  { background: #fff0f8; color: #d0208a; border: 2px solid #f8b4dc; }
+  .phase-compare { background: #f0fff4; color: var(--accent3); border: 2px solid #a8e6b8; }
+
+  /* Example word (word 1 — listen only) */
+  .example-listen-row {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .example-label {
+    font-size: 0.82rem; font-weight: 700; color: var(--mid); text-align: center; line-height: 1.5;
+  }
+  .listen-play-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    padding: 11px 28px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, var(--accent2), #2d6cbf);
+    color: white; cursor: pointer;
+    box-shadow: 0 4px 0 rgba(30,80,180,0.35), 0 6px 16px rgba(74,144,217,0.3);
+    display: inline-flex; align-items: center; gap: 9px; transition: all 0.15s;
+  }
+  .listen-play-btn:hover { transform: translateY(-2px); }
+  .listen-play-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
+
+  .start-practice-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    padding: 11px 28px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, #e040a0, #bf1a80);
+    color: white; cursor: pointer; margin-top: 10px;
+    box-shadow: 0 4px 0 rgba(150,10,100,0.35), 0 6px 16px rgba(224,64,160,0.3);
+    display: inline-flex; align-items: center; gap: 9px; transition: all 0.15s;
+  }
+  .start-practice-btn:hover { transform: translateY(-2px); }
+
+  /* Recording controls */
+  .record-controls { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+  .record-btn {
+    width: 80px; height: 80px; border-radius: 50%; border: none;
+    background: linear-gradient(135deg, #ff4d6d, #c9003c);
+    color: white; font-size: 2rem; cursor: pointer;
+    box-shadow: 0 6px 0 rgba(150,0,40,0.4), 0 8px 24px rgba(255,77,109,0.4);
+    transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .record-btn:hover { transform: translateY(-3px) scale(1.05); }
+  .record-btn.recording {
+    animation: recordPulse 1s ease-in-out infinite;
+    background: linear-gradient(135deg, #ff1a1a, #990000);
+  }
+  @keyframes recordPulse {
+    0%   { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 0 rgba(255,26,26,0.5); }
+    70%  { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 20px rgba(255,26,26,0); }
+    100% { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 0 rgba(255,26,26,0); }
+  }
+  .record-hint { font-size: 0.85rem; font-weight: 700; color: var(--mid); }
+
+  /* Playback + compare row */
+  .compare-controls { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
+
+  .playback-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  .playback-btn {
+    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    padding: 10px 22px; border-radius: 36px; border: none;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.15s;
+  }
+  .playback-btn.my-voice {
+    background: linear-gradient(135deg, #fff0f8, #f8d6ee);
+    color: #d0208a; border: 2.5px solid #f0a8d8;
+  }
+  .playback-btn.my-voice:hover { background: linear-gradient(135deg, #f8c8e8, #f0a0d0); }
+  .playback-btn.correct-voice {
+    background: linear-gradient(135deg, var(--accent2), #2d6cbf);
+    color: white; box-shadow: 0 3px 0 rgba(30,80,180,0.35), 0 5px 14px rgba(74,144,217,0.3);
+  }
+  .playback-btn.correct-voice:hover { transform: translateY(-2px); }
+  .playback-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
+
+  /* Feedback badge */
+  .feedback-badge {
+    padding: 10px 22px; border-radius: 14px; font-weight: 800; font-size: 1rem;
+    display: none; align-items: center; gap: 10px;
+    animation: fadeIn 0.35s ease;
+  }
+  .feedback-badge.show { display: inline-flex; }
+  .feedback-badge.correct { background: #e8faf0; color: #1a7a3a; border: 2.5px solid #8ee0b4; }
+  .feedback-badge.try-again { background: #fff4e0; color: #a05000; border: 2.5px solid #f0c870; }
+  .feedback-badge.partial { background: #f0f4ff; color: #3050b0; border: 2.5px solid #a8b8f0; }
+
+  /* Re-record link */
+  .rerecord-link {
+    background: none; border: none; color: var(--mid); font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem; font-weight: 700; cursor: pointer; text-decoration: underline;
+    padding: 2px 6px;
+  }
+  .rerecord-link:hover { color: var(--dark); }
+
+  /* Next button */
+  .practice-next-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
+    padding: 13px 36px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, var(--accent3), #3a9a3a);
+    color: white; cursor: pointer; margin-top: 8px;
+    box-shadow: 0 4px 0 rgba(40,120,40,0.4), 0 6px 18px rgba(92,184,92,0.35);
+    display: inline-flex; align-items: center; gap: 10px; transition: all 0.15s;
+  }
+  .practice-next-btn:hover { transform: translateY(-2px); }
+  .practice-next-btn:active { transform: translateY(2px); }
+  .practice-next-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* Finish card */
+  .practice-finish {
+    text-align: center; padding: 40px 20px;
+    display: none;
+  }
+  .practice-finish.show { display: block; animation: fadeIn 0.5s ease; }
+  .practice-finish h2 { font-family: 'Fredoka One', cursive; font-size: 2rem; color: #e040a0; margin: 12px 0 8px; }
+  .practice-finish p { color: var(--mid); font-weight: 600; }
+  .finish-icon { font-size: 4rem; }
+
+  /* Per-set practice button — inside letter block footer / word card */
+  .set-practice-bar {
+    padding: 12px 20px 14px; text-align: center;
+    border-top: 2px dashed var(--light);
+    background: linear-gradient(135deg, #fff5fb, #ffeaf6);
+  }
+  .set-practice-btn {
+    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    padding: 9px 22px; border-radius: 30px; border: none;
+    background: linear-gradient(135deg, #ff7eb3, #e040a0);
+    color: white; cursor: pointer;
+    box-shadow: 0 3px 0 rgba(180,20,100,0.35), 0 5px 14px rgba(224,64,160,0.25);
+    transition: all 0.18s; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .set-practice-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(180,20,100,0.35), 0 8px 18px rgba(224,64,160,0.3); }
+  .set-practice-btn:active { transform: translateY(1px); }
+
+  /* Practice button inside the wp1/wp2 word-display card */
+  .wp-practice-bar {
+    text-align: center; margin-top: 18px; padding-top: 16px;
+    border-top: 2px dashed var(--light);
+  }
+
+  /* Countdown ring on record button */
+  .record-btn-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+  .record-countdown {
+    position: absolute; top: -6px; right: -6px;
+    background: #ff4d6d; color: white;
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: none; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  }
+  .record-countdown.show { display: flex; }
+
+  /* ── Test Yourself button (section level) ── */
+  .section-test-bar {
+    text-align: center; margin: 18px auto 4px; padding: 0 16px;
+  }
+  .test-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
+    padding: 11px 28px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, #5cb85c, #3a7a3a);
+    color: white; cursor: pointer;
+    box-shadow: 0 4px 0 rgba(30,100,30,0.4), 0 6px 18px rgba(92,184,92,0.3);
+    transition: all 0.18s; display: inline-flex; align-items: center; gap: 9px;
+  }
+  .test-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(30,100,30,0.4), 0 10px 22px rgba(92,184,92,0.35); }
+  .test-btn:active { transform: translateY(2px); }
+
+  /* ── Judge buttons ── */
+  .test-judge-row {
+    display: flex; gap: 14px; justify-content: center; margin-top: 16px; flex-wrap: wrap;
+  }
+  .judge-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1.1rem;
+    padding: 13px 32px; border-radius: 36px; border: none; cursor: pointer;
+    transition: all 0.15s; flex: 1; max-width: 180px;
+  }
+  .judge-btn.correct {
+    background: linear-gradient(135deg, #5cb85c, #3a7a3a); color: white;
+    box-shadow: 0 4px 0 rgba(30,100,30,0.4), 0 6px 16px rgba(92,184,92,0.3);
+  }
+  .judge-btn.incorrect {
+    background: linear-gradient(135deg, #e05555, #b02020); color: white;
+    box-shadow: 0 4px 0 rgba(140,10,10,0.4), 0 6px 16px rgba(220,80,80,0.3);
+  }
+  .judge-btn:hover { transform: translateY(-2px) scale(1.03); }
+  .judge-btn:active { transform: translateY(2px); }
+
+  /* ── Results list ── */
+  .result-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 14px; border-radius: 12px; margin-bottom: 8px;
+    font-weight: 700; font-size: 1rem;
+  }
+  .result-item.ok  { background: #e8faf0; color: #1a7a3a; border: 2px solid #a8e6b8; }
+  .result-item.bad { background: #fdf0f0; color: #a02020; border: 2px solid #f0b8b8; }
+  .result-item .ri-word { font-family: 'Fredoka One', cursive; font-size: 1.2rem; margin-right: 4px; }
+  .result-item .ri-mark { font-size: 1.3rem; flex-shrink: 0; }
+  .result-item .ri-play {
+    margin-left: auto; background: none; border: none; cursor: pointer;
+    font-size: 1rem; color: inherit; opacity: 0.7; padding: 2px 6px;
+  }
+  .result-item .ri-play:hover { opacity: 1; }
+</style>
+  .mic-warning {
+    background: #fff4e0; border: 2px solid #f0c870; border-radius: 14px;
+    padding: 14px 18px; font-size: 0.88rem; font-weight: 600; color: #806000;
+    margin-top: 16px; display: none; line-height: 1.7; text-align: left;
+  }
+  .mic-warning.show { display: block; }
+  .mic-warning code {
+    background: rgba(0,0,0,0.08); border-radius: 5px; padding: 1px 6px;
+    font-family: monospace; font-size: 0.85em; font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Word<span>Link</span></h1>
+  <p>Learn to link letters · Read with confidence</p>
+</header>
+
+<div class="top-nav">
+  <button class="nav-tab sec-alphabet active" onclick="showSection('alphabet',this)">🔤 Alphabet</button>
+  <button class="nav-tab sec-sounds"          onclick="showSection('sounds',this)">🔊 Letter Sounds</button>
+  <button class="nav-tab sec-words1"          onclick="showSection('wp1',this)">📖 Word Pronunciation 1</button>
+  <button class="nav-tab sec-words2"          onclick="showSection('wp2',this)">📗 Word Pronunciation 2</button>
+</div>
+
+<!-- SECTION 1 — ALPHABET -->
+<div class="section-page active" id="sec-alphabet">
+  <p class="sec-intro">Tap any letter to hear its name — the way you say the alphabet.<br>
+    <strong style="color:var(--accent2)">Blue = vowel</strong> &nbsp;·&nbsp; <strong style="color:var(--teal)">Green = consonant</strong>
+  </p>
+  <div class="alpha-grid" id="nameGrid"></div>
+</div>
+
+<!-- SECTION 2 — LETTER SOUNDS -->
+<div class="section-page" id="sec-sounds">
+  <p class="sec-intro">Tap any word to hear it spoken slowly. Listen for the sound that letter makes.<br>
+    <strong style="color:var(--accent2)">Blue = vowel</strong> &nbsp;·&nbsp; <strong style="color:var(--teal)">Green = consonant</strong> &nbsp;·&nbsp; <strong style="color:var(--accent4)">Yellow = second sound</strong>
+  </p>
+  <div class="section-test-bar">
+    <button class="test-btn" onclick="openTest('sounds')">🧪 Test Yourself — 10 random words</button>
+  </div>
+  <div class="sounds-wrap" id="soundsWrap"></div>
+</div>
+
+<!-- SECTION 3 — WORD PRONUNCIATION 1 -->
+<div class="section-page" id="sec-wp1">
+  <div class="section-test-bar">
+    <button class="test-btn" onclick="openTest('wp1')">🧪 Test Yourself — 10 random words</button>
+  </div>
+  <div class="family-selector" id="wp1-selector"></div>
+  <div class="main-card" id="wp1-page">
+    <div class="family-title" id="wp1-title"></div>
+    <div class="word-display">
+      <div class="tile-labels" id="wp1-labels"></div>
+      <div class="letter-tiles" id="wp1-tiles"></div>
+      <div class="word-emoji-display" id="wp1-emoji"></div>
+      <button class="audio-btn" id="wp1-audioBtn" onclick="speakCurrent('wp1')">
+        <span>🔊</span> <span id="wp1-audioLbl">Hear the word</span>
+      </button>
+      <div class="speed-row">
+        <span class="speed-label">Speed:</span>
+        <div class="speed-btns">
+          <button class="speed-opt active" onclick="setSpeed(0.6,this)">Slow</button>
+          <button class="speed-opt" onclick="setSpeed(0.85,this)">Medium</button>
+          <button class="speed-opt" onclick="setSpeed(1.0,this)">Normal</button>
+        </div>
+      </div>
+      <div class="wp-practice-bar">
+        <button class="set-practice-btn" onclick="openPracticeForWp('wp1')">🎙️ Practise this word group</button>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="wp-nav-btn" id="wp1-prev" onclick="navigate('wp1',-1)">← Back</button>
+      <span class="word-counter" id="wp1-counter"></span>
+      <button class="wp-nav-btn" id="wp1-next" onclick="navigate('wp1',1)">Next →</button>
+    </div>
+    <div class="hint-box"><div class="hint-icon">💡</div><p id="wp1-hint">Choose a word group above. Tap each letter tile to hear its sound. Press <strong>Hear the word</strong> to listen to the whole word.</p></div>
+    <div class="trophy-msg" id="wp1-trophy"><div style="font-size:3rem">🏆</div><h2>Well done!</h2><p>You read all the words in this group.<br>Pick another group to keep going!</p></div>
+    <div class="word-grid" id="wp1-grid"></div>
+  </div>
+</div>
+
+<!-- SECTION 4 — WORD PRONUNCIATION 2 -->
+<div class="section-page" id="sec-wp2">
+  <div class="section-test-bar">
+    <button class="test-btn" onclick="openTest('wp2')">🧪 Test Yourself — 10 random words</button>
+  </div>
+  <div id="wp2-selector-wrap"></div>
+  <div class="main-card" id="wp2-page">
+    <div class="family-title" id="wp2-title"></div>
+    <div class="word-display">
+      <div class="tile-labels" id="wp2-labels"></div>
+      <div class="letter-tiles" id="wp2-tiles"></div>
+      <div class="word-emoji-display" id="wp2-emoji"></div>
+      <button class="audio-btn" id="wp2-audioBtn" onclick="speakCurrent('wp2')">
+        <span>🔊</span> <span id="wp2-audioLbl">Hear the word</span>
+      </button>
+      <div class="speed-row">
+        <span class="speed-label">Speed:</span>
+        <div class="speed-btns">
+          <button class="speed-opt active" onclick="setSpeed(0.6,this)">Slow</button>
+          <button class="speed-opt" onclick="setSpeed(0.85,this)">Medium</button>
+          <button class="speed-opt" onclick="setSpeed(1.0,this)">Normal</button>
+        </div>
+      </div>
+      <div class="wp-practice-bar">
+        <button class="set-practice-btn" onclick="openPracticeForWp('wp2')">🎙️ Practise this word group</button>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="wp-nav-btn" id="wp2-prev" onclick="navigate('wp2',-1)">← Back</button>
+      <span class="word-counter" id="wp2-counter"></span>
+      <button class="wp-nav-btn" id="wp2-next" onclick="navigate('wp2',1)">Next →</button>
+    </div>
+    <div class="hint-box"><div class="hint-icon">💡</div><p id="wp2-hint">Choose a word group above. Tap each letter tile to hear its sound. Press <strong>Hear the word</strong> to listen to the whole word.</p></div>
+    <div class="trophy-msg" id="wp2-trophy"><div style="font-size:3rem">🏆</div><h2>Well done!</h2><p>You read all the words in this group.<br>Pick another group to keep going!</p></div>
+    <div class="word-grid" id="wp2-grid"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PRACTICE MODE OVERLAY
+══════════════════════════════════════════ -->
+<div class="practice-overlay" id="practiceOverlay">
+
+  <div class="practice-header">
+    <button class="practice-back" onclick="closePractice()" title="Back">←</button>
+    <div class="practice-header-text">
+      <h2 id="practiceTitle">🎙️ Practice Reading</h2>
+      <p id="practiceSubtitle">Listen · Record · Compare</p>
+    </div>
+  </div>
+
+  <div class="practice-body">
+
+    <div class="practice-step-info">
+      <div class="step-counter" id="practiceStepCounter">Word 1 of 1</div>
+      <div class="practice-progress"><div class="practice-progress-fill" id="practiceProgressFill" style="width:0%"></div></div>
+    </div>
+
+    <!-- PHASE 0: Example (word 1 — listen only) -->
+    <div id="phaseExample">
+      <div class="practice-card">
+        <div class="practice-word-emoji" id="exampleEmoji"></div>
+        <div class="practice-word" id="exampleWord"></div>
+        <div class="practice-word-label">Example word — listen first</div>
+        <span class="phase-banner phase-listen">👂 Listen</span><br>
+        <div class="example-listen-row">
+          <div class="example-label">Hear how this word sounds.<br>Then tap the button below to start practising.</div>
+          <button class="listen-play-btn" id="examplePlayBtn" onclick="playExampleWord()">
+            <span>🔊</span> <span id="examplePlayLbl">Hear the word</span>
+          </button>
+          <button class="start-practice-btn" onclick="startPracticeWords()">
+            🎙️ Start Practising →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 1: Record -->
+    <div id="phaseRecord" style="display:none">
+      <div class="practice-card">
+        <div class="practice-word-emoji" id="recordEmoji"></div>
+        <div class="practice-word" id="recordWord"></div>
+        <div class="practice-word-label" id="recordWordLabel">Your turn — say this word</div>
+        <span class="phase-banner phase-record">🎙️ Record your voice</span>
+        <div class="record-controls">
+          <div class="record-btn-wrap">
+            <button class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙️</button>
+            <div class="record-countdown" id="recordCountdown">3</div>
+          </div>
+          <div class="record-hint" id="recordHint">Tap the mic — recording stops after 3 seconds</div>
+        </div>
+        <div class="mic-warning" id="micWarning" style="margin-top:16px"></div>
+      </div>
+    </div>
+
+    <!-- PHASE 2: Compare -->
+    <div id="phaseCompare" style="display:none">
+      <div class="practice-card">
+        <div class="practice-word-emoji" id="compareEmoji"></div>
+        <div class="practice-word" id="compareWord"></div>
+        <div class="practice-word-label">Compare your voice</div>
+        <span class="phase-banner phase-compare">🔍 Compare</span>
+        <div class="compare-controls">
+          <div class="feedback-badge" id="feedbackBadge"></div>
+          <div class="playback-row">
+            <button class="playback-btn my-voice" onclick="playMyRecording()">
+              🎧 My recording
+            </button>
+            <button class="playback-btn correct-voice" id="correctVoiceBtn" onclick="playCorrectWord()">
+              🔊 Correct word
+            </button>
+          </div>
+          <button class="rerecord-link" onclick="goBackToRecord()">↩ Record again</button>
+          <button class="practice-next-btn" id="practiceNextBtn" onclick="advancePractice()">
+            Next word →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINISH -->
+    <div class="practice-finish" id="practiceFinish">
+      <div class="finish-icon">🏅</div>
+      <h2>Practice complete!</h2>
+      <p>Great work! You practised all the words in this set.<br>Head back and try another group.</p>
+      <br>
+      <button class="practice-next-btn" onclick="closePractice()" style="margin-top:10px">
+        ← Back to lessons
+      </button>
+    </div>
+
+  </div><!-- /practice-body -->
+</div><!-- /practiceOverlay -->
+
+<!-- ══════════════════════════════════════════
+     TEST YOURSELF OVERLAY
+══════════════════════════════════════════ -->
+<div class="practice-overlay" id="testOverlay">
+
+  <div class="practice-header" style="background:linear-gradient(135deg,#5cb85c,#3a7a3a)">
+    <button class="practice-back" onclick="closeTest()" title="Back">←</button>
+    <div class="practice-header-text">
+      <h2 id="testTitle">🧪 Test Yourself</h2>
+      <p id="testSubtitle">10 random words</p>
+    </div>
+  </div>
+
+  <div class="practice-body">
+
+    <div class="practice-step-info">
+      <div class="step-counter" id="testStepCounter">Word 1 of 10</div>
+      <div class="practice-progress">
+        <div class="practice-progress-fill" id="testProgressFill" style="width:0%;background:linear-gradient(90deg,#5cb85c,#3a7a3a)"></div>
+      </div>
+    </div>
+
+    <!-- TEST RECORD PHASE -->
+    <div id="testPhaseRecord">
+      <div class="practice-card">
+        <div class="practice-word-emoji" id="testEmoji"></div>
+        <div class="practice-word" id="testWord"></div>
+        <div class="practice-word-label">Say this word out loud</div>
+        <span class="phase-banner phase-record">🎙️ Record your voice</span>
+        <div class="record-controls">
+          <div class="record-btn-wrap">
+            <button class="record-btn" id="testRecordBtn" onclick="testToggleRecording()">🎙️</button>
+            <div class="record-countdown" id="testCountdown">3</div>
+          </div>
+          <div class="record-hint" id="testRecordHint">Tap the mic — recording stops after 3 seconds</div>
+        </div>
+        <div class="mic-warning" id="testMicWarning" style="margin-top:16px"></div>
+      </div>
+    </div>
+
+    <!-- TEST COMPARE PHASE -->
+    <div id="testPhaseCompare" style="display:none">
+      <div class="practice-card">
+        <div class="practice-word-emoji" id="testCompareEmoji"></div>
+        <div class="practice-word" id="testCompareWord"></div>
+        <div class="practice-word-label">Compare, then mark yourself</div>
+        <span class="phase-banner phase-compare">🔍 How did you do?</span>
+        <div class="compare-controls">
+          <div class="playback-row">
+            <button class="playback-btn my-voice" onclick="testPlayMyRecording()">🎧 My recording</button>
+            <button class="playback-btn correct-voice" id="testCorrectVoiceBtn" onclick="testPlayCorrectWord()">🔊 Correct word</button>
+          </div>
+          <div class="test-judge-row">
+            <button class="judge-btn correct" onclick="testJudge(true)">✅ Correct</button>
+            <button class="judge-btn incorrect" onclick="testJudge(false)">❌ Incorrect</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEST RESULTS -->
+    <div id="testPhaseResults" style="display:none">
+      <div class="practice-card" style="text-align:left">
+        <div style="text-align:center;margin-bottom:20px">
+          <div style="font-size:3rem" id="testResultIcon">🏅</div>
+          <div class="practice-word" id="testResultScore" style="font-size:2rem"></div>
+          <div class="practice-word-label" id="testResultMsg"></div>
+        </div>
+        <div id="testResultList"></div>
+        <div style="text-align:center;margin-top:24px">
+          <button class="practice-next-btn" onclick="openTest(testSection)" style="margin-right:10px">🔁 Try again</button>
+          <button class="practice-next-btn" onclick="closeTest()" style="background:linear-gradient(135deg,var(--mid),#555)">← Back</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>Created by <strong>Masoud Fakhr</strong></footer>
+
+<script>
+/* ══════════════════════════════════════════
+   EMOJI MAP
+══════════════════════════════════════════ */
+const EMOJI = {
+  // Animals
+  'ant':'🐜','bat':'🦇','bee':'🐝','bug':'🐛','cat':'🐱','cow':'🐄',
+  'crab':'🦀','dog':'🐶','duck':'🦆','elephant':'🐘','fish':'🐟','fox':'🦊',
+  'giraffe':'🦒','hen':'🐓','insect':'🐛','ox':'🐂','pig':'🐷',
+  'ram':'🐏','rat':'🐀','vet':'🩺',
+  // People
+  'boy':'👦','dad':'👨','giant':'🧌','kid':'👦','king':'👑','man':'👨',
+  'men':'👥','uncle':'👴',
+  // Food & drink
+  'apple':'🍎','bun':'🧁','cake':'🎂','chip':'🍟','chop':'🥩','cup':'🥤',
+  'egg':'🥚','fig':'🍑','food':'🍱','ham':'🥩','ice':'🧊','jam':'🍯',
+  'meat':'🥩','pan':'🍳','pie':'🥧','pop':'🥤','yam':'🍠',
+  // Nature & outdoors
+  'day':'🌤️','lake':'🏞️','moon':'🌙','mud':'🟤','rain':'🌧️','snow':'❄️',
+  'soil':'🌱','sun':'☀️','tree':'🌳','vine':'🌿',
+  // Transport
+  'bus':'🚌','ship':'🚢','train':'🚂','truck':'🚚','van':'🚐',
+  // Buildings & places
+  'city':'🏙️','den':'🏕️','shop':'🏪','zoo':'🦁',
+  // Household objects
+  'bag':'👜','bath':'🛁','bed':'🛏️','bell':'🔔','bin':'🗑️','book':'📚',
+  'box':'📦','brush':'🪥','can':'🥫','clock':'🕐','dish':'🍽️','door':'🚪',
+  'fan':'🌀','jar':'🫙','kit':'🧰','lamp':'💡','map':'🗺️',
+  'mat':'🧹','mop':'🧹','mug':'☕','net':'🥅','pen':'✏️','phone':'📱',
+  'photo':'📷','pin':'📍','pot':'🪴','rope':'🪢','rug':'🪣','shell':'🐚',
+  'soap':'🧼','spoon':'🥄','tag':'🏷️','tin':'🥫','tube':'🧴',
+  'umbrella':'☂️','watch':'⌚','wig':'👱',
+  // Clothing
+  'cap':'🧢','coat':'🧥','dress':'👗','hat':'🎩','tie':'👔','vest':'🦺',
+  // Body parts
+  'face':'😊','feet':'🦶','foot':'🦶','leg':'🦵','lip':'👄',
+  'mouth':'👄','paw':'🐾','teeth':'🦷','thumb':'👍','toe':'🦶','toes':'🦶',
+  // Actions
+  'cry':'😢','dig':'⛏️','draw':'✏️','drop':'💧','eat':'🍽️','fly':'🪰',
+  'hop':'🦘','hug':'🤗','jump':'🦘','ride':'🏇','run':'🏃','sit':'🧘',
+  'sleep':'😴','spin':'🌀','stop':'🛑','wag':'🐕',
+  // Sports & play
+  'ball':'⚽','game':'🎮','pool':'🏊','slide':'🛝','toy':'🧸',
+  // Objects & tools
+  'add':'➕','boat':'⛵','bridge':'🌉','coin':'🪙','cube':'🧊',
+  'dam':'🌊','doll':'🪆','dot':'🔵','drum':'🥁','flag':'🚩',
+  'gate':'🚧','gem':'💎','glue':'🧴','gun':'🔫','hoe':'🌾',
+  'key':'🔑','lock':'🔒','love':'❤️','mail':'📬','match':'🔥',
+  'mix':'🥣','rock':'🪨','roof':'🏠','saw':'🪚','shed':'🏚️',
+  'six':'6️⃣','nine':'9️⃣','ten':'🔟','star':'⭐','stick':'🪵','wood':'🪵',
+  // Communication & media
+  'chat':'💬','graph':'📊','ink':'🖊️','jazz':'🎷',
+  'page':'📄','read':'📖','word':'📝',
+  // Colours & visual concepts
+  'blue':'🔵','black':'⬛','brown':'🟤','green':'🟢','red':'🔴',
+  'clue':'🔍','fire':'🔥','fizz':'🫧','hot':'🌡️',
+  // Misc clear ones
+  'ask':'❓','odd':'🤔','quiz':'❓','yes':'✅',
+  'year':'📅','zero':'0️⃣','zip':'🤐','zoo':'🦁','zoom':'🔍',
+  'cliff':'🏔️','road':'🛣️','sand':'🏖️',
+  'step':'👣','tail':'🐈','team':'👥','trip':'✈️',
+};
+function emo(word) { return EMOJI[word.toLowerCase()] || ''; }
+
+/* ══════════════════════════════════════════
+   DATA — ALPHABET NAMES
+══════════════════════════════════════════ */
+const letterNames = [
+  {l:'A',name:'ay',        vowel:true},
+  {l:'B',name:'bee',       vowel:false},
+  {l:'C',name:'see',       vowel:false},
+  {l:'D',name:'dee',       vowel:false},
+  {l:'E',name:'e',         vowel:true},
+  {l:'F',name:'ef',        vowel:false},
+  {l:'G',name:'jee',       vowel:false},
+  {l:'H',name:'aych',      vowel:false},
+  {l:'I',name:'eye',       vowel:true},
+  {l:'J',name:'jay',       vowel:false},
+  {l:'K',name:'kay',       vowel:false},
+  {l:'L',name:'el',        vowel:false},
+  {l:'M',name:'em',        vowel:false},
+  {l:'N',name:'en',        vowel:false},
+  {l:'O',name:'oh',        vowel:true},
+  {l:'P',name:'pee',       vowel:false},
+  {l:'Q',name:'cue',       vowel:false},
+  {l:'R',name:'ar',        vowel:false},
+  {l:'S',name:'es',        vowel:false},
+  {l:'T',name:'tee',       vowel:false},
+  {l:'U',name:'you',       vowel:true},
+  {l:'V',name:'vee',       vowel:false},
+  {l:'W',name:'double-you',vowel:false},
+  {l:'X',name:'ex',        vowel:false},
+  {l:'Y',name:'why',       vowel:false},
+  {l:'Z',name:'zee',       vowel:false},
+];
+
+/* ══════════════════════════════════════════
+   DATA — LETTER SOUNDS
+══════════════════════════════════════════ */
+const letterSoundData = [
+  { l:'A', vowel:true,  sounds:[{ label:'Short a — as in…', examples:['ant','apple','ask','add'] }]},
+  { l:'B', vowel:false, sounds:[{ label:'Sound — as in…', examples:['bat','bag','bed','bus','big'] }]},
+  { l:'C', vowel:false, sounds:[
+    { label:'Hard sound — as in…', examples:['cat','cup','cap','cut','come'] },
+    { label:'Soft sound — as in…', examples:['city','cent','circle','face','ice'], note:'C makes this sound before e, i, or y.' }
+  ]},
+  { l:'D', vowel:false, sounds:[{ label:'Sound — as in…', examples:['dog','dig','dad','day','door'] }]},
+  { l:'E', vowel:true,  sounds:[{ label:'Short e — as in…', examples:['egg','end','enter','empty'] }]},
+  { l:'F', vowel:false, sounds:[{ label:'Sound — as in…', examples:['fan','fig','fun','fish','foot'] }]},
+  { l:'G', vowel:false, sounds:[
+    { label:'Hard sound — as in…', examples:['gap','got','give','go','get'] },
+    { label:'Soft sound — as in…', examples:['gem','giant','giraffe','age','page'], note:'G makes this sound before e, i, or y.' }
+  ]},
+  { l:'H', vowel:false, sounds:[{ label:'Sound — as in…', examples:['hat','hop','him','her','hot'] }]},
+  { l:'I', vowel:true,  sounds:[{ label:'Short i — as in…', examples:['ink','in','ill','insect'] }]},
+  { l:'J', vowel:false, sounds:[{ label:'Sound — as in…', examples:['jam','job','jump','just','jar'] }]},
+  { l:'K', vowel:false, sounds:[{ label:'Sound — as in…', examples:['kit','kid','king','keep','kind'] }]},
+  { l:'L', vowel:false, sounds:[{ label:'Sound — as in…', examples:['lap','leg','lip','lot','love'] }]},
+  { l:'M', vowel:false, sounds:[{ label:'Sound — as in…', examples:['map','man','mud','most','me'] }]},
+  { l:'N', vowel:false, sounds:[{ label:'Sound — as in…', examples:['net','not','nap','name','no'] }]},
+  { l:'O', vowel:true,  sounds:[{ label:'Short o — as in…', examples:['odd','on','off','ox'] }]},
+  { l:'P', vowel:false, sounds:[{ label:'Sound — as in…', examples:['pan','pet','pin','pot','put'] }]},
+  { l:'Q', vowel:false, sounds:[{ label:'Sound — as in…', examples:['quiz','queen','quick','quiet','quit'], note:'Q is almost always followed by U in English.' }]},
+  { l:'R', vowel:false, sounds:[{ label:'Sound — as in…', examples:['ran','red','rip','run','road'] }]},
+  { l:'S', vowel:false, sounds:[
+    { label:'"S" sound — as in…', examples:['sun','sit','sad','set','soft'] },
+    { label:'"Z" sound — as in…', examples:['is','his','has','was','as'], note:'S sounds like Z in many very common words.' }
+  ]},
+  { l:'T', vowel:false, sounds:[{ label:'Sound — as in…', examples:['tap','top','tin','ten','tell'] }]},
+  { l:'U', vowel:true,  sounds:[{ label:'Short u — as in…', examples:['up','under','uncle','umbrella'] }]},
+  { l:'V', vowel:false, sounds:[{ label:'Sound — as in…', examples:['van','vet','vest','vine','voice'] }]},
+  { l:'W', vowel:false, sounds:[{ label:'Sound — as in…', examples:['win','wet','was','want','word'] }]},
+  { l:'X', vowel:false, sounds:[{ label:'Sound — as in…', examples:['box','fox','mix','fix','six'] }]},
+  { l:'Y', vowel:false, sounds:[
+    { label:'"Y" sound — as in…', examples:['yes','yet','you','your','year'] },
+    { label:'"EE" sound — as in…', examples:['happy','very','baby','city','funny'], note:'Y sounds like "ee" at the end of most words.' }
+  ]},
+  { l:'Z', vowel:false, sounds:[{ label:'Sound — as in…', examples:['zip','zoo','zero','zoom','zone'] }]},
+];
+
+/* ══════════════════════════════════════════
+   DATA — WORD PRONUNCIATION 1
+══════════════════════════════════════════ */
+const wp1Families = [
+  { ending:'an', words:['man','can','pan','ran','fan','tan','van'] },
+  { ending:'at', words:['cat','bat','hat','mat','rat','sat','pat'] },
+  { ending:'ap', words:['cap','map','nap','tap','lap','gap'] },
+  { ending:'ag', words:['bag','tag','rag','wag','lag'] },
+  { ending:'am', words:['ham','jam','ram','dam','yam'] },
+  { ending:'et', words:['pet','net','set','bet','met','wet'] },
+  { ending:'en', words:['pen','hen','ten','men','den'] },
+  { ending:'ig', words:['big','dig','fig','pig','wig'] },
+  { ending:'in', words:['pin','bin','fin','tin','win'] },
+  { ending:'ip', words:['lip','dip','hip','sip','tip','zip'] },
+  { ending:'op', words:['hop','mop','top','pop','cop'] },
+  { ending:'ot', words:['hot','pot','dot','lot','not'] },
+  { ending:'ug', words:['bug','dug','hug','mug','rug'] },
+  { ending:'un', words:['sun','fun','run','bun','gun'] },
+];
+
+/* ══════════════════════════════════════════
+   DATA — WORD PRONUNCIATION 2
+══════════════════════════════════════════ */
+const wp2Families = [
+  // 1. Consonant digraphs
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'sh', words:['ship','shop','fish','dish','shed','shell'], mode:'whole', patternHint:'<strong>sh</strong> makes one sound — like a quiet "shh". You can hear it at the start or end of a word.' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'ch', words:['chip','chat','much','rich','chop','chest'], mode:'whole', patternHint:'<strong>ch</strong> makes one sound — like in <em>chip</em>. It can come at the start or end of a word.' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'th', words:['this','that','these','those'], mode:'whole', patternHint:'This <strong>th</strong> uses your voice — put your finger on your throat and feel it buzz. Try: <em>this… that…</em>' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'th', words:['thin','think','bath','teeth'], mode:'whole', patternHint:'This <strong>th</strong> uses only air — no voice. Put your tongue between your teeth and blow. Try: <em>thin… think…</em>' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'wh', words:['when','what','why','where'], mode:'whole', patternHint:'<strong>wh</strong> usually makes a "w" sound — like in <em>when</em> and <em>what</em>.' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'ph', words:['phone','photo','graph','elephant'], mode:'whole', patternHint:'<strong>ph</strong> makes an "f" sound — like in <em>phone</em>. It comes from Greek words.' },
+  // 2a. Long vowel pairs
+  { cat:'Vowel pairs — long sounds', ending:'ee', words:['see','tree','bee','feet'], mode:'whole', patternHint:'<strong>ee</strong> makes a long "ee" sound — like in <em>see</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ea', words:['eat','team','meat','read'], mode:'whole', patternHint:'<strong>ea</strong> makes a long "ee" sound — like in <em>eat</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ai', words:['rain','train','mail','tail'], mode:'whole', patternHint:'<strong>ai</strong> makes a long "ay" sound — like in <em>rain</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ay', words:['day','play','say','way'], mode:'whole', patternHint:'<strong>ay</strong> makes a long "ay" sound — like in <em>day</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'oa', words:['boat','coat','road','soap'], mode:'whole', patternHint:'<strong>oa</strong> makes a long "oh" sound — like in <em>boat</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'oe', words:['toe','goes','toes','hoe'], mode:'whole', patternHint:'<strong>oe</strong> makes a long "oh" sound — like in <em>toe</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ie', words:['pie','tie','lie','die'], mode:'whole', patternHint:'<strong>ie</strong> makes a long "eye" sound — like in <em>pie</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ue', words:['blue','glue','true','clue'], mode:'whole', patternHint:'<strong>ue</strong> makes a long "oo" or "you" sound — like in <em>blue</em>.' },
+  // 2b. Other vowel pairs
+  { cat:'Vowel pairs — other sounds', ending:'oo', words:['moon','food','soon','pool','cool','roof'], mode:'whole', patternHint:'<strong>oo</strong> here makes a long sound — like in <em>moon</em>. Say it with a long "oo".' },
+  { cat:'Vowel pairs — other sounds', ending:'oo', words:['book','look','cook','foot','good','wood'], mode:'whole', patternHint:'<strong>oo</strong> here makes a short sound — like in <em>book</em>. The lips round but the sound is shorter.' },
+  { cat:'Vowel pairs — other sounds', ending:'ou', words:['out','loud','sound','found','mouth','count'], mode:'whole', patternHint:'<strong>ou</strong> here makes an "ow" sound — like in <em>out</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'ou', words:['could','would','should','your','four','pour'], mode:'whole', patternHint:'<strong>ou</strong> here makes different sounds — "ood" in <em>could</em>, "or" in <em>four</em>. Listen carefully to each word.' },
+  { cat:'Vowel pairs — other sounds', ending:'ow', words:['cow','now','snow','low'], mode:'whole', patternHint:'<strong>ow</strong> can sound like "ow" in <em>cow</em>, or "oh" in <em>snow</em>. Both are common.' },
+  { cat:'Vowel pairs — other sounds', ending:'oi', words:['coin','join','boil','soil'], mode:'whole', patternHint:'<strong>oi</strong> makes an "oy" sound — like in <em>coin</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'oy', words:['boy','toy','enjoy','annoy'], mode:'whole', patternHint:'<strong>oy</strong> makes the same sound as <strong>oi</strong> — like in <em>boy</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'au', words:['author','August','auto','haul'], mode:'whole', patternHint:'<strong>au</strong> makes an "aw" sound — like in <em>author</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'aw', words:['saw','law','paw','draw'], mode:'whole', patternHint:'<strong>aw</strong> makes the same sound as <strong>au</strong> — like in <em>saw</em>.' },
+  // 3. Silent e
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ake', words:['cake','make','take','lake'], mode:'split', splitAt:1 },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ate', words:['late','mate','gate','hate'], mode:'split', splitAt:1 },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ine', words:['fine','line','mine','nine'], mode:'split', splitAt:1 },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ope', words:['hope','rope','cope','nope'], mode:'split', splitAt:1 },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ute', words:['cute','mute','tube','cube'], mode:'split', splitAt:1 },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ide', words:['ride','side','hide','wide'], mode:'split', splitAt:1 },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ame', words:['game','name','same','came'], mode:'split', splitAt:1 },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ore', words:['more','core','sore','bore'], mode:'split', splitAt:1 },
+  // 4. Beginning blends
+  { cat:'Beginning blends  (both sounds heard)', ending:'st', words:['stop','step','stand','stick'], mode:'whole', patternHint:'<strong>st</strong> = s + t. Both sounds are heard. Try slowly: <em>s… t… stop.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'bl', words:['black','blue','block','blow'],  mode:'whole', patternHint:'<strong>bl</strong> = b + l. Try slowly: <em>b… l… black.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'tr', words:['tree','train','truck','trip'],  mode:'whole', patternHint:'<strong>tr</strong> = t + r. Try slowly: <em>t… r… tree.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'dr', words:['drop','drum','dress','drink'], mode:'whole', patternHint:'<strong>dr</strong> = d + r. Try slowly: <em>d… r… drop.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'cl', words:['class','clap','clock','clean'], mode:'whole', patternHint:'<strong>cl</strong> = c + l. Try slowly: <em>c… l… class.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'fl', words:['flag','flat','flip','fly'],    mode:'whole', patternHint:'<strong>fl</strong> = f + l. Try slowly: <em>f… l… flag.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'gr', words:['green','grab','grow','great'], mode:'whole', patternHint:'<strong>gr</strong> = g + r. Try slowly: <em>g… r… green.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'pl', words:['play','plan','plant','please'],mode:'whole', patternHint:'<strong>pl</strong> = p + l. Try slowly: <em>p… l… play.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'br', words:['brown','bring','bread','brush'],mode:'whole', patternHint:'<strong>br</strong> = b + r. Try slowly: <em>b… r… brown.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'cr', words:['crab','cry','crop','cross'],   mode:'whole', patternHint:'<strong>cr</strong> = c + r. Try slowly: <em>c… r… crab.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'sl', words:['slip','slow','sleep','slide'], mode:'whole', patternHint:'<strong>sl</strong> = s + l. Try slowly: <em>s… l… slip.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'sp', words:['spin','spot','speak','spoon'], mode:'whole', patternHint:'<strong>sp</strong> = s + p. Try slowly: <em>s… p… spin.</em>' },
+  // 5. Common endings
+  { cat:'Common endings', ending:'ck',  words:['back','duck','pick','rock'],      mode:'whole', patternHint:'<strong>ck</strong> makes a "k" sound. The two letters work as one.' },
+  { cat:'Common endings', ending:'ll',  words:['ball','bell','fill','doll'],      mode:'whole', patternHint:'<strong>ll</strong> makes a single "l" sound.' },
+  { cat:'Common endings', ending:'ff',  words:['off','puff','cliff','staff'],     mode:'whole', patternHint:'<strong>ff</strong> makes a single "f" sound.' },
+  { cat:'Common endings', ending:'ss',  words:['miss','pass','bus','dress'],      mode:'whole', patternHint:'<strong>ss</strong> makes a single "s" sound.' },
+  { cat:'Common endings', ending:'zz',  words:['buzz','jazz','fizz','fuzz'],      mode:'whole', patternHint:'<strong>zz</strong> makes a single "z" sound.' },
+  { cat:'Common endings', ending:'tch', words:['catch','match','watch','pitch'],  mode:'whole', patternHint:'<strong>tch</strong> makes a "ch" sound — like in <em>catch</em>. It always comes after a short vowel.' },
+  { cat:'Common endings', ending:'dge', words:['bridge','edge','badge','judge'],  mode:'whole', patternHint:'<strong>dge</strong> makes a "j" sound — like in <em>bridge</em>. It always comes after a short vowel.' },
+  { cat:'Common endings', ending:'ed',  words:['jumped','played','looked','helped'], mode:'whole', patternHint:'<strong>ed</strong> at the end can sound like "d" (played), "t" (looked), or "id" (wanted).' },
+  { cat:'Common endings', ending:'ing', words:['going','playing','looking','eating'], mode:'whole', patternHint:'<strong>ing</strong> is added to verbs to show something is happening now.' },
+];
+
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+const wpState = {
+  wp1: { familyIdx:0, wordIdx:0, seen:new Set() },
+  wp2: { familyIdx:0, wordIdx:0, seen:new Set() },
+};
+let speechRate = 0.6;
+
+/* ══════════════════════════════════════════
+   SECTION SWITCH
+══════════════════════════════════════════ */
+function showSection(name, btn) {
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.section-page').forEach(p => p.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+}
+
+/* ══════════════════════════════════════════
+   BUILD ALPHABET GRID
+══════════════════════════════════════════ */
+function buildNameGrid() {
+  const grid = document.getElementById('nameGrid');
+  letterNames.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'alpha-card' + (item.vowel ? ' vowel' : '');
+    card.innerHTML = `<div class="alpha-letter">${item.l}</div><div class="alpha-name">"${item.name}"</div>`;
+    card.onclick = () => {
+      document.querySelectorAll('.alpha-card').forEach(c => c.classList.remove('playing'));
+      card.classList.add('playing');
+      speakRaw(item.name, () => card.classList.remove('playing'));
+    };
+    grid.appendChild(card);
+  });
+}
+
+/* ══════════════════════════════════════════
+   BUILD LETTER SOUNDS
+══════════════════════════════════════════ */
+function buildSoundsSection() {
+  const wrap = document.getElementById('soundsWrap');
+  letterSoundData.forEach(entry => {
+    const block = document.createElement('div');
+    block.className = 'letter-block' + (entry.vowel ? ' vowel' : '');
+
+    const nameEntry = letterNames.find(n => n.l === entry.l);
+    const hdr = document.createElement('div');
+    hdr.className = 'letter-block-header';
+
+    const letterEl = document.createElement('div');
+    letterEl.className = 'letter-block-letter tappable';
+    letterEl.textContent = entry.l;
+    letterEl.title = 'Tap to hear the letter name';
+    letterEl.onclick = () => {
+      letterEl.classList.add('playing');
+      speakRaw(nameEntry ? nameEntry.name : entry.l, () => letterEl.classList.remove('playing'));
+    };
+
+    const descEl = document.createElement('div');
+    descEl.className = 'letter-block-desc';
+    descEl.innerHTML = `<h3>${entry.l} — ${entry.vowel ? 'Vowel' : 'Consonant'}</h3><p>Tap the letter to hear its name. Tap a word to hear it spoken.</p>`;
+
+    hdr.appendChild(letterEl);
+    hdr.appendChild(descEl);
+    block.appendChild(hdr);
+
+    entry.sounds.forEach(sg => {
+      const grp = document.createElement('div');
+      grp.className = 'sound-group';
+
+      const lbl = document.createElement('div');
+      lbl.className = 'sound-group-label';
+      lbl.textContent = sg.label;
+      grp.appendChild(lbl);
+
+      const pills = document.createElement('div');
+      pills.className = 'example-pills';
+      sg.examples.forEach(word => {
+        const pill = document.createElement('button');
+        pill.className = 'example-pill';
+        const em = emo(word);
+        pill.innerHTML = `<span>🔊</span>${word}${em ? '<span class="pill-emoji">' + em + '</span>' : ''}`;
+        pill.onclick = () => {
+          block.querySelectorAll('.example-pill').forEach(p => p.classList.remove('playing'));
+          pill.classList.add('playing');
+          speakRaw(word, () => pill.classList.remove('playing'));
+        };
+        pills.appendChild(pill);
+      });
+      grp.appendChild(pills);
+
+      if (sg.note) {
+        const note = document.createElement('div');
+        note.className = 'sound-note';
+        note.textContent = '💡 ' + sg.note;
+        grp.appendChild(note);
+      }
+      block.appendChild(grp);
+    });
+
+    // Practice button for this letter's words
+    const allWords = entry.sounds.flatMap(sg => sg.examples);
+    if (allWords.length >= 2) {
+      const practiceBar = document.createElement('div');
+      practiceBar.className = 'set-practice-bar';
+      const pb = document.createElement('button');
+      pb.className = 'set-practice-btn';
+      pb.innerHTML = '🎙️ Practise these words';
+      pb.onclick = () => openPractice(allWords, `🔊 Letter ${entry.l} — sounds`);
+      practiceBar.appendChild(pb);
+      block.appendChild(practiceBar);
+    }
+
+    wrap.appendChild(block);
+  });
+}
+
+/* ══════════════════════════════════════════
+   BUILD WP1 SELECTOR
+══════════════════════════════════════════ */
+function buildWp1Selector() {
+  const wrap = document.getElementById('wp1-selector');
+  wp1Families.forEach((f, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'family-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = '-' + f.ending;
+    btn.onclick = () => selectFamily('wp1', i);
+    wrap.appendChild(btn);
+  });
+}
+
+/* ══════════════════════════════════════════
+   BUILD WP2 SELECTOR
+══════════════════════════════════════════ */
+function buildWp2Selector() {
+  const wrap = document.getElementById('wp2-selector-wrap');
+  let lastCat = null, selectorDiv = null;
+  wp2Families.forEach((f, i) => {
+    if (f.cat !== lastCat) {
+      const div = document.createElement('div');
+      div.className = 'cat-divider';
+      div.innerHTML = `<hr><span class="cat-pill">${f.cat}</span><hr>`;
+      wrap.appendChild(div);
+      selectorDiv = document.createElement('div');
+      selectorDiv.className = 'family-selector';
+      wrap.appendChild(selectorDiv);
+      lastCat = f.cat;
+    }
+    const btn = document.createElement('button');
+    btn.className = 'family-btn' + (i === 0 ? ' active' : '');
+    btn.dataset.idx = i;
+    let label = f.mode === 'split' ? '-' + f.ending : f.ending;
+    if (f.ending === 'th' && f.words.includes('this')) label = 'th (voice)';
+    if (f.ending === 'th' && f.words.includes('thin')) label = 'th (air)';
+    btn.textContent = label;
+    btn.onclick = () => selectFamily('wp2', i);
+    selectorDiv.appendChild(btn);
+  });
+}
+
+/* ══════════════════════════════════════════
+   SELECT FAMILY
+══════════════════════════════════════════ */
+function selectFamily(wp, idx) {
+  wpState[wp].familyIdx = idx;
+  wpState[wp].wordIdx = 0;
+  if (wp === 'wp1') {
+    document.querySelectorAll('#wp1-selector .family-btn').forEach((b,i) => b.classList.toggle('active', i === idx));
+  } else {
+    document.querySelectorAll('#wp2-selector-wrap .family-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.idx) === idx));
+  }
+  document.getElementById(wp + '-trophy').classList.remove('show');
+  renderWord(wp);
+  renderGrid(wp);
+}
+
+/* ══════════════════════════════════════════
+   RENDER WORD
+══════════════════════════════════════════ */
+function renderWord(wp) {
+  const families = wp === 'wp1' ? wp1Families : wp2Families;
+  const s = wpState[wp];
+  const fam = families[s.familyIdx];
+  const word = fam.words[s.wordIdx];
+
+  const titleEl = document.getElementById(wp + '-title');
+  if (wp === 'wp1') {
+    titleEl.innerHTML = `Word group: <strong>-${fam.ending}</strong>`;
+  } else {
+    let tl = fam.mode === 'split' ? '-' + fam.ending : fam.ending;
+    if (fam.ending === 'th' && fam.words.includes('this')) tl = 'th (with voice)';
+    if (fam.ending === 'th' && fam.words.includes('thin')) tl = 'th (air only)';
+    titleEl.innerHTML = `Word group: <strong>${tl}</strong>`;
+  }
+
+  const labelsEl = document.getElementById(wp + '-labels');
+  const tilesEl  = document.getElementById(wp + '-tiles');
+  labelsEl.innerHTML = '';
+  tilesEl.innerHTML  = '';
+
+  if (wp === 'wp1' || fam.mode === 'split') {
+    const splitAt = fam.splitAt ?? (word.length - fam.ending.length);
+    word.split('').forEach((letter, i) => {
+      const isEnd = i >= splitAt;
+      const lbl = document.createElement('div');
+      lbl.className = 'tile-label-item ' + (isEnd ? 'el' : 'bl');
+      lbl.style.width = '68px';
+      if (i === 0) lbl.textContent = 'beginning';
+      else if (i === splitAt) lbl.textContent = 'ending';
+      labelsEl.appendChild(lbl);
+      const tile = document.createElement('div');
+      tile.className = 'tile ' + (isEnd ? 'ending' : 'beginning');
+      tile.textContent = letter;
+      tile.style.animationDelay = (i * 0.07) + 's';
+      tile.onclick = () => speakRaw(letter);
+      tilesEl.appendChild(tile);
+    });
+    const beg = word.slice(0, splitAt);
+    document.getElementById(wp + '-hint').innerHTML =
+      `The word <strong>"${word}"</strong> — the beginning is <strong>"${beg}"</strong> and the ending is <strong>"-${fam.ending}"</strong>.`;
+  } else {
+    const patStart = word.indexOf(fam.ending);
+    const patLen   = fam.ending.length;
+    word.split('').forEach((letter, i) => {
+      const isPat = patStart >= 0 && i >= patStart && i < patStart + patLen;
+      const lbl = document.createElement('div');
+      lbl.className = 'tile-label-item ' + (isPat ? 'bl' : 'dg');
+      lbl.style.width = '68px';
+      if (i === patStart) lbl.textContent = 'pattern';
+      labelsEl.appendChild(lbl);
+      const tile = document.createElement('div');
+      tile.className = 'tile ' + (isPat ? 'beginning' : 'digraph');
+      tile.textContent = letter;
+      tile.style.animationDelay = (i * 0.07) + 's';
+      tile.onclick = () => speakRaw(letter);
+      tilesEl.appendChild(tile);
+    });
+    let hint = `The word is <strong>"${word}"</strong>. The orange letters show the pattern <strong>"${fam.ending}"</strong>. Tap each letter to hear its sound.`;
+    if (fam.patternHint) hint += '<br><br>' + fam.patternHint;
+    document.getElementById(wp + '-hint').innerHTML = hint;
+  }
+
+  // Emoji in main display
+  const emojiDiv = document.getElementById(wp + '-emoji');
+  if (emojiDiv) emojiDiv.textContent = emo(word);
+
+  document.getElementById(wp + '-counter').textContent = `${s.wordIdx + 1} / ${fam.words.length}`;
+  document.getElementById(wp + '-prev').disabled = s.wordIdx === 0;
+  document.getElementById(wp + '-next').disabled = s.wordIdx === fam.words.length - 1;
+  s.seen.add(`${s.familyIdx}-${s.wordIdx}`);
+}
+
+/* ══════════════════════════════════════════
+   RENDER GRID
+══════════════════════════════════════════ */
+function renderGrid(wp) {
+  const families = wp === 'wp1' ? wp1Families : wp2Families;
+  const s = wpState[wp];
+  const fam = families[s.familyIdx];
+  const grid = document.getElementById(wp + '-grid');
+  grid.innerHTML = '';
+  fam.words.forEach((word, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'word-chip' + (i === s.wordIdx ? ' current' : '');
+    const em = emo(word);
+    const emHTML = em ? `<span class="chip-emoji">${em}</span>` : '';
+    if (wp === 'wp1' || fam.mode === 'split') {
+      const sp = fam.splitAt ?? (word.length - fam.ending.length);
+      chip.innerHTML = `<span class="chip-beginning">${word.slice(0,sp)}</span><span class="chip-ending">${word.slice(sp)}</span>${emHTML}<div class="chip-audio">🔊 tap</div>`;
+    } else {
+      chip.innerHTML = `<span class="chip-whole">${word}</span>${emHTML}<div class="chip-audio">🔊 tap</div>`;
+    }
+    chip.onclick = () => { s.wordIdx = i; renderWord(wp); renderGrid(wp); speakCurrent(wp); };
+    grid.appendChild(chip);
+  });
+}
+
+/* ══════════════════════════════════════════
+   NAVIGATE
+══════════════════════════════════════════ */
+function navigate(wp, dir) {
+  const families = wp === 'wp1' ? wp1Families : wp2Families;
+  const s = wpState[wp];
+  s.wordIdx = Math.max(0, Math.min(families[s.familyIdx].words.length - 1, s.wordIdx + dir));
+  renderWord(wp);
+  renderGrid(wp);
+  const fam = families[s.familyIdx];
+  const allSeen = fam.words.every((_,i) => s.seen.has(`${s.familyIdx}-${i}`));
+  if (allSeen && s.wordIdx === fam.words.length - 1) {
+    setTimeout(() => document.getElementById(wp + '-trophy').classList.add('show'), 400);
+  }
+}
+
+/* ══════════════════════════════════════════
+   AUDIO
+══════════════════════════════════════════ */
+function speakCurrent(wp) {
+  const families = wp === 'wp1' ? wp1Families : wp2Families;
+  const s = wpState[wp];
+  const word = families[s.familyIdx].words[s.wordIdx];
+  const btn = document.getElementById(wp + '-audioBtn');
+  const lbl = document.getElementById(wp + '-audioLbl');
+  if (!window.speechSynthesis) { alert('Try Chrome or Edge for audio.'); return; }
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(word);
+  utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  btn.classList.add('speaking'); lbl.textContent = 'Listening…';
+  utt.onend = utt.onerror = () => { btn.classList.remove('speaking'); lbl.textContent = 'Hear the word'; };
+  window.speechSynthesis.speak(utt);
+  s.seen.add(`${s.familyIdx}-${s.wordIdx}`);
+}
+
+function speakRaw(text, onEnd) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  utt.onend = utt.onerror = () => { if (onEnd) onEnd(); };
+  window.speechSynthesis.speak(utt);
+}
+
+function setSpeed(rate, el) {
+  speechRate = rate;
+  document.querySelectorAll('.speed-opt').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ══════════════════════════════════════════
+   PRACTICE MODE — getUserMedia + MediaRecorder
+   Works on GitHub Pages / any real https:// host.
+   Flow: example (listen) -> record 3 s auto -> compare -> next
+══════════════════════════════════════════ */
+
+var pWords    = [];
+var pIdx      = 0;
+var pAudio    = null;   // recorded Audio element
+var pStream   = null;   // MediaStream
+var pRecorder = null;   // MediaRecorder
+var pChunks   = [];
+var pTimer    = null;
+
+/* ── Open ── */
+function openPractice(words, label) {
+  if (!words || words.length < 2) { alert('Need at least 2 words to practise.'); return; }
+  pWords = words.slice();
+  pIdx   = 0;
+  pAudio = null;
+  document.getElementById('practiceTitle').textContent    = 'Practice Reading';
+  document.getElementById('practiceSubtitle').textContent = label || '';
+  pCleanup();
+  showExample();
+  document.getElementById('practiceOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function openPracticeForWp(wp) {
+  var families = wp === 'wp1' ? wp1Families : wp2Families;
+  var fam = families[wpState[wp].familyIdx];
+  var lbl = wp === 'wp1' ? ('Word group -' + fam.ending) : ('Word group ' + fam.ending);
+  openPractice(fam.words.slice(), lbl);
+}
+
+function closePractice() {
+  pCleanup();
+  document.getElementById('practiceOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function pCleanup() {
+  if (pTimer)    { clearInterval(pTimer); pTimer = null; }
+  if (pRecorder && pRecorder.state !== 'inactive') {
+    try { pRecorder.stop(); } catch(e) {}
+  }
+  pRecorder = null;
+  if (pStream)   { pStream.getTracks().forEach(function(t){ t.stop(); }); pStream = null; }
+  pChunks = [];
+}
+
+/* ── Phase helpers ── */
+function hideAllPhases() {
+  ['phaseExample','phaseRecord','phaseCompare','practiceFinish'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.style.display = 'none'; el.classList.remove('show'); }
+  });
+}
+
+function setProgress() {
+  var total = pWords.length;
+  document.getElementById('practiceStepCounter').textContent =
+    pIdx === 0 ? ('Example — word 1 of ' + total) : ('Word ' + (pIdx+1) + ' of ' + total);
+  var pct = total > 1 ? (pIdx / (total-1)) * 100 : 100;
+  document.getElementById('practiceProgressFill').style.width = pct + '%';
+}
+
+/* ── PHASE 0: Example ── */
+function showExample() {
+  hideAllPhases();
+  setProgress();
+  var word = pWords[0];
+  document.getElementById('exampleEmoji').textContent   = emo(word);
+  document.getElementById('exampleWord').textContent    = word;
+  document.getElementById('examplePlayLbl').textContent = 'Hear the word';
+  document.getElementById('examplePlayBtn').classList.remove('speaking');
+  document.getElementById('phaseExample').style.display = '';
+}
+
+function playExampleWord() {
+  var word = pWords[0];
+  var btn  = document.getElementById('examplePlayBtn');
+  var lbl  = document.getElementById('examplePlayLbl');
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(word);
+  utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  btn.classList.add('speaking'); lbl.textContent = 'Listening...';
+  utt.onend = utt.onerror = function() { btn.classList.remove('speaking'); lbl.textContent = 'Hear the word'; };
+  window.speechSynthesis.speak(utt);
+}
+
+function startPracticeWords() {
+  pIdx = 1;
+  setProgress();
+  showRecord();
+}
+
+/* ── PHASE 1: Record ── */
+function showRecord() {
+  hideAllPhases();
+  pCleanup();
+  pAudio = null;
+  var word = pWords[pIdx];
+  document.getElementById('recordEmoji').textContent     = emo(word);
+  document.getElementById('recordWord').textContent      = word;
+  document.getElementById('recordWordLabel').textContent = 'Your turn — say this word';
+  document.getElementById('recordBtn').classList.remove('recording');
+  document.getElementById('recordBtn').innerHTML         = '🎙️';
+  document.getElementById('recordHint').textContent      = 'Tap the mic — recording stops after 3 seconds';
+  document.getElementById('recordCountdown').classList.remove('show');
+  var w = document.getElementById('micWarning');
+  w.innerHTML = ''; w.classList.remove('show');
+  document.getElementById('phaseRecord').style.display = '';
+}
+
+function toggleRecording() {
+  if (pRecorder && pRecorder.state === 'recording') {
+    pStopRec();
+  } else {
+    pStartRec();
+  }
+}
+
+function pStartRec() {
+  var warn = document.getElementById('micWarning');
+  warn.innerHTML = ''; warn.classList.remove('show');
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    warn.innerHTML = '⚠️ Your browser does not support microphone access. Use Chrome or Edge on a desktop.';
+    warn.classList.add('show');
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+    .then(function(stream) {
+      pStream  = stream;
+      pChunks  = [];
+
+      var mimeType = '';
+      if (window.MediaRecorder) {
+        ['audio/webm;codecs=opus','audio/webm','audio/ogg'].forEach(function(t) {
+          if (!mimeType && MediaRecorder.isTypeSupported(t)) mimeType = t;
+        });
+      }
+
+      try {
+        pRecorder = mimeType ? new MediaRecorder(stream, {mimeType: mimeType}) : new MediaRecorder(stream);
+      } catch(e) {
+        pRecorder = new MediaRecorder(stream);
+      }
+
+      pRecorder.ondataavailable = function(e) {
+        if (e.data && e.data.size > 0) pChunks.push(e.data);
+      };
+
+      pRecorder.onstop = function() {
+        pStream.getTracks().forEach(function(t){ t.stop(); });
+        pStream = null;
+        if (pChunks.length === 0) { showRecord(); return; }
+        var blob = new Blob(pChunks, { type: pRecorder.mimeType || 'audio/webm' });
+        pAudio = new Audio(URL.createObjectURL(blob));
+        showCompare();
+      };
+
+      pRecorder.start(100);
+
+      document.getElementById('recordBtn').classList.add('recording');
+      document.getElementById('recordBtn').innerHTML = '⏹';
+      document.getElementById('recordHint').textContent = '● Recording...';
+
+      var secs = 3;
+      var cd = document.getElementById('recordCountdown');
+      cd.textContent = secs; cd.classList.add('show');
+      pTimer = setInterval(function() {
+        secs--;
+        if (secs <= 0) { pStopRec(); }
+        else { cd.textContent = secs; }
+      }, 1000);
+    })
+    .catch(function(err) {
+      var n = err && err.name ? err.name : 'Error';
+      var msg = '⚠️ Microphone error: <strong>' + n + '</strong><br>';
+      if (n === 'NotAllowedError' || n === 'PermissionDeniedError') {
+        msg += 'Click the 🔒 icon in the address bar, set Microphone to <strong>Allow</strong>, then <strong>reload the page</strong> and try again.';
+      } else if (n === 'NotFoundError') {
+        msg += 'No microphone found on this device.';
+      } else if (n === 'NotReadableError') {
+        msg += 'Microphone is in use by another app (Zoom, Teams, etc.). Close it and try again.';
+      } else {
+        msg += 'Please check your browser and system microphone settings.';
+      }
+      warn.innerHTML = msg; warn.classList.add('show');
+    });
+}
+
+function pStopRec() {
+  if (pTimer) { clearInterval(pTimer); pTimer = null; }
+  document.getElementById('recordCountdown').classList.remove('show');
+  if (pRecorder && pRecorder.state === 'recording') {
+    try { pRecorder.stop(); } catch(e) {}
+  }
+  document.getElementById('recordBtn').classList.remove('recording');
+  document.getElementById('recordBtn').innerHTML = '🎙️';
+}
+
+/* ── PHASE 2: Compare ── */
+function showCompare() {
+  hideAllPhases();
+  var word = pWords[pIdx];
+  document.getElementById('compareEmoji').textContent = emo(word);
+  document.getElementById('compareWord').textContent  = word;
+  document.getElementById('feedbackBadge').className  = 'feedback-badge';
+  document.getElementById('feedbackBadge').innerHTML  = '';
+  var isLast = pIdx >= pWords.length - 1;
+  document.getElementById('practiceNextBtn').textContent = isLast ? '✓ Finish' : 'Next word →';
+  document.getElementById('phaseCompare').style.display = '';
+}
+
+function playMyRecording() {
+  if (!pAudio) return;
+  pAudio.currentTime = 0; pAudio.play();
+}
+
+function playCorrectWord() {
+  var word = pWords[pIdx];
+  var btn  = document.getElementById('correctVoiceBtn');
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(word);
+  utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  btn.classList.add('speaking');
+  utt.onend = utt.onerror = function() { btn.classList.remove('speaking'); };
+  window.speechSynthesis.speak(utt);
+}
+
+function goBackToRecord() { showRecord(); }
+
+function advancePractice() {
+  pIdx++;
+  if (pIdx >= pWords.length) {
+    hideAllPhases();
+    var fin = document.getElementById('practiceFinish');
+    fin.style.display = ''; fin.classList.add('show');
+    document.getElementById('practiceProgressFill').style.width = '100%';
+    document.getElementById('practiceStepCounter').textContent  = 'All done! 🎉';
+    return;
+  }
+  setProgress();
+  showRecord();
+}
+
+/* ══════════════════════════════════════════
+   TEST YOURSELF MODE
+══════════════════════════════════════════ */
+
+var testSection  = '';
+var testWords    = [];   // 10 shuffled words
+var testIdx      = 0;
+var testResults  = [];   // [{word, correct, audio}]
+var tAudio       = null;
+var tStream      = null;
+var tRecorder    = null;
+var tChunks      = [];
+var tTimer       = null;
+
+/* ── Helpers ── */
+function getAllWordsForSection(section) {
+  var words = [];
+  if (section === 'sounds') {
+    letterSoundData.forEach(function(entry) {
+      entry.sounds.forEach(function(sg) { sg.examples.forEach(function(w){ words.push(w); }); });
+    });
+  } else if (section === 'wp1') {
+    wp1Families.forEach(function(f){ f.words.forEach(function(w){ words.push(w); }); });
+  } else if (section === 'wp2') {
+    wp2Families.forEach(function(f){ f.words.forEach(function(w){ words.push(w); }); });
+  }
+  // deduplicate
+  return words.filter(function(w,i,a){ return a.indexOf(w) === i; });
+}
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+/* ── Open / Close ── */
+function openTest(section) {
+  testSection = section;
+  var pool = getAllWordsForSection(section);
+  testWords  = shuffle(pool).slice(0, 10);
+  testIdx    = 0;
+  testResults= [];
+  tAudio     = null;
+
+  var labels = { sounds:'🔊 Letter Sounds', wp1:'📖 Word Pronunciation 1', wp2:'📗 Word Pronunciation 2' };
+  document.getElementById('testTitle').textContent    = '🧪 Test Yourself';
+  document.getElementById('testSubtitle').textContent = labels[section] || '';
+
+  tCleanup();
+  testShowRecord();
+  document.getElementById('testOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeTest() {
+  tCleanup();
+  document.getElementById('testOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function tCleanup() {
+  if (tTimer)    { clearInterval(tTimer); tTimer = null; }
+  if (tRecorder && tRecorder.state !== 'inactive') { try { tRecorder.stop(); } catch(e){} }
+  tRecorder = null;
+  if (tStream)   { tStream.getTracks().forEach(function(t){ t.stop(); }); tStream = null; }
+  tChunks = [];
+}
+
+function testHideAll() {
+  ['testPhaseRecord','testPhaseCompare','testPhaseResults'].forEach(function(id){
+    document.getElementById(id).style.display = 'none';
+  });
+}
+
+function testSetProgress() {
+  document.getElementById('testStepCounter').textContent = 'Word ' + (testIdx+1) + ' of ' + testWords.length;
+  document.getElementById('testProgressFill').style.width = ((testIdx / testWords.length) * 100) + '%';
+}
+
+/* ── Record phase ── */
+function testShowRecord() {
+  testHideAll();
+  tCleanup();
+  tAudio = null;
+  testSetProgress();
+  var word = testWords[testIdx];
+  document.getElementById('testEmoji').textContent      = emo(word);
+  document.getElementById('testWord').textContent       = word;
+  document.getElementById('testRecordBtn').classList.remove('recording');
+  document.getElementById('testRecordBtn').innerHTML    = '🎙️';
+  document.getElementById('testRecordHint').textContent = 'Tap the mic — recording stops after 3 seconds';
+  document.getElementById('testCountdown').classList.remove('show');
+  var w = document.getElementById('testMicWarning');
+  w.innerHTML = ''; w.classList.remove('show');
+  document.getElementById('testPhaseRecord').style.display = '';
+}
+
+function testToggleRecording() {
+  if (tRecorder && tRecorder.state === 'recording') {
+    tStopRec();
+  } else {
+    tStartRec();
+  }
+}
+
+function tStartRec() {
+  var warn = document.getElementById('testMicWarning');
+  warn.innerHTML = ''; warn.classList.remove('show');
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    warn.innerHTML = '⚠️ Microphone not supported. Use Chrome or Edge on a desktop.';
+    warn.classList.add('show'); return;
+  }
+
+  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+    .then(function(stream) {
+      tStream = stream; tChunks = [];
+      var mimeType = '';
+      if (window.MediaRecorder) {
+        ['audio/webm;codecs=opus','audio/webm','audio/ogg'].forEach(function(t){
+          if (!mimeType && MediaRecorder.isTypeSupported(t)) mimeType = t;
+        });
+      }
+      try { tRecorder = mimeType ? new MediaRecorder(stream,{mimeType:mimeType}) : new MediaRecorder(stream); }
+      catch(e) { tRecorder = new MediaRecorder(stream); }
+
+      tRecorder.ondataavailable = function(e){ if (e.data && e.data.size>0) tChunks.push(e.data); };
+      tRecorder.onstop = function() {
+        tStream.getTracks().forEach(function(t){ t.stop(); }); tStream = null;
+        if (tChunks.length === 0) { testShowRecord(); return; }
+        var blob = new Blob(tChunks, { type: tRecorder.mimeType || 'audio/webm' });
+        tAudio = new Audio(URL.createObjectURL(blob));
+        testShowCompare();
+      };
+      tRecorder.start(100);
+
+      document.getElementById('testRecordBtn').classList.add('recording');
+      document.getElementById('testRecordBtn').innerHTML = '⏹';
+      document.getElementById('testRecordHint').textContent = '● Recording...';
+
+      var secs = 3;
+      var cd = document.getElementById('testCountdown');
+      cd.textContent = secs; cd.classList.add('show');
+      tTimer = setInterval(function(){
+        secs--;
+        if (secs <= 0) { tStopRec(); } else { cd.textContent = secs; }
+      }, 1000);
+    })
+    .catch(function(err) {
+      var n = err && err.name ? err.name : 'Error';
+      var msg = '⚠️ Microphone error: <strong>' + n + '</strong><br>';
+      if (n === 'NotAllowedError' || n === 'PermissionDeniedError') {
+        msg += 'Allow microphone in your browser settings, then reload and try again.';
+      } else if (n === 'NotFoundError') {
+        msg += 'No microphone found.';
+      } else if (n === 'NotReadableError') {
+        msg += 'Mic in use by another app. Close it and try again.';
+      } else { msg += 'Check browser and system mic settings.'; }
+      var w = document.getElementById('testMicWarning');
+      w.innerHTML = msg; w.classList.add('show');
+    });
+}
+
+function tStopRec() {
+  if (tTimer) { clearInterval(tTimer); tTimer = null; }
+  document.getElementById('testCountdown').classList.remove('show');
+  if (tRecorder && tRecorder.state === 'recording') { try { tRecorder.stop(); } catch(e){} }
+  document.getElementById('testRecordBtn').classList.remove('recording');
+  document.getElementById('testRecordBtn').innerHTML = '🎙️';
+}
+
+/* ── Compare phase ── */
+function testShowCompare() {
+  testHideAll();
+  var word = testWords[testIdx];
+  document.getElementById('testCompareEmoji').textContent = emo(word);
+  document.getElementById('testCompareWord').textContent  = word;
+  document.getElementById('testPhaseCompare').style.display = '';
+}
+
+function testPlayMyRecording() {
+  if (!tAudio) return;
+  tAudio.currentTime = 0; tAudio.play();
+}
+
+function testPlayCorrectWord() {
+  var word = testWords[testIdx];
+  var btn  = document.getElementById('testCorrectVoiceBtn');
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(word);
+  utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  btn.classList.add('speaking');
+  utt.onend = utt.onerror = function(){ btn.classList.remove('speaking'); };
+  window.speechSynthesis.speak(utt);
+}
+
+function testJudge(correct) {
+  testResults.push({ word: testWords[testIdx], correct: correct, audio: tAudio });
+  testIdx++;
+  if (testIdx >= testWords.length) {
+    testShowResults();
+  } else {
+    testShowRecord();
+  }
+}
+
+/* ── Results phase ── */
+function testShowResults() {
+  testHideAll();
+  document.getElementById('testProgressFill').style.width = '100%';
+  document.getElementById('testStepCounter').textContent  = 'Done!';
+
+  var score = testResults.filter(function(r){ return r.correct; }).length;
+  var total = testResults.length;
+  var pct   = Math.round((score / total) * 100);
+
+  var icon = pct === 100 ? '🏆' : pct >= 70 ? '🌟' : pct >= 50 ? '👍' : '💪';
+  var msg  = pct === 100 ? 'Perfect score!' : pct >= 70 ? 'Great work!' : pct >= 50 ? 'Good effort — keep practising!' : 'Keep going — practice makes perfect!';
+
+  document.getElementById('testResultIcon').textContent  = icon;
+  document.getElementById('testResultScore').textContent = score + ' / ' + total + ' correct';
+  document.getElementById('testResultMsg').textContent   = msg;
+
+  var list = document.getElementById('testResultList');
+  list.innerHTML = '';
+  testResults.forEach(function(r, i) {
+    var div = document.createElement('div');
+    div.className = 'result-item ' + (r.correct ? 'ok' : 'bad');
+    var em = emo(r.word);
+    div.innerHTML =
+      '<span class="ri-mark">' + (r.correct ? '✅' : '❌') + '</span>' +
+      '<span class="ri-word">' + r.word + '</span>' +
+      (em ? '<span>' + em + '</span>' : '') +
+      '<button class="ri-play" onclick="testPlayResult(' + i + ')" title="Hear correct pronunciation">🔊</button>';
+    list.appendChild(div);
+  });
+
+  document.getElementById('testPhaseResults').style.display = '';
+}
+
+function testPlayResult(i) {
+  var word = testResults[i].word;
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(word);
+  utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  window.speechSynthesis.speak(utt);
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+buildNameGrid();
+buildSoundsSection();
+buildWp1Selector();
+buildWp2Selector();
+selectFamily('wp1', 0);
+selectFamily('wp2', 0);
+</script>
+</body>
+</html>
