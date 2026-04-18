@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Learn to Read</title>
+<title>WordLink — Learn to Read</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -1317,6 +1317,10 @@ function selectFamily(wp, idx) {
   document.getElementById(wp + '-trophy').classList.remove('show');
   renderWord(wp);
   renderGrid(wp);
+  if (wp === 'wp2') {
+    const display = document.getElementById('wp2-page');
+    if (display) setTimeout(function(){ display.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
+  }
 }
 
 /* ══════════════════════════════════════════
