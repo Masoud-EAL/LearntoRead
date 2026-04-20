@@ -533,6 +533,71 @@
   .practice-finish p { color: var(--mid); font-weight: 600; }
   .finish-icon { font-size: 4rem; }
 
+
+  .nav-tab.sec-sentences.active { background: var(--accent4); color: white; border-color: var(--accent4); box-shadow: 0 4px 14px rgba(244,132,95,0.4); }
+
+  /* ── Read Sentences section ── */
+  .sentence-level-tabs {
+    display: flex; gap: 10px; justify-content: center; margin: 18px 16px 0;
+  }
+  .level-tab {
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    padding: 10px 28px; border-radius: 30px; border: 2.5px solid var(--light);
+    background: white; color: var(--mid); cursor: pointer; transition: all 0.18s;
+  }
+  .level-tab.active {
+    background: var(--accent4); color: white; border-color: var(--accent4);
+    box-shadow: 0 4px 12px rgba(244,132,95,0.35);
+  }
+  .level-tab:hover:not(.active) { border-color: var(--accent4); color: var(--accent4); }
+
+  .sentence-level-page { display: none; }
+  .sentence-level-page.active { display: block; }
+
+  .sentence-group {
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow); border: 2px solid var(--light);
+    margin: 16px 0; overflow: hidden;
+  }
+  .sentence-group-header {
+    background: linear-gradient(135deg, #f0f4ff, #e4eaff);
+    padding: 12px 18px; font-family: 'Fredoka One', cursive;
+    font-size: 1rem; color: var(--accent2);
+    border-bottom: 2px solid var(--light);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sentence-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 16px; border-bottom: 1px solid var(--light);
+    transition: background 0.15s;
+  }
+  .sentence-row:last-child { border-bottom: none; }
+  .sentence-row:hover { background: #f8faff; }
+  .sentence-text {
+    flex: 1; font-size: 1rem; font-weight: 600; color: var(--dark); line-height: 1.4;
+  }
+  .sentence-play-btn {
+    background: linear-gradient(135deg, var(--accent2), #2d6cbf);
+    border: none; border-radius: 50%; width: 36px; height: 36px;
+    color: white; font-size: 1rem; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(74,144,217,0.3); transition: all 0.15s;
+  }
+  .sentence-play-btn:hover { transform: scale(1.1); }
+  .sentence-play-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
+
+  .sentence-level-intro {
+    padding: 14px 18px 0; font-size: 0.9rem; color: var(--mid);
+    font-weight: 600; line-height: 1.6; text-align: center;
+  }
+
+  /* Practice button for sentence groups */
+  .sentence-practice-bar {
+    padding: 10px 16px 12px; text-align: center;
+    border-top: 2px dashed var(--light);
+    background: linear-gradient(135deg, #fff5fb, #ffeaf6);
+  }
+
   /* Per-set practice button — inside letter block footer / word card */
   .set-practice-bar {
     padding: 12px 20px 14px; text-align: center;
@@ -619,6 +684,12 @@
   }
   .result-item .ri-play:hover { opacity: 1; }
 
+  /* Sentence mode in test overlay — smaller font, text wraps */
+  .test-sentence-mode {
+    font-size: 1.15rem !important; letter-spacing: 0 !important;
+    line-height: 1.5 !important; word-break: normal !important;
+  }
+
   /* Mic permission warning */
   .mic-warning {
     background: #fff4e0; border: 2px solid #f0c870; border-radius: 14px;
@@ -644,6 +715,7 @@
   <button class="nav-tab sec-sounds"          onclick="showSection('sounds',this)">🔊 Letter Sounds</button>
   <button class="nav-tab sec-words1"          onclick="showSection('wp1',this)">📖 Word Pronunciation 1</button>
   <button class="nav-tab sec-words2"          onclick="showSection('wp2',this)">📗 Word Pronunciation 2</button>
+  <button class="nav-tab sec-sentences"        onclick="showSection('sentences',this)">📝 Read Sentences</button>
 </div>
 
 <!-- SECTION 1 — ALPHABET -->
@@ -738,6 +810,28 @@
     <div class="hint-box"><div class="hint-icon">💡</div><p id="wp2-hint">Choose a word group above. Tap each letter tile to hear its sound. Press <strong>Hear the word</strong> to listen to the whole word.</p></div>
     <div class="trophy-msg" id="wp2-trophy"><div style="font-size:3rem">🏆</div><h2>Well done!</h2><p>You read all the words in this group.<br>Pick another group to keep going!</p></div>
     <div class="word-grid" id="wp2-grid"></div>
+  </div>
+</div>
+
+<!-- SECTION 5 — READ SENTENCES -->
+<div class="section-page" id="sec-sentences">
+  <div class="sentence-level-tabs">
+    <button class="level-tab active" onclick="showLevel(0,this)">Level 0 — Beginner</button>
+    <button class="level-tab"        onclick="showLevel(1,this)">Level 1 — Elementary</button>
+  </div>
+  <div class="sentence-level-page active" id="sent-level-0">
+    <p class="sentence-level-intro">Simple everyday sentences. Listen, then practise saying them aloud.</p>
+    <div class="section-test-bar">
+      <button class="test-btn" onclick="openTest('sent0')">🧪 Test Yourself — 10 random sentences</button>
+    </div>
+    <div id="sent-level-0-groups"></div>
+  </div>
+  <div class="sentence-level-page" id="sent-level-1">
+    <p class="sentence-level-intro">A little longer — using common spelling patterns from Word Pronunciation 2.</p>
+    <div class="section-test-bar">
+      <button class="test-btn" onclick="openTest('sent1')">🧪 Test Yourself — 10 random sentences</button>
+    </div>
+    <div id="sent-level-1-groups"></div>
   </div>
 </div>
 
@@ -1487,7 +1581,8 @@ function setSpeed(rate, el) {
 
 var pWords    = [];
 var pIdx      = 0;
-var pAudio    = null;   // recorded Audio element
+var pAudio    = null;
+var pIsSent   = false;  // true when practising sentences (longer recording)   // recorded Audio element
 var pStream   = null;   // MediaStream
 var pRecorder = null;   // MediaRecorder
 var pChunks   = [];
@@ -1496,9 +1591,10 @@ var pTimer    = null;
 /* ── Open ── */
 function openPractice(words, label) {
   if (!words || words.length < 2) { alert('Need at least 2 words to practise.'); return; }
-  pWords = words.slice();
-  pIdx   = 0;
-  pAudio = null;
+  pWords  = words.slice();
+  pIdx    = 0;
+  pAudio  = null;
+  pIsSent = words.some(function(w){ return w.indexOf(' ') !== -1; });
   document.getElementById('practiceTitle').textContent    = 'Practice Reading';
   document.getElementById('practiceSubtitle').textContent = label || '';
   pCleanup();
@@ -1551,9 +1647,11 @@ function showExample() {
   hideAllPhases();
   setProgress();
   var word = pWords[0];
-  document.getElementById('exampleEmoji').textContent   = emo(word);
+  document.getElementById('exampleEmoji').textContent   = pIsSent ? '' : emo(word);
+  document.getElementById('exampleEmoji').style.display = pIsSent ? 'none' : '';
   document.getElementById('exampleWord').textContent    = word;
-  document.getElementById('examplePlayLbl').textContent = 'Hear the word';
+  document.getElementById('exampleWord').classList.toggle('test-sentence-mode', pIsSent);
+  document.getElementById('examplePlayLbl').textContent = pIsSent ? 'Hear the sentence' : 'Hear the word';
   document.getElementById('examplePlayBtn').classList.remove('speaking');
   document.getElementById('phaseExample').style.display = '';
 }
@@ -1565,9 +1663,13 @@ function playExampleWord() {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(word);
-  utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
-  btn.classList.add('speaking'); lbl.textContent = 'Listening...';
-  utt.onend = utt.onerror = function() { btn.classList.remove('speaking'); lbl.textContent = 'Hear the word'; };
+  utt.rate = pIsSent ? 0.85 : speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  btn.classList.add('speaking');
+  lbl.textContent = pIsSent ? 'Listening...' : 'Listening...';
+  utt.onend = utt.onerror = function() {
+    btn.classList.remove('speaking');
+    lbl.textContent = pIsSent ? 'Hear the sentence' : 'Hear the word';
+  };
   window.speechSynthesis.speak(utt);
 }
 
@@ -1583,12 +1685,16 @@ function showRecord() {
   pCleanup();
   pAudio = null;
   var word = pWords[pIdx];
-  document.getElementById('recordEmoji').textContent     = emo(word);
+  document.getElementById('recordEmoji').textContent     = pIsSent ? '' : emo(word);
+  document.getElementById('recordEmoji').style.display   = pIsSent ? 'none' : '';
   document.getElementById('recordWord').textContent      = word;
-  document.getElementById('recordWordLabel').textContent = 'Your turn — say this word';
+  document.getElementById('recordWord').classList.toggle('test-sentence-mode', pIsSent);
+  document.getElementById('recordWordLabel').textContent = pIsSent ? 'Your turn — read this sentence' : 'Your turn — say this word';
   document.getElementById('recordBtn').classList.remove('recording');
   document.getElementById('recordBtn').innerHTML         = '🎙️';
-  document.getElementById('recordHint').textContent      = 'Tap the mic — recording stops after 3 seconds';
+  document.getElementById('recordHint').textContent      = pIsSent
+    ? 'Tap the mic — recording stops after 10 seconds'
+    : 'Tap the mic — recording stops after 3 seconds';
   document.getElementById('recordCountdown').classList.remove('show');
   var w = document.getElementById('micWarning');
   w.innerHTML = ''; w.classList.remove('show');
@@ -1650,7 +1756,7 @@ function pStartRec() {
       document.getElementById('recordBtn').innerHTML = '⏹';
       document.getElementById('recordHint').textContent = '● Recording...';
 
-      var secs = 3;
+      var secs = pIsSent ? 10 : 3;
       var cd = document.getElementById('recordCountdown');
       cd.textContent = secs; cd.classList.add('show');
       pTimer = setInterval(function() {
@@ -1689,12 +1795,15 @@ function pStopRec() {
 function showCompare() {
   hideAllPhases();
   var word = pWords[pIdx];
-  document.getElementById('compareEmoji').textContent = emo(word);
-  document.getElementById('compareWord').textContent  = word;
-  document.getElementById('feedbackBadge').className  = 'feedback-badge';
-  document.getElementById('feedbackBadge').innerHTML  = '';
+  document.getElementById('compareEmoji').textContent  = pIsSent ? '' : emo(word);
+  document.getElementById('compareEmoji').style.display = pIsSent ? 'none' : '';
+  document.getElementById('compareWord').textContent   = word;
+  document.getElementById('compareWord').classList.toggle('test-sentence-mode', pIsSent);
+  document.getElementById('correctVoiceBtn').textContent = pIsSent ? '🔊 Correct sentence' : '🔊 Correct word';
+  document.getElementById('feedbackBadge').className   = 'feedback-badge';
+  document.getElementById('feedbackBadge').innerHTML   = '';
   var isLast = pIdx >= pWords.length - 1;
-  document.getElementById('practiceNextBtn').textContent = isLast ? '✓ Finish' : 'Next word →';
+  document.getElementById('practiceNextBtn').textContent = isLast ? '✓ Finish' : 'Next →';
   document.getElementById('phaseCompare').style.display = '';
 }
 
@@ -1709,7 +1818,7 @@ function playCorrectWord() {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(word);
-  utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  utt.rate = pIsSent ? 0.85 : speechRate; utt.pitch = 1.0; utt.lang = 'en-AU';
   btn.classList.add('speaking');
   utt.onend = utt.onerror = function() { btn.classList.remove('speaking'); };
   window.speechSynthesis.speak(utt);
@@ -1756,6 +1865,10 @@ function getAllWordsForSection(section) {
     wp1Families.forEach(function(f){ f.words.forEach(function(w){ words.push(w); }); });
   } else if (section === 'wp2') {
     wp2Families.forEach(function(f){ f.words.forEach(function(w){ words.push(w); }); });
+  } else if (section === 'sent0') {
+    sentenceData[0].forEach(function(g){ g.sentences.forEach(function(s){ words.push(s); }); });
+  } else if (section === 'sent1') {
+    sentenceData[1].forEach(function(g){ g.sentences.forEach(function(s){ words.push(s); }); });
   }
   // deduplicate
   return words.filter(function(w,i,a){ return a.indexOf(w) === i; });
@@ -1779,9 +1892,14 @@ function openTest(section) {
   testResults= [];
   tAudio     = null;
 
-  var labels = { sounds:'🔊 Letter Sounds', wp1:'📖 Word Pronunciation 1', wp2:'📗 Word Pronunciation 2' };
+  var labels = { sounds:'🔊 Letter Sounds', wp1:'📖 Word Pronunciation 1', wp2:'📗 Word Pronunciation 2', sent0:'📝 Read Sentences — Level 0', sent1:'📝 Read Sentences — Level 1' };
   document.getElementById('testTitle').textContent    = '🧪 Test Yourself';
   document.getElementById('testSubtitle').textContent = labels[section] || '';
+
+  // Sentence mode: larger text, no emoji, slower TTS
+  var isSent = (section === 'sent0' || section === 'sent1');
+  document.getElementById('testWord').classList.toggle('test-sentence-mode', isSent);
+  document.getElementById('testCompareWord').classList.toggle('test-sentence-mode', isSent);
 
   tCleanup();
   testShowRecord();
@@ -1821,11 +1939,15 @@ function testShowRecord() {
   tAudio = null;
   testSetProgress();
   var word = testWords[testIdx];
-  document.getElementById('testEmoji').textContent      = emo(word);
+  var isSent = (testSection === 'sent0' || testSection === 'sent1');
+  document.getElementById('testEmoji').textContent      = isSent ? '' : emo(word);
+  document.getElementById('testEmoji').style.display    = isSent ? 'none' : '';
   document.getElementById('testWord').textContent       = word;
   document.getElementById('testRecordBtn').classList.remove('recording');
   document.getElementById('testRecordBtn').innerHTML    = '🎙️';
-  document.getElementById('testRecordHint').textContent = 'Tap the mic — recording stops after 3 seconds';
+  document.getElementById('testRecordHint').textContent = isSent
+    ? 'Tap the mic — recording stops after 10 seconds'
+    : 'Tap the mic — recording stops after 3 seconds';
   document.getElementById('testCountdown').classList.remove('show');
   var w = document.getElementById('testMicWarning');
   w.innerHTML = ''; w.classList.remove('show');
@@ -1875,7 +1997,8 @@ function tStartRec() {
       document.getElementById('testRecordBtn').innerHTML = '⏹';
       document.getElementById('testRecordHint').textContent = '● Recording...';
 
-      var secs = 3;
+      var isSent = (testSection === 'sent0' || testSection === 'sent1');
+      var secs = isSent ? 10 : 3;
       var cd = document.getElementById('testCountdown');
       cd.textContent = secs; cd.classList.add('show');
       tTimer = setInterval(function(){
@@ -1910,8 +2033,11 @@ function tStopRec() {
 function testShowCompare() {
   testHideAll();
   var word = testWords[testIdx];
-  document.getElementById('testCompareEmoji').textContent = emo(word);
+  var isSent = (testSection === 'sent0' || testSection === 'sent1');
+  document.getElementById('testCompareEmoji').textContent = isSent ? '' : emo(word);
+  document.getElementById('testCompareEmoji').style.display = isSent ? 'none' : '';
   document.getElementById('testCompareWord').textContent  = word;
+  document.getElementById('testCorrectVoiceBtn').textContent = isSent ? '🔊 Correct sentence' : '🔊 Correct word';
   document.getElementById('testPhaseCompare').style.display = '';
 }
 
@@ -1923,10 +2049,11 @@ function testPlayMyRecording() {
 function testPlayCorrectWord() {
   var word = testWords[testIdx];
   var btn  = document.getElementById('testCorrectVoiceBtn');
+  var isSent = (testSection === 'sent0' || testSection === 'sent1');
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(word);
-  utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  utt.rate = isSent ? 0.85 : speechRate; utt.pitch = 1.0; utt.lang = 'en-AU';
   btn.classList.add('speaking');
   utt.onend = utt.onerror = function(){ btn.classList.remove('speaking'); };
   window.speechSynthesis.speak(utt);
@@ -1978,10 +2105,280 @@ function testShowResults() {
 
 function testPlayResult(i) {
   var word = testResults[i].word;
+  var isSent = (testSection === 'sent0' || testSection === 'sent1');
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(word);
-  utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  utt.rate = isSent ? 0.85 : speechRate; utt.pitch = 1.0; utt.lang = 'en-AU';
+  window.speechSynthesis.speak(utt);
+}
+
+/* ══════════════════════════════════════════
+   READ SENTENCES — DATA
+══════════════════════════════════════════ */
+
+const sentenceData = {
+  0: [
+    {
+      topic: '👤 About me — name',
+      sentences: [
+        'My name is David.',
+        'I spell my name D-A-V-I-D.',
+      ]
+    },
+    {
+      topic: '🌏 About me — background',
+      sentences: [
+        'I am 30 years old.',
+        'I am from Vietnam.',
+        'I am from Ho Chi Minh City.',
+        'I speak Vietnamese and a little English.',
+      ]
+    },
+    {
+      topic: '🏫 My class',
+      sentences: [
+        "My teacher's name is Sarah.",
+        'I go to English class on Mondays.',
+        'I go to English class on Wednesdays.',
+        'I go to English class on Thursdays.',
+        'I go to English class from 9:00 to 2:30.',
+      ]
+    },
+    {
+      topic: '🏠 Where I live',
+      sentences: [
+        'I live in Springvale.',
+        'My address is 25 King Street, Springvale, Victoria, 3171.',
+      ]
+    },
+    {
+      topic: '👨‍👩‍👧‍👦 My family',
+      sentences: [
+        'I am married.',
+        'I have two children.',
+        'I have one son and one daughter.',
+        'There are four people in my family.',
+        'I have one brother and one sister.',
+      ]
+    },
+    {
+      topic: '📅 Today',
+      sentences: [
+        'Today is Monday.',
+        'The date is 20 April 2026.',
+        'The weather is sunny and warm.',
+        'My birthday is on 15 June 1995.',
+      ]
+    },
+    {
+      topic: '🎒 My bag',
+      sentences: [
+        'I have a book in my bag.',
+        'I have a pen in my bag.',
+        'I have a phone in my bag.',
+        'I have a notebook in my bag.',
+      ]
+    },
+    {
+      topic: '❤️ What I like',
+      sentences: [
+        'My weekend is good.',
+        'I like football.',
+        'I like music.',
+        'I like cooking.',
+        'My favourite colour is blue.',
+        'My favourite fruit is apple.',
+        'My favourite food is rice and chicken.',
+      ]
+    },
+    {
+      topic: '📱 My details',
+      sentences: [
+        'My phone number is 0400 123 456.',
+        'I come to Australia in 2022.',
+      ]
+    },
+    {
+      topic: '⏰ My day',
+      sentences: [
+        'I wake up at 7:00 every day.',
+        'I wake up at 8:30 on weekends.',
+      ]
+    },
+    {
+      topic: '✅ What I can do',
+      sentences: [
+        'I can drive.',
+        'I can cook.',
+        'I can clean.',
+        'I can use a computer.',
+        'I can speak a little English.',
+      ]
+    },
+    {
+      topic: '🌟 My goals',
+      sentences: [
+        'I want to learn English.',
+        'I want to speak to people.',
+        'I want to find a good job.',
+        'I want to help my children with school.',
+      ]
+    },
+  ],
+  1: [
+    {
+      topic: '🔊 sh, ch, th, ph words',
+      sentences: [
+        'She shops at the fish shop on the main street.',
+        'I think the children should share the chocolate chip cookies.',
+        'The phone photo shows a dolphin near the shore.',
+        'He checks his phone when he gets to the station.',
+      ]
+    },
+    {
+      topic: '🌧️ ee, ea, ai, ay words',
+      sentences: [
+        'I eat a meal of meat and green beans each day.',
+        'The train came in the rain on a Tuesday.',
+        'She reads to her team by the tree every day.',
+        'I wait at the train station and play games on my phone.',
+      ]
+    },
+    {
+      topic: '🚣 oa, ow, oo words',
+      sentences: [
+        'I wear a coat when it rains and I row my boat on the road trip.',
+        'The cook took a good look at the food on the stove.',
+        'The moon shines cool light over the roof of the school.',
+        'I know how to grow my own food in the backyard.',
+      ]
+    },
+    {
+      topic: '✨ Silent e words',
+      sentences: [
+        'I like to bake a cake and make some juice at home.',
+        'We ride our bikes on the wide path by the lake.',
+        'I hope to find a safe place to hide my phone case.',
+        'She came late but gave me a nice name tag to use.',
+      ]
+    },
+    {
+      topic: '🔗 Blends — st, tr, bl, cl, gr',
+      sentences: [
+        'I stop at the store and grab a green plant for my class.',
+        'She claps and steps to the strong beat of the drum.',
+        'The train track goes straight through the black bluffs.',
+        'I try to stay clean and tidy at the start of each day.',
+      ]
+    },
+    {
+      topic: '📝 -tion, -sion, -ture, -cian words',
+      sentences: [
+        'The nation has a new station for the next generation.',
+        'I have a question about the action in that section of the book.',
+        'The musician played with passion at the television station.',
+        'Take a picture of the nature and capture the future.',
+        'I need more information about the division of the class.',
+      ]
+    },
+    {
+      topic: '🔚 -ck, -tch, -dge, -ing, -ed endings',
+      sentences: [
+        'I picked up a black duck by the bridge and watched it swim.',
+        'She matched her bag with her jacket and looked very smart.',
+        'The children are playing, learning and reading every day.',
+        'He jumped and clapped when he watched his team win.',
+        'I walked along the edge of the dock and caught a fish.',
+      ]
+    },
+    {
+      topic: '🗣️ Talking about yourself',
+      sentences: [
+        'My vision is to get a good education for my children.',
+        'I have a passion for cooking and I want to study nutrition.',
+        'The action I take today shapes the future of my family.',
+        'I go to the doctor, the physician checks my blood pressure.',
+        'I feel a mixture of tension and excitement about my future.',
+      ]
+    },
+  ]
+};
+
+/* ══════════════════════════════════════════
+   READ SENTENCES — BUILD
+══════════════════════════════════════════ */
+
+function showLevel(level, btn) {
+  document.querySelectorAll('.level-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.sentence-level-page').forEach(p => p.classList.remove('active'));
+  document.getElementById('sent-level-' + level).classList.add('active');
+}
+
+function buildSentences() {
+  [0, 1].forEach(function(level) {
+    var container = document.getElementById('sent-level-' + level + '-groups');
+    container.innerHTML = '';
+    sentenceData[level].forEach(function(group) {
+      // Group card
+      var card = document.createElement('div');
+      card.className = 'sentence-group';
+
+      // Header
+      var header = document.createElement('div');
+      header.className = 'sentence-group-header';
+      header.textContent = group.topic;
+      card.appendChild(header);
+
+      // Sentence rows
+      group.sentences.forEach(function(sent) {
+        var row = document.createElement('div');
+        row.className = 'sentence-row';
+
+        var text = document.createElement('div');
+        text.className = 'sentence-text';
+        text.textContent = sent;
+
+        var playBtn = document.createElement('button');
+        playBtn.className = 'sentence-play-btn';
+        playBtn.innerHTML = '🔊';
+        playBtn.title = 'Hear this sentence';
+        playBtn.onclick = (function(s, b) {
+          return function() { speakSentence(s, b); };
+        })(sent, playBtn);
+
+        row.appendChild(text);
+        row.appendChild(playBtn);
+        card.appendChild(row);
+      });
+
+      // Practice button for this group
+      var practiceBar = document.createElement('div');
+      practiceBar.className = 'sentence-practice-bar';
+      var pb = document.createElement('button');
+      pb.className = 'set-practice-btn';
+      pb.innerHTML = '🎙️ Practise these sentences';
+      pb.onclick = (function(sentences, topic) {
+        return function() { openPractice(sentences, topic); };
+      })(group.sentences.slice(), group.topic);
+      practiceBar.appendChild(pb);
+      card.appendChild(practiceBar);
+
+      container.appendChild(card);
+    });
+  });
+}
+
+function speakSentence(text, btn) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(text);
+  utt.rate = 0.85; utt.pitch = 1.0; utt.lang = 'en-AU';
+  if (btn) {
+    btn.classList.add('speaking');
+    utt.onend = utt.onerror = function() { btn.classList.remove('speaking'); };
+  }
   window.speechSynthesis.speak(utt);
 }
 
@@ -1992,6 +2389,7 @@ buildNameGrid();
 buildSoundsSection();
 buildWp1Selector();
 buildWp2Selector();
+buildSentences();
 selectFamily('wp1', 0);
 selectFamily('wp2', 0);
 </script>
