@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -22,617 +21,616 @@
     --radius: 18px;
   }
 
-- { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
-font-family: ‘Nunito’, sans-serif;
-background: var(–bg);
-color: var(–dark);
-min-height: 100vh;
-background-image:
-radial-gradient(circle at 10% 20%, rgba(244,132,95,0.08) 0%, transparent 50%),
-radial-gradient(circle at 90% 80%, rgba(74,144,217,0.08) 0%, transparent 50%);
-}
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(244,132,95,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(74,144,217,0.08) 0%, transparent 50%);
+  }
 
-/* ── HEADER ── */
-header { text-align: center; padding: 30px 20px 10px; }
-header h1 {
-font-family: ‘Fredoka One’, cursive;
-font-size: clamp(2rem, 6vw, 3.2rem);
-color: var(–accent1); letter-spacing: 1px; line-height: 1;
-}
-header h1 span { color: var(–accent2); }
-header p { margin-top: 6px; font-size: 0.97rem; color: var(–mid); font-weight: 600; }
+  /* ── HEADER ── */
+  header { text-align: center; padding: 30px 20px 10px; }
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    color: var(--accent1); letter-spacing: 1px; line-height: 1;
+  }
+  header h1 span { color: var(--accent2); }
+  header p { margin-top: 6px; font-size: 0.97rem; color: var(--mid); font-weight: 600; }
 
-/* ── TOP NAV ── */
-.top-nav {
-display: flex; justify-content: center; gap: 8px;
-margin: 20px auto 0; padding: 0 12px; flex-wrap: wrap;
-max-width: 820px;
-}
-.nav-tab {
-font-family: ‘Fredoka One’, cursive; font-size: 0.98rem;
-padding: 10px 20px; border-radius: 36px; border: 2.5px solid var(–light);
-background: white; color: var(–mid); cursor: pointer;
-transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-white-space: nowrap;
-}
-.nav-tab:hover:not(.active) { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,0.12); }
-.nav-tab.sec-alphabet.active  { background: var(–teal);    color: white; border-color: var(–teal);    box-shadow: 0 4px 14px rgba(43,170,138,0.4); }
-.nav-tab.sec-sounds.active    { background: var(–accent2); color: white; border-color: var(–accent2); box-shadow: 0 4px 14px rgba(74,144,217,0.4); }
-.nav-tab.sec-words1.active    { background: var(–accent1); color: white; border-color: var(–accent1); box-shadow: 0 4px 14px rgba(244,132,95,0.4); }
-.nav-tab.sec-words2.active    { background: var(–purple);  color: white; border-color: var(–purple);  box-shadow: 0 4px 14px rgba(155,111,212,0.4); }
+  /* ── TOP NAV ── */
+  .top-nav {
+    display: flex; justify-content: center; gap: 8px;
+    margin: 20px auto 0; padding: 0 12px; flex-wrap: wrap;
+    max-width: 820px;
+  }
+  .nav-tab {
+    font-family: 'Fredoka One', cursive; font-size: 0.98rem;
+    padding: 10px 20px; border-radius: 36px; border: 2.5px solid var(--light);
+    background: white; color: var(--mid); cursor: pointer;
+    transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    white-space: nowrap;
+  }
+  .nav-tab:hover:not(.active) { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,0.12); }
+  .nav-tab.sec-alphabet.active  { background: var(--teal);    color: white; border-color: var(--teal);    box-shadow: 0 4px 14px rgba(43,170,138,0.4); }
+  .nav-tab.sec-sounds.active    { background: var(--accent2); color: white; border-color: var(--accent2); box-shadow: 0 4px 14px rgba(74,144,217,0.4); }
+  .nav-tab.sec-words1.active    { background: var(--accent1); color: white; border-color: var(--accent1); box-shadow: 0 4px 14px rgba(244,132,95,0.4); }
+  .nav-tab.sec-words2.active    { background: var(--purple);  color: white; border-color: var(--purple);  box-shadow: 0 4px 14px rgba(155,111,212,0.4); }
 
-/* ── SECTION PAGES ── */
-.section-page { display: none; }
-.section-page.active { display: block; }
+  /* ── SECTION PAGES ── */
+  .section-page { display: none; }
+  .section-page.active { display: block; }
 
-/* ════════════════════════════════
-SECTION 1 — ALPHABET
-════════════════════════════════ */
-.sec-intro {
-text-align: center; max-width: 520px; margin: 20px auto 0;
-padding: 0 16px; color: var(–mid); font-size: 0.93rem; font-weight: 600; line-height: 1.6;
-}
+  /* ════════════════════════════════
+     SECTION 1 — ALPHABET
+  ════════════════════════════════ */
+  .sec-intro {
+    text-align: center; max-width: 520px; margin: 20px auto 0;
+    padding: 0 16px; color: var(--mid); font-size: 0.93rem; font-weight: 600; line-height: 1.6;
+  }
 
-.alpha-grid {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
-gap: 10px; max-width: 720px; margin: 18px auto 40px; padding: 0 16px;
-}
+  .alpha-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    gap: 10px; max-width: 720px; margin: 18px auto 40px; padding: 0 16px;
+  }
 
-.alpha-card {
-background: white; border-radius: 14px; border: 2.5px solid var(–light);
-padding: 14px 8px 10px; text-align: center; cursor: pointer;
-transition: all 0.18s; box-shadow: 0 2px 8px rgba(0,0,0,0.07); user-select: none;
-}
-.alpha-card:hover { transform: translateY(-4px); box-shadow: 0 7px 18px rgba(0,0,0,0.12); border-color: var(–teal); }
-.alpha-card.playing {
-background: linear-gradient(135deg,#e8faf5,#c8f0e4);
-border-color: var(–teal); transform: translateY(-4px) scale(1.05);
-box-shadow: 0 8px 22px rgba(43,170,138,0.3);
-}
-.alpha-card.vowel { border-color: #b4d0f4; }
-.alpha-card.vowel:hover { border-color: var(–accent2); }
-.alpha-card.vowel.playing { background: linear-gradient(135deg,#eef5ff,#d6e8ff); border-color: var(–accent2); box-shadow: 0 8px 22px rgba(74,144,217,0.3); }
+  .alpha-card {
+    background: white; border-radius: 14px; border: 2.5px solid var(--light);
+    padding: 14px 8px 10px; text-align: center; cursor: pointer;
+    transition: all 0.18s; box-shadow: 0 2px 8px rgba(0,0,0,0.07); user-select: none;
+  }
+  .alpha-card:hover { transform: translateY(-4px); box-shadow: 0 7px 18px rgba(0,0,0,0.12); border-color: var(--teal); }
+  .alpha-card.playing {
+    background: linear-gradient(135deg,#e8faf5,#c8f0e4);
+    border-color: var(--teal); transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 22px rgba(43,170,138,0.3);
+  }
+  .alpha-card.vowel { border-color: #b4d0f4; }
+  .alpha-card.vowel:hover { border-color: var(--accent2); }
+  .alpha-card.vowel.playing { background: linear-gradient(135deg,#eef5ff,#d6e8ff); border-color: var(--accent2); box-shadow: 0 8px 22px rgba(74,144,217,0.3); }
 
-.alpha-letter { font-family: ‘Fredoka One’, cursive; font-size: 2.4rem; line-height: 1; color: var(–teal); }
-.alpha-card.vowel .alpha-letter { color: var(–accent2); }
-.alpha-name { font-size: 0.78rem; font-weight: 700; color: var(–mid); margin-top: 4px; }
+  .alpha-letter { font-family: 'Fredoka One', cursive; font-size: 2.4rem; line-height: 1; color: var(--teal); }
+  .alpha-card.vowel .alpha-letter { color: var(--accent2); }
+  .alpha-name { font-size: 0.78rem; font-weight: 700; color: var(--mid); margin-top: 4px; }
 
-/* ════════════════════════════════
-SECTION 2 — LETTER SOUNDS
-════════════════════════════════ */
-.sounds-wrap {
-max-width: 680px; margin: 22px auto 40px; padding: 0 16px;
-display: flex; flex-direction: column; gap: 18px;
-}
+  /* ════════════════════════════════
+     SECTION 2 — LETTER SOUNDS
+  ════════════════════════════════ */
+  .sounds-wrap {
+    max-width: 680px; margin: 22px auto 40px; padding: 0 16px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
 
-.letter-block {
-background: white; border-radius: var(–radius);
-border: 2px solid var(–light); box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-overflow: hidden;
-}
+  .letter-block {
+    background: white; border-radius: var(--radius);
+    border: 2px solid var(--light); box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    overflow: hidden;
+  }
 
-.letter-block-header {
-display: flex; align-items: center; gap: 16px;
-padding: 16px 20px 12px; border-bottom: 2px solid var(–light);
-}
+  .letter-block-header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px 20px 12px; border-bottom: 2px solid var(--light);
+  }
 
-.letter-block-letter {
-font-family: ‘Fredoka One’, cursive; font-size: 3rem; line-height: 1;
-color: var(–teal); min-width: 48px; text-align: center;
-}
-.letter-block.vowel .letter-block-letter { color: var(–accent2); }
+  .letter-block-letter {
+    font-family: 'Fredoka One', cursive; font-size: 3rem; line-height: 1;
+    color: var(--teal); min-width: 48px; text-align: center;
+  }
+  .letter-block.vowel .letter-block-letter { color: var(--accent2); }
 
-.letter-block-letter.tappable {
-cursor: pointer; border-radius: 12px; padding: 4px 8px; transition: all 0.18s;
-}
-.letter-block-letter.tappable:hover {
-background: linear-gradient(135deg,#e8faf5,#c8f0e4);
-transform: scale(1.08); box-shadow: 0 4px 12px rgba(43,170,138,0.25);
-}
-.letter-block.vowel .letter-block-letter.tappable:hover {
-background: linear-gradient(135deg,#eef5ff,#d6e8ff);
-box-shadow: 0 4px 12px rgba(74,144,217,0.25);
-}
-.letter-block-letter.tappable.playing {
-background: linear-gradient(135deg,#e8faf5,#c8f0e4);
-transform: scale(1.1); box-shadow: 0 6px 18px rgba(43,170,138,0.35);
-}
-.letter-block.vowel .letter-block-letter.tappable.playing {
-background: linear-gradient(135deg,#eef5ff,#d6e8ff);
-box-shadow: 0 6px 18px rgba(74,144,217,0.35);
-}
+  .letter-block-letter.tappable {
+    cursor: pointer; border-radius: 12px; padding: 4px 8px; transition: all 0.18s;
+  }
+  .letter-block-letter.tappable:hover {
+    background: linear-gradient(135deg,#e8faf5,#c8f0e4);
+    transform: scale(1.08); box-shadow: 0 4px 12px rgba(43,170,138,0.25);
+  }
+  .letter-block.vowel .letter-block-letter.tappable:hover {
+    background: linear-gradient(135deg,#eef5ff,#d6e8ff);
+    box-shadow: 0 4px 12px rgba(74,144,217,0.25);
+  }
+  .letter-block-letter.tappable.playing {
+    background: linear-gradient(135deg,#e8faf5,#c8f0e4);
+    transform: scale(1.1); box-shadow: 0 6px 18px rgba(43,170,138,0.35);
+  }
+  .letter-block.vowel .letter-block-letter.tappable.playing {
+    background: linear-gradient(135deg,#eef5ff,#d6e8ff);
+    box-shadow: 0 6px 18px rgba(74,144,217,0.35);
+  }
 
-.letter-block-desc { flex: 1; }
-.letter-block-desc h3 { font-family: ‘Fredoka One’, cursive; font-size: 1.05rem; color: var(–dark); margin-bottom: 2px; }
-.letter-block-desc p { font-size: 0.83rem; color: var(–mid); font-weight: 600; line-height: 1.5; }
+  .letter-block-desc { flex: 1; }
+  .letter-block-desc h3 { font-family: 'Fredoka One', cursive; font-size: 1.05rem; color: var(--dark); margin-bottom: 2px; }
+  .letter-block-desc p { font-size: 0.83rem; color: var(--mid); font-weight: 600; line-height: 1.5; }
 
-.sound-group { padding: 14px 20px 16px; }
-.sound-group + .sound-group {
-border-top: 2px dashed var(–light);
-background: linear-gradient(135deg, #fffdf0, #fff8e0);
-}
+  .sound-group { padding: 14px 20px 16px; }
+  .sound-group + .sound-group {
+    border-top: 2px dashed var(--light);
+    background: linear-gradient(135deg, #fffdf0, #fff8e0);
+  }
 
-.sound-group-label {
-font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
-letter-spacing: 1.5px; color: var(–mid); margin-bottom: 10px;
-}
-.sound-group + .sound-group .sound-group-label { color: var(–accent4); }
+  .sound-group-label {
+    font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1.5px; color: var(--mid); margin-bottom: 10px;
+  }
+  .sound-group + .sound-group .sound-group-label { color: var(--accent4); }
 
-.sound-note {
-font-size: 0.78rem; color: var(–mid); font-weight: 600;
-font-style: italic; margin-top: 8px;
-}
+  .sound-note {
+    font-size: 0.78rem; color: var(--mid); font-weight: 600;
+    font-style: italic; margin-top: 8px;
+  }
 
-.example-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .example-pills { display: flex; flex-wrap: wrap; gap: 8px; }
 
-.example-pill {
-font-family: ‘Nunito’, sans-serif; font-weight: 800; font-size: 1rem;
-padding: 7px 18px; border-radius: 30px;
-border: 2px solid var(–light); background: var(–bg);
-color: var(–dark); cursor: pointer; transition: all 0.16s;
-box-shadow: 0 2px 6px rgba(0,0,0,0.07);
-display: inline-flex; align-items: center; gap: 6px;
-}
-.example-pill:hover {
-background: var(–teal); color: white; border-color: var(–teal);
-transform: translateY(-2px); box-shadow: 0 5px 14px rgba(43,170,138,0.3);
-}
-.letter-block.vowel .example-pill:hover {
-background: var(–accent2); border-color: var(–accent2);
-box-shadow: 0 5px 14px rgba(74,144,217,0.3);
-}
-.sound-group + .sound-group .example-pill:hover {
-background: var(–accent4); border-color: var(–accent4);
-box-shadow: 0 5px 14px rgba(240,180,41,0.35); color: white;
-}
-.example-pill.playing {
-background: var(–teal); color: white; border-color: var(–teal);
-transform: scale(1.06); box-shadow: 0 5px 14px rgba(43,170,138,0.35);
-}
-.letter-block.vowel .example-pill.playing { background: var(–accent2); border-color: var(–accent2); }
-.sound-group + .sound-group .example-pill.playing { background: var(–accent4); border-color: var(–accent4); }
-.pill-emoji { font-size: 1.3em; line-height: 1; }
+  .example-pill {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
+    padding: 7px 18px; border-radius: 30px;
+    border: 2px solid var(--light); background: var(--bg);
+    color: var(--dark); cursor: pointer; transition: all 0.16s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .example-pill:hover {
+    background: var(--teal); color: white; border-color: var(--teal);
+    transform: translateY(-2px); box-shadow: 0 5px 14px rgba(43,170,138,0.3);
+  }
+  .letter-block.vowel .example-pill:hover {
+    background: var(--accent2); border-color: var(--accent2);
+    box-shadow: 0 5px 14px rgba(74,144,217,0.3);
+  }
+  .sound-group + .sound-group .example-pill:hover {
+    background: var(--accent4); border-color: var(--accent4);
+    box-shadow: 0 5px 14px rgba(240,180,41,0.35); color: white;
+  }
+  .example-pill.playing {
+    background: var(--teal); color: white; border-color: var(--teal);
+    transform: scale(1.06); box-shadow: 0 5px 14px rgba(43,170,138,0.35);
+  }
+  .letter-block.vowel .example-pill.playing { background: var(--accent2); border-color: var(--accent2); }
+  .sound-group + .sound-group .example-pill.playing { background: var(--accent4); border-color: var(--accent4); }
+  .pill-emoji { font-size: 1.3em; line-height: 1; }
 
-/* ════════════════════════════════
-SHARED WORD PRONUNCIATION STYLES
-════════════════════════════════ */
-.family-selector {
-display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
-max-width: 780px; margin: 20px auto 0; padding: 0 16px;
-}
-.family-btn {
-font-family: ‘Fredoka One’, cursive; font-size: 1rem; padding: 8px 18px;
-border-radius: 30px; border: 2.5px solid transparent;
-background: white; color: var(–mid); cursor: pointer;
-transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-.family-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.12); }
-.family-btn.active { color: white; transform: translateY(-2px); }
-#wp1-selector .family-btn.active { background: var(–accent1); border-color: var(–accent1); box-shadow: 0 5px 15px rgba(244,132,95,0.35); }
-#wp2-selector-wrap .family-btn.active { background: var(–purple); border-color: var(–purple); box-shadow: 0 5px 15px rgba(155,111,212,0.35); }
+  /* ════════════════════════════════
+     SHARED WORD PRONUNCIATION STYLES
+  ════════════════════════════════ */
+  .family-selector {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+    max-width: 780px; margin: 20px auto 0; padding: 0 16px;
+  }
+  .family-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1rem; padding: 8px 18px;
+    border-radius: 30px; border: 2.5px solid transparent;
+    background: white; color: var(--mid); cursor: pointer;
+    transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .family-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.12); }
+  .family-btn.active { color: white; transform: translateY(-2px); }
+  #wp1-selector .family-btn.active { background: var(--accent1); border-color: var(--accent1); box-shadow: 0 5px 15px rgba(244,132,95,0.35); }
+  #wp2-selector-wrap .family-btn.active { background: var(--purple); border-color: var(--purple); box-shadow: 0 5px 15px rgba(155,111,212,0.35); }
 
-.main-card { max-width: 600px; margin: 22px auto; padding: 0 16px 40px; }
+  .main-card { max-width: 600px; margin: 22px auto; padding: 0 16px 40px; }
 
-.family-title { font-family: ‘Fredoka One’, cursive; font-size: 1.25rem; color: var(–mid); text-align: center; margin-bottom: 22px; letter-spacing: 1px; }
-.family-title strong { font-size: 1.55rem; }
-#wp1-page .family-title strong { color: var(–accent2); }
-#wp2-page .family-title strong { color: var(–purple); }
+  .family-title { font-family: 'Fredoka One', cursive; font-size: 1.25rem; color: var(--mid); text-align: center; margin-bottom: 22px; letter-spacing: 1px; }
+  .family-title strong { font-size: 1.55rem; }
+  #wp1-page .family-title strong { color: var(--accent2); }
+  #wp2-page .family-title strong { color: var(--purple); }
 
-.word-display {
-background: white; border-radius: var(–radius); box-shadow: var(–shadow);
-padding: 30px 26px 24px; text-align: center; position: relative; overflow: hidden; border: 2px solid var(–light);
-}
-.word-display::before { content:’’; position:absolute; top:0; left:0; right:0; height:5px; }
-#wp1-page .word-display::before { background: linear-gradient(90deg, var(–accent1), var(–accent4), var(–accent2)); }
-#wp2-page .word-display::before { background: linear-gradient(90deg, var(–purple), var(–accent2), var(–accent3)); }
+  .word-display {
+    background: white; border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 30px 26px 24px; text-align: center; position: relative; overflow: hidden; border: 2px solid var(--light);
+  }
+  .word-display::before { content:''; position:absolute; top:0; left:0; right:0; height:5px; }
+  #wp1-page .word-display::before { background: linear-gradient(90deg, var(--accent1), var(--accent4), var(--accent2)); }
+  #wp2-page .word-display::before { background: linear-gradient(90deg, var(--purple), var(--accent2), var(--accent3)); }
 
-.word-emoji-display { font-size: 3.5rem; line-height: 1; margin-bottom: 10px; min-height: 1.2em; }
+  .word-emoji-display { font-size: 3.5rem; line-height: 1; margin-bottom: 10px; min-height: 1.2em; }
 
-.letter-tiles { display:flex; justify-content:center; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
-.tile {
-width:68px; height:78px; border-radius:14px;
-display:flex; align-items:center; justify-content:center;
-font-family:‘Fredoka One’,cursive; font-size:2.6rem; line-height:1;
-box-shadow:0 4px 0 rgba(0,0,0,0.12), 0 6px 14px rgba(0,0,0,0.08);
-transition:transform 0.15s; animation:tilePop 0.35s cubic-bezier(0.34,1.56,0.64,1) both; cursor:pointer;
-}
-.tile.beginning { background:linear-gradient(135deg,#fff7f0,#ffe4d6); color:var(–accent1); border:2.5px solid #f4c5b4; }
-.tile.ending    { background:linear-gradient(135deg,#eef5ff,#d6e8ff); color:var(–accent2); border:2.5px solid #b4d0f4; }
-.tile.digraph   { background:linear-gradient(135deg,#f5f0ff,#e8d6ff); color:var(–purple);  border:2.5px solid #d4b4f4; }
-.tile:hover { transform:translateY(-4px); }
+  .letter-tiles { display:flex; justify-content:center; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
+  .tile {
+    width:68px; height:78px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fredoka One',cursive; font-size:2.6rem; line-height:1;
+    box-shadow:0 4px 0 rgba(0,0,0,0.12), 0 6px 14px rgba(0,0,0,0.08);
+    transition:transform 0.15s; animation:tilePop 0.35s cubic-bezier(0.34,1.56,0.64,1) both; cursor:pointer;
+  }
+  .tile.beginning { background:linear-gradient(135deg,#fff7f0,#ffe4d6); color:var(--accent1); border:2.5px solid #f4c5b4; }
+  .tile.ending    { background:linear-gradient(135deg,#eef5ff,#d6e8ff); color:var(--accent2); border:2.5px solid #b4d0f4; }
+  .tile.digraph   { background:linear-gradient(135deg,#f5f0ff,#e8d6ff); color:var(--purple);  border:2.5px solid #d4b4f4; }
+  .tile:hover { transform:translateY(-4px); }
 
-@keyframes tilePop {
-from { transform:scale(0.5) translateY(20px); opacity:0; }
-to   { transform:scale(1) translateY(0);      opacity:1; }
-}
+  @keyframes tilePop {
+    from { transform:scale(0.5) translateY(20px); opacity:0; }
+    to   { transform:scale(1) translateY(0);      opacity:1; }
+  }
 
-.tile-labels { display:flex; justify-content:center; gap:8px; margin-bottom:8px; }
-.tile-label-item { width:68px; text-align:center; font-size:0.68rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; }
-.tile-label-item.bl { color:var(–accent1); }
-.tile-label-item.el { color:var(–accent2); }
-.tile-label-item.dg { color:var(–purple); }
+  .tile-labels { display:flex; justify-content:center; gap:8px; margin-bottom:8px; }
+  .tile-label-item { width:68px; text-align:center; font-size:0.68rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; }
+  .tile-label-item.bl { color:var(--accent1); }
+  .tile-label-item.el { color:var(--accent2); }
+  .tile-label-item.dg { color:var(--purple); }
 
-.audio-btn {
-color:white; border:none; border-radius:50px; padding:12px 32px;
-font-family:‘Nunito’,sans-serif; font-size:1.05rem; font-weight:800;
-cursor:pointer; display:inline-flex; align-items:center; gap:10px;
-transition:all 0.15s; margin-bottom:6px;
-}
-#wp1-page .audio-btn { background:linear-gradient(135deg,var(–accent1),#e06840); box-shadow:0 4px 0 rgba(200,80,40,0.4),0 6px 18px rgba(244,132,95,0.3); }
-#wp2-page .audio-btn { background:linear-gradient(135deg,var(–purple),#7a4fbf);  box-shadow:0 4px 0 rgba(100,50,170,0.4),0 6px 18px rgba(155,111,212,0.3); }
-.audio-btn:hover { transform:translateY(-2px); }
-.audio-btn:active { transform:translateY(2px); }
-.audio-btn.speaking { animation:pulse 0.6s ease-in-out infinite alternate; }
-@keyframes pulse { from{filter:brightness(1);} to{filter:brightness(1.15);} }
+  .audio-btn {
+    color:white; border:none; border-radius:50px; padding:12px 32px;
+    font-family:'Nunito',sans-serif; font-size:1.05rem; font-weight:800;
+    cursor:pointer; display:inline-flex; align-items:center; gap:10px;
+    transition:all 0.15s; margin-bottom:6px;
+  }
+  #wp1-page .audio-btn { background:linear-gradient(135deg,var(--accent1),#e06840); box-shadow:0 4px 0 rgba(200,80,40,0.4),0 6px 18px rgba(244,132,95,0.3); }
+  #wp2-page .audio-btn { background:linear-gradient(135deg,var(--purple),#7a4fbf);  box-shadow:0 4px 0 rgba(100,50,170,0.4),0 6px 18px rgba(155,111,212,0.3); }
+  .audio-btn:hover { transform:translateY(-2px); }
+  .audio-btn:active { transform:translateY(2px); }
+  .audio-btn.speaking { animation:pulse 0.6s ease-in-out infinite alternate; }
+  @keyframes pulse { from{filter:brightness(1);} to{filter:brightness(1.15);} }
 
-.nav-row { display:flex; gap:12px; justify-content:center; margin-top:20px; align-items:center; }
-.wp-nav-btn {
-background:white; border:2.5px solid var(–light); color:var(–dark);
-border-radius:50px; padding:10px 22px; font-family:‘Nunito’,sans-serif;
-font-size:1rem; font-weight:700; cursor:pointer; display:inline-flex;
-align-items:center; gap:8px; transition:all 0.15s; box-shadow:0 2px 8px rgba(0,0,0,0.06);
-}
-.wp-nav-btn:hover:not(:disabled) { background:var(–dark); color:white; border-color:var(–dark); transform:translateY(-2px); }
-.wp-nav-btn:disabled { opacity:0.35; cursor:not-allowed; }
-.word-counter { font-size:0.95rem; font-weight:700; color:var(–mid); min-width:60px; text-align:center; }
+  .nav-row { display:flex; gap:12px; justify-content:center; margin-top:20px; align-items:center; }
+  .wp-nav-btn {
+    background:white; border:2.5px solid var(--light); color:var(--dark);
+    border-radius:50px; padding:10px 22px; font-family:'Nunito',sans-serif;
+    font-size:1rem; font-weight:700; cursor:pointer; display:inline-flex;
+    align-items:center; gap:8px; transition:all 0.15s; box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  }
+  .wp-nav-btn:hover:not(:disabled) { background:var(--dark); color:white; border-color:var(--dark); transform:translateY(-2px); }
+  .wp-nav-btn:disabled { opacity:0.35; cursor:not-allowed; }
+  .word-counter { font-size:0.95rem; font-weight:700; color:var(--mid); min-width:60px; text-align:center; }
 
-.hint-box { background:linear-gradient(135deg,#f0faf0,#e0f5e0); border:2px solid #b8e8b8; border-radius:var(–radius); padding:15px 18px; margin-top:22px; display:flex; align-items:flex-start; gap:12px; }
-.hint-icon { font-size:1.5rem; flex-shrink:0; margin-top:2px; }
-.hint-box p { font-size:0.9rem; color:#2a5a2a; font-weight:600; line-height:1.6; }
-.hint-box p strong { color:var(–accent1); }
+  .hint-box { background:linear-gradient(135deg,#f0faf0,#e0f5e0); border:2px solid #b8e8b8; border-radius:var(--radius); padding:15px 18px; margin-top:22px; display:flex; align-items:flex-start; gap:12px; }
+  .hint-icon { font-size:1.5rem; flex-shrink:0; margin-top:2px; }
+  .hint-box p { font-size:0.9rem; color:#2a5a2a; font-weight:600; line-height:1.6; }
+  .hint-box p strong { color:var(--accent1); }
 
-.speed-row { display:flex; align-items:center; justify-content:center; gap:10px; margin-top:14px; flex-wrap:wrap; }
-.speed-label { font-size:0.8rem; font-weight:700; color:var(–mid); text-transform:uppercase; letter-spacing:1px; }
-.speed-btns { display:flex; gap:6px; }
-.speed-opt { padding:5px 13px; border-radius:20px; border:2px solid var(–light); background:white; font-family:‘Nunito’,sans-serif; font-weight:700; font-size:0.8rem; cursor:pointer; color:var(–mid); transition:all 0.15s; }
-.speed-opt.active { background:var(–accent2); color:white; border-color:var(–accent2); }
+  .speed-row { display:flex; align-items:center; justify-content:center; gap:10px; margin-top:14px; flex-wrap:wrap; }
+  .speed-label { font-size:0.8rem; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; }
+  .speed-btns { display:flex; gap:6px; }
+  .speed-opt { padding:5px 13px; border-radius:20px; border:2px solid var(--light); background:white; font-family:'Nunito',sans-serif; font-weight:700; font-size:0.8rem; cursor:pointer; color:var(--mid); transition:all 0.15s; }
+  .speed-opt.active { background:var(--accent2); color:white; border-color:var(--accent2); }
 
-.word-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:10px; margin-top:24px; }
-.word-chip { background:white; border:2px solid var(–light); border-radius:12px; padding:10px 8px; text-align:center; cursor:pointer; transition:all 0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
-.word-chip:hover { transform:translateY(-3px); box-shadow:0 6px 16px rgba(0,0,0,0.1); }
-#wp1-page .word-chip:hover   { border-color:var(–accent1); }
-#wp1-page .word-chip.current { background:linear-gradient(135deg,#fff4f0,#ffe8df); border-color:var(–accent1); box-shadow:0 4px 14px rgba(244,132,95,0.25); }
-#wp2-page .word-chip:hover   { border-color:var(–purple); }
-#wp2-page .word-chip.current { background:linear-gradient(135deg,#f5f0ff,#ead6ff); border-color:var(–purple); box-shadow:0 4px 14px rgba(155,111,212,0.25); }
-.chip-beginning { font-family:‘Fredoka One’,cursive; font-size:1.4rem; color:var(–accent1); }
-.chip-ending    { font-family:‘Fredoka One’,cursive; font-size:1.4rem; color:var(–accent2); }
-.chip-whole     { font-family:‘Fredoka One’,cursive; font-size:1.4rem; color:var(–purple); }
-.chip-emoji     { font-size:1.5em; display:block; margin-top:3px; line-height:1; }
-.chip-audio     { font-size:0.66rem; color:var(–mid); margin-top:2px; }
+  .word-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:10px; margin-top:24px; }
+  .word-chip { background:white; border:2px solid var(--light); border-radius:12px; padding:10px 8px; text-align:center; cursor:pointer; transition:all 0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+  .word-chip:hover { transform:translateY(-3px); box-shadow:0 6px 16px rgba(0,0,0,0.1); }
+  #wp1-page .word-chip:hover   { border-color:var(--accent1); }
+  #wp1-page .word-chip.current { background:linear-gradient(135deg,#fff4f0,#ffe8df); border-color:var(--accent1); box-shadow:0 4px 14px rgba(244,132,95,0.25); }
+  #wp2-page .word-chip:hover   { border-color:var(--purple); }
+  #wp2-page .word-chip.current { background:linear-gradient(135deg,#f5f0ff,#ead6ff); border-color:var(--purple); box-shadow:0 4px 14px rgba(155,111,212,0.25); }
+  .chip-beginning { font-family:'Fredoka One',cursive; font-size:1.4rem; color:var(--accent1); }
+  .chip-ending    { font-family:'Fredoka One',cursive; font-size:1.4rem; color:var(--accent2); }
+  .chip-whole     { font-family:'Fredoka One',cursive; font-size:1.4rem; color:var(--purple); }
+  .chip-emoji     { font-size:1.5em; display:block; margin-top:3px; line-height:1; }
+  .chip-audio     { font-size:0.66rem; color:var(--mid); margin-top:2px; }
 
-.trophy-msg { text-align:center; padding:22px; display:none; }
-.trophy-msg.show { display:block; animation:fadeIn 0.5s ease; }
-@keyframes fadeIn { from{opacity:0;transform:scale(0.8);} to{opacity:1;transform:scale(1);} }
-.trophy-msg h2 { font-family:‘Fredoka One’,cursive; font-size:2rem; color:var(–accent4); margin-bottom:6px; }
-.trophy-msg p { color:var(–mid); font-weight:600; }
+  .trophy-msg { text-align:center; padding:22px; display:none; }
+  .trophy-msg.show { display:block; animation:fadeIn 0.5s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:scale(0.8);} to{opacity:1;transform:scale(1);} }
+  .trophy-msg h2 { font-family:'Fredoka One',cursive; font-size:2rem; color:var(--accent4); margin-bottom:6px; }
+  .trophy-msg p { color:var(--mid); font-weight:600; }
 
-.cat-divider { max-width:780px; margin:26px auto 0; padding:0 16px; display:flex; align-items:center; gap:14px; }
-.cat-divider hr { flex:1; border:none; border-top:2px solid var(–light); }
-.cat-pill { font-family:‘Fredoka One’,cursive; font-size:0.88rem; color:white; background:var(–purple); border-radius:20px; padding:5px 16px; white-space:nowrap; }
+  .cat-divider { max-width:780px; margin:26px auto 0; padding:0 16px; display:flex; align-items:center; gap:14px; }
+  .cat-divider hr { flex:1; border:none; border-top:2px solid var(--light); }
+  .cat-pill { font-family:'Fredoka One',cursive; font-size:0.88rem; color:white; background:var(--purple); border-radius:20px; padding:5px 16px; white-space:nowrap; }
 
-footer { text-align:center; padding:18px; font-size:0.85rem; color:var(–mid); font-weight:600; border-top:2px solid var(–light); margin-top:12px; }
-footer strong { color:var(–accent1); }
+  footer { text-align:center; padding:18px; font-size:0.85rem; color:var(--mid); font-weight:600; border-top:2px solid var(--light); margin-top:12px; }
+  footer strong { color:var(--accent1); }
 
-@media (max-width:480px) {
-.nav-tab { font-size:0.85rem; padding:8px 14px; }
-.tile { width:58px; height:68px; font-size:2.1rem; }
-.alpha-grid { grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); }
-.alpha-letter { font-size:2rem; }
-.letter-block-letter { font-size:2.4rem; }
-}
+  @media (max-width:480px) {
+    .nav-tab { font-size:0.85rem; padding:8px 14px; }
+    .tile { width:58px; height:68px; font-size:2.1rem; }
+    .alpha-grid { grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); }
+    .alpha-letter { font-size:2rem; }
+    .letter-block-letter { font-size:2.4rem; }
+  }
 
-/* ════════════════════════════════
-PRACTICE BUTTON (top of sections)
-════════════════════════════════ */
-.practice-bar {
-text-align: center; margin: 18px auto 0; padding: 0 16px;
-}
-.practice-btn {
-font-family: ‘Fredoka One’, cursive; font-size: 1.05rem;
-padding: 11px 28px; border-radius: 36px; border: none;
-background: linear-gradient(135deg, #ff7eb3, #e040a0);
-color: white; cursor: pointer;
-box-shadow: 0 4px 0 rgba(180,20,100,0.35), 0 6px 18px rgba(224,64,160,0.3);
-transition: all 0.18s; display: inline-flex; align-items: center; gap: 9px;
-}
-.practice-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(180,20,100,0.35), 0 10px 22px rgba(224,64,160,0.35); }
-.practice-btn:active { transform: translateY(2px); }
+  /* ════════════════════════════════
+     PRACTICE BUTTON (top of sections)
+  ════════════════════════════════ */
+  .practice-bar {
+    text-align: center; margin: 18px auto 0; padding: 0 16px;
+  }
+  .practice-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
+    padding: 11px 28px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, #ff7eb3, #e040a0);
+    color: white; cursor: pointer;
+    box-shadow: 0 4px 0 rgba(180,20,100,0.35), 0 6px 18px rgba(224,64,160,0.3);
+    transition: all 0.18s; display: inline-flex; align-items: center; gap: 9px;
+  }
+  .practice-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(180,20,100,0.35), 0 10px 22px rgba(224,64,160,0.35); }
+  .practice-btn:active { transform: translateY(2px); }
 
-/* ════════════════════════════════
-PRACTICE OVERLAY / PAGE
-════════════════════════════════ */
-.practice-overlay {
-display: none; position: fixed; inset: 0;
-background: var(–bg); z-index: 100; overflow-y: auto;
-padding: 0 0 40px;
-}
-.practice-overlay.active { display: block; }
+  /* ════════════════════════════════
+     PRACTICE OVERLAY / PAGE
+  ════════════════════════════════ */
+  .practice-overlay {
+    display: none; position: fixed; inset: 0;
+    background: var(--bg); z-index: 100; overflow-y: auto;
+    padding: 0 0 40px;
+  }
+  .practice-overlay.active { display: block; }
 
-.practice-header {
-background: linear-gradient(135deg, #ff7eb3, #e040a0);
-padding: 18px 20px 16px; display: flex; align-items: center;
-gap: 14px; position: sticky; top: 0; z-index: 10;
-box-shadow: 0 4px 16px rgba(224,64,160,0.3);
-}
-.practice-back {
-background: rgba(255,255,255,0.25); border: none; border-radius: 50%;
-width: 40px; height: 40px; font-size: 1.3rem; color: white;
-cursor: pointer; display: flex; align-items: center; justify-content: center;
-flex-shrink: 0; transition: background 0.15s;
-}
-.practice-back:hover { background: rgba(255,255,255,0.4); }
-.practice-header-text { color: white; }
-.practice-header-text h2 { font-family: ‘Fredoka One’, cursive; font-size: 1.4rem; line-height: 1; }
-.practice-header-text p { font-size: 0.82rem; font-weight: 600; opacity: 0.88; margin-top: 3px; }
+  .practice-header {
+    background: linear-gradient(135deg, #ff7eb3, #e040a0);
+    padding: 18px 20px 16px; display: flex; align-items: center;
+    gap: 14px; position: sticky; top: 0; z-index: 10;
+    box-shadow: 0 4px 16px rgba(224,64,160,0.3);
+  }
+  .practice-back {
+    background: rgba(255,255,255,0.25); border: none; border-radius: 50%;
+    width: 40px; height: 40px; font-size: 1.3rem; color: white;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background 0.15s;
+  }
+  .practice-back:hover { background: rgba(255,255,255,0.4); }
+  .practice-header-text { color: white; }
+  .practice-header-text h2 { font-family: 'Fredoka One', cursive; font-size: 1.4rem; line-height: 1; }
+  .practice-header-text p { font-size: 0.82rem; font-weight: 600; opacity: 0.88; margin-top: 3px; }
 
-.practice-body { max-width: 580px; margin: 0 auto; padding: 24px 16px 0; }
+  .practice-body { max-width: 580px; margin: 0 auto; padding: 24px 16px 0; }
 
-/* Step indicator */
-.practice-step-info {
-text-align: center; margin-bottom: 20px;
-}
-.practice-step-info .step-counter {
-font-family: ‘Fredoka One’, cursive; font-size: 0.95rem;
-color: var(–mid); letter-spacing: 1px;
-}
-.practice-progress {
-height: 6px; background: var(–light); border-radius: 10px;
-margin: 8px auto 0; max-width: 300px; overflow: hidden;
-}
-.practice-progress-fill {
-height: 100%; border-radius: 10px;
-background: linear-gradient(90deg, #ff7eb3, #e040a0);
-transition: width 0.4s ease;
-}
+  /* Step indicator */
+  .practice-step-info {
+    text-align: center; margin-bottom: 20px;
+  }
+  .practice-step-info .step-counter {
+    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    color: var(--mid); letter-spacing: 1px;
+  }
+  .practice-progress {
+    height: 6px; background: var(--light); border-radius: 10px;
+    margin: 8px auto 0; max-width: 300px; overflow: hidden;
+  }
+  .practice-progress-fill {
+    height: 100%; border-radius: 10px;
+    background: linear-gradient(90deg, #ff7eb3, #e040a0);
+    transition: width 0.4s ease;
+  }
 
-/* Word display card in practice */
-.practice-card {
-background: white; border-radius: var(–radius);
-box-shadow: var(–shadow); border: 2px solid var(–light);
-padding: 28px 24px 24px; text-align: center; position: relative; overflow: hidden;
-}
-.practice-card::before {
-content:’’; position:absolute; top:0; left:0; right:0; height:5px;
-background: linear-gradient(90deg, #ff7eb3, #e040a0, #ff7eb3);
-}
-.practice-word-emoji { font-size: 3rem; line-height: 1; margin-bottom: 10px; min-height: 1.1em; }
-.practice-word {
-font-family: ‘Fredoka One’, cursive; font-size: 3.2rem;
-color: var(–dark); letter-spacing: 2px; margin-bottom: 6px;
-}
-.practice-word-label {
-font-size: 0.78rem; font-weight: 800; text-transform: uppercase;
-letter-spacing: 1.5px; color: var(–mid); margin-bottom: 20px;
-}
+  /* Word display card in practice */
+  .practice-card {
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow); border: 2px solid var(--light);
+    padding: 28px 24px 24px; text-align: center; position: relative; overflow: hidden;
+  }
+  .practice-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:5px;
+    background: linear-gradient(90deg, #ff7eb3, #e040a0, #ff7eb3);
+  }
+  .practice-word-emoji { font-size: 3rem; line-height: 1; margin-bottom: 10px; min-height: 1.1em; }
+  .practice-word {
+    font-family: 'Fredoka One', cursive; font-size: 3.2rem;
+    color: var(--dark); letter-spacing: 2px; margin-bottom: 6px;
+  }
+  .practice-word-label {
+    font-size: 0.78rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1.5px; color: var(--mid); margin-bottom: 20px;
+  }
 
-/* Phase banners */
-.phase-banner {
-font-family: ‘Fredoka One’, cursive; font-size: 0.92rem;
-padding: 7px 18px; border-radius: 24px; display: inline-block;
-margin-bottom: 18px; letter-spacing: 0.5px;
-}
-.phase-listen  { background: #e8f5ff; color: var(–accent2); border: 2px solid #b4d8f8; }
-.phase-record  { background: #fff0f8; color: #d0208a; border: 2px solid #f8b4dc; }
-.phase-compare { background: #f0fff4; color: var(–accent3); border: 2px solid #a8e6b8; }
+  /* Phase banners */
+  .phase-banner {
+    font-family: 'Fredoka One', cursive; font-size: 0.92rem;
+    padding: 7px 18px; border-radius: 24px; display: inline-block;
+    margin-bottom: 18px; letter-spacing: 0.5px;
+  }
+  .phase-listen  { background: #e8f5ff; color: var(--accent2); border: 2px solid #b4d8f8; }
+  .phase-record  { background: #fff0f8; color: #d0208a; border: 2px solid #f8b4dc; }
+  .phase-compare { background: #f0fff4; color: var(--accent3); border: 2px solid #a8e6b8; }
 
-/* Example word (word 1 — listen only) */
-.example-listen-row {
-display: flex; flex-direction: column; align-items: center; gap: 12px;
-}
-.example-label {
-font-size: 0.82rem; font-weight: 700; color: var(–mid); text-align: center; line-height: 1.5;
-}
-.listen-play-btn {
-font-family: ‘Fredoka One’, cursive; font-size: 1rem;
-padding: 11px 28px; border-radius: 36px; border: none;
-background: linear-gradient(135deg, var(–accent2), #2d6cbf);
-color: white; cursor: pointer;
-box-shadow: 0 4px 0 rgba(30,80,180,0.35), 0 6px 16px rgba(74,144,217,0.3);
-display: inline-flex; align-items: center; gap: 9px; transition: all 0.15s;
-}
-.listen-play-btn:hover { transform: translateY(-2px); }
-.listen-play-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
+  /* Example word (word 1 — listen only) */
+  .example-listen-row {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .example-label {
+    font-size: 0.82rem; font-weight: 700; color: var(--mid); text-align: center; line-height: 1.5;
+  }
+  .listen-play-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    padding: 11px 28px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, var(--accent2), #2d6cbf);
+    color: white; cursor: pointer;
+    box-shadow: 0 4px 0 rgba(30,80,180,0.35), 0 6px 16px rgba(74,144,217,0.3);
+    display: inline-flex; align-items: center; gap: 9px; transition: all 0.15s;
+  }
+  .listen-play-btn:hover { transform: translateY(-2px); }
+  .listen-play-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
 
-.start-practice-btn {
-font-family: ‘Fredoka One’, cursive; font-size: 1rem;
-padding: 11px 28px; border-radius: 36px; border: none;
-background: linear-gradient(135deg, #e040a0, #bf1a80);
-color: white; cursor: pointer; margin-top: 10px;
-box-shadow: 0 4px 0 rgba(150,10,100,0.35), 0 6px 16px rgba(224,64,160,0.3);
-display: inline-flex; align-items: center; gap: 9px; transition: all 0.15s;
-}
-.start-practice-btn:hover { transform: translateY(-2px); }
+  .start-practice-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    padding: 11px 28px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, #e040a0, #bf1a80);
+    color: white; cursor: pointer; margin-top: 10px;
+    box-shadow: 0 4px 0 rgba(150,10,100,0.35), 0 6px 16px rgba(224,64,160,0.3);
+    display: inline-flex; align-items: center; gap: 9px; transition: all 0.15s;
+  }
+  .start-practice-btn:hover { transform: translateY(-2px); }
 
-/* Recording controls */
-.record-controls { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  /* Recording controls */
+  .record-controls { display: flex; flex-direction: column; align-items: center; gap: 14px; }
 
-.record-btn {
-width: 80px; height: 80px; border-radius: 50%; border: none;
-background: linear-gradient(135deg, #ff4d6d, #c9003c);
-color: white; font-size: 2rem; cursor: pointer;
-box-shadow: 0 6px 0 rgba(150,0,40,0.4), 0 8px 24px rgba(255,77,109,0.4);
-transition: all 0.15s; display: flex; align-items: center; justify-content: center;
-position: relative;
-}
-.record-btn:hover { transform: translateY(-3px) scale(1.05); }
-.record-btn.recording {
-animation: recordPulse 1s ease-in-out infinite;
-background: linear-gradient(135deg, #ff1a1a, #990000);
-}
-@keyframes recordPulse {
-0%   { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 0 rgba(255,26,26,0.5); }
-70%  { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 20px rgba(255,26,26,0); }
-100% { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 0 rgba(255,26,26,0); }
-}
-.record-hint { font-size: 0.85rem; font-weight: 700; color: var(–mid); }
+  .record-btn {
+    width: 80px; height: 80px; border-radius: 50%; border: none;
+    background: linear-gradient(135deg, #ff4d6d, #c9003c);
+    color: white; font-size: 2rem; cursor: pointer;
+    box-shadow: 0 6px 0 rgba(150,0,40,0.4), 0 8px 24px rgba(255,77,109,0.4);
+    transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .record-btn:hover { transform: translateY(-3px) scale(1.05); }
+  .record-btn.recording {
+    animation: recordPulse 1s ease-in-out infinite;
+    background: linear-gradient(135deg, #ff1a1a, #990000);
+  }
+  @keyframes recordPulse {
+    0%   { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 0 rgba(255,26,26,0.5); }
+    70%  { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 20px rgba(255,26,26,0); }
+    100% { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 0 rgba(255,26,26,0); }
+  }
+  .record-hint { font-size: 0.85rem; font-weight: 700; color: var(--mid); }
 
-/* Playback + compare row */
-.compare-controls { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
+  /* Playback + compare row */
+  .compare-controls { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
 
-.playback-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .playback-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
-.playback-btn {
-font-family: ‘Fredoka One’, cursive; font-size: 0.95rem;
-padding: 10px 22px; border-radius: 36px; border: none;
-cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
-transition: all 0.15s;
-}
-.playback-btn.my-voice {
-background: linear-gradient(135deg, #fff0f8, #f8d6ee);
-color: #d0208a; border: 2.5px solid #f0a8d8;
-}
-.playback-btn.my-voice:hover { background: linear-gradient(135deg, #f8c8e8, #f0a0d0); }
-.playback-btn.correct-voice {
-background: linear-gradient(135deg, var(–accent2), #2d6cbf);
-color: white; box-shadow: 0 3px 0 rgba(30,80,180,0.35), 0 5px 14px rgba(74,144,217,0.3);
-}
-.playback-btn.correct-voice:hover { transform: translateY(-2px); }
-.playback-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
+  .playback-btn {
+    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    padding: 10px 22px; border-radius: 36px; border: none;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.15s;
+  }
+  .playback-btn.my-voice {
+    background: linear-gradient(135deg, #fff0f8, #f8d6ee);
+    color: #d0208a; border: 2.5px solid #f0a8d8;
+  }
+  .playback-btn.my-voice:hover { background: linear-gradient(135deg, #f8c8e8, #f0a0d0); }
+  .playback-btn.correct-voice {
+    background: linear-gradient(135deg, var(--accent2), #2d6cbf);
+    color: white; box-shadow: 0 3px 0 rgba(30,80,180,0.35), 0 5px 14px rgba(74,144,217,0.3);
+  }
+  .playback-btn.correct-voice:hover { transform: translateY(-2px); }
+  .playback-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
 
-/* Feedback badge */
-.feedback-badge {
-padding: 10px 22px; border-radius: 14px; font-weight: 800; font-size: 1rem;
-display: none; align-items: center; gap: 10px;
-animation: fadeIn 0.35s ease;
-}
-.feedback-badge.show { display: inline-flex; }
-.feedback-badge.correct { background: #e8faf0; color: #1a7a3a; border: 2.5px solid #8ee0b4; }
-.feedback-badge.try-again { background: #fff4e0; color: #a05000; border: 2.5px solid #f0c870; }
-.feedback-badge.partial { background: #f0f4ff; color: #3050b0; border: 2.5px solid #a8b8f0; }
+  /* Feedback badge */
+  .feedback-badge {
+    padding: 10px 22px; border-radius: 14px; font-weight: 800; font-size: 1rem;
+    display: none; align-items: center; gap: 10px;
+    animation: fadeIn 0.35s ease;
+  }
+  .feedback-badge.show { display: inline-flex; }
+  .feedback-badge.correct { background: #e8faf0; color: #1a7a3a; border: 2.5px solid #8ee0b4; }
+  .feedback-badge.try-again { background: #fff4e0; color: #a05000; border: 2.5px solid #f0c870; }
+  .feedback-badge.partial { background: #f0f4ff; color: #3050b0; border: 2.5px solid #a8b8f0; }
 
-/* Re-record link */
-.rerecord-link {
-background: none; border: none; color: var(–mid); font-family: ‘Nunito’, sans-serif;
-font-size: 0.85rem; font-weight: 700; cursor: pointer; text-decoration: underline;
-padding: 2px 6px;
-}
-.rerecord-link:hover { color: var(–dark); }
+  /* Re-record link */
+  .rerecord-link {
+    background: none; border: none; color: var(--mid); font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem; font-weight: 700; cursor: pointer; text-decoration: underline;
+    padding: 2px 6px;
+  }
+  .rerecord-link:hover { color: var(--dark); }
 
-/* Next button */
-.practice-next-btn {
-font-family: ‘Fredoka One’, cursive; font-size: 1.05rem;
-padding: 13px 36px; border-radius: 36px; border: none;
-background: linear-gradient(135deg, var(–accent3), #3a9a3a);
-color: white; cursor: pointer; margin-top: 8px;
-box-shadow: 0 4px 0 rgba(40,120,40,0.4), 0 6px 18px rgba(92,184,92,0.35);
-display: inline-flex; align-items: center; gap: 10px; transition: all 0.15s;
-}
-.practice-next-btn:hover { transform: translateY(-2px); }
-.practice-next-btn:active { transform: translateY(2px); }
-.practice-next-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  /* Next button */
+  .practice-next-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
+    padding: 13px 36px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, var(--accent3), #3a9a3a);
+    color: white; cursor: pointer; margin-top: 8px;
+    box-shadow: 0 4px 0 rgba(40,120,40,0.4), 0 6px 18px rgba(92,184,92,0.35);
+    display: inline-flex; align-items: center; gap: 10px; transition: all 0.15s;
+  }
+  .practice-next-btn:hover { transform: translateY(-2px); }
+  .practice-next-btn:active { transform: translateY(2px); }
+  .practice-next-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-/* Finish card */
-.practice-finish {
-text-align: center; padding: 40px 20px;
-display: none;
-}
-.practice-finish.show { display: block; animation: fadeIn 0.5s ease; }
-.practice-finish h2 { font-family: ‘Fredoka One’, cursive; font-size: 2rem; color: #e040a0; margin: 12px 0 8px; }
-.practice-finish p { color: var(–mid); font-weight: 600; }
-.finish-icon { font-size: 4rem; }
+  /* Finish card */
+  .practice-finish {
+    text-align: center; padding: 40px 20px;
+    display: none;
+  }
+  .practice-finish.show { display: block; animation: fadeIn 0.5s ease; }
+  .practice-finish h2 { font-family: 'Fredoka One', cursive; font-size: 2rem; color: #e040a0; margin: 12px 0 8px; }
+  .practice-finish p { color: var(--mid); font-weight: 600; }
+  .finish-icon { font-size: 4rem; }
 
-/* Per-set practice button — inside letter block footer / word card */
-.set-practice-bar {
-padding: 12px 20px 14px; text-align: center;
-border-top: 2px dashed var(–light);
-background: linear-gradient(135deg, #fff5fb, #ffeaf6);
-}
-.set-practice-btn {
-font-family: ‘Fredoka One’, cursive; font-size: 0.95rem;
-padding: 9px 22px; border-radius: 30px; border: none;
-background: linear-gradient(135deg, #ff7eb3, #e040a0);
-color: white; cursor: pointer;
-box-shadow: 0 3px 0 rgba(180,20,100,0.35), 0 5px 14px rgba(224,64,160,0.25);
-transition: all 0.18s; display: inline-flex; align-items: center; gap: 8px;
-}
-.set-practice-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(180,20,100,0.35), 0 8px 18px rgba(224,64,160,0.3); }
-.set-practice-btn:active { transform: translateY(1px); }
+  /* Per-set practice button — inside letter block footer / word card */
+  .set-practice-bar {
+    padding: 12px 20px 14px; text-align: center;
+    border-top: 2px dashed var(--light);
+    background: linear-gradient(135deg, #fff5fb, #ffeaf6);
+  }
+  .set-practice-btn {
+    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    padding: 9px 22px; border-radius: 30px; border: none;
+    background: linear-gradient(135deg, #ff7eb3, #e040a0);
+    color: white; cursor: pointer;
+    box-shadow: 0 3px 0 rgba(180,20,100,0.35), 0 5px 14px rgba(224,64,160,0.25);
+    transition: all 0.18s; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .set-practice-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(180,20,100,0.35), 0 8px 18px rgba(224,64,160,0.3); }
+  .set-practice-btn:active { transform: translateY(1px); }
 
-/* Practice button inside the wp1/wp2 word-display card */
-.wp-practice-bar {
-text-align: center; margin-top: 18px; padding-top: 16px;
-border-top: 2px dashed var(–light);
-}
+  /* Practice button inside the wp1/wp2 word-display card */
+  .wp-practice-bar {
+    text-align: center; margin-top: 18px; padding-top: 16px;
+    border-top: 2px dashed var(--light);
+  }
 
-/* Countdown ring on record button */
-.record-btn-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
-.record-countdown {
-position: absolute; top: -6px; right: -6px;
-background: #ff4d6d; color: white;
-font-family: ‘Fredoka One’, cursive; font-size: 1rem;
-width: 26px; height: 26px; border-radius: 50%;
-display: none; align-items: center; justify-content: center;
-box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-}
-.record-countdown.show { display: flex; }
+  /* Countdown ring on record button */
+  .record-btn-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+  .record-countdown {
+    position: absolute; top: -6px; right: -6px;
+    background: #ff4d6d; color: white;
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: none; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  }
+  .record-countdown.show { display: flex; }
 
-/* ── Test Yourself button (section level) ── */
-.section-test-bar {
-text-align: center; margin: 18px auto 4px; padding: 0 16px;
-}
-.test-btn {
-font-family: ‘Fredoka One’, cursive; font-size: 1.05rem;
-padding: 11px 28px; border-radius: 36px; border: none;
-background: linear-gradient(135deg, #5cb85c, #3a7a3a);
-color: white; cursor: pointer;
-box-shadow: 0 4px 0 rgba(30,100,30,0.4), 0 6px 18px rgba(92,184,92,0.3);
-transition: all 0.18s; display: inline-flex; align-items: center; gap: 9px;
-}
-.test-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(30,100,30,0.4), 0 10px 22px rgba(92,184,92,0.35); }
-.test-btn:active { transform: translateY(2px); }
+  /* ── Test Yourself button (section level) ── */
+  .section-test-bar {
+    text-align: center; margin: 18px auto 4px; padding: 0 16px;
+  }
+  .test-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
+    padding: 11px 28px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, #5cb85c, #3a7a3a);
+    color: white; cursor: pointer;
+    box-shadow: 0 4px 0 rgba(30,100,30,0.4), 0 6px 18px rgba(92,184,92,0.3);
+    transition: all 0.18s; display: inline-flex; align-items: center; gap: 9px;
+  }
+  .test-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(30,100,30,0.4), 0 10px 22px rgba(92,184,92,0.35); }
+  .test-btn:active { transform: translateY(2px); }
 
-/* ── Judge buttons ── */
-.test-judge-row {
-display: flex; gap: 14px; justify-content: center; margin-top: 16px; flex-wrap: wrap;
-}
-.judge-btn {
-font-family: ‘Fredoka One’, cursive; font-size: 1.1rem;
-padding: 13px 32px; border-radius: 36px; border: none; cursor: pointer;
-transition: all 0.15s; flex: 1; max-width: 180px;
-}
-.judge-btn.correct {
-background: linear-gradient(135deg, #5cb85c, #3a7a3a); color: white;
-box-shadow: 0 4px 0 rgba(30,100,30,0.4), 0 6px 16px rgba(92,184,92,0.3);
-}
-.judge-btn.incorrect {
-background: linear-gradient(135deg, #e05555, #b02020); color: white;
-box-shadow: 0 4px 0 rgba(140,10,10,0.4), 0 6px 16px rgba(220,80,80,0.3);
-}
-.judge-btn:hover { transform: translateY(-2px) scale(1.03); }
-.judge-btn:active { transform: translateY(2px); }
+  /* ── Judge buttons ── */
+  .test-judge-row {
+    display: flex; gap: 14px; justify-content: center; margin-top: 16px; flex-wrap: wrap;
+  }
+  .judge-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1.1rem;
+    padding: 13px 32px; border-radius: 36px; border: none; cursor: pointer;
+    transition: all 0.15s; flex: 1; max-width: 180px;
+  }
+  .judge-btn.correct {
+    background: linear-gradient(135deg, #5cb85c, #3a7a3a); color: white;
+    box-shadow: 0 4px 0 rgba(30,100,30,0.4), 0 6px 16px rgba(92,184,92,0.3);
+  }
+  .judge-btn.incorrect {
+    background: linear-gradient(135deg, #e05555, #b02020); color: white;
+    box-shadow: 0 4px 0 rgba(140,10,10,0.4), 0 6px 16px rgba(220,80,80,0.3);
+  }
+  .judge-btn:hover { transform: translateY(-2px) scale(1.03); }
+  .judge-btn:active { transform: translateY(2px); }
 
-/* ── Results list ── */
-.result-item {
-display: flex; align-items: center; gap: 12px;
-padding: 9px 14px; border-radius: 12px; margin-bottom: 8px;
-font-weight: 700; font-size: 1rem;
-}
-.result-item.ok  { background: #e8faf0; color: #1a7a3a; border: 2px solid #a8e6b8; }
-.result-item.bad { background: #fdf0f0; color: #a02020; border: 2px solid #f0b8b8; }
-.result-item .ri-word { font-family: ‘Fredoka One’, cursive; font-size: 1.2rem; margin-right: 4px; }
-.result-item .ri-mark { font-size: 1.3rem; flex-shrink: 0; }
-.result-item .ri-play {
-margin-left: auto; background: none; border: none; cursor: pointer;
-font-size: 1rem; color: inherit; opacity: 0.7; padding: 2px 6px;
-}
-.result-item .ri-play:hover { opacity: 1; }
+  /* ── Results list ── */
+  .result-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 14px; border-radius: 12px; margin-bottom: 8px;
+    font-weight: 700; font-size: 1rem;
+  }
+  .result-item.ok  { background: #e8faf0; color: #1a7a3a; border: 2px solid #a8e6b8; }
+  .result-item.bad { background: #fdf0f0; color: #a02020; border: 2px solid #f0b8b8; }
+  .result-item .ri-word { font-family: 'Fredoka One', cursive; font-size: 1.2rem; margin-right: 4px; }
+  .result-item .ri-mark { font-size: 1.3rem; flex-shrink: 0; }
+  .result-item .ri-play {
+    margin-left: auto; background: none; border: none; cursor: pointer;
+    font-size: 1rem; color: inherit; opacity: 0.7; padding: 2px 6px;
+  }
+  .result-item .ri-play:hover { opacity: 1; }
 
-/* Mic permission warning */
-.mic-warning {
-background: #fff4e0; border: 2px solid #f0c870; border-radius: 14px;
-padding: 14px 18px; font-size: 0.88rem; font-weight: 600; color: #806000;
-margin-top: 16px; display: none; line-height: 1.7; text-align: left;
-}
-.mic-warning.show { display: block; }
-.mic-warning code {
-background: rgba(0,0,0,0.08); border-radius: 5px; padding: 1px 6px;
-font-family: monospace; font-size: 0.85em; font-weight: 700;
-}
+  /* Mic permission warning */
+  .mic-warning {
+    background: #fff4e0; border: 2px solid #f0c870; border-radius: 14px;
+    padding: 14px 18px; font-size: 0.88rem; font-weight: 600; color: #806000;
+    margin-top: 16px; display: none; line-height: 1.7; text-align: left;
+  }
+  .mic-warning.show { display: block; }
+  .mic-warning code {
+    background: rgba(0,0,0,0.08); border-radius: 5px; padding: 1px 6px;
+    font-family: monospace; font-size: 0.85em; font-weight: 700;
+  }
 </style>
-
 </head>
 <body>
 
@@ -649,7 +647,6 @@ font-family: monospace; font-size: 0.85em; font-weight: 700;
 </div>
 
 <!-- SECTION 1 — ALPHABET -->
-
 <div class="section-page active" id="sec-alphabet">
   <p class="sec-intro">Tap any letter to hear its name — the way you say the alphabet.<br>
     <strong style="color:var(--accent2)">Blue = vowel</strong> &nbsp;·&nbsp; <strong style="color:var(--teal)">Green = consonant</strong>
@@ -658,7 +655,6 @@ font-family: monospace; font-size: 0.85em; font-weight: 700;
 </div>
 
 <!-- SECTION 2 — LETTER SOUNDS -->
-
 <div class="section-page" id="sec-sounds">
   <p class="sec-intro">Tap any word to hear it spoken slowly. Listen for the sound that letter makes.<br>
     <strong style="color:var(--accent2)">Blue = vowel</strong> &nbsp;·&nbsp; <strong style="color:var(--teal)">Green = consonant</strong> &nbsp;·&nbsp; <strong style="color:var(--accent4)">Yellow = second sound</strong>
@@ -670,7 +666,6 @@ font-family: monospace; font-size: 0.85em; font-weight: 700;
 </div>
 
 <!-- SECTION 3 — WORD PRONUNCIATION 1 -->
-
 <div class="section-page" id="sec-wp1">
   <div class="section-test-bar">
     <button class="test-btn" onclick="openTest('wp1')">🧪 Test Yourself — 10 random words</button>
@@ -709,7 +704,6 @@ font-family: monospace; font-size: 0.85em; font-weight: 700;
 </div>
 
 <!-- SECTION 4 — WORD PRONUNCIATION 2 -->
-
 <div class="section-page" id="sec-wp2">
   <div class="section-test-bar">
     <button class="test-btn" onclick="openTest('wp2')">🧪 Test Yourself — 10 random words</button>
@@ -750,7 +744,6 @@ font-family: monospace; font-size: 0.85em; font-weight: 700;
 <!-- ══════════════════════════════════════════
      PRACTICE MODE OVERLAY
 ══════════════════════════════════════════ -->
-
 <div class="practice-overlay" id="practiceOverlay">
 
   <div class="practice-header">
@@ -763,85 +756,83 @@ font-family: monospace; font-size: 0.85em; font-weight: 700;
 
   <div class="practice-body">
 
-```
-<div class="practice-step-info">
-  <div class="step-counter" id="practiceStepCounter">Word 1 of 1</div>
-  <div class="practice-progress"><div class="practice-progress-fill" id="practiceProgressFill" style="width:0%"></div></div>
-</div>
-
-<!-- PHASE 0: Example (word 1 — listen only) -->
-<div id="phaseExample">
-  <div class="practice-card">
-    <div class="practice-word-emoji" id="exampleEmoji"></div>
-    <div class="practice-word" id="exampleWord"></div>
-    <div class="practice-word-label">Example word — listen first</div>
-    <span class="phase-banner phase-listen">👂 Listen</span><br>
-    <div class="example-listen-row">
-      <div class="example-label">Hear how this word sounds.<br>Then tap the button below to start practising.</div>
-      <button class="listen-play-btn" id="examplePlayBtn" onclick="playExampleWord()">
-        <span>🔊</span> <span id="examplePlayLbl">Hear the word</span>
-      </button>
-      <button class="start-practice-btn" onclick="startPracticeWords()">
-        🎙️ Start Practising →
-      </button>
+    <div class="practice-step-info">
+      <div class="step-counter" id="practiceStepCounter">Word 1 of 1</div>
+      <div class="practice-progress"><div class="practice-progress-fill" id="practiceProgressFill" style="width:0%"></div></div>
     </div>
-  </div>
-</div>
 
-<!-- PHASE 1: Record -->
-<div id="phaseRecord" style="display:none">
-  <div class="practice-card">
-    <div class="practice-word-emoji" id="recordEmoji"></div>
-    <div class="practice-word" id="recordWord"></div>
-    <div class="practice-word-label" id="recordWordLabel">Your turn — say this word</div>
-    <span class="phase-banner phase-record">🎙️ Record your voice</span>
-    <div class="record-controls">
-      <div class="record-btn-wrap">
-        <button class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙️</button>
-        <div class="record-countdown" id="recordCountdown">3</div>
+    <!-- PHASE 0: Example (word 1 — listen only) -->
+    <div id="phaseExample">
+      <div class="practice-card">
+        <div class="practice-word-emoji" id="exampleEmoji"></div>
+        <div class="practice-word" id="exampleWord"></div>
+        <div class="practice-word-label">Example word — listen first</div>
+        <span class="phase-banner phase-listen">👂 Listen</span><br>
+        <div class="example-listen-row">
+          <div class="example-label">Hear how this word sounds.<br>Then tap the button below to start practising.</div>
+          <button class="listen-play-btn" id="examplePlayBtn" onclick="playExampleWord()">
+            <span>🔊</span> <span id="examplePlayLbl">Hear the word</span>
+          </button>
+          <button class="start-practice-btn" onclick="startPracticeWords()">
+            🎙️ Start Practising →
+          </button>
+        </div>
       </div>
-      <div class="record-hint" id="recordHint">Tap the mic — recording stops after 3 seconds</div>
     </div>
-    <div class="mic-warning" id="micWarning" style="margin-top:16px"></div>
-  </div>
-</div>
 
-<!-- PHASE 2: Compare -->
-<div id="phaseCompare" style="display:none">
-  <div class="practice-card">
-    <div class="practice-word-emoji" id="compareEmoji"></div>
-    <div class="practice-word" id="compareWord"></div>
-    <div class="practice-word-label">Compare your voice</div>
-    <span class="phase-banner phase-compare">🔍 Compare</span>
-    <div class="compare-controls">
-      <div class="feedback-badge" id="feedbackBadge"></div>
-      <div class="playback-row">
-        <button class="playback-btn my-voice" onclick="playMyRecording()">
-          🎧 My recording
-        </button>
-        <button class="playback-btn correct-voice" id="correctVoiceBtn" onclick="playCorrectWord()">
-          🔊 Correct word
-        </button>
+    <!-- PHASE 1: Record -->
+    <div id="phaseRecord" style="display:none">
+      <div class="practice-card">
+        <div class="practice-word-emoji" id="recordEmoji"></div>
+        <div class="practice-word" id="recordWord"></div>
+        <div class="practice-word-label" id="recordWordLabel">Your turn — say this word</div>
+        <span class="phase-banner phase-record">🎙️ Record your voice</span>
+        <div class="record-controls">
+          <div class="record-btn-wrap">
+            <button class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙️</button>
+            <div class="record-countdown" id="recordCountdown">3</div>
+          </div>
+          <div class="record-hint" id="recordHint">Tap the mic — recording stops after 3 seconds</div>
+        </div>
+        <div class="mic-warning" id="micWarning" style="margin-top:16px"></div>
       </div>
-      <button class="rerecord-link" onclick="goBackToRecord()">↩ Record again</button>
-      <button class="practice-next-btn" id="practiceNextBtn" onclick="advancePractice()">
-        Next word →
+    </div>
+
+    <!-- PHASE 2: Compare -->
+    <div id="phaseCompare" style="display:none">
+      <div class="practice-card">
+        <div class="practice-word-emoji" id="compareEmoji"></div>
+        <div class="practice-word" id="compareWord"></div>
+        <div class="practice-word-label">Compare your voice</div>
+        <span class="phase-banner phase-compare">🔍 Compare</span>
+        <div class="compare-controls">
+          <div class="feedback-badge" id="feedbackBadge"></div>
+          <div class="playback-row">
+            <button class="playback-btn my-voice" onclick="playMyRecording()">
+              🎧 My recording
+            </button>
+            <button class="playback-btn correct-voice" id="correctVoiceBtn" onclick="playCorrectWord()">
+              🔊 Correct word
+            </button>
+          </div>
+          <button class="rerecord-link" onclick="goBackToRecord()">↩ Record again</button>
+          <button class="practice-next-btn" id="practiceNextBtn" onclick="advancePractice()">
+            Next word →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINISH -->
+    <div class="practice-finish" id="practiceFinish">
+      <div class="finish-icon">🏅</div>
+      <h2>Practice complete!</h2>
+      <p>Great work! You practised all the words in this set.<br>Head back and try another group.</p>
+      <br>
+      <button class="practice-next-btn" onclick="closePractice()" style="margin-top:10px">
+        ← Back to lessons
       </button>
     </div>
-  </div>
-</div>
-
-<!-- FINISH -->
-<div class="practice-finish" id="practiceFinish">
-  <div class="finish-icon">🏅</div>
-  <h2>Practice complete!</h2>
-  <p>Great work! You practised all the words in this set.<br>Head back and try another group.</p>
-  <br>
-  <button class="practice-next-btn" onclick="closePractice()" style="margin-top:10px">
-    ← Back to lessons
-  </button>
-</div>
-```
 
   </div><!-- /practice-body -->
 </div><!-- /practiceOverlay -->
@@ -849,7 +840,6 @@ font-family: monospace; font-size: 0.85em; font-weight: 700;
 <!-- ══════════════════════════════════════════
      TEST YOURSELF OVERLAY
 ══════════════════════════════════════════ -->
-
 <div class="practice-overlay" id="testOverlay">
 
   <div class="practice-header" style="background:linear-gradient(135deg,#5cb85c,#3a7a3a)">
@@ -862,68 +852,66 @@ font-family: monospace; font-size: 0.85em; font-weight: 700;
 
   <div class="practice-body">
 
-```
-<div class="practice-step-info">
-  <div class="step-counter" id="testStepCounter">Word 1 of 10</div>
-  <div class="practice-progress">
-    <div class="practice-progress-fill" id="testProgressFill" style="width:0%;background:linear-gradient(90deg,#5cb85c,#3a7a3a)"></div>
-  </div>
-</div>
-
-<!-- TEST RECORD PHASE -->
-<div id="testPhaseRecord">
-  <div class="practice-card">
-    <div class="practice-word-emoji" id="testEmoji"></div>
-    <div class="practice-word" id="testWord"></div>
-    <div class="practice-word-label">Say this word out loud</div>
-    <span class="phase-banner phase-record">🎙️ Record your voice</span>
-    <div class="record-controls">
-      <div class="record-btn-wrap">
-        <button class="record-btn" id="testRecordBtn" onclick="testToggleRecording()">🎙️</button>
-        <div class="record-countdown" id="testCountdown">3</div>
-      </div>
-      <div class="record-hint" id="testRecordHint">Tap the mic — recording stops after 3 seconds</div>
-    </div>
-    <div class="mic-warning" id="testMicWarning" style="margin-top:16px"></div>
-  </div>
-</div>
-
-<!-- TEST COMPARE PHASE -->
-<div id="testPhaseCompare" style="display:none">
-  <div class="practice-card">
-    <div class="practice-word-emoji" id="testCompareEmoji"></div>
-    <div class="practice-word" id="testCompareWord"></div>
-    <div class="practice-word-label">Compare, then mark yourself</div>
-    <span class="phase-banner phase-compare">🔍 How did you do?</span>
-    <div class="compare-controls">
-      <div class="playback-row">
-        <button class="playback-btn my-voice" onclick="testPlayMyRecording()">🎧 My recording</button>
-        <button class="playback-btn correct-voice" id="testCorrectVoiceBtn" onclick="testPlayCorrectWord()">🔊 Correct word</button>
-      </div>
-      <div class="test-judge-row">
-        <button class="judge-btn correct" onclick="testJudge(true)">✅ Correct</button>
-        <button class="judge-btn incorrect" onclick="testJudge(false)">❌ Incorrect</button>
+    <div class="practice-step-info">
+      <div class="step-counter" id="testStepCounter">Word 1 of 10</div>
+      <div class="practice-progress">
+        <div class="practice-progress-fill" id="testProgressFill" style="width:0%;background:linear-gradient(90deg,#5cb85c,#3a7a3a)"></div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- TEST RESULTS -->
-<div id="testPhaseResults" style="display:none">
-  <div class="practice-card" style="text-align:left">
-    <div style="text-align:center;margin-bottom:20px">
-      <div style="font-size:3rem" id="testResultIcon">🏅</div>
-      <div class="practice-word" id="testResultScore" style="font-size:2rem"></div>
-      <div class="practice-word-label" id="testResultMsg"></div>
+    <!-- TEST RECORD PHASE -->
+    <div id="testPhaseRecord">
+      <div class="practice-card">
+        <div class="practice-word-emoji" id="testEmoji"></div>
+        <div class="practice-word" id="testWord"></div>
+        <div class="practice-word-label">Say this word out loud</div>
+        <span class="phase-banner phase-record">🎙️ Record your voice</span>
+        <div class="record-controls">
+          <div class="record-btn-wrap">
+            <button class="record-btn" id="testRecordBtn" onclick="testToggleRecording()">🎙️</button>
+            <div class="record-countdown" id="testCountdown">3</div>
+          </div>
+          <div class="record-hint" id="testRecordHint">Tap the mic — recording stops after 3 seconds</div>
+        </div>
+        <div class="mic-warning" id="testMicWarning" style="margin-top:16px"></div>
+      </div>
     </div>
-    <div id="testResultList"></div>
-    <div style="text-align:center;margin-top:24px">
-      <button class="practice-next-btn" onclick="openTest(testSection)" style="margin-right:10px">🔁 Try again</button>
-      <button class="practice-next-btn" onclick="closeTest()" style="background:linear-gradient(135deg,var(--mid),#555)">← Back</button>
+
+    <!-- TEST COMPARE PHASE -->
+    <div id="testPhaseCompare" style="display:none">
+      <div class="practice-card">
+        <div class="practice-word-emoji" id="testCompareEmoji"></div>
+        <div class="practice-word" id="testCompareWord"></div>
+        <div class="practice-word-label">Compare, then mark yourself</div>
+        <span class="phase-banner phase-compare">🔍 How did you do?</span>
+        <div class="compare-controls">
+          <div class="playback-row">
+            <button class="playback-btn my-voice" onclick="testPlayMyRecording()">🎧 My recording</button>
+            <button class="playback-btn correct-voice" id="testCorrectVoiceBtn" onclick="testPlayCorrectWord()">🔊 Correct word</button>
+          </div>
+          <div class="test-judge-row">
+            <button class="judge-btn correct" onclick="testJudge(true)">✅ Correct</button>
+            <button class="judge-btn incorrect" onclick="testJudge(false)">❌ Incorrect</button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-```
+
+    <!-- TEST RESULTS -->
+    <div id="testPhaseResults" style="display:none">
+      <div class="practice-card" style="text-align:left">
+        <div style="text-align:center;margin-bottom:20px">
+          <div style="font-size:3rem" id="testResultIcon">🏅</div>
+          <div class="practice-word" id="testResultScore" style="font-size:2rem"></div>
+          <div class="practice-word-label" id="testResultMsg"></div>
+        </div>
+        <div id="testResultList"></div>
+        <div style="text-align:center;margin-top:24px">
+          <button class="practice-next-btn" onclick="openTest(testSection)" style="margin-right:10px">🔁 Try again</button>
+          <button class="practice-next-btn" onclick="closeTest()" style="background:linear-gradient(135deg,var(--mid),#555)">← Back</button>
+        </div>
+      </div>
+    </div>
 
   </div>
 </div>
@@ -1152,11 +1140,6 @@ const wp2Families = [
   { cat:'Common endings', ending:'dge', words:['bridge','edge','badge','judge'],  mode:'whole', patternHint:'<strong>dge</strong> makes a "j" sound — like in <em>bridge</em>. It always comes after a short vowel.' },
   { cat:'Common endings', ending:'ed',  words:['jumped','played','looked','helped'], mode:'whole', patternHint:'<strong>ed</strong> at the end can sound like "d" (played), "t" (looked), or "id" (wanted).' },
   { cat:'Common endings', ending:'ing', words:['going','playing','looking','eating'], mode:'whole', patternHint:'<strong>ing</strong> is added to verbs to show something is happening now.' },
-  // 6. Word endings — sounds like "shun" / "cher"
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'tion', words:['nation','station','action','mention','motion','section'], mode:'whole', patternHint:'<strong>tion</strong> sounds like "shun" — like in <em>nation</em>. It is one of the most common word endings in English.' },
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'sion', words:['mission','session','passion','tension','vision','division'], mode:'whole', patternHint:'<strong>sion</strong> can sound like "shun" (mission) or "zhun" (vision). Listen carefully to each word.' },
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'cian', words:['musician','magician','technician','politician','physician'], mode:'whole', patternHint:'<strong>cian</strong> sounds like "shun" — like in <em>musician</em>. It usually refers to a person with a skill.' },
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'ture', words:['picture','nature','future','culture','mixture','capture'], mode:'whole', patternHint:'<strong>ture</strong> sounds like "cher" — like in <em>picture</em>. Say it as one quick sound: "p-ik-cher".' },
 ];
 
 /* ══════════════════════════════════════════
@@ -2007,6 +1990,5 @@ buildWp2Selector();
 selectFamily('wp1', 0);
 selectFamily('wp2', 0);
 </script>
-
 </body>
 </html>
