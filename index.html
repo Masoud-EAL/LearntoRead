@@ -1073,6 +1073,12 @@ const EMOJI = {
   'year':'📅','zero':'0️⃣','zip':'🤐','zoo':'🦁','zoom':'🔍',
   'cliff':'🏔️','road':'🛣️','sand':'🏖️',
   'step':'👣','tail':'🐈','team':'👥','trip':'✈️',
+  // Long I words
+  'ice':'🧊','rice':'🍚','kite':'🪁','bike':'🚲','write':'✍️',
+  // Short O new words
+  'octopus':'🐙','olive':'🫒',
+  // Long O words
+  'orange':'🍊','open':'📂','order':'📋',
 };
 function emo(word) { return EMOJI[word.toLowerCase()] || ''; }
 
@@ -1126,13 +1132,13 @@ const letterSoundData = [
     { label:'Soft sound — as in…', examples:['gem','giant','giraffe','age','page'], note:'G makes this sound before e, i, or y.' }
   ]},
   { l:'H', vowel:false, sounds:[{ label:'Sound — as in…', examples:['hat','hop','him','her','hot'] }]},
-  { l:'I', vowel:true,  sounds:[{ label:'Short i — as in…', examples:['ink','in','ill','insect'] }]},
+  { l:'I', vowel:true,  sounds:[{ label:'Short i — as in…', examples:['ink','in','ill','insect'] }, { label:'Long i — as in…', examples:['ice','rice','nice','kite','time','bike','five','life','like','write'] }]},
   { l:'J', vowel:false, sounds:[{ label:'Sound — as in…', examples:['jam','job','jump','just','jar'] }]},
   { l:'K', vowel:false, sounds:[{ label:'Sound — as in…', examples:['kit','kid','king','keep','kind'] }]},
   { l:'L', vowel:false, sounds:[{ label:'Sound — as in…', examples:['lap','leg','lip','lot','love'] }]},
   { l:'M', vowel:false, sounds:[{ label:'Sound — as in…', examples:['map','man','mud','most','me'] }]},
   { l:'N', vowel:false, sounds:[{ label:'Sound — as in…', examples:['net','not','nap','name','no'] }]},
-  { l:'O', vowel:true,  sounds:[{ label:'Short o — as in…', examples:['odd','on','off','ox'] }]},
+  { l:'O', vowel:true,  sounds:[{ label:'Short o — as in…', examples:['odd','ox','octopus','olive'] }, { label:'Long o — as in…', examples:['orange','october','open','over','old','only','oven','order'] }]},
   { l:'P', vowel:false, sounds:[{ label:'Sound — as in…', examples:['pan','pet','pin','pot','put'] }]},
   { l:'Q', vowel:false, sounds:[{ label:'Sound — as in…', examples:['quiz','queen','quick','quiet','quit'], note:'Q is almost always followed by U in English.' }]},
   { l:'R', vowel:false, sounds:[{ label:'Sound — as in…', examples:['ran','red','rip','run','road'] }]},
