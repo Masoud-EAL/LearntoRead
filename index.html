@@ -758,8 +758,8 @@
   <button class="nav-tab sec-sentences"        onclick="showSection('sentences',this)">📝 Read Sentences</button>
 </div>
 
-<div class="voice-selector-bar">
-  <span class="voice-selector-label">🎙️ Voice:</span>
+<div class="voice-selector-bar" id="voiceSelectorBar">
+ <span class="voice-selector-label">🎙️ Voice:</span>
   <select class="voice-select" id="voiceSelect" onchange="onVoiceSelectChange()">
     <option value="female">Female</option>
     <option value="male">Male</option>
@@ -1357,10 +1357,22 @@ function loadVoices() {
   if (notice) notice.style.display = hasBoth ? 'none' : '';
 }
 
+function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+}
+
 function onVoiceSelectChange() {
   const sel = document.getElementById('voiceSelect');
   if (sel) selectedVoiceGender = sel.value;
 }
+
+// Hide voice selector on mobile — pitch/voice APIs are unreliable on iOS and Android
+(function() {
+  if (isMobileDevice()) {
+    const bar = document.getElementById('voiceSelectorBar');
+    if (bar) bar.style.display = 'none';
+  }
+})();
 
 function applyVoice(utt) {
   const v = pickVoice(selectedVoiceGender);
