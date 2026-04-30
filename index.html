@@ -2525,5 +2525,42 @@ buildSentences();
 selectFamily('wp1', 0);
 selectFamily('wp2', 0);
 </script>
+ <script>
+  // Platform detection
+  function getPlatform() {
+    const ua = navigator.userAgent;
+    const isiOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    const isAndroid = /android/i.test(ua);
+    return { isiOS, isAndroid };
+  }
+
+  const platform = getPlatform();
+  let selectedVoice = 'female';
+
+  // Intercept voice selection
+  function onVoiceSelectChange() {
+    const voiceSelect = document.getElementById('voiceSelect');
+    selectedVoice = voiceSelect.value;
+    localStorage.setItem('selectedVoice', selectedVoice);
+  }
+
+  // Wrap speechSynthesis.speak() to apply mobile adjustments
+  const originalSpeak = window.speechSynthesis.speak;
+  window.speechSynthesis.speak = function(utterance) {
+    if ((platform.isiOS || platform.isAndroid) && selectedVoice === 'male') {
+      utterance.pitch = 0.75;  // Lower pitch for male
+      utterance.rate = 0.9;    // Slower rate
+    }
+    return originalSpeak.call(this, utterance);
+  };
+
+  // Restore saved voice on load
+  window.addEventListener('DOMContentLoaded', function() {
+    const saved = localStorage.getItem('selectedVoice') || 'female';
+    selectedVoice = saved;
+    const voiceSelect = document.getElementById('voiceSelect');
+    if (voiceSelect) voiceSelect.value = saved;
+  });
+</script>
 </body>
 </html>
