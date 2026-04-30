@@ -327,6 +327,34 @@
   footer { text-align:center; padding:18px; font-size:0.85rem; color:var(--mid); font-weight:600; border-top:2px solid var(--light); margin-top:12px; }
   footer strong { color:var(--accent1); }
 
+  /* ── VOICE SELECTOR ── */
+  .voice-selector-bar {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin: 10px auto 0; padding: 0 16px;
+    flex-wrap: wrap;
+  }
+  .voice-selector-label {
+    font-size: 0.82rem; font-weight: 700; color: var(--mid);
+    text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+  }
+  .voice-select {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.88rem;
+    padding: 7px 14px; border-radius: 24px;
+    border: 2.5px solid var(--light); background: white; color: var(--dark);
+    cursor: pointer; outline: none; transition: all 0.18s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a6f65' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+    padding-right: 32px;
+  }
+  .voice-select:hover, .voice-select:focus {
+    border-color: var(--accent2); box-shadow: 0 3px 12px rgba(74,144,217,0.2);
+  }
+  .voice-unavailable {
+    font-size: 0.78rem; color: var(--mid); font-style: italic; font-weight: 600;
+  }
+
   @media (max-width:480px) {
     .nav-tab { font-size:0.85rem; padding:8px 14px; }
     .tile { width:58px; height:68px; font-size:2.1rem; }
@@ -728,6 +756,17 @@
   <button class="nav-tab sec-words1"          onclick="showSection('wp1',this)">📖 Word Pronunciation 1</button>
   <button class="nav-tab sec-words2"          onclick="showSection('wp2',this)">📗 Word Pronunciation 2</button>
   <button class="nav-tab sec-sentences"        onclick="showSection('sentences',this)">📝 Read Sentences</button>
+</div>
+
+<div class="voice-selector-bar">
+  <span class="voice-selector-label">🎙️ Voice:</span>
+  <select class="voice-select" id="voiceSelect" onchange="onVoiceSelectChange()">
+    <option value="female">Female</option>
+    <option value="male">Male</option>
+  </select>
+  <span class="voice-unavailable" id="voiceUnavailable" style="display:none">
+    (only one voice available on this device)
+  </span>
 </div>
 
 <!-- SECTION 1 — ALPHABET -->
@@ -1269,6 +1308,74 @@ const wpState = {
 let speechRate = 0.6;
 
 /* ══════════════════════════════════════════
+   VOICE SELECTION
+══════════════════════════════════════════ */
+let selectedVoiceGender = 'female'; // default
+let cachedVoices = [];
+
+function getAUVoices() {
+  const all = window.speechSynthesis.getVoices();
+  if (!all || all.length === 0) return [];
+  // Prefer en-AU, fall back to en-GB, then en
+  const auVoices  = all.filter(v => v.lang === 'en-AU');
+  const gbVoices  = all.filter(v => v.lang === 'en-GB');
+  const enVoices  = all.filter(v => v.lang.startsWith('en'));
+  return auVoices.length ? auVoices : (gbVoices.length ? gbVoices : enVoices);
+}
+
+// Heuristic: many browsers label voices with 'Female'/'Male' or gendered names
+function classifyVoice(voice) {
+  const n = (voice.name || '').toLowerCase();
+  // Explicit gender labels
+  if (/\bfemale\b/.test(n)) return 'female';
+  if (/\bmale\b/.test(n))   return 'male';
+  // Common female voice names
+  if (/karen|catherine|zira|samantha|victoria|moira|fiona|tessa|lee|kyoko|amélie|amelie|anna|serena|alice|joanna|salli|kimberly|kendra|ivy|aria|jenny|libby|mia|natasha|nicole|nicky|raveena|veena|allison|ava/.test(n)) return 'female';
+  // Common male voice names
+  if (/daniel|david|james|tom|liam|george|lee|oliver|nathan|gordon|bruce|rishi|arthur|matthew|mark|russell|wayne|fred/.test(n)) return 'male';
+  return 'unknown';
+}
+
+function pickVoice(gender) {
+  const voices = getAUVoices();
+  if (!voices.length) return null;
+  const gendered = voices.filter(v => classifyVoice(v) === gender);
+  if (gendered.length) return gendered[0];
+  // If no gendered match, return any
+  return voices[0];
+}
+
+function loadVoices() {
+  cachedVoices = getAUVoices();
+  if (!cachedVoices.length) return;
+
+  const femaleVoices = cachedVoices.filter(v => classifyVoice(v) === 'female');
+  const maleVoices   = cachedVoices.filter(v => classifyVoice(v) === 'male');
+  const hasBoth = femaleVoices.length > 0 && maleVoices.length > 0;
+
+  const notice = document.getElementById('voiceUnavailable');
+  if (notice) notice.style.display = hasBoth ? 'none' : '';
+}
+
+function onVoiceSelectChange() {
+  const sel = document.getElementById('voiceSelect');
+  if (sel) selectedVoiceGender = sel.value;
+}
+
+function applyVoice(utt) {
+  const v = pickVoice(selectedVoiceGender);
+  if (v) utt.voice = v;
+  // Keep lang hint so browser doesn't fall back to a wrong locale
+  utt.lang = (v && v.lang) ? v.lang : 'en-AU';
+}
+
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+  // Chrome loads voices asynchronously; Safari loads them synchronously
+  setTimeout(loadVoices, 200);
+}
+
+/* ══════════════════════════════════════════
    SECTION SWITCH
 ══════════════════════════════════════════ */
 function showSection(name, btn) {
@@ -1570,6 +1677,7 @@ function speakCurrent(wp) {
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(word);
   utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  applyVoice(utt);
   btn.classList.add('speaking'); lbl.textContent = 'Listening…';
   utt.onend = utt.onerror = () => { btn.classList.remove('speaking'); lbl.textContent = 'Hear the word'; };
   window.speechSynthesis.speak(utt);
@@ -1581,6 +1689,7 @@ function speakRaw(text, onEnd) {
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(text);
   utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  applyVoice(utt);
   utt.onend = utt.onerror = () => { if (onEnd) onEnd(); };
   window.speechSynthesis.speak(utt);
 }
@@ -1682,6 +1791,7 @@ function playExampleWord() {
   window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(word);
   utt.rate = pIsSent ? 0.85 : speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  applyVoice(utt);
   btn.classList.add('speaking');
   lbl.textContent = pIsSent ? 'Listening...' : 'Listening...';
   utt.onend = utt.onerror = function() {
@@ -1837,6 +1947,7 @@ function playCorrectWord() {
   window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(word);
   utt.rate = pIsSent ? 0.85 : speechRate; utt.pitch = 1.0; utt.lang = 'en-AU';
+  applyVoice(utt);
   btn.classList.add('speaking');
   utt.onend = utt.onerror = function() { btn.classList.remove('speaking'); };
   window.speechSynthesis.speak(utt);
@@ -2072,6 +2183,7 @@ function testPlayCorrectWord() {
   window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(word);
   utt.rate = isSent ? 0.85 : speechRate; utt.pitch = 1.0; utt.lang = 'en-AU';
+  applyVoice(utt);
   btn.classList.add('speaking');
   utt.onend = utt.onerror = function(){ btn.classList.remove('speaking'); };
   window.speechSynthesis.speak(utt);
@@ -2128,6 +2240,7 @@ function testPlayResult(i) {
   window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(word);
   utt.rate = isSent ? 0.85 : speechRate; utt.pitch = 1.0; utt.lang = 'en-AU';
+  applyVoice(utt);
   window.speechSynthesis.speak(utt);
 }
 
@@ -2393,6 +2506,7 @@ function speakSentence(text, btn) {
   window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(text);
   utt.rate = 0.85; utt.pitch = 1.0; utt.lang = 'en-AU';
+  applyVoice(utt);
   if (btn) {
     btn.classList.add('speaking');
     utt.onend = utt.onerror = function() { btn.classList.remove('speaking'); };
