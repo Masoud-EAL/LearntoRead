@@ -2548,8 +2548,8 @@ selectFamily('wp2', 0);
   const originalSpeak = window.speechSynthesis.speak;
   window.speechSynthesis.speak = function(utterance) {
     if ((platform.isiOS || platform.isAndroid) && selectedVoice === 'male') {
-      utterance.pitch = 0.75;  // Lower pitch for male
-      utterance.rate = 0.9;    // Slower rate
+      utterance.pitch = 0.55;  // Lower pitch for male
+      utterance.rate = 0.8;    // Slower rate
     }
     return originalSpeak.call(this, utterance);
   };
