@@ -327,34 +327,6 @@
   footer { text-align:center; padding:18px; font-size:0.85rem; color:var(--mid); font-weight:600; border-top:2px solid var(--light); margin-top:12px; }
   footer strong { color:var(--accent1); }
 
-  /* ── VOICE SELECTOR ── */
-  .voice-selector-bar {
-    display: flex; align-items: center; justify-content: center;
-    gap: 10px; margin: 10px auto 0; padding: 0 16px;
-    flex-wrap: wrap;
-  }
-  .voice-selector-label {
-    font-size: 0.82rem; font-weight: 700; color: var(--mid);
-    text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
-  }
-  .voice-select {
-    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.88rem;
-    padding: 7px 14px; border-radius: 24px;
-    border: 2.5px solid var(--light); background: white; color: var(--dark);
-    cursor: pointer; outline: none; transition: all 0.18s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-    appearance: none; -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a6f65' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 12px center;
-    padding-right: 32px;
-  }
-  .voice-select:hover, .voice-select:focus {
-    border-color: var(--accent2); box-shadow: 0 3px 12px rgba(74,144,217,0.2);
-  }
-  .voice-unavailable {
-    font-size: 0.78rem; color: var(--mid); font-style: italic; font-weight: 600;
-  }
-
   @media (max-width:480px) {
     .nav-tab { font-size:0.85rem; padding:8px 14px; }
     .tile { width:58px; height:68px; font-size:2.1rem; }
@@ -633,9 +605,10 @@
 
   /* Practice button for sentence groups */
   .sentence-practice-bar {
-    padding: 10px 16px 12px; text-align: center;
+    padding: 10px 16px 12px;
     border-top: 2px dashed var(--light);
     background: linear-gradient(135deg, #fff5fb, #ffeaf6);
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
   }
 
   /* Per-set practice button — inside letter block footer / word card */
@@ -659,6 +632,7 @@
   .wp-practice-bar {
     text-align: center; margin-top: 18px; padding-top: 16px;
     border-top: 2px dashed var(--light);
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
   }
 
   /* Countdown ring on record button */
@@ -741,6 +715,108 @@
     background: rgba(0,0,0,0.08); border-radius: 5px; padding: 1px 6px;
     font-family: monospace; font-size: 0.85em; font-weight: 700;
   }
+
+  /* ── VOICE SELECTOR ── */
+  .voice-selector-bar {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin: 10px auto 0; padding: 0 16px; flex-wrap: wrap;
+  }
+  .voice-selector-label {
+    font-size: 0.82rem; font-weight: 700; color: var(--mid);
+    text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+  }
+  .voice-select {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.88rem;
+    padding: 7px 14px; border-radius: 24px;
+    border: 2.5px solid var(--light); background: white; color: var(--dark);
+    cursor: pointer; outline: none; transition: all 0.18s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a6f65' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+    padding-right: 32px;
+  }
+  .voice-select:hover, .voice-select:focus { border-color: var(--accent2); box-shadow: 0 3px 12px rgba(74,144,217,0.2); }
+
+  /* ── SPELLING PRACTICE ── */
+  .spell-practice-btn {
+    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    padding: 9px 22px; border-radius: 30px; border: none;
+    background: linear-gradient(135deg, #7eb8ff, #4a7fd4);
+    color: white; cursor: pointer;
+    box-shadow: 0 3px 0 rgba(30,80,180,0.3), 0 5px 14px rgba(74,127,212,0.25);
+    transition: all 0.18s; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .spell-practice-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(30,80,180,0.3), 0 8px 18px rgba(74,127,212,0.3); }
+  .spell-practice-btn:active { transform: translateY(1px); }
+  .spell-header-gradient { background: linear-gradient(135deg, #4a7fd4, #2a4fa0); }
+
+  .spell-input-wrap { margin: 18px 0 10px; text-align: center; }
+  .spell-input {
+    font-family: 'Nunito', sans-serif; font-size: 1.3rem; font-weight: 700;
+    padding: 12px 18px; border-radius: 16px; width: 100%; max-width: 420px;
+    border: 3px solid var(--light); outline: none; box-sizing: border-box;
+    transition: border-color 0.18s; color: var(--dark); background: #fafafa; text-align: center;
+  }
+  .spell-input:focus { border-color: #4a7fd4; background: white; }
+  .spell-input.shake { animation: spellShake 0.4s ease; border-color: #e05555; }
+  @keyframes spellShake {
+    0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-7px); }
+    40%{ transform:translateX(7px); }  60%{ transform:translateX(-5px); } 80%{ transform:translateX(5px); }
+  }
+  .spell-diff {
+    font-family: 'Fredoka One', cursive; font-size: 1.6rem; letter-spacing: 4px;
+    margin: 10px auto 4px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; min-height: 48px;
+  }
+  .spell-char {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 44px; border-radius: 10px; font-size: 1.3rem; border: 2px solid transparent;
+  }
+  .spell-char.correct { background: #d4f5d4; color: #1a7a1a; border-color: #7ac97a; }
+  .spell-char.wrong   { background: #fdd;   color: #b00;    border-color: #f09090; }
+  .spell-char.missing { background: #fff0cc; color: #a06000; border-color: #f0c060; font-size: 0.9rem; }
+  .spell-char.extra   { background: #ffe0f0; color: #a0006a; border-color: #f090c0; }
+  .spell-feedback-msg {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
+    margin: 8px 0 4px; min-height: 24px; text-align: center;
+  }
+  .spell-feedback-msg.correct { color: #1a7a1a; }
+  .spell-feedback-msg.wrong   { color: #b00; }
+  .spell-attempts {
+    font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700;
+    color: var(--mid); margin-bottom: 6px; text-align: center;
+  }
+  .spell-btn-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 14px; }
+  .spell-check-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    padding: 11px 28px; border-radius: 30px; border: none;
+    background: linear-gradient(135deg, #4a7fd4, #2a4fa0); color: white; cursor: pointer;
+    box-shadow: 0 3px 0 rgba(30,80,180,0.3); transition: all 0.18s;
+  }
+  .spell-check-btn:hover { transform: translateY(-2px); }
+  .spell-check-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .spell-secondary-btn {
+    font-family: 'Fredoka One', cursive; font-size: 0.92rem;
+    padding: 10px 20px; border-radius: 30px; border: 2.5px solid var(--light);
+    background: white; color: var(--dark); cursor: pointer; transition: all 0.18s;
+  }
+  .spell-secondary-btn:hover { border-color: #4a7fd4; color: #4a7fd4; }
+  .spell-answer-reveal {
+    font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: #2a4fa0;
+    background: #e8f0ff; border-radius: 14px; padding: 10px 22px;
+    margin: 10px auto 4px; display: none; text-align: center; letter-spacing: 2px;
+  }
+  .spell-listen-btn {
+    font-family: 'Fredoka One', cursive; font-size: 0.9rem;
+    padding: 8px 18px; border-radius: 24px; border: none;
+    background: linear-gradient(135deg, #ffb347, #e08020); color: white; cursor: pointer;
+    box-shadow: 0 2px 0 rgba(160,80,0,0.3); transition: all 0.18s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .spell-listen-btn:hover { transform: translateY(-1px); }
+  .spell-listen-btn.speaking { opacity: 0.6; }
+  .sent-spelling-wrap .spell-input { font-size: 1.05rem; }
+  .sent-spelling-wrap .spell-diff  { font-size: 1rem; letter-spacing: 2px; }
 </style>
 </head>
 <body>
@@ -759,14 +835,11 @@
 </div>
 
 <div class="voice-selector-bar" id="voiceSelectorBar">
- <span class="voice-selector-label">🎙️ Voice:</span>
+  <span class="voice-selector-label">🎙️ Voice:</span>
   <select class="voice-select" id="voiceSelect" onchange="onVoiceSelectChange()">
     <option value="female">Female</option>
     <option value="male">Male</option>
   </select>
-  <span class="voice-unavailable" id="voiceUnavailable" style="display:none">
-    (only one voice available on this device)
-  </span>
 </div>
 
 <!-- SECTION 1 — ALPHABET -->
@@ -812,7 +885,8 @@
         </div>
       </div>
       <div class="wp-practice-bar">
-        <button class="set-practice-btn" onclick="openPracticeForWp('wp1')">🎙️ Practise this word group</button>
+        <button class="set-practice-btn" onclick="openPracticeForWp('wp1')">🎙️ Practise saying this word group</button>
+        <button class="spell-practice-btn" onclick="openSpellingForWp('wp1')">✏️ Spelling practice</button>
       </div>
     </div>
     <div class="nav-row">
@@ -850,7 +924,8 @@
         </div>
       </div>
       <div class="wp-practice-bar">
-        <button class="set-practice-btn" onclick="openPracticeForWp('wp2')">🎙️ Practise this word group</button>
+        <button class="set-practice-btn" onclick="openPracticeForWp('wp2')">🎙️ Practise saying this word group</button>
+        <button class="spell-practice-btn" onclick="openSpellingForWp('wp2')">✏️ Spelling practice</button>
       </div>
     </div>
     <div class="nav-row">
@@ -891,6 +966,62 @@
       <button class="test-btn" onclick="openTest('sent1')">🧪 Test Yourself — 10 random sentences</button>
     </div>
     <div id="sent-level-1-groups"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SPELLING PRACTICE OVERLAY
+══════════════════════════════════════════ -->
+<div class="practice-overlay" id="spellingOverlay">
+  <div class="practice-header spell-header-gradient">
+    <button class="practice-back" onclick="closeSpelling()" title="Back">←</button>
+    <div class="practice-header-text">
+      <h2 id="spellingTitle">✏️ Spelling Practice</h2>
+      <p id="spellingSubtitle">Listen · Write · Check</p>
+    </div>
+  </div>
+  <div class="practice-body">
+    <div class="practice-step-info">
+      <div class="step-counter" id="spellingStepCounter">Word 1 of 1</div>
+      <div class="practice-progress">
+        <div class="practice-progress-fill" id="spellingProgressFill" style="width:0%;background:linear-gradient(90deg,#4a7fd4,#2a4fa0)"></div>
+      </div>
+    </div>
+    <div id="spellingPhase">
+      <div class="practice-card">
+        <div class="practice-word-label" id="spellingWordLabel">Listen, then type what you hear</div>
+        <div style="text-align:center; margin: 12px 0 6px;">
+          <button class="spell-listen-btn" id="spellingListenBtn" onclick="spellingSpeak()">
+            🔊 <span id="spellingListenLbl">Hear it</span>
+          </button>
+        </div>
+        <div class="spell-input-wrap" id="spellingInputWrap">
+          <input class="spell-input" id="spellingInput" type="text" autocomplete="off"
+            autocorrect="off" autocapitalize="off" spellcheck="false"
+            placeholder="Type your answer here…"
+            onkeydown="if(event.key==='Enter') checkSpelling()">
+        </div>
+        <div class="spell-diff" id="spellingDiff"></div>
+        <div class="spell-feedback-msg" id="spellingFeedback"></div>
+        <div class="spell-attempts" id="spellingAttempts"></div>
+        <div class="spell-answer-reveal" id="spellingAnswer"></div>
+        <div class="spell-btn-row">
+          <button class="spell-check-btn" id="spellingCheckBtn" onclick="checkSpelling()">✔ Check</button>
+          <button class="spell-secondary-btn" id="spellingTryAgainBtn" onclick="spellingTryAgain()" style="display:none">↩ Try again</button>
+          <button class="spell-secondary-btn" id="spellingShowAnswerBtn" onclick="spellingShowAnswer()" style="display:none">👁 Show answer</button>
+          <button class="spell-secondary-btn" onclick="spellingNext()">Skip →</button>
+        </div>
+      </div>
+    </div>
+    <div class="practice-finish" id="spellingFinish" style="display:none">
+      <div class="finish-icon">🌟</div>
+      <h2>Spelling complete!</h2>
+      <p id="spellingFinishMsg">Great work!</p>
+      <br>
+      <button class="practice-next-btn" onclick="closeSpelling()" style="margin-top:10px; font-size:1.1rem; padding:14px 36px;">
+        ← Back to lessons
+      </button>
+    </div>
   </div>
 </div>
 
@@ -1314,86 +1445,53 @@ const wpState = {
   wp2: { familyIdx:0, wordIdx:0, seen:new Set() },
 };
 let speechRate = 0.6;
+var sentenceRate = 0.6;
 
 /* ══════════════════════════════════════════
    VOICE SELECTION
 ══════════════════════════════════════════ */
-let selectedVoiceGender = 'female'; // default
-let cachedVoices = [];
+let selectedVoiceGender = 'female';
+const VOICE_PITCH = { female: 1.2, male: 0.75 };
+const FEMALE_NAMES = /karen|catherine|zira|samantha|victoria|moira|fiona|tessa|kyoko|am[eé]lie|anna|serena|alice|joanna|salli|kimberly|kendra|ivy|aria|jenny|libby|mia|natasha|nicole|nicky|raveena|veena|allison|ava|\bfemale\b/i;
+const MALE_NAMES   = /daniel|david|james|tom|liam|george|oliver|nathan|gordon|bruce|rishi|arthur|matthew|mark|russell|wayne|fred|\bmale\b/i;
 
-function getAUVoices() {
-  const all = window.speechSynthesis.getVoices();
-  if (!all || all.length === 0) return [];
-  // Prefer en-AU, fall back to en-GB, then en
-  const auVoices  = all.filter(v => v.lang === 'en-AU');
-  const gbVoices  = all.filter(v => v.lang === 'en-GB');
-  const enVoices  = all.filter(v => v.lang.startsWith('en'));
-  return auVoices.length ? auVoices : (gbVoices.length ? gbVoices : enVoices);
-}
-
-// Heuristic: many browsers label voices with 'Female'/'Male' or gendered names
 function classifyVoice(voice) {
-  const n = (voice.name || '').toLowerCase();
-  // Explicit gender labels
-  if (/\bfemale\b/.test(n)) return 'female';
-  if (/\bmale\b/.test(n))   return 'male';
-  // Common female voice names
-  if (/karen|catherine|zira|samantha|victoria|moira|fiona|tessa|lee|kyoko|amélie|amelie|anna|serena|alice|joanna|salli|kimberly|kendra|ivy|aria|jenny|libby|mia|natasha|nicole|nicky|raveena|veena|allison|ava/.test(n)) return 'female';
-  // Common male voice names
-  if (/daniel|david|james|tom|liam|george|lee|oliver|nathan|gordon|bruce|rishi|arthur|matthew|mark|russell|wayne|fred/.test(n)) return 'male';
+  const n = voice.name || '';
+  if (FEMALE_NAMES.test(n)) return 'female';
+  if (MALE_NAMES.test(n))   return 'male';
   return 'unknown';
 }
-
+function getEnglishVoices() {
+  const all = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  const au = all.filter(v => v.lang === 'en-AU');
+  const gb = all.filter(v => v.lang === 'en-GB');
+  const en = all.filter(v => v.lang && v.lang.startsWith('en'));
+  return au.length ? au : gb.length ? gb : en;
+}
 function pickVoice(gender) {
-  const voices = getAUVoices();
-  if (!voices.length) return null;
-  const gendered = voices.filter(v => classifyVoice(v) === gender);
-  if (gendered.length) return gendered[0];
-  // If no gendered match, return any
-  return voices[0];
+  const voices = getEnglishVoices();
+  const match = voices.find(v => classifyVoice(v) === gender);
+  return match || voices[0] || null;
 }
-
-function loadVoices() {
-  cachedVoices = getAUVoices();
-  if (!cachedVoices.length) return;
-
-  const femaleVoices = cachedVoices.filter(v => classifyVoice(v) === 'female');
-  const maleVoices   = cachedVoices.filter(v => classifyVoice(v) === 'male');
-  const hasBoth = femaleVoices.length > 0 && maleVoices.length > 0;
-
-  const notice = document.getElementById('voiceUnavailable');
-  if (notice) notice.style.display = hasBoth ? 'none' : '';
-}
-
-function isMobileDevice() {
-  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-}
-
 function onVoiceSelectChange() {
   const sel = document.getElementById('voiceSelect');
   if (sel) selectedVoiceGender = sel.value;
 }
-
-// Hide voice selector on mobile — pitch/voice APIs are unreliable on iOS and Android
+function applyVoice(utt) {
+  const v = pickVoice(selectedVoiceGender);
+  if (v) { utt.voice = v; utt.lang = v.lang; } else { utt.lang = 'en-AU'; }
+  utt.pitch = VOICE_PITCH[selectedVoiceGender] || 1.0;
+}
+function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+}
 (function() {
   if (isMobileDevice()) {
-    const bar = document.getElementById('voiceSelectorBar');
+    var bar = document.getElementById('voiceSelectorBar');
     if (bar) bar.style.display = 'none';
   }
 })();
-
-function applyVoice(utt) {
-  const v = pickVoice(selectedVoiceGender);
-  if (v) utt.voice = v;
-  // Keep lang hint so browser doesn't fall back to a wrong locale
-  utt.lang = (v && v.lang) ? v.lang : 'en-AU';
-}
-
-if (window.speechSynthesis) {
-  window.speechSynthesis.onvoiceschanged = loadVoices;
-  // Chrome loads voices asynchronously; Safari loads them synchronously
-  setTimeout(loadVoices, 200);
-}
+if (window.speechSynthesis) { window.speechSynthesis.onvoiceschanged = function() {}; }
 
 /* ══════════════════════════════════════════
    SECTION SWITCH
@@ -1719,8 +1817,6 @@ function setSpeed(rate, el) {
   document.querySelectorAll('.speed-opt:not(.sent-speed)').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
 }
-
-var sentenceRate = 0.6;
 function setSentSpeed(rate, el) {
   sentenceRate = rate;
   document.querySelectorAll('.sent-speed').forEach(b => b.classList.remove('active'));
@@ -2361,7 +2457,7 @@ const sentenceData = {
       topic: '📱 My details',
       sentences: [
         'My phone number is 0400 123 456.',
-        'I came to Australia in 2022.',
+        'I come to Australia in 2022.',
       ]
     },
     {
@@ -2523,11 +2619,20 @@ function buildSentences() {
       practiceBar.className = 'sentence-practice-bar';
       var pb = document.createElement('button');
       pb.className = 'set-practice-btn';
-      pb.innerHTML = '🎙️ Practise these sentences';
+      pb.innerHTML = '🎙️ Practise saying these sentences';
       pb.onclick = (function(sentences, topic) {
         return function() { openPractice(sentences, topic); };
       })(group.sentences.slice(), group.topic);
       practiceBar.appendChild(pb);
+
+      var sb = document.createElement('button');
+      sb.className = 'spell-practice-btn';
+      sb.innerHTML = '✏️ Spelling practice';
+      sb.onclick = (function(sentences, topic) {
+        return function() { openSpelling(sentences, topic); };
+      })(group.sentences.slice(), group.topic);
+      practiceBar.appendChild(sb);
+
       card.appendChild(practiceBar);
 
       container.appendChild(card);
@@ -2546,6 +2651,189 @@ function speakSentence(text, btn) {
     utt.onend = utt.onerror = function() { btn.classList.remove('speaking'); };
   }
   window.speechSynthesis.speak(utt);
+}
+
+/* ══════════════════════════════════════════
+   SPELLING PRACTICE
+══════════════════════════════════════════ */
+var spWords    = [];
+var spIdx      = 0;
+var spAttempts = 0;
+var spIsSent   = false;
+var spCorrect  = 0;
+var MAX_ATTEMPTS = 3;
+
+function openSpellingForWp(wp) {
+  var families = wp === 'wp1' ? wp1Families : wp2Families;
+  var fam = families[wpState[wp].familyIdx];
+  if (!fam) { alert('Choose a word group first.'); return; }
+  var lbl = wp === 'wp1' ? ('Word group -' + fam.ending) : ('Word group ' + fam.ending);
+  openSpelling(fam.words.slice(), lbl);
+}
+
+function openSpelling(words, label) {
+  if (!words || words.length < 1) { alert('No words to practise.'); return; }
+  spWords   = words.slice();
+  spIdx     = 0;
+  spCorrect = 0;
+  spIsSent  = words.some(function(w) { return w.indexOf(' ') !== -1; });
+  document.getElementById('spellingTitle').textContent    = '✏️ Spelling Practice';
+  document.getElementById('spellingSubtitle').textContent = label || '';
+  document.getElementById('spellingPhase').style.display  = '';
+  var fin = document.getElementById('spellingFinish');
+  fin.style.display = 'none'; fin.classList.remove('show');
+  document.getElementById('spellingOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  spLoadItem();
+  setTimeout(spellingSpeak, 400);
+}
+
+function closeSpelling() {
+  document.getElementById('spellingOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+  window.speechSynthesis && window.speechSynthesis.cancel();
+}
+
+function spLoadItem() {
+  spAttempts = 0;
+  var total  = spWords.length;
+  var label  = spIsSent ? 'Sentence' : 'Word';
+  document.getElementById('spellingStepCounter').textContent = label + ' ' + (spIdx + 1) + ' of ' + total;
+  var pct = total > 1 ? (spIdx / (total - 1)) * 100 : 100;
+  document.getElementById('spellingProgressFill').style.width = pct + '%';
+  document.getElementById('spellingWordLabel').textContent = spIsSent
+    ? 'Listen, then type the sentence exactly'
+    : 'Listen, then type the word';
+  var inp = document.getElementById('spellingInput');
+  inp.value = ''; inp.disabled = false; inp.classList.remove('shake');
+  inp.placeholder = spIsSent ? 'Type the sentence here…' : 'Type the word here…';
+  document.getElementById('spellingDiff').innerHTML       = '';
+  document.getElementById('spellingFeedback').textContent = '';
+  document.getElementById('spellingFeedback').className   = 'spell-feedback-msg';
+  document.getElementById('spellingAttempts').textContent = '';
+  document.getElementById('spellingAnswer').style.display = 'none';
+  document.getElementById('spellingCheckBtn').disabled    = false;
+  document.getElementById('spellingTryAgainBtn').style.display   = 'none';
+  document.getElementById('spellingShowAnswerBtn').style.display = 'none';
+  document.getElementById('spellingListenLbl').textContent = 'Hear it';
+  document.getElementById('spellingListenBtn').classList.remove('speaking');
+  inp.parentElement.className = spIsSent ? 'spell-input-wrap sent-spelling-wrap' : 'spell-input-wrap';
+  setTimeout(function() { inp.focus(); }, 100);
+}
+
+function spellingSpeak() {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var word = spWords[spIdx];
+  var utt  = new SpeechSynthesisUtterance(word);
+  utt.rate = spIsSent ? sentenceRate : speechRate;
+  utt.pitch = 1.0; utt.lang = 'en-AU';
+  applyVoice(utt);
+  var btn = document.getElementById('spellingListenBtn');
+  var lbl = document.getElementById('spellingListenLbl');
+  btn.classList.add('speaking'); lbl.textContent = 'Listening…';
+  utt.onend = utt.onerror = function() {
+    btn.classList.remove('speaking'); lbl.textContent = 'Hear it again';
+  };
+  window.speechSynthesis.speak(utt);
+}
+
+function checkSpelling() {
+  var answer = spWords[spIdx];
+  var typed  = document.getElementById('spellingInput').value;
+  var isCorrect = spIsSent ? (typed.trim() === answer.trim()) : (typed.trim().toLowerCase() === answer.trim().toLowerCase());
+  spAttempts++;
+  renderDiff(answer, typed, spIsSent);
+  var feedback = document.getElementById('spellingFeedback');
+  var attemptsLeft = MAX_ATTEMPTS - spAttempts;
+
+  if (isCorrect) {
+    spCorrect++;
+    feedback.textContent = '✅ Correct!'; feedback.className = 'spell-feedback-msg correct';
+    document.getElementById('spellingAttempts').textContent = '';
+    document.getElementById('spellingCheckBtn').disabled = true;
+    document.getElementById('spellingTryAgainBtn').style.display   = 'none';
+    document.getElementById('spellingShowAnswerBtn').style.display = 'none';
+    document.getElementById('spellingInput').disabled = true;
+    setTimeout(spellingNext, 1200);
+  } else {
+    var inp = document.getElementById('spellingInput');
+    inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake');
+    if (spAttempts >= MAX_ATTEMPTS) {
+      feedback.textContent = '❌ Not quite.'; feedback.className = 'spell-feedback-msg wrong';
+      document.getElementById('spellingAttempts').textContent = 'No attempts left.';
+      document.getElementById('spellingCheckBtn').disabled = true;
+      document.getElementById('spellingTryAgainBtn').style.display   = 'none';
+      document.getElementById('spellingShowAnswerBtn').style.display = '';
+      inp.disabled = true;
+    } else {
+      feedback.textContent = '❌ Not quite — try again!'; feedback.className = 'spell-feedback-msg wrong';
+      document.getElementById('spellingAttempts').textContent =
+        attemptsLeft + ' attempt' + (attemptsLeft === 1 ? '' : 's') + ' left';
+      document.getElementById('spellingTryAgainBtn').style.display   = '';
+      document.getElementById('spellingShowAnswerBtn').style.display = spAttempts >= 2 ? '' : 'none';
+    }
+  }
+}
+
+function renderDiff(answer, typed, isSent) {
+  var container = document.getElementById('spellingDiff');
+  container.innerHTML = '';
+  var a = isSent ? answer : answer.toLowerCase();
+  var t = isSent ? typed  : typed.toLowerCase();
+  // LCS diff
+  var m = a.length, n = t.length;
+  var dp = [];
+  for (var i = 0; i <= m; i++) { dp[i] = []; for (var j = 0; j <= n; j++) dp[i][j] = 0; }
+  for (var i = 1; i <= m; i++)
+    for (var j = 1; j <= n; j++)
+      dp[i][j] = a[i-1] === t[j-1] ? dp[i-1][j-1] + 1 : Math.max(dp[i-1][j], dp[i][j-1]);
+  var ops = []; var i = m, j = n;
+  while (i > 0 || j > 0) {
+    if (i > 0 && j > 0 && a[i-1] === t[j-1]) { ops.unshift({type:'match', char:typed[j-1]}); i--; j--; }
+    else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) { ops.unshift({type:'insert', char:typed[j-1]}); j--; }
+    else { ops.unshift({type:'delete', char:answer[i-1]}); i--; }
+  }
+  ops.forEach(function(op) {
+    var span = document.createElement('span');
+    span.className = 'spell-char';
+    if (op.type === 'match')  { span.classList.add('correct'); span.textContent = op.char; }
+    else if (op.type === 'insert') { span.classList.add('extra');   span.textContent = op.char; span.title = 'Extra letter'; }
+    else { span.classList.add('missing'); span.textContent = op.char; span.title = 'Missing: ' + op.char; }
+    container.appendChild(span);
+  });
+}
+
+function spellingTryAgain() {
+  var inp = document.getElementById('spellingInput');
+  inp.disabled = false; inp.classList.remove('shake'); inp.value = '';
+  document.getElementById('spellingDiff').innerHTML       = '';
+  document.getElementById('spellingFeedback').textContent = '';
+  document.getElementById('spellingFeedback').className   = 'spell-feedback-msg';
+  document.getElementById('spellingTryAgainBtn').style.display = 'none';
+  document.getElementById('spellingCheckBtn').disabled = false;
+  inp.focus();
+}
+
+function spellingShowAnswer() {
+  var el = document.getElementById('spellingAnswer');
+  el.textContent = spWords[spIdx]; el.style.display = '';
+  document.getElementById('spellingShowAnswerBtn').style.display = 'none';
+}
+
+function spellingNext() {
+  spIdx++;
+  if (spIdx >= spWords.length) { spShowFinish(); }
+  else { spLoadItem(); setTimeout(spellingSpeak, 300); }
+}
+
+function spShowFinish() {
+  document.getElementById('spellingPhase').style.display = 'none';
+  var fin = document.getElementById('spellingFinish');
+  fin.style.display = ''; fin.classList.add('show');
+  var label = spIsSent ? 'sentences' : 'words';
+  document.getElementById('spellingFinishMsg').textContent =
+    'You spelled ' + spCorrect + ' out of ' + spWords.length + ' ' + label + ' correctly. Great work!';
 }
 
 /* ══════════════════════════════════════════
