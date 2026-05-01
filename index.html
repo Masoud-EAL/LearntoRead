@@ -1744,7 +1744,7 @@ var pTimer    = null;
 
 /* ── Open ── */
 function openPractice(words, label) {
-  if (!words || words.length < 2) { alert('Need at least 2 words to practise.'); return; }
+  if (!words || words.length < 1) { alert('Need at least 1 item to practise.'); return; }
   pWords  = words.slice();
   pIdx    = 0;
   pAudio  = null;
@@ -1752,7 +1752,11 @@ function openPractice(words, label) {
   document.getElementById('practiceTitle').textContent    = 'Practice Reading';
   document.getElementById('practiceSubtitle').textContent = label || '';
   pCleanup();
-  showExample();
+  if (pIsSent) {
+    showRecord();   // sentences: skip example, practise all from the first one
+  } else {
+    showExample();  // words: keep the listen-first example phase
+  }
   document.getElementById('practiceOverlay').classList.add('active');
   document.body.style.overflow = 'hidden';
 }
@@ -1790,9 +1794,12 @@ function hideAllPhases() {
 
 function setProgress() {
   var total = pWords.length;
+  var label = pIsSent ? 'Sentence' : 'Word';
   document.getElementById('practiceStepCounter').textContent =
-    pIdx === 0 ? ('Example — word 1 of ' + total) : ('Word ' + (pIdx+1) + ' of ' + total);
-  var pct = total > 1 ? (pIdx / (total-1)) * 100 : 100;
+    (!pIsSent && pIdx === 0)
+      ? ('Example — word 1 of ' + total)
+      : (label + ' ' + (pIdx + 1) + ' of ' + total);
+  var pct = total > 1 ? (pIdx / (total - 1)) * 100 : 100;
   document.getElementById('practiceProgressFill').style.width = pct + '%';
 }
 
@@ -1830,13 +1837,13 @@ function playExampleWord() {
 
 function startPracticeWords() {
   pIdx = 1;
-  setProgress();
   showRecord();
 }
 
 /* ── PHASE 1: Record ── */
 function showRecord() {
   hideAllPhases();
+  setProgress();
   pCleanup();
   pAudio = null;
   var word = pWords[pIdx];
