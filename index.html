@@ -866,6 +866,14 @@
 
 <!-- SECTION 5 — READ SENTENCES -->
 <div class="section-page" id="sec-sentences">
+  <div class="speed-row" style="margin-bottom:6px">
+    <span class="speed-label">Speed:</span>
+    <div class="speed-btns">
+      <button class="speed-opt sent-speed active" onclick="setSentSpeed(0.6,this)">Slow</button>
+      <button class="speed-opt sent-speed" onclick="setSentSpeed(0.85,this)">Medium</button>
+      <button class="speed-opt sent-speed" onclick="setSentSpeed(1.0,this)">Normal</button>
+    </div>
+  </div>
   <div class="sentence-level-tabs">
     <button class="level-tab active" onclick="showLevel(0,this)">Level 0 — Beginner</button>
     <button class="level-tab"        onclick="showLevel(1,this)">Level 1 — Elementary</button>
@@ -1708,7 +1716,14 @@ function speakRaw(text, onEnd) {
 
 function setSpeed(rate, el) {
   speechRate = rate;
-  document.querySelectorAll('.speed-opt').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.speed-opt:not(.sent-speed)').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+var sentenceRate = 0.6;
+function setSentSpeed(rate, el) {
+  sentenceRate = rate;
+  document.querySelectorAll('.sent-speed').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
 }
 
@@ -2339,7 +2354,7 @@ const sentenceData = {
       topic: '📱 My details',
       sentences: [
         'My phone number is 0400 123 456.',
-        'I come to Australia in 2022.',
+        'I came to Australia in 2022.',
       ]
     },
     {
@@ -2517,7 +2532,7 @@ function speakSentence(text, btn) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(text);
-  utt.rate = 0.85; utt.pitch = 1.0; utt.lang = 'en-AU';
+  utt.rate = sentenceRate; utt.pitch = 1.0; utt.lang = 'en-AU';
   applyVoice(utt);
   if (btn) {
     btn.classList.add('speaking');
