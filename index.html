@@ -885,7 +885,7 @@
         </div>
       </div>
       <div class="wp-practice-bar">
-        <button class="set-practice-btn" onclick="openPracticeForWp('wp1')">🎙️ Practise saying this word group</button>
+        <button class="set-practice-btn" onclick="openPracticeForWp('wp1')">🎙️ Pronunciation practice</button>
         <button class="spell-practice-btn" onclick="openSpellingForWp('wp1')">✏️ Spelling practice</button>
       </div>
     </div>
@@ -924,7 +924,7 @@
         </div>
       </div>
       <div class="wp-practice-bar">
-        <button class="set-practice-btn" onclick="openPracticeForWp('wp2')">🎙️ Practise saying this word group</button>
+        <button class="set-practice-btn" onclick="openPracticeForWp('wp2')">🎙️ Pronunciation practice</button>
         <button class="spell-practice-btn" onclick="openSpellingForWp('wp2')">✏️ Spelling practice</button>
       </div>
     </div>
@@ -2619,7 +2619,7 @@ function buildSentences() {
       practiceBar.className = 'sentence-practice-bar';
       var pb = document.createElement('button');
       pb.className = 'set-practice-btn';
-      pb.innerHTML = '🎙️ Practise saying these sentences';
+      pb.innerHTML = '🎙️ Pronunciation practice';
       pb.onclick = (function(sentences, topic) {
         return function() { openPractice(sentences, topic); };
       })(group.sentences.slice(), group.topic);
