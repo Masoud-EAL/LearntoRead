@@ -177,6 +177,28 @@
     font-style: italic; margin-top: 8px;
   }
 
+  /* Phoneme tile button shown at top of each sound group */
+  .phoneme-tile-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'Fredoka One', cursive; font-size: 1.55rem; line-height: 1;
+    width: 52px; height: 58px; border-radius: 12px; cursor: pointer;
+    border: 2.5px solid var(--light); background: white; color: var(--teal);
+    box-shadow: 0 3px 0 rgba(0,0,0,0.10), 0 4px 10px rgba(0,0,0,0.07);
+    transition: all 0.16s; margin-bottom: 10px;
+    user-select: none;
+  }
+  .letter-block.vowel .phoneme-tile-btn { color: var(--accent2); }
+  .sound-group + .sound-group .phoneme-tile-btn { color: var(--accent4); border-color: #f0c870; }
+  .phoneme-tile-btn:hover { transform: translateY(-3px) scale(1.07); box-shadow: 0 6px 16px rgba(43,170,138,0.25); border-color: var(--teal); }
+  .letter-block.vowel .phoneme-tile-btn:hover { box-shadow: 0 6px 16px rgba(74,144,217,0.25); border-color: var(--accent2); }
+  .sound-group + .sound-group .phoneme-tile-btn:hover { border-color: var(--accent4); box-shadow: 0 6px 16px rgba(240,180,41,0.25); }
+  .phoneme-tile-btn.playing {
+    background: linear-gradient(135deg,#e8faf5,#c8f0e4); border-color: var(--teal);
+    transform: translateY(-3px) scale(1.1); box-shadow: 0 7px 18px rgba(43,170,138,0.35);
+  }
+  .letter-block.vowel .phoneme-tile-btn.playing { background: linear-gradient(135deg,#eef5ff,#d6e8ff); border-color: var(--accent2); box-shadow: 0 7px 18px rgba(74,144,217,0.35); }
+  .sound-group + .sound-group .phoneme-tile-btn.playing { background: linear-gradient(135deg,#fffde8,#fff0b0); border-color: var(--accent4); box-shadow: 0 7px 18px rgba(240,180,41,0.35); }
+
   .example-pills { display: flex; flex-wrap: wrap; gap: 8px; }
 
   .example-pill {
@@ -254,6 +276,7 @@
   .tile.ending    { background:linear-gradient(135deg,#eef5ff,#d6e8ff); color:var(--accent2); border:2.5px solid #b4d0f4; }
   .tile.digraph   { background:linear-gradient(135deg,#f5f0ff,#e8d6ff); color:var(--purple);  border:2.5px solid #d4b4f4; }
   .tile:hover { transform:translateY(-4px); }
+  .tile.playing { transform:translateY(-4px) scale(1.1); filter: brightness(1.12); box-shadow:0 6px 4px rgba(0,0,0,0.15), 0 8px 18px rgba(0,0,0,0.12); }
 
   @keyframes tilePop {
     from { transform:scale(0.5) translateY(20px); opacity:0; }
@@ -1339,44 +1362,50 @@ const letterNames = [
 // phonemeWav: the WAV file to play when the big letter is tapped.
 // For letters with two sounds, the first/main sound is used here.
 const letterSoundData = [
-  { l:'A', vowel:true,  phonemeWav:'æ as in bat.wav', sounds:[{ label:'Short a — as in…', examples:['ant','apple','ask','add'] }]},
-  { l:'B', vowel:false, phonemeWav:'b.wav', sounds:[{ label:'Sound — as in…', examples:['bat','bag','bed','bus','big'] }]},
+  { l:'A', vowel:true,  phonemeWav:'æ as in bat.wav', sounds:[{ wav:'æ as in bat.wav', label:'Short a — as in…', examples:['ant','apple','ask','add'] }]},
+  { l:'B', vowel:false, phonemeWav:'b.wav', sounds:[{ wav:'b.wav', label:'Sound — as in…', examples:['bat','bag','bed','bus','big'] }]},
   { l:'C', vowel:false, phonemeWav:'k.wav', sounds:[
-    { label:'Hard sound — as in…', examples:['cat','cup','cap','cut','come'] },
-    { label:'Soft sound — as in…', examples:['city','cent','circle','face','ice'], note:'C makes this sound before e, i, or y.' }
+    { wav:'k.wav',  label:'Hard sound — as in…', examples:['cat','cup','cap','cut','come'] },
+    { wav:'s.wav',  label:'Soft sound — as in…', examples:['city','cent','circle','face','ice'], note:'C makes this sound before e, i, or y.' }
   ]},
-  { l:'D', vowel:false, phonemeWav:'d.wav', sounds:[{ label:'Sound — as in…', examples:['dog','dig','dad','day','door'] }]},
-  { l:'E', vowel:true,  phonemeWav:'e as in bet.wav', sounds:[{ label:'Short e — as in…', examples:['egg','end','enter','empty'] }]},
-  { l:'F', vowel:false, phonemeWav:'f.wav', sounds:[{ label:'Sound — as in…', examples:['fan','fig','fun','fish','foot'] }]},
+  { l:'D', vowel:false, phonemeWav:'d.wav', sounds:[{ wav:'d.wav', label:'Sound — as in…', examples:['dog','dig','dad','day','door'] }]},
+  { l:'E', vowel:true,  phonemeWav:'e as in bet.wav', sounds:[{ wav:'e as in bet.wav', label:'Short e — as in…', examples:['egg','end','enter','empty'] }]},
+  { l:'F', vowel:false, phonemeWav:'f.wav', sounds:[{ wav:'f.wav', label:'Sound — as in…', examples:['fan','fig','fun','fish','foot'] }]},
   { l:'G', vowel:false, phonemeWav:'g.wav', sounds:[
-    { label:'Hard sound — as in…', examples:['gap','got','give','go','get'] },
-    { label:'Soft sound — as in…', examples:['gem','giant','giraffe','age','page'], note:'G makes this sound before e, i, or y.' }
+    { wav:'g.wav',              label:'Hard sound — as in…', examples:['gap','got','give','go','get'] },
+    { wav:'dʒ as in jar.wav',  label:'Soft sound — as in…', examples:['gem','giant','giraffe','age','page'], note:'G makes this sound before e, i, or y.' }
   ]},
-  { l:'H', vowel:false, phonemeWav:'h.wav', sounds:[{ label:'Sound — as in…', examples:['hat','hop','him','her','hot'] }]},
-  { l:'I', vowel:true,  phonemeWav:'ɪ as in bit.wav', sounds:[{ label:'Short i — as in…', examples:['ink','in','ill','insect'] }, { label:'Long i — as in…', examples:['ice','rice','nice','kite','time','bike','five','life','like','write'] }]},
-  { l:'J', vowel:false, phonemeWav:'dʒ as in jar.wav', sounds:[{ label:'Sound — as in…', examples:['jam','job','jump','just','jar'] }]},
-  { l:'K', vowel:false, phonemeWav:'k.wav', sounds:[{ label:'Sound — as in…', examples:['kit','kid','king','keep','kind'] }]},
-  { l:'L', vowel:false, phonemeWav:'l.wav', sounds:[{ label:'Sound — as in…', examples:['lap','leg','lip','lot','love'] }]},
-  { l:'M', vowel:false, phonemeWav:'m.wav', sounds:[{ label:'Sound — as in…', examples:['map','man','mud','most','me'] }]},
-  { l:'N', vowel:false, phonemeWav:'n.wav', sounds:[{ label:'Sound — as in…', examples:['net','not','nap','name','no'] }]},
-  { l:'O', vowel:true,  phonemeWav:'ɒ as in hot.wav', sounds:[{ label:'Short o — as in…', examples:['odd','ox','octopus','olive'] }, { label:'Long o — as in…', examples:['open','over','old','only','order'] }]},
-  { l:'P', vowel:false, phonemeWav:'p.wav', sounds:[{ label:'Sound — as in…', examples:['pan','pet','pin','pot','put'] }]},
-  { l:'Q', vowel:false, phonemeWav:'k.wav', sounds:[{ label:'Sound — as in…', examples:['quiz','queen','quick','quiet','quit'], note:'Q is almost always followed by U in English.' }]},
-  { l:'R', vowel:false, phonemeWav:'r.wav', sounds:[{ label:'Sound — as in…', examples:['ran','red','rip','run','road'] }]},
+  { l:'H', vowel:false, phonemeWav:'h.wav', sounds:[{ wav:'h.wav', label:'Sound — as in…', examples:['hat','hop','him','her','hot'] }]},
+  { l:'I', vowel:true,  phonemeWav:'ɪ as in bit.wav', sounds:[
+    { wav:'ɪ as in bit.wav',  label:'Short i — as in…', examples:['ink','in','ill','insect'] },
+    { wav:'aɪ as in ice.wav', label:'Long i — as in…',  examples:['ice','rice','nice','kite','time','bike','five','life','like','write'] }
+  ]},
+  { l:'J', vowel:false, phonemeWav:'dʒ as in jar.wav', sounds:[{ wav:'dʒ as in jar.wav', label:'Sound — as in…', examples:['jam','job','jump','just','jar'] }]},
+  { l:'K', vowel:false, phonemeWav:'k.wav', sounds:[{ wav:'k.wav', label:'Sound — as in…', examples:['kit','kid','king','keep','kind'] }]},
+  { l:'L', vowel:false, phonemeWav:'l.wav', sounds:[{ wav:'l.wav', label:'Sound — as in…', examples:['lap','leg','lip','lot','love'] }]},
+  { l:'M', vowel:false, phonemeWav:'m.wav', sounds:[{ wav:'m.wav', label:'Sound — as in…', examples:['map','man','mud','most','me'] }]},
+  { l:'N', vowel:false, phonemeWav:'n.wav', sounds:[{ wav:'n.wav', label:'Sound — as in…', examples:['net','not','nap','name','no'] }]},
+  { l:'O', vowel:true,  phonemeWav:'ɒ as in hot.wav', sounds:[
+    { wav:'ɒ as in hot.wav',  label:'Short o — as in…', examples:['odd','ox','octopus','olive'] },
+    { wav:'əʊ as in boat.wav',label:'Long o — as in…',  examples:['open','over','old','only','order'] }
+  ]},
+  { l:'P', vowel:false, phonemeWav:'p.wav', sounds:[{ wav:'p.wav', label:'Sound — as in…', examples:['pan','pet','pin','pot','put'] }]},
+  { l:'Q', vowel:false, phonemeWav:'k.wav', sounds:[{ wav:'k.wav', label:'Sound — as in…', examples:['quiz','queen','quick','quiet','quit'], note:'Q is almost always followed by U in English.' }]},
+  { l:'R', vowel:false, phonemeWav:'r.wav', sounds:[{ wav:'r.wav', label:'Sound — as in…', examples:['ran','red','rip','run','road'] }]},
   { l:'S', vowel:false, phonemeWav:'s.wav', sounds:[
-    { label:'"S" sound — as in…', examples:['sun','sit','sad','set','soft'] },
-    { label:'"Z" sound — as in…', examples:['is','his','has','was','as'], note:'S sounds like Z in many very common words.' }
+    { wav:'s.wav', label:'"S" sound — as in…', examples:['sun','sit','sad','set','soft'] },
+    { wav:'z.wav', label:'"Z" sound — as in…', examples:['is','his','has','was','as'], note:'S sounds like Z in many very common words.' }
   ]},
-  { l:'T', vowel:false, phonemeWav:'t.wav', sounds:[{ label:'Sound — as in…', examples:['tap','top','tin','ten','tell'] }]},
-  { l:'U', vowel:true,  phonemeWav:'ʌ as in cup.wav', sounds:[{ label:'Short u — as in…', examples:['up','under','uncle','umbrella'] }]},
-  { l:'V', vowel:false, phonemeWav:'v.wav', sounds:[{ label:'Sound — as in…', examples:['van','vet','vest','vine','voice'] }]},
-  { l:'W', vowel:false, phonemeWav:'w.wav', sounds:[{ label:'Sound — as in…', examples:['win','wet','was','want','word'] }]},
-  { l:'X', vowel:false, phonemeWav:'ks.wav', sounds:[{ label:'Sound — as in…', examples:['box','fox','mix','fix','six'] }]},
+  { l:'T', vowel:false, phonemeWav:'t.wav', sounds:[{ wav:'t.wav', label:'Sound — as in…', examples:['tap','top','tin','ten','tell'] }]},
+  { l:'U', vowel:true,  phonemeWav:'ʌ as in cup.wav', sounds:[{ wav:'ʌ as in cup.wav', label:'Short u — as in…', examples:['up','under','uncle','umbrella'] }]},
+  { l:'V', vowel:false, phonemeWav:'v.wav', sounds:[{ wav:'v.wav', label:'Sound — as in…', examples:['van','vet','vest','vine','voice'] }]},
+  { l:'W', vowel:false, phonemeWav:'w.wav', sounds:[{ wav:'w.wav', label:'Sound — as in…', examples:['win','wet','was','want','word'] }]},
+  { l:'X', vowel:false, phonemeWav:'ks.wav', sounds:[{ wav:'ks.wav', label:'Sound — as in…', examples:['box','fox','mix','fix','six'] }]},
   { l:'Y', vowel:false, phonemeWav:'j as in yam.wav', sounds:[
-    { label:'"Y" sound — as in…', examples:['yes','yet','you','your','year'] },
-    { label:'"EE" sound — as in…', examples:['happy','very','baby','city','funny'], note:'Y sounds like "ee" at the end of most words.' }
+    { wav:'j as in yam.wav', label:'"Y" sound — as in…', examples:['yes','yet','you','your','year'] },
+    { wav:'iː as in eat.wav', label:'"EE" sound — as in…', examples:['happy','very','baby','city','funny'], note:'Y sounds like "ee" at the end of most words.' }
   ]},
-  { l:'Z', vowel:false, phonemeWav:'z.wav', sounds:[{ label:'Sound — as in…', examples:['zip','zoo','zero','zoom','zone'] }]},
+  { l:'Z', vowel:false, phonemeWav:'z.wav', sounds:[{ wav:'z.wav', label:'Sound — as in…', examples:['zip','zoo','zero','zoom','zone'] }]},
 ];
 
 /* ══════════════════════════════════════════
@@ -1410,6 +1439,48 @@ function playPhonemeWav(filename, el) {
   audio.play().catch(() => {
     if (el) el.classList.remove('playing');
   });
+}
+
+/* ══════════════════════════════════════════
+   WP1 PHONEME MAP
+   All WP1 words are short-vowel CVC/CVCe patterns.
+   Returns array of { display, wav } tiles for a given word.
+══════════════════════════════════════════ */
+
+// Simple consonant → WAV (for WP1 context)
+const CONSONANT_WAV = {
+  b:'b.wav', c:'k.wav', d:'d.wav', f:'f.wav', g:'g.wav', h:'h.wav',
+  j:'dʒ as in jar.wav', k:'k.wav', l:'l.wav', m:'m.wav', n:'n.wav',
+  p:'p.wav', r:'r.wav', s:'s.wav', t:'t.wav', v:'v.wav', w:'w.wav',
+  x:'ks.wav', y:'j as in yam.wav', z:'z.wav'
+};
+
+// Short vowel → WAV (all WP1 vowels are short)
+const SHORT_VOWEL_WAV = {
+  a: 'æ as in bat.wav',
+  e: 'e as in bet.wav',
+  i: 'ɪ as in bit.wav',
+  o: 'ɒ as in hot.wav',
+  u: 'ʌ as in cup.wav'
+};
+
+// Per-word overrides for any consonant that needs a non-default sound
+const WP1_OVERRIDE = {
+  // 'can' → c = k (already default), no overrides needed
+  // All WP1 words use standard short-vowel + hard consonant patterns
+};
+
+function getWp1Tiles(word) {
+  const tiles = [];
+  for (let i = 0; i < word.length; i++) {
+    const ch = word[i].toLowerCase();
+    const wav = WP1_OVERRIDE[word + '_' + i]
+      || SHORT_VOWEL_WAV[ch]
+      || CONSONANT_WAV[ch]
+      || null;
+    tiles.push({ display: word[i], wav });
+  }
+  return tiles;
 }
 
 /* ══════════════════════════════════════════
@@ -1623,6 +1694,16 @@ function buildSoundsSection() {
       const grp = document.createElement('div');
       grp.className = 'sound-group';
 
+      // Phoneme tile for this specific sound group
+      if (sg.wav) {
+        const tileBtn = document.createElement('button');
+        tileBtn.className = 'phoneme-tile-btn';
+        tileBtn.textContent = entry.l;
+        tileBtn.title = 'Tap to hear this sound';
+        tileBtn.onclick = () => playPhonemeWav(sg.wav, tileBtn);
+        grp.appendChild(tileBtn);
+      }
+
       const lbl = document.createElement('div');
       lbl.className = 'sound-group-label';
       lbl.textContent = sg.label;
@@ -1759,6 +1840,7 @@ function renderWord(wp) {
 
   if (wp === 'wp1' || fam.mode === 'split') {
     const splitAt = fam.splitAt ?? (word.length - fam.ending.length);
+    const tiles = (wp === 'wp1') ? getWp1Tiles(word) : null;
     word.split('').forEach((letter, i) => {
       const isEnd = i >= splitAt;
       const lbl = document.createElement('div');
@@ -1771,7 +1853,12 @@ function renderWord(wp) {
       tile.className = 'tile ' + (isEnd ? 'ending' : 'beginning');
       tile.textContent = letter;
       tile.style.animationDelay = (i * 0.07) + 's';
-      tile.onclick = () => speakRaw(letter);
+      if (wp === 'wp1' && tiles && tiles[i] && tiles[i].wav) {
+        tile.onclick = () => playPhonemeWav(tiles[i].wav, tile);
+        tile.title = 'Tap to hear the phoneme';
+      } else {
+        tile.onclick = () => speakRaw(letter);
+      }
       tilesEl.appendChild(tile);
     });
     const beg = word.slice(0, splitAt);
