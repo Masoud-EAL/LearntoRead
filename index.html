@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -33,814 +34,814 @@
     --radius: 18px;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--bg);
-    color: var(--dark);
-    min-height: 100vh;
-    background-image:
-      radial-gradient(circle at 10% 20%, rgba(244,132,95,0.08) 0%, transparent 50%),
-      radial-gradient(circle at 90% 80%, rgba(74,144,217,0.08) 0%, transparent 50%);
-  }
-
-  /* ── HEADER ── */
-  header { text-align: center; padding: 30px 20px 10px; }
-  header h1 {
-    font-family: 'Fredoka One', cursive;
-    font-size: clamp(2rem, 6vw, 3.2rem);
-    color: var(--accent1); letter-spacing: 1px; line-height: 1;
-  }
-  header h1 span { color: var(--accent2); }
-  header p { margin-top: 6px; font-size: 0.97rem; color: var(--mid); font-weight: 600; }
-
-  /* ── TOP NAV ── */
-  .top-nav {
-    display: flex; justify-content: center; gap: 8px;
-    margin: 20px auto 0; padding: 0 12px; flex-wrap: wrap;
-    max-width: 820px;
-  }
-  .nav-tab {
-    font-family: 'Fredoka One', cursive; font-size: 0.98rem;
-    padding: 10px 20px; border-radius: 36px; border: 2.5px solid var(--light);
-    background: white; color: var(--mid); cursor: pointer;
-    transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-    white-space: nowrap;
-  }
-  .nav-tab:hover:not(.active) { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,0.12); }
-  .nav-tab.sec-alphabet.active  { background: var(--teal);    color: white; border-color: var(--teal);    box-shadow: 0 4px 14px rgba(43,170,138,0.4); }
-  .nav-tab.sec-sounds.active    { background: var(--accent2); color: white; border-color: var(--accent2); box-shadow: 0 4px 14px rgba(74,144,217,0.4); }
-  .nav-tab.sec-words1.active    { background: var(--accent1); color: white; border-color: var(--accent1); box-shadow: 0 4px 14px rgba(244,132,95,0.4); }
-  .nav-tab.sec-words2.active    { background: var(--purple);  color: white; border-color: var(--purple);  box-shadow: 0 4px 14px rgba(155,111,212,0.4); }
-
-  /* ── SECTION PAGES ── */
-  .section-page { display: none; }
-  .section-page.active { display: block; }
-
-  /* ════════════════════════════════
-     SECTION 1 — ALPHABET
-  ════════════════════════════════ */
-  .sec-intro {
-    text-align: center; max-width: 520px; margin: 20px auto 0;
-    padding: 0 16px; color: var(--mid); font-size: 0.93rem; font-weight: 600; line-height: 1.6;
-  }
-
-  .alpha-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
-    gap: 10px; max-width: 720px; margin: 18px auto 40px; padding: 0 16px;
-  }
-
-  .alpha-card {
-    background: white; border-radius: 14px; border: 2.5px solid var(--light);
-    padding: 14px 8px 10px; text-align: center; cursor: pointer;
-    transition: all 0.18s; box-shadow: 0 2px 8px rgba(0,0,0,0.07); user-select: none;
-  }
-  .alpha-card:hover { transform: translateY(-4px); box-shadow: 0 7px 18px rgba(0,0,0,0.12); border-color: var(--teal); }
-  .alpha-card.playing {
-    background: linear-gradient(135deg,#e8faf5,#c8f0e4);
-    border-color: var(--teal); transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 8px 22px rgba(43,170,138,0.3);
-  }
-  .alpha-card.vowel { border-color: #b4d0f4; }
-  .alpha-card.vowel:hover { border-color: var(--accent2); }
-  .alpha-card.vowel.playing { background: linear-gradient(135deg,#eef5ff,#d6e8ff); border-color: var(--accent2); box-shadow: 0 8px 22px rgba(74,144,217,0.3); }
-
-  .alpha-letter { font-family: 'Fredoka One', cursive; font-size: 2.4rem; line-height: 1; color: var(--teal); }
-  .alpha-card.vowel .alpha-letter { color: var(--accent2); }
-  .alpha-name { font-size: 0.78rem; font-weight: 700; color: var(--mid); margin-top: 4px; }
-
-  /* ════════════════════════════════
-     SECTION 2 — LETTER SOUNDS
-  ════════════════════════════════ */
-  .sounds-wrap {
-    max-width: 680px; margin: 22px auto 40px; padding: 0 16px;
-    display: flex; flex-direction: column; gap: 18px;
-  }
-
-  .letter-block {
-    background: white; border-radius: var(--radius);
-    border: 2px solid var(--light); box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-    overflow: hidden;
-  }
-
-  .letter-block-header {
-    display: flex; align-items: center; gap: 16px;
-    padding: 16px 20px 12px; border-bottom: 2px solid var(--light);
-  }
-
-  .letter-block-letter {
-    font-family: 'Fredoka One', cursive; font-size: 3rem; line-height: 1;
-    color: var(--teal); min-width: 48px; text-align: center;
-  }
-  .letter-block.vowel .letter-block-letter { color: var(--accent2); }
-
-  .letter-block-letter.tappable {
-    cursor: pointer; border-radius: 12px; padding: 4px 8px; transition: all 0.18s;
-  }
-  .letter-block-letter.tappable:hover {
-    background: linear-gradient(135deg,#e8faf5,#c8f0e4);
-    transform: scale(1.08); box-shadow: 0 4px 12px rgba(43,170,138,0.25);
-  }
-  .letter-block.vowel .letter-block-letter.tappable:hover {
-    background: linear-gradient(135deg,#eef5ff,#d6e8ff);
-    box-shadow: 0 4px 12px rgba(74,144,217,0.25);
-  }
-  .letter-block-letter.tappable.playing {
-    background: linear-gradient(135deg,#e8faf5,#c8f0e4);
-    transform: scale(1.1); box-shadow: 0 6px 18px rgba(43,170,138,0.35);
-  }
-  .letter-block.vowel .letter-block-letter.tappable.playing {
-    background: linear-gradient(135deg,#eef5ff,#d6e8ff);
-    box-shadow: 0 6px 18px rgba(74,144,217,0.35);
-  }
-
-  .letter-block-desc { flex: 1; }
-  .letter-block-desc h3 { font-family: 'Fredoka One', cursive; font-size: 1.05rem; color: var(--dark); margin-bottom: 2px; }
-  .letter-block-desc p { font-size: 0.83rem; color: var(--mid); font-weight: 600; line-height: 1.5; }
-
-  .sound-group { padding: 14px 20px 16px; }
-  .sound-group + .sound-group {
-    border-top: 2px dashed var(--light);
-    background: linear-gradient(135deg, #fffdf0, #fff8e0);
-  }
-
-  .sound-group-label {
-    font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
-    letter-spacing: 1.5px; color: var(--mid); margin-bottom: 10px;
-  }
-  .sound-group + .sound-group .sound-group-label { color: var(--accent4); }
-
-  .sound-note {
-    font-size: 0.78rem; color: var(--mid); font-weight: 600;
-    font-style: italic; margin-top: 8px;
-  }
-
-  /* Phoneme tile button shown at top of each sound group */
-  .phoneme-tile-btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    font-family: 'Fredoka One', cursive; font-size: 1.55rem; line-height: 1;
-    width: 52px; height: 58px; border-radius: 12px; cursor: pointer;
-    border: 2.5px solid var(--light); background: white; color: var(--teal);
-    box-shadow: 0 3px 0 rgba(0,0,0,0.10), 0 4px 10px rgba(0,0,0,0.07);
-    transition: all 0.16s; margin-bottom: 10px;
-    user-select: none;
-  }
-  .letter-block.vowel .phoneme-tile-btn { color: var(--accent2); }
-  .sound-group + .sound-group .phoneme-tile-btn { color: var(--accent4); border-color: #f0c870; }
-  .phoneme-tile-btn:hover { transform: translateY(-3px) scale(1.07); box-shadow: 0 6px 16px rgba(43,170,138,0.25); border-color: var(--teal); }
-  .letter-block.vowel .phoneme-tile-btn:hover { box-shadow: 0 6px 16px rgba(74,144,217,0.25); border-color: var(--accent2); }
-  .sound-group + .sound-group .phoneme-tile-btn:hover { border-color: var(--accent4); box-shadow: 0 6px 16px rgba(240,180,41,0.25); }
-  .phoneme-tile-btn.playing {
-    background: linear-gradient(135deg,#e8faf5,#c8f0e4); border-color: var(--teal);
-    transform: translateY(-3px) scale(1.1); box-shadow: 0 7px 18px rgba(43,170,138,0.35);
-  }
-  .letter-block.vowel .phoneme-tile-btn.playing { background: linear-gradient(135deg,#eef5ff,#d6e8ff); border-color: var(--accent2); box-shadow: 0 7px 18px rgba(74,144,217,0.35); }
-  .sound-group + .sound-group .phoneme-tile-btn.playing { background: linear-gradient(135deg,#fffde8,#fff0b0); border-color: var(--accent4); box-shadow: 0 7px 18px rgba(240,180,41,0.35); }
-
-  .example-pills { display: flex; flex-wrap: wrap; gap: 8px; }
-
-  .example-pill {
-    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
-    padding: 7px 18px; border-radius: 30px;
-    border: 2px solid var(--light); background: var(--bg);
-    color: var(--dark); cursor: pointer; transition: all 0.16s;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.07);
-    display: inline-flex; align-items: center; gap: 6px;
-  }
-  .example-pill:hover {
-    background: var(--teal); color: white; border-color: var(--teal);
-    transform: translateY(-2px); box-shadow: 0 5px 14px rgba(43,170,138,0.3);
-  }
-  .letter-block.vowel .example-pill:hover {
-    background: var(--accent2); border-color: var(--accent2);
-    box-shadow: 0 5px 14px rgba(74,144,217,0.3);
-  }
-  .sound-group + .sound-group .example-pill:hover {
-    background: var(--accent4); border-color: var(--accent4);
-    box-shadow: 0 5px 14px rgba(240,180,41,0.35); color: white;
-  }
-  .example-pill.playing {
-    background: var(--teal); color: white; border-color: var(--teal);
-    transform: scale(1.06); box-shadow: 0 5px 14px rgba(43,170,138,0.35);
-  }
-  .letter-block.vowel .example-pill.playing { background: var(--accent2); border-color: var(--accent2); }
-  .sound-group + .sound-group .example-pill.playing { background: var(--accent4); border-color: var(--accent4); }
-  .pill-emoji { font-size: 1.3em; line-height: 1; }
-
-  /* ════════════════════════════════
-     SHARED WORD PRONUNCIATION STYLES
-  ════════════════════════════════ */
-  .family-selector {
-    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
-    max-width: 780px; margin: 20px auto 0; padding: 0 16px;
-  }
-  .family-btn {
-    font-family: 'Fredoka One', cursive; font-size: 1rem; padding: 8px 18px;
-    border-radius: 30px; border: 2.5px solid transparent;
-    background: white; color: var(--mid); cursor: pointer;
-    transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  }
-  .family-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.12); }
-  .family-btn.active { color: white; transform: translateY(-2px); }
-  #wp1-selector .family-btn.active { background: var(--accent1); border-color: var(--accent1); box-shadow: 0 5px 15px rgba(244,132,95,0.35); }
-  #wp2-selector-wrap .family-btn.active { background: var(--purple); border-color: var(--purple); box-shadow: 0 5px 15px rgba(155,111,212,0.35); }
-
-  .main-card { max-width: 600px; margin: 22px auto; padding: 0 16px 40px; }
-
-  .family-title { font-family: 'Fredoka One', cursive; font-size: 1.25rem; color: var(--mid); text-align: center; margin-bottom: 22px; letter-spacing: 1px; }
-  .family-title strong { font-size: 1.55rem; }
-  #wp1-page .family-title strong { color: var(--accent2); }
-  #wp2-page .family-title strong { color: var(--purple); }
-
-  .word-display {
-    background: white; border-radius: var(--radius); box-shadow: var(--shadow);
-    padding: 30px 26px 24px; text-align: center; position: relative; overflow: hidden; border: 2px solid var(--light);
-  }
-  .word-display::before { content:''; position:absolute; top:0; left:0; right:0; height:5px; }
-  #wp1-page .word-display::before { background: linear-gradient(90deg, var(--accent1), var(--accent4), var(--accent2)); }
-  #wp2-page .word-display::before { background: linear-gradient(90deg, var(--purple), var(--accent2), var(--accent3)); }
-
-  .word-emoji-display { font-size: 3.5rem; line-height: 1; margin-bottom: 10px; min-height: 1.2em; }
-
-  .letter-tiles { display:flex; justify-content:center; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
-  .tile {
-    width:68px; height:78px; border-radius:14px;
-    display:flex; align-items:center; justify-content:center;
-    font-family:'Fredoka One',cursive; font-size:2.6rem; line-height:1;
-    box-shadow:0 4px 0 rgba(0,0,0,0.12), 0 6px 14px rgba(0,0,0,0.08);
-    transition:transform 0.15s; animation:tilePop 0.35s cubic-bezier(0.34,1.56,0.64,1) both; cursor:pointer;
-  }
-  .tile.beginning { background:linear-gradient(135deg,#fff7f0,#ffe4d6); color:var(--accent1); border:2.5px solid #f4c5b4; }
-  .tile.ending    { background:linear-gradient(135deg,#eef5ff,#d6e8ff); color:var(--accent2); border:2.5px solid #b4d0f4; }
-  .tile.digraph   { background:linear-gradient(135deg,#f5f0ff,#e8d6ff); color:var(--purple);  border:2.5px solid #d4b4f4; }
-  .tile:hover { transform:translateY(-4px); }
-  .tile.playing { transform:translateY(-4px) scale(1.1); filter: brightness(1.12); box-shadow:0 6px 4px rgba(0,0,0,0.15), 0 8px 18px rgba(0,0,0,0.12); }
-
-  @keyframes tilePop {
-    from { transform:scale(0.5) translateY(20px); opacity:0; }
-    to   { transform:scale(1) translateY(0);      opacity:1; }
-  }
-
-  .tile-labels { display:flex; justify-content:center; gap:8px; margin-bottom:8px; }
-  .tile-label-item { width:68px; text-align:center; font-size:0.68rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; }
-  .tile-label-item.bl { color:var(--accent1); }
-  .tile-label-item.el { color:var(--accent2); }
-  .tile-label-item.dg { color:var(--purple); }
-
-  .audio-btn {
-    color:white; border:none; border-radius:50px; padding:12px 32px;
-    font-family:'Nunito',sans-serif; font-size:1.05rem; font-weight:800;
-    cursor:pointer; display:inline-flex; align-items:center; gap:10px;
-    transition:all 0.15s; margin-bottom:6px;
-  }
-  #wp1-page .audio-btn { background:linear-gradient(135deg,var(--accent1),#e06840); box-shadow:0 4px 0 rgba(200,80,40,0.4),0 6px 18px rgba(244,132,95,0.3); }
-  #wp2-page .audio-btn { background:linear-gradient(135deg,var(--purple),#7a4fbf);  box-shadow:0 4px 0 rgba(100,50,170,0.4),0 6px 18px rgba(155,111,212,0.3); }
-  .audio-btn:hover { transform:translateY(-2px); }
-  .audio-btn:active { transform:translateY(2px); }
-  .audio-btn.speaking { animation:pulse 0.6s ease-in-out infinite alternate; }
-  @keyframes pulse { from{filter:brightness(1);} to{filter:brightness(1.15);} }
-
-  .nav-row { display:flex; gap:12px; justify-content:center; margin-top:20px; align-items:center; }
-  .wp-nav-btn {
-    background:white; border:2.5px solid var(--light); color:var(--dark);
-    border-radius:50px; padding:10px 22px; font-family:'Nunito',sans-serif;
-    font-size:1rem; font-weight:700; cursor:pointer; display:inline-flex;
-    align-items:center; gap:8px; transition:all 0.15s; box-shadow:0 2px 8px rgba(0,0,0,0.06);
-  }
-  .wp-nav-btn:hover:not(:disabled) { background:var(--dark); color:white; border-color:var(--dark); transform:translateY(-2px); }
-  .wp-nav-btn:disabled { opacity:0.35; cursor:not-allowed; }
-  .word-counter { font-size:0.95rem; font-weight:700; color:var(--mid); min-width:60px; text-align:center; }
-
-  .hint-box { background:linear-gradient(135deg,#f0faf0,#e0f5e0); border:2px solid #b8e8b8; border-radius:var(--radius); padding:15px 18px; margin-top:22px; display:flex; align-items:flex-start; gap:12px; }
-  .hint-icon { font-size:1.5rem; flex-shrink:0; margin-top:2px; }
-  .hint-box p { font-size:0.9rem; color:#2a5a2a; font-weight:600; line-height:1.6; }
-  .hint-box p strong { color:var(--accent1); }
-
-  .speed-row { display:flex; align-items:center; justify-content:center; gap:10px; margin-top:14px; flex-wrap:wrap; }
-  .speed-label { font-size:0.8rem; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:1px; }
-  .speed-btns { display:flex; gap:6px; }
-  .speed-opt { padding:5px 13px; border-radius:20px; border:2px solid var(--light); background:white; font-family:'Nunito',sans-serif; font-weight:700; font-size:0.8rem; cursor:pointer; color:var(--mid); transition:all 0.15s; }
-  .speed-opt.active { background:var(--accent2); color:white; border-color:var(--accent2); }
-
-  .word-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:10px; margin-top:24px; }
-  .word-chip { background:white; border:2px solid var(--light); border-radius:12px; padding:10px 8px; text-align:center; cursor:pointer; transition:all 0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
-  .word-chip:hover { transform:translateY(-3px); box-shadow:0 6px 16px rgba(0,0,0,0.1); }
-  #wp1-page .word-chip:hover   { border-color:var(--accent1); }
-  #wp1-page .word-chip.current { background:linear-gradient(135deg,#fff4f0,#ffe8df); border-color:var(--accent1); box-shadow:0 4px 14px rgba(244,132,95,0.25); }
-  #wp2-page .word-chip:hover   { border-color:var(--purple); }
-  #wp2-page .word-chip.current { background:linear-gradient(135deg,#f5f0ff,#ead6ff); border-color:var(--purple); box-shadow:0 4px 14px rgba(155,111,212,0.25); }
-  .chip-beginning { font-family:'Fredoka One',cursive; font-size:1.4rem; color:var(--accent1); }
-  .chip-ending    { font-family:'Fredoka One',cursive; font-size:1.4rem; color:var(--accent2); }
-  .chip-whole     { font-family:'Fredoka One',cursive; font-size:1.4rem; color:var(--purple); }
-  .chip-emoji     { font-size:1.5em; display:block; margin-top:3px; line-height:1; }
-  .chip-audio     { font-size:0.66rem; color:var(--mid); margin-top:2px; }
-
-  .trophy-msg { text-align:center; padding:22px; display:none; }
-  .trophy-msg.show { display:block; animation:fadeIn 0.5s ease; }
-  @keyframes fadeIn { from{opacity:0;transform:scale(0.8);} to{opacity:1;transform:scale(1);} }
-  .trophy-msg h2 { font-family:'Fredoka One',cursive; font-size:2rem; color:var(--accent4); margin-bottom:6px; }
-  .trophy-msg p { color:var(--mid); font-weight:600; }
-
-  .cat-divider { max-width:780px; margin:26px auto 0; padding:0 16px; display:flex; align-items:center; gap:14px; }
-  .cat-divider hr { flex:1; border:none; border-top:2px solid var(--light); }
-  .cat-pill { font-family:'Fredoka One',cursive; font-size:0.88rem; color:white; background:var(--purple); border-radius:20px; padding:5px 16px; white-space:nowrap; }
-
-  footer { text-align:center; padding:18px; font-size:0.85rem; color:var(--mid); font-weight:600; border-top:2px solid var(--light); margin-top:12px; }
-  footer strong { color:var(--accent1); }
-
-  @media (max-width:480px) {
-    .nav-tab { font-size:0.85rem; padding:8px 14px; }
-    .tile { width:58px; height:68px; font-size:2.1rem; }
-    .alpha-grid { grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); }
-    .alpha-letter { font-size:2rem; }
-    .letter-block-letter { font-size:2.4rem; }
-  }
-
-  /* ════════════════════════════════
-     PRACTICE BUTTON (top of sections)
-  ════════════════════════════════ */
-  .practice-bar {
-    text-align: center; margin: 18px auto 0; padding: 0 16px;
-  }
-  .practice-btn {
-    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
-    padding: 11px 28px; border-radius: 36px; border: none;
-    background: linear-gradient(135deg, #ff7eb3, #e040a0);
-    color: white; cursor: pointer;
-    box-shadow: 0 4px 0 rgba(180,20,100,0.35), 0 6px 18px rgba(224,64,160,0.3);
-    transition: all 0.18s; display: inline-flex; align-items: center; gap: 9px;
-  }
-  .practice-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(180,20,100,0.35), 0 10px 22px rgba(224,64,160,0.35); }
-  .practice-btn:active { transform: translateY(2px); }
-
-  /* ════════════════════════════════
-     PRACTICE OVERLAY / PAGE
-  ════════════════════════════════ */
-  .practice-overlay {
-    display: none; position: fixed; inset: 0;
-    background: var(--bg); z-index: 100; overflow-y: auto;
-    padding: 0 0 40px;
-  }
-  .practice-overlay.active { display: block; }
-
-  .practice-header {
-    background: linear-gradient(135deg, #ff7eb3, #e040a0);
-    padding: 18px 20px 16px; display: flex; align-items: center;
-    gap: 14px; position: sticky; top: 0; z-index: 10;
-    box-shadow: 0 4px 16px rgba(224,64,160,0.3);
-  }
-  .practice-back {
-    background: rgba(255,255,255,0.25); border: none; border-radius: 50%;
-    width: 40px; height: 40px; font-size: 1.3rem; color: white;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; transition: background 0.15s;
-  }
-  .practice-back:hover { background: rgba(255,255,255,0.4); }
-  .practice-header-text { color: white; }
-  .practice-header-text h2 { font-family: 'Fredoka One', cursive; font-size: 1.4rem; line-height: 1; }
-  .practice-header-text p { font-size: 0.82rem; font-weight: 600; opacity: 0.88; margin-top: 3px; }
-
-  .practice-body { max-width: 580px; margin: 0 auto; padding: 24px 16px 0; }
-
-  /* Step indicator */
-  .practice-step-info {
-    text-align: center; margin-bottom: 20px;
-  }
-  .practice-step-info .step-counter {
-    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
-    color: var(--mid); letter-spacing: 1px;
-  }
-  .practice-progress {
-    height: 6px; background: var(--light); border-radius: 10px;
-    margin: 8px auto 0; max-width: 300px; overflow: hidden;
-  }
-  .practice-progress-fill {
-    height: 100%; border-radius: 10px;
-    background: linear-gradient(90deg, #ff7eb3, #e040a0);
-    transition: width 0.4s ease;
-  }
-
-  /* Word display card in practice */
-  .practice-card {
-    background: white; border-radius: var(--radius);
-    box-shadow: var(--shadow); border: 2px solid var(--light);
-    padding: 28px 24px 24px; text-align: center; position: relative; overflow: hidden;
-  }
-  .practice-card::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:5px;
-    background: linear-gradient(90deg, #ff7eb3, #e040a0, #ff7eb3);
-  }
-  .practice-word-emoji { font-size: 3rem; line-height: 1; margin-bottom: 10px; min-height: 1.1em; }
-  .practice-word {
-    font-family: 'Fredoka One', cursive; font-size: 3.2rem;
-    color: var(--dark); letter-spacing: 2px; margin-bottom: 6px;
-  }
-  .practice-word-label {
-    font-size: 0.78rem; font-weight: 800; text-transform: uppercase;
-    letter-spacing: 1.5px; color: var(--mid); margin-bottom: 20px;
-  }
-
-  /* Phase banners */
-  .phase-banner {
-    font-family: 'Fredoka One', cursive; font-size: 0.92rem;
-    padding: 7px 18px; border-radius: 24px; display: inline-block;
-    margin-bottom: 18px; letter-spacing: 0.5px;
-  }
-  .phase-listen  { background: #e8f5ff; color: var(--accent2); border: 2px solid #b4d8f8; }
-  .phase-record  { background: #fff0f8; color: #d0208a; border: 2px solid #f8b4dc; }
-  .phase-compare { background: #f0fff4; color: var(--accent3); border: 2px solid #a8e6b8; }
-
-  /* Example word (word 1 — listen only) */
-  .example-listen-row {
-    display: flex; flex-direction: column; align-items: center; gap: 12px;
-  }
-  .example-label {
-    font-size: 0.82rem; font-weight: 700; color: var(--mid); text-align: center; line-height: 1.5;
-  }
-  .listen-play-btn {
-    font-family: 'Fredoka One', cursive; font-size: 1rem;
-    padding: 11px 28px; border-radius: 36px; border: none;
-    background: linear-gradient(135deg, var(--accent2), #2d6cbf);
-    color: white; cursor: pointer;
-    box-shadow: 0 4px 0 rgba(30,80,180,0.35), 0 6px 16px rgba(74,144,217,0.3);
-    display: inline-flex; align-items: center; gap: 9px; transition: all 0.15s;
-  }
-  .listen-play-btn:hover { transform: translateY(-2px); }
-  .listen-play-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
-
-  .start-practice-btn {
-    font-family: 'Fredoka One', cursive; font-size: 1rem;
-    padding: 11px 28px; border-radius: 36px; border: none;
-    background: linear-gradient(135deg, #e040a0, #bf1a80);
-    color: white; cursor: pointer; margin-top: 10px;
-    box-shadow: 0 4px 0 rgba(150,10,100,0.35), 0 6px 16px rgba(224,64,160,0.3);
-    display: inline-flex; align-items: center; gap: 9px; transition: all 0.15s;
-  }
-  .start-practice-btn:hover { transform: translateY(-2px); }
-
-  /* Recording controls */
-  .record-controls { display: flex; flex-direction: column; align-items: center; gap: 14px; }
-
-  .record-btn {
-    width: 80px; height: 80px; border-radius: 50%; border: none;
-    background: linear-gradient(135deg, #ff4d6d, #c9003c);
-    color: white; font-size: 2rem; cursor: pointer;
-    box-shadow: 0 6px 0 rgba(150,0,40,0.4), 0 8px 24px rgba(255,77,109,0.4);
-    transition: all 0.15s; display: flex; align-items: center; justify-content: center;
-    position: relative;
-  }
-  .record-btn:hover { transform: translateY(-3px) scale(1.05); }
-  .record-btn.recording {
-    animation: recordPulse 1s ease-in-out infinite;
-    background: linear-gradient(135deg, #ff1a1a, #990000);
-  }
-  @keyframes recordPulse {
-    0%   { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 0 rgba(255,26,26,0.5); }
-    70%  { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 20px rgba(255,26,26,0); }
-    100% { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 0 rgba(255,26,26,0); }
-  }
-  .record-hint { font-size: 0.85rem; font-weight: 700; color: var(--mid); }
-
-  /* Playback + compare row */
-  .compare-controls { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
-
-  .playback-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-
-  .playback-btn {
-    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
-    padding: 10px 22px; border-radius: 36px; border: none;
-    cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
-    transition: all 0.15s;
-  }
-  .playback-btn.my-voice {
-    background: linear-gradient(135deg, #fff0f8, #f8d6ee);
-    color: #d0208a; border: 2.5px solid #f0a8d8;
-  }
-  .playback-btn.my-voice:hover { background: linear-gradient(135deg, #f8c8e8, #f0a0d0); }
-  .playback-btn.correct-voice {
-    background: linear-gradient(135deg, var(--accent2), #2d6cbf);
-    color: white; box-shadow: 0 3px 0 rgba(30,80,180,0.35), 0 5px 14px rgba(74,144,217,0.3);
-  }
-  .playback-btn.correct-voice:hover { transform: translateY(-2px); }
-  .playback-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
-
-  /* Feedback badge */
-  .feedback-badge {
-    padding: 10px 22px; border-radius: 14px; font-weight: 800; font-size: 1rem;
-    display: none; align-items: center; gap: 10px;
-    animation: fadeIn 0.35s ease;
-  }
-  .feedback-badge.show { display: inline-flex; }
-  .feedback-badge.correct { background: #e8faf0; color: #1a7a3a; border: 2.5px solid #8ee0b4; }
-  .feedback-badge.try-again { background: #fff4e0; color: #a05000; border: 2.5px solid #f0c870; }
-  .feedback-badge.partial { background: #f0f4ff; color: #3050b0; border: 2.5px solid #a8b8f0; }
-
-  /* Re-record link */
-  .rerecord-link {
-    background: none; border: none; color: var(--mid); font-family: 'Nunito', sans-serif;
-    font-size: 0.85rem; font-weight: 700; cursor: pointer; text-decoration: underline;
-    padding: 2px 6px;
-  }
-  .rerecord-link:hover { color: var(--dark); }
-
-  /* Next button */
-  .practice-next-btn {
-    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
-    padding: 13px 36px; border-radius: 36px; border: none;
-    background: linear-gradient(135deg, var(--accent3), #3a9a3a);
-    color: white; cursor: pointer; margin-top: 8px;
-    box-shadow: 0 4px 0 rgba(40,120,40,0.4), 0 6px 18px rgba(92,184,92,0.35);
-    display: inline-flex; align-items: center; gap: 10px; transition: all 0.15s;
-  }
-  .practice-next-btn:hover { transform: translateY(-2px); }
-  .practice-next-btn:active { transform: translateY(2px); }
-  .practice-next-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-  /* Finish card */
-  .practice-finish {
-    text-align: center; padding: 40px 20px;
-    display: none;
-  }
-  .practice-finish.show { display: block; animation: fadeIn 0.5s ease; }
-  .practice-finish h2 { font-family: 'Fredoka One', cursive; font-size: 2rem; color: #e040a0; margin: 12px 0 8px; }
-  .practice-finish p { color: var(--mid); font-weight: 600; }
-  .finish-icon { font-size: 4rem; }
-
-
-  .nav-tab.sec-sentences.active { background: var(--accent4); color: white; border-color: var(--accent4); box-shadow: 0 4px 14px rgba(244,132,95,0.4); }
-
-  /* ── Read Sentences section ── */
-  .sentence-level-tabs {
-    display: flex; gap: 10px; justify-content: center; margin: 18px 16px 0;
-  }
-  .level-tab {
-    font-family: 'Fredoka One', cursive; font-size: 1rem;
-    padding: 10px 28px; border-radius: 30px; border: 2.5px solid var(--light);
-    background: white; color: var(--mid); cursor: pointer; transition: all 0.18s;
-  }
-  .level-tab.active {
-    background: var(--accent4); color: white; border-color: var(--accent4);
-    box-shadow: 0 4px 12px rgba(244,132,95,0.35);
-  }
-  .level-tab:hover:not(.active) { border-color: var(--accent4); color: var(--accent4); }
-
-  .sentence-level-page { display: none; }
-  .sentence-level-page.active { display: block; }
-
-  .sentence-group {
-    background: white; border-radius: var(--radius);
-    box-shadow: var(--shadow); border: 2px solid var(--light);
-    margin: 16px 0; overflow: hidden;
-  }
-  .sentence-group-header {
-    background: linear-gradient(135deg, #f0f4ff, #e4eaff);
-    padding: 12px 18px; font-family: 'Fredoka One', cursive;
-    font-size: 1rem; color: var(--accent2);
-    border-bottom: 2px solid var(--light);
-    display: flex; align-items: center; gap: 8px;
-  }
-  .sentence-row {
-    display: flex; align-items: center; gap: 10px;
-    padding: 11px 16px; border-bottom: 1px solid var(--light);
-    transition: background 0.15s;
-  }
-  .sentence-row:last-child { border-bottom: none; }
-  .sentence-row:hover { background: #f8faff; }
-  .sentence-text {
-    flex: 1; font-size: 1rem; font-weight: 600; color: var(--dark); line-height: 1.4;
-  }
-  .sentence-play-btn {
-    background: linear-gradient(135deg, var(--accent2), #2d6cbf);
-    border: none; border-radius: 50%; width: 36px; height: 36px;
-    color: white; font-size: 1rem; cursor: pointer; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 6px rgba(74,144,217,0.3); transition: all 0.15s;
-  }
-  .sentence-play-btn:hover { transform: scale(1.1); }
-  .sentence-play-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
-
-  .sentence-level-intro {
-    padding: 14px 18px 0; font-size: 0.9rem; color: var(--mid);
-    font-weight: 600; line-height: 1.6; text-align: center;
-  }
-
-  /* Practice button for sentence groups */
-  .sentence-practice-bar {
-    padding: 10px 16px 12px;
-    border-top: 2px dashed var(--light);
-    background: linear-gradient(135deg, #fff5fb, #ffeaf6);
-    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
-  }
-
-  /* Per-set practice button — inside letter block footer / word card */
-  .set-practice-bar {
-    padding: 12px 20px 14px; text-align: center;
-    border-top: 2px dashed var(--light);
-    background: linear-gradient(135deg, #fff5fb, #ffeaf6);
-  }
-  .set-practice-btn {
-    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
-    padding: 9px 22px; border-radius: 30px; border: none;
-    background: linear-gradient(135deg, #ff7eb3, #e040a0);
-    color: white; cursor: pointer;
-    box-shadow: 0 3px 0 rgba(180,20,100,0.35), 0 5px 14px rgba(224,64,160,0.25);
-    transition: all 0.18s; display: inline-flex; align-items: center; gap: 8px;
-  }
-  .set-practice-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(180,20,100,0.35), 0 8px 18px rgba(224,64,160,0.3); }
-  .set-practice-btn:active { transform: translateY(1px); }
-
-  /* Practice button inside the wp1/wp2 word-display card */
-  .wp-practice-bar {
-    text-align: center; margin-top: 18px; padding-top: 16px;
-    border-top: 2px dashed var(--light);
-    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
-  }
-
-  /* Countdown ring on record button */
-  .record-btn-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
-  .record-countdown {
-    position: absolute; top: -6px; right: -6px;
-    background: #ff4d6d; color: white;
-    font-family: 'Fredoka One', cursive; font-size: 1rem;
-    width: 26px; height: 26px; border-radius: 50%;
-    display: none; align-items: center; justify-content: center;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-  }
-  .record-countdown.show { display: flex; }
-
-  /* ── Test Yourself button (section level) ── */
-  .section-test-bar {
-    text-align: center; margin: 18px auto 4px; padding: 0 16px;
-  }
-  .test-btn {
-    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
-    padding: 11px 28px; border-radius: 36px; border: none;
-    background: linear-gradient(135deg, #5cb85c, #3a7a3a);
-    color: white; cursor: pointer;
-    box-shadow: 0 4px 0 rgba(30,100,30,0.4), 0 6px 18px rgba(92,184,92,0.3);
-    transition: all 0.18s; display: inline-flex; align-items: center; gap: 9px;
-  }
-  .test-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(30,100,30,0.4), 0 10px 22px rgba(92,184,92,0.35); }
-  .test-btn:active { transform: translateY(2px); }
-
-  /* ── Judge buttons ── */
-  .test-judge-row {
-    display: flex; gap: 14px; justify-content: center; margin-top: 16px; flex-wrap: wrap;
-  }
-  .judge-btn {
-    font-family: 'Fredoka One', cursive; font-size: 1.1rem;
-    padding: 13px 32px; border-radius: 36px; border: none; cursor: pointer;
-    transition: all 0.15s; flex: 1; max-width: 180px;
-  }
-  .judge-btn.correct {
-    background: linear-gradient(135deg, #5cb85c, #3a7a3a); color: white;
-    box-shadow: 0 4px 0 rgba(30,100,30,0.4), 0 6px 16px rgba(92,184,92,0.3);
-  }
-  .judge-btn.incorrect {
-    background: linear-gradient(135deg, #e05555, #b02020); color: white;
-    box-shadow: 0 4px 0 rgba(140,10,10,0.4), 0 6px 16px rgba(220,80,80,0.3);
-  }
-  .judge-btn:hover { transform: translateY(-2px) scale(1.03); }
-  .judge-btn:active { transform: translateY(2px); }
-
-  /* ── Results list ── */
-  .result-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 9px 14px; border-radius: 12px; margin-bottom: 8px;
-    font-weight: 700; font-size: 1rem;
-  }
-  .result-item.ok  { background: #e8faf0; color: #1a7a3a; border: 2px solid #a8e6b8; }
-  .result-item.bad { background: #fdf0f0; color: #a02020; border: 2px solid #f0b8b8; }
-  .result-item .ri-word { font-family: 'Fredoka One', cursive; font-size: 1.2rem; margin-right: 4px; }
-  .result-item .ri-mark { font-size: 1.3rem; flex-shrink: 0; }
-  .result-item .ri-play {
-    margin-left: auto; background: none; border: none; cursor: pointer;
-    font-size: 1rem; color: inherit; opacity: 0.7; padding: 2px 6px;
-  }
-  .result-item .ri-play:hover { opacity: 1; }
-
-  /* Sentence mode in test overlay — smaller font, text wraps */
-  .test-sentence-mode {
-    font-size: 1.15rem !important; letter-spacing: 0 !important;
-    line-height: 1.5 !important; word-break: normal !important;
-  }
-
-  /* Mic permission warning */
-  .mic-warning {
-    background: #fff4e0; border: 2px solid #f0c870; border-radius: 14px;
-    padding: 14px 18px; font-size: 0.88rem; font-weight: 600; color: #806000;
-    margin-top: 16px; display: none; line-height: 1.7; text-align: left;
-  }
-  .mic-warning.show { display: block; }
-  .mic-warning code {
-    background: rgba(0,0,0,0.08); border-radius: 5px; padding: 1px 6px;
-    font-family: monospace; font-size: 0.85em; font-weight: 700;
-  }
-
-  /* ── VOICE SELECTOR ── */
-  .voice-selector-bar {
-    display: flex; align-items: center; justify-content: center;
-    gap: 10px; margin: 10px auto 0; padding: 0 16px; flex-wrap: wrap;
-  }
-  .voice-selector-label {
-    font-size: 0.82rem; font-weight: 700; color: var(--mid);
-    text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
-  }
-  .voice-select {
-    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.88rem;
-    padding: 7px 14px; border-radius: 24px;
-    border: 2.5px solid var(--light); background: white; color: var(--dark);
-    cursor: pointer; outline: none; transition: all 0.18s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-    appearance: none; -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a6f65' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 12px center;
-    padding-right: 32px;
-  }
-  .voice-select:hover, .voice-select:focus { border-color: var(--accent2); box-shadow: 0 3px 12px rgba(74,144,217,0.2); }
-
-  /* ── SPELLING PRACTICE ── */
-  .spell-practice-btn {
-    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
-    padding: 9px 22px; border-radius: 30px; border: none;
-    background: linear-gradient(135deg, #7eb8ff, #4a7fd4);
-    color: white; cursor: pointer;
-    box-shadow: 0 3px 0 rgba(30,80,180,0.3), 0 5px 14px rgba(74,127,212,0.25);
-    transition: all 0.18s; display: inline-flex; align-items: center; gap: 8px;
-  }
-  .spell-practice-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(30,80,180,0.3), 0 8px 18px rgba(74,127,212,0.3); }
-  .spell-practice-btn:active { transform: translateY(1px); }
-  .spell-header-gradient { background: linear-gradient(135deg, #4a7fd4, #2a4fa0); }
-
-  .spell-input-wrap { margin: 18px 0 10px; text-align: center; }
-  .spell-input {
-    font-family: 'Nunito', sans-serif; font-size: 1.3rem; font-weight: 700;
-    padding: 12px 18px; border-radius: 16px; width: 100%; max-width: 420px;
-    border: 3px solid var(--light); outline: none; box-sizing: border-box;
-    transition: border-color 0.18s; color: var(--dark); background: #fafafa; text-align: center;
-  }
-  .spell-input:focus { border-color: #4a7fd4; background: white; }
-  .spell-input.shake { animation: spellShake 0.4s ease; border-color: #e05555; }
-  @keyframes spellShake {
-    0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-7px); }
-    40%{ transform:translateX(7px); }  60%{ transform:translateX(-5px); } 80%{ transform:translateX(5px); }
-  }
-  .spell-diff {
-    font-family: 'Fredoka One', cursive; font-size: 1.6rem; letter-spacing: 4px;
-    margin: 10px auto 4px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; min-height: 48px;
-  }
-  .spell-char {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 36px; height: 44px; border-radius: 10px; font-size: 1.3rem; border: 2px solid transparent;
-  }
-  .spell-char.correct { background: #d4f5d4; color: #1a7a1a; border-color: #7ac97a; }
-  .spell-char.wrong   { background: #fdd;   color: #b00;    border-color: #f09090; }
-  .spell-char.missing { background: #fff0cc; color: #a06000; border-color: #f0c060; font-size: 0.9rem; }
-  .spell-char.extra   { background: #ffe0f0; color: #a0006a; border-color: #f090c0; }
-  .spell-feedback-msg {
-    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
-    margin: 8px 0 4px; min-height: 24px; text-align: center;
-  }
-  .spell-feedback-msg.correct { color: #1a7a1a; }
-  .spell-feedback-msg.wrong   { color: #b00; }
-  .spell-attempts {
-    font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700;
-    color: var(--mid); margin-bottom: 6px; text-align: center;
-  }
-  .spell-btn-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 14px; }
-  .spell-check-btn {
-    font-family: 'Fredoka One', cursive; font-size: 1rem;
-    padding: 11px 28px; border-radius: 30px; border: none;
-    background: linear-gradient(135deg, #4a7fd4, #2a4fa0); color: white; cursor: pointer;
-    box-shadow: 0 3px 0 rgba(30,80,180,0.3); transition: all 0.18s;
-  }
-  .spell-check-btn:hover { transform: translateY(-2px); }
-  .spell-check-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-  .spell-secondary-btn {
-    font-family: 'Fredoka One', cursive; font-size: 0.92rem;
-    padding: 10px 20px; border-radius: 30px; border: 2.5px solid var(--light);
-    background: white; color: var(--dark); cursor: pointer; transition: all 0.18s;
-  }
-  .spell-secondary-btn:hover { border-color: #4a7fd4; color: #4a7fd4; }
-  .spell-answer-reveal {
-    font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: #2a4fa0;
-    background: #e8f0ff; border-radius: 14px; padding: 10px 22px;
-    margin: 10px auto 4px; display: none; text-align: center; letter-spacing: 2px;
-  }
-  .spell-listen-btn {
-    font-family: 'Fredoka One', cursive; font-size: 0.9rem;
-    padding: 8px 18px; border-radius: 24px; border: none;
-    background: linear-gradient(135deg, #ffb347, #e08020); color: white; cursor: pointer;
-    box-shadow: 0 2px 0 rgba(160,80,0,0.3); transition: all 0.18s;
-    display: inline-flex; align-items: center; gap: 6px;
-  }
-  .spell-listen-btn:hover { transform: translateY(-1px); }
-  .spell-listen-btn.speaking { opacity: 0.6; }
-  .sent-spelling-wrap .spell-input { font-size: 1.05rem; }
-  .sent-spelling-wrap .spell-diff  { font-size: 1rem; letter-spacing: 2px; }
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+font-family: ‘Nunito’, sans-serif;
+background: var(–bg);
+color: var(–dark);
+min-height: 100vh;
+background-image:
+radial-gradient(circle at 10% 20%, rgba(244,132,95,0.08) 0%, transparent 50%),
+radial-gradient(circle at 90% 80%, rgba(74,144,217,0.08) 0%, transparent 50%);
+}
+
+/* ── HEADER ── */
+header { text-align: center; padding: 30px 20px 10px; }
+header h1 {
+font-family: ‘Fredoka One’, cursive;
+font-size: clamp(2rem, 6vw, 3.2rem);
+color: var(–accent1); letter-spacing: 1px; line-height: 1;
+}
+header h1 span { color: var(–accent2); }
+header p { margin-top: 6px; font-size: 0.97rem; color: var(–mid); font-weight: 600; }
+
+/* ── TOP NAV ── */
+.top-nav {
+display: flex; justify-content: center; gap: 8px;
+margin: 20px auto 0; padding: 0 12px; flex-wrap: wrap;
+max-width: 820px;
+}
+.nav-tab {
+font-family: ‘Fredoka One’, cursive; font-size: 0.98rem;
+padding: 10px 20px; border-radius: 36px; border: 2.5px solid var(–light);
+background: white; color: var(–mid); cursor: pointer;
+transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+white-space: nowrap;
+}
+.nav-tab:hover:not(.active) { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,0.12); }
+.nav-tab.sec-alphabet.active  { background: var(–teal);    color: white; border-color: var(–teal);    box-shadow: 0 4px 14px rgba(43,170,138,0.4); }
+.nav-tab.sec-sounds.active    { background: var(–accent2); color: white; border-color: var(–accent2); box-shadow: 0 4px 14px rgba(74,144,217,0.4); }
+.nav-tab.sec-words1.active    { background: var(–accent1); color: white; border-color: var(–accent1); box-shadow: 0 4px 14px rgba(244,132,95,0.4); }
+.nav-tab.sec-words2.active    { background: var(–purple);  color: white; border-color: var(–purple);  box-shadow: 0 4px 14px rgba(155,111,212,0.4); }
+
+/* ── SECTION PAGES ── */
+.section-page { display: none; }
+.section-page.active { display: block; }
+
+/* ════════════════════════════════
+SECTION 1 — ALPHABET
+════════════════════════════════ */
+.sec-intro {
+text-align: center; max-width: 520px; margin: 20px auto 0;
+padding: 0 16px; color: var(–mid); font-size: 0.93rem; font-weight: 600; line-height: 1.6;
+}
+
+.alpha-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+gap: 10px; max-width: 720px; margin: 18px auto 40px; padding: 0 16px;
+}
+
+.alpha-card {
+background: white; border-radius: 14px; border: 2.5px solid var(–light);
+padding: 14px 8px 10px; text-align: center; cursor: pointer;
+transition: all 0.18s; box-shadow: 0 2px 8px rgba(0,0,0,0.07); user-select: none;
+}
+.alpha-card:hover { transform: translateY(-4px); box-shadow: 0 7px 18px rgba(0,0,0,0.12); border-color: var(–teal); }
+.alpha-card.playing {
+background: linear-gradient(135deg,#e8faf5,#c8f0e4);
+border-color: var(–teal); transform: translateY(-4px) scale(1.05);
+box-shadow: 0 8px 22px rgba(43,170,138,0.3);
+}
+.alpha-card.vowel { border-color: #b4d0f4; }
+.alpha-card.vowel:hover { border-color: var(–accent2); }
+.alpha-card.vowel.playing { background: linear-gradient(135deg,#eef5ff,#d6e8ff); border-color: var(–accent2); box-shadow: 0 8px 22px rgba(74,144,217,0.3); }
+
+.alpha-letter { font-family: ‘Fredoka One’, cursive; font-size: 2.4rem; line-height: 1; color: var(–teal); }
+.alpha-card.vowel .alpha-letter { color: var(–accent2); }
+.alpha-name { font-size: 0.78rem; font-weight: 700; color: var(–mid); margin-top: 4px; }
+
+/* ════════════════════════════════
+SECTION 2 — LETTER SOUNDS
+════════════════════════════════ */
+.sounds-wrap {
+max-width: 680px; margin: 22px auto 40px; padding: 0 16px;
+display: flex; flex-direction: column; gap: 18px;
+}
+
+.letter-block {
+background: white; border-radius: var(–radius);
+border: 2px solid var(–light); box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+overflow: hidden;
+}
+
+.letter-block-header {
+display: flex; align-items: center; gap: 16px;
+padding: 16px 20px 12px; border-bottom: 2px solid var(–light);
+}
+
+.letter-block-letter {
+font-family: ‘Fredoka One’, cursive; font-size: 3rem; line-height: 1;
+color: var(–teal); min-width: 48px; text-align: center;
+}
+.letter-block.vowel .letter-block-letter { color: var(–accent2); }
+
+.letter-block-letter.tappable {
+cursor: pointer; border-radius: 12px; padding: 4px 8px; transition: all 0.18s;
+}
+.letter-block-letter.tappable:hover {
+background: linear-gradient(135deg,#e8faf5,#c8f0e4);
+transform: scale(1.08); box-shadow: 0 4px 12px rgba(43,170,138,0.25);
+}
+.letter-block.vowel .letter-block-letter.tappable:hover {
+background: linear-gradient(135deg,#eef5ff,#d6e8ff);
+box-shadow: 0 4px 12px rgba(74,144,217,0.25);
+}
+.letter-block-letter.tappable.playing {
+background: linear-gradient(135deg,#e8faf5,#c8f0e4);
+transform: scale(1.1); box-shadow: 0 6px 18px rgba(43,170,138,0.35);
+}
+.letter-block.vowel .letter-block-letter.tappable.playing {
+background: linear-gradient(135deg,#eef5ff,#d6e8ff);
+box-shadow: 0 6px 18px rgba(74,144,217,0.35);
+}
+
+.letter-block-desc { flex: 1; }
+.letter-block-desc h3 { font-family: ‘Fredoka One’, cursive; font-size: 1.05rem; color: var(–dark); margin-bottom: 2px; }
+.letter-block-desc p { font-size: 0.83rem; color: var(–mid); font-weight: 600; line-height: 1.5; }
+
+.sound-group { padding: 14px 20px 16px; }
+.sound-group + .sound-group {
+border-top: 2px dashed var(–light);
+background: linear-gradient(135deg, #fffdf0, #fff8e0);
+}
+
+.sound-group-label {
+font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+letter-spacing: 1.5px; color: var(–mid); margin-bottom: 10px;
+}
+.sound-group + .sound-group .sound-group-label { color: var(–accent4); }
+
+.sound-note {
+font-size: 0.78rem; color: var(–mid); font-weight: 600;
+font-style: italic; margin-top: 8px;
+}
+
+/* Phoneme tile button shown at top of each sound group */
+.phoneme-tile-btn {
+display: inline-flex; align-items: center; justify-content: center;
+font-family: ‘Fredoka One’, cursive; font-size: 1.55rem; line-height: 1;
+width: 52px; height: 58px; border-radius: 12px; cursor: pointer;
+border: 2.5px solid var(–light); background: white; color: var(–teal);
+box-shadow: 0 3px 0 rgba(0,0,0,0.10), 0 4px 10px rgba(0,0,0,0.07);
+transition: all 0.16s; margin-bottom: 10px;
+user-select: none;
+}
+.letter-block.vowel .phoneme-tile-btn { color: var(–accent2); }
+.sound-group + .sound-group .phoneme-tile-btn { color: var(–accent4); border-color: #f0c870; }
+.phoneme-tile-btn:hover { transform: translateY(-3px) scale(1.07); box-shadow: 0 6px 16px rgba(43,170,138,0.25); border-color: var(–teal); }
+.letter-block.vowel .phoneme-tile-btn:hover { box-shadow: 0 6px 16px rgba(74,144,217,0.25); border-color: var(–accent2); }
+.sound-group + .sound-group .phoneme-tile-btn:hover { border-color: var(–accent4); box-shadow: 0 6px 16px rgba(240,180,41,0.25); }
+.phoneme-tile-btn.playing {
+background: linear-gradient(135deg,#e8faf5,#c8f0e4); border-color: var(–teal);
+transform: translateY(-3px) scale(1.1); box-shadow: 0 7px 18px rgba(43,170,138,0.35);
+}
+.letter-block.vowel .phoneme-tile-btn.playing { background: linear-gradient(135deg,#eef5ff,#d6e8ff); border-color: var(–accent2); box-shadow: 0 7px 18px rgba(74,144,217,0.35); }
+.sound-group + .sound-group .phoneme-tile-btn.playing { background: linear-gradient(135deg,#fffde8,#fff0b0); border-color: var(–accent4); box-shadow: 0 7px 18px rgba(240,180,41,0.35); }
+
+.example-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.example-pill {
+font-family: ‘Nunito’, sans-serif; font-weight: 800; font-size: 1rem;
+padding: 7px 18px; border-radius: 30px;
+border: 2px solid var(–light); background: var(–bg);
+color: var(–dark); cursor: pointer; transition: all 0.16s;
+box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+display: inline-flex; align-items: center; gap: 6px;
+}
+.example-pill:hover {
+background: var(–teal); color: white; border-color: var(–teal);
+transform: translateY(-2px); box-shadow: 0 5px 14px rgba(43,170,138,0.3);
+}
+.letter-block.vowel .example-pill:hover {
+background: var(–accent2); border-color: var(–accent2);
+box-shadow: 0 5px 14px rgba(74,144,217,0.3);
+}
+.sound-group + .sound-group .example-pill:hover {
+background: var(–accent4); border-color: var(–accent4);
+box-shadow: 0 5px 14px rgba(240,180,41,0.35); color: white;
+}
+.example-pill.playing {
+background: var(–teal); color: white; border-color: var(–teal);
+transform: scale(1.06); box-shadow: 0 5px 14px rgba(43,170,138,0.35);
+}
+.letter-block.vowel .example-pill.playing { background: var(–accent2); border-color: var(–accent2); }
+.sound-group + .sound-group .example-pill.playing { background: var(–accent4); border-color: var(–accent4); }
+.pill-emoji { font-size: 1.3em; line-height: 1; }
+
+/* ════════════════════════════════
+SHARED WORD PRONUNCIATION STYLES
+════════════════════════════════ */
+.family-selector {
+display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+max-width: 780px; margin: 20px auto 0; padding: 0 16px;
+}
+.family-btn {
+font-family: ‘Fredoka One’, cursive; font-size: 1rem; padding: 8px 18px;
+border-radius: 30px; border: 2.5px solid transparent;
+background: white; color: var(–mid); cursor: pointer;
+transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.family-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.12); }
+.family-btn.active { color: white; transform: translateY(-2px); }
+#wp1-selector .family-btn.active { background: var(–accent1); border-color: var(–accent1); box-shadow: 0 5px 15px rgba(244,132,95,0.35); }
+#wp2-selector-wrap .family-btn.active { background: var(–purple); border-color: var(–purple); box-shadow: 0 5px 15px rgba(155,111,212,0.35); }
+
+.main-card { max-width: 600px; margin: 22px auto; padding: 0 16px 40px; }
+
+.family-title { font-family: ‘Fredoka One’, cursive; font-size: 1.25rem; color: var(–mid); text-align: center; margin-bottom: 22px; letter-spacing: 1px; }
+.family-title strong { font-size: 1.55rem; }
+#wp1-page .family-title strong { color: var(–accent2); }
+#wp2-page .family-title strong { color: var(–purple); }
+
+.word-display {
+background: white; border-radius: var(–radius); box-shadow: var(–shadow);
+padding: 30px 26px 24px; text-align: center; position: relative; overflow: hidden; border: 2px solid var(–light);
+}
+.word-display::before { content:’’; position:absolute; top:0; left:0; right:0; height:5px; }
+#wp1-page .word-display::before { background: linear-gradient(90deg, var(–accent1), var(–accent4), var(–accent2)); }
+#wp2-page .word-display::before { background: linear-gradient(90deg, var(–purple), var(–accent2), var(–accent3)); }
+
+.word-emoji-display { font-size: 3.5rem; line-height: 1; margin-bottom: 10px; min-height: 1.2em; }
+
+.letter-tiles { display:flex; justify-content:center; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
+.tile {
+width:68px; height:78px; border-radius:14px;
+display:flex; align-items:center; justify-content:center;
+font-family:‘Fredoka One’,cursive; font-size:2.6rem; line-height:1;
+box-shadow:0 4px 0 rgba(0,0,0,0.12), 0 6px 14px rgba(0,0,0,0.08);
+transition:transform 0.15s; animation:tilePop 0.35s cubic-bezier(0.34,1.56,0.64,1) both; cursor:pointer;
+}
+.tile.beginning { background:linear-gradient(135deg,#fff7f0,#ffe4d6); color:var(–accent1); border:2.5px solid #f4c5b4; }
+.tile.ending    { background:linear-gradient(135deg,#eef5ff,#d6e8ff); color:var(–accent2); border:2.5px solid #b4d0f4; }
+.tile.digraph   { background:linear-gradient(135deg,#f5f0ff,#e8d6ff); color:var(–purple);  border:2.5px solid #d4b4f4; }
+.tile:hover { transform:translateY(-4px); }
+.tile.playing { transform:translateY(-4px) scale(1.1); filter: brightness(1.12); box-shadow:0 6px 4px rgba(0,0,0,0.15), 0 8px 18px rgba(0,0,0,0.12); }
+
+@keyframes tilePop {
+from { transform:scale(0.5) translateY(20px); opacity:0; }
+to   { transform:scale(1) translateY(0);      opacity:1; }
+}
+
+.tile-labels { display:flex; justify-content:center; gap:8px; margin-bottom:8px; }
+.tile-label-item { width:68px; text-align:center; font-size:0.68rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; }
+.tile-label-item.bl { color:var(–accent1); }
+.tile-label-item.el { color:var(–accent2); }
+.tile-label-item.dg { color:var(–purple); }
+
+.audio-btn {
+color:white; border:none; border-radius:50px; padding:12px 32px;
+font-family:‘Nunito’,sans-serif; font-size:1.05rem; font-weight:800;
+cursor:pointer; display:inline-flex; align-items:center; gap:10px;
+transition:all 0.15s; margin-bottom:6px;
+}
+#wp1-page .audio-btn { background:linear-gradient(135deg,var(–accent1),#e06840); box-shadow:0 4px 0 rgba(200,80,40,0.4),0 6px 18px rgba(244,132,95,0.3); }
+#wp2-page .audio-btn { background:linear-gradient(135deg,var(–purple),#7a4fbf);  box-shadow:0 4px 0 rgba(100,50,170,0.4),0 6px 18px rgba(155,111,212,0.3); }
+.audio-btn:hover { transform:translateY(-2px); }
+.audio-btn:active { transform:translateY(2px); }
+.audio-btn.speaking { animation:pulse 0.6s ease-in-out infinite alternate; }
+@keyframes pulse { from{filter:brightness(1);} to{filter:brightness(1.15);} }
+
+.nav-row { display:flex; gap:12px; justify-content:center; margin-top:20px; align-items:center; }
+.wp-nav-btn {
+background:white; border:2.5px solid var(–light); color:var(–dark);
+border-radius:50px; padding:10px 22px; font-family:‘Nunito’,sans-serif;
+font-size:1rem; font-weight:700; cursor:pointer; display:inline-flex;
+align-items:center; gap:8px; transition:all 0.15s; box-shadow:0 2px 8px rgba(0,0,0,0.06);
+}
+.wp-nav-btn:hover:not(:disabled) { background:var(–dark); color:white; border-color:var(–dark); transform:translateY(-2px); }
+.wp-nav-btn:disabled { opacity:0.35; cursor:not-allowed; }
+.word-counter { font-size:0.95rem; font-weight:700; color:var(–mid); min-width:60px; text-align:center; }
+
+.hint-box { background:linear-gradient(135deg,#f0faf0,#e0f5e0); border:2px solid #b8e8b8; border-radius:var(–radius); padding:15px 18px; margin-top:22px; display:flex; align-items:flex-start; gap:12px; }
+.hint-icon { font-size:1.5rem; flex-shrink:0; margin-top:2px; }
+.hint-box p { font-size:0.9rem; color:#2a5a2a; font-weight:600; line-height:1.6; }
+.hint-box p strong { color:var(–accent1); }
+
+.speed-row { display:flex; align-items:center; justify-content:center; gap:10px; margin-top:14px; flex-wrap:wrap; }
+.speed-label { font-size:0.8rem; font-weight:700; color:var(–mid); text-transform:uppercase; letter-spacing:1px; }
+.speed-btns { display:flex; gap:6px; }
+.speed-opt { padding:5px 13px; border-radius:20px; border:2px solid var(–light); background:white; font-family:‘Nunito’,sans-serif; font-weight:700; font-size:0.8rem; cursor:pointer; color:var(–mid); transition:all 0.15s; }
+.speed-opt.active { background:var(–accent2); color:white; border-color:var(–accent2); }
+
+.word-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:10px; margin-top:24px; }
+.word-chip { background:white; border:2px solid var(–light); border-radius:12px; padding:10px 8px; text-align:center; cursor:pointer; transition:all 0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+.word-chip:hover { transform:translateY(-3px); box-shadow:0 6px 16px rgba(0,0,0,0.1); }
+#wp1-page .word-chip:hover   { border-color:var(–accent1); }
+#wp1-page .word-chip.current { background:linear-gradient(135deg,#fff4f0,#ffe8df); border-color:var(–accent1); box-shadow:0 4px 14px rgba(244,132,95,0.25); }
+#wp2-page .word-chip:hover   { border-color:var(–purple); }
+#wp2-page .word-chip.current { background:linear-gradient(135deg,#f5f0ff,#ead6ff); border-color:var(–purple); box-shadow:0 4px 14px rgba(155,111,212,0.25); }
+.chip-beginning { font-family:‘Fredoka One’,cursive; font-size:1.4rem; color:var(–accent1); }
+.chip-ending    { font-family:‘Fredoka One’,cursive; font-size:1.4rem; color:var(–accent2); }
+.chip-whole     { font-family:‘Fredoka One’,cursive; font-size:1.4rem; color:var(–purple); }
+.chip-emoji     { font-size:1.5em; display:block; margin-top:3px; line-height:1; }
+.chip-audio     { font-size:0.66rem; color:var(–mid); margin-top:2px; }
+
+.trophy-msg { text-align:center; padding:22px; display:none; }
+.trophy-msg.show { display:block; animation:fadeIn 0.5s ease; }
+@keyframes fadeIn { from{opacity:0;transform:scale(0.8);} to{opacity:1;transform:scale(1);} }
+.trophy-msg h2 { font-family:‘Fredoka One’,cursive; font-size:2rem; color:var(–accent4); margin-bottom:6px; }
+.trophy-msg p { color:var(–mid); font-weight:600; }
+
+.cat-divider { max-width:780px; margin:26px auto 0; padding:0 16px; display:flex; align-items:center; gap:14px; }
+.cat-divider hr { flex:1; border:none; border-top:2px solid var(–light); }
+.cat-pill { font-family:‘Fredoka One’,cursive; font-size:0.88rem; color:white; background:var(–purple); border-radius:20px; padding:5px 16px; white-space:nowrap; }
+
+footer { text-align:center; padding:18px; font-size:0.85rem; color:var(–mid); font-weight:600; border-top:2px solid var(–light); margin-top:12px; }
+footer strong { color:var(–accent1); }
+
+@media (max-width:480px) {
+.nav-tab { font-size:0.85rem; padding:8px 14px; }
+.tile { width:58px; height:68px; font-size:2.1rem; }
+.alpha-grid { grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); }
+.alpha-letter { font-size:2rem; }
+.letter-block-letter { font-size:2.4rem; }
+}
+
+/* ════════════════════════════════
+PRACTICE BUTTON (top of sections)
+════════════════════════════════ */
+.practice-bar {
+text-align: center; margin: 18px auto 0; padding: 0 16px;
+}
+.practice-btn {
+font-family: ‘Fredoka One’, cursive; font-size: 1.05rem;
+padding: 11px 28px; border-radius: 36px; border: none;
+background: linear-gradient(135deg, #ff7eb3, #e040a0);
+color: white; cursor: pointer;
+box-shadow: 0 4px 0 rgba(180,20,100,0.35), 0 6px 18px rgba(224,64,160,0.3);
+transition: all 0.18s; display: inline-flex; align-items: center; gap: 9px;
+}
+.practice-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(180,20,100,0.35), 0 10px 22px rgba(224,64,160,0.35); }
+.practice-btn:active { transform: translateY(2px); }
+
+/* ════════════════════════════════
+PRACTICE OVERLAY / PAGE
+════════════════════════════════ */
+.practice-overlay {
+display: none; position: fixed; inset: 0;
+background: var(–bg); z-index: 100; overflow-y: auto;
+padding: 0 0 40px;
+}
+.practice-overlay.active { display: block; }
+
+.practice-header {
+background: linear-gradient(135deg, #ff7eb3, #e040a0);
+padding: 18px 20px 16px; display: flex; align-items: center;
+gap: 14px; position: sticky; top: 0; z-index: 10;
+box-shadow: 0 4px 16px rgba(224,64,160,0.3);
+}
+.practice-back {
+background: rgba(255,255,255,0.25); border: none; border-radius: 50%;
+width: 40px; height: 40px; font-size: 1.3rem; color: white;
+cursor: pointer; display: flex; align-items: center; justify-content: center;
+flex-shrink: 0; transition: background 0.15s;
+}
+.practice-back:hover { background: rgba(255,255,255,0.4); }
+.practice-header-text { color: white; }
+.practice-header-text h2 { font-family: ‘Fredoka One’, cursive; font-size: 1.4rem; line-height: 1; }
+.practice-header-text p { font-size: 0.82rem; font-weight: 600; opacity: 0.88; margin-top: 3px; }
+
+.practice-body { max-width: 580px; margin: 0 auto; padding: 24px 16px 0; }
+
+/* Step indicator */
+.practice-step-info {
+text-align: center; margin-bottom: 20px;
+}
+.practice-step-info .step-counter {
+font-family: ‘Fredoka One’, cursive; font-size: 0.95rem;
+color: var(–mid); letter-spacing: 1px;
+}
+.practice-progress {
+height: 6px; background: var(–light); border-radius: 10px;
+margin: 8px auto 0; max-width: 300px; overflow: hidden;
+}
+.practice-progress-fill {
+height: 100%; border-radius: 10px;
+background: linear-gradient(90deg, #ff7eb3, #e040a0);
+transition: width 0.4s ease;
+}
+
+/* Word display card in practice */
+.practice-card {
+background: white; border-radius: var(–radius);
+box-shadow: var(–shadow); border: 2px solid var(–light);
+padding: 28px 24px 24px; text-align: center; position: relative; overflow: hidden;
+}
+.practice-card::before {
+content:’’; position:absolute; top:0; left:0; right:0; height:5px;
+background: linear-gradient(90deg, #ff7eb3, #e040a0, #ff7eb3);
+}
+.practice-word-emoji { font-size: 3rem; line-height: 1; margin-bottom: 10px; min-height: 1.1em; }
+.practice-word {
+font-family: ‘Fredoka One’, cursive; font-size: 3.2rem;
+color: var(–dark); letter-spacing: 2px; margin-bottom: 6px;
+}
+.practice-word-label {
+font-size: 0.78rem; font-weight: 800; text-transform: uppercase;
+letter-spacing: 1.5px; color: var(–mid); margin-bottom: 20px;
+}
+
+/* Phase banners */
+.phase-banner {
+font-family: ‘Fredoka One’, cursive; font-size: 0.92rem;
+padding: 7px 18px; border-radius: 24px; display: inline-block;
+margin-bottom: 18px; letter-spacing: 0.5px;
+}
+.phase-listen  { background: #e8f5ff; color: var(–accent2); border: 2px solid #b4d8f8; }
+.phase-record  { background: #fff0f8; color: #d0208a; border: 2px solid #f8b4dc; }
+.phase-compare { background: #f0fff4; color: var(–accent3); border: 2px solid #a8e6b8; }
+
+/* Example word (word 1 — listen only) */
+.example-listen-row {
+display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.example-label {
+font-size: 0.82rem; font-weight: 700; color: var(–mid); text-align: center; line-height: 1.5;
+}
+.listen-play-btn {
+font-family: ‘Fredoka One’, cursive; font-size: 1rem;
+padding: 11px 28px; border-radius: 36px; border: none;
+background: linear-gradient(135deg, var(–accent2), #2d6cbf);
+color: white; cursor: pointer;
+box-shadow: 0 4px 0 rgba(30,80,180,0.35), 0 6px 16px rgba(74,144,217,0.3);
+display: inline-flex; align-items: center; gap: 9px; transition: all 0.15s;
+}
+.listen-play-btn:hover { transform: translateY(-2px); }
+.listen-play-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
+
+.start-practice-btn {
+font-family: ‘Fredoka One’, cursive; font-size: 1rem;
+padding: 11px 28px; border-radius: 36px; border: none;
+background: linear-gradient(135deg, #e040a0, #bf1a80);
+color: white; cursor: pointer; margin-top: 10px;
+box-shadow: 0 4px 0 rgba(150,10,100,0.35), 0 6px 16px rgba(224,64,160,0.3);
+display: inline-flex; align-items: center; gap: 9px; transition: all 0.15s;
+}
+.start-practice-btn:hover { transform: translateY(-2px); }
+
+/* Recording controls */
+.record-controls { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+.record-btn {
+width: 80px; height: 80px; border-radius: 50%; border: none;
+background: linear-gradient(135deg, #ff4d6d, #c9003c);
+color: white; font-size: 2rem; cursor: pointer;
+box-shadow: 0 6px 0 rgba(150,0,40,0.4), 0 8px 24px rgba(255,77,109,0.4);
+transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+position: relative;
+}
+.record-btn:hover { transform: translateY(-3px) scale(1.05); }
+.record-btn.recording {
+animation: recordPulse 1s ease-in-out infinite;
+background: linear-gradient(135deg, #ff1a1a, #990000);
+}
+@keyframes recordPulse {
+0%   { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 0 rgba(255,26,26,0.5); }
+70%  { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 20px rgba(255,26,26,0); }
+100% { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 0 rgba(255,26,26,0); }
+}
+.record-hint { font-size: 0.85rem; font-weight: 700; color: var(–mid); }
+
+/* Playback + compare row */
+.compare-controls { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
+
+.playback-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+.playback-btn {
+font-family: ‘Fredoka One’, cursive; font-size: 0.95rem;
+padding: 10px 22px; border-radius: 36px; border: none;
+cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+transition: all 0.15s;
+}
+.playback-btn.my-voice {
+background: linear-gradient(135deg, #fff0f8, #f8d6ee);
+color: #d0208a; border: 2.5px solid #f0a8d8;
+}
+.playback-btn.my-voice:hover { background: linear-gradient(135deg, #f8c8e8, #f0a0d0); }
+.playback-btn.correct-voice {
+background: linear-gradient(135deg, var(–accent2), #2d6cbf);
+color: white; box-shadow: 0 3px 0 rgba(30,80,180,0.35), 0 5px 14px rgba(74,144,217,0.3);
+}
+.playback-btn.correct-voice:hover { transform: translateY(-2px); }
+.playback-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
+
+/* Feedback badge */
+.feedback-badge {
+padding: 10px 22px; border-radius: 14px; font-weight: 800; font-size: 1rem;
+display: none; align-items: center; gap: 10px;
+animation: fadeIn 0.35s ease;
+}
+.feedback-badge.show { display: inline-flex; }
+.feedback-badge.correct { background: #e8faf0; color: #1a7a3a; border: 2.5px solid #8ee0b4; }
+.feedback-badge.try-again { background: #fff4e0; color: #a05000; border: 2.5px solid #f0c870; }
+.feedback-badge.partial { background: #f0f4ff; color: #3050b0; border: 2.5px solid #a8b8f0; }
+
+/* Re-record link */
+.rerecord-link {
+background: none; border: none; color: var(–mid); font-family: ‘Nunito’, sans-serif;
+font-size: 0.85rem; font-weight: 700; cursor: pointer; text-decoration: underline;
+padding: 2px 6px;
+}
+.rerecord-link:hover { color: var(–dark); }
+
+/* Next button */
+.practice-next-btn {
+font-family: ‘Fredoka One’, cursive; font-size: 1.05rem;
+padding: 13px 36px; border-radius: 36px; border: none;
+background: linear-gradient(135deg, var(–accent3), #3a9a3a);
+color: white; cursor: pointer; margin-top: 8px;
+box-shadow: 0 4px 0 rgba(40,120,40,0.4), 0 6px 18px rgba(92,184,92,0.35);
+display: inline-flex; align-items: center; gap: 10px; transition: all 0.15s;
+}
+.practice-next-btn:hover { transform: translateY(-2px); }
+.practice-next-btn:active { transform: translateY(2px); }
+.practice-next-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* Finish card */
+.practice-finish {
+text-align: center; padding: 40px 20px;
+display: none;
+}
+.practice-finish.show { display: block; animation: fadeIn 0.5s ease; }
+.practice-finish h2 { font-family: ‘Fredoka One’, cursive; font-size: 2rem; color: #e040a0; margin: 12px 0 8px; }
+.practice-finish p { color: var(–mid); font-weight: 600; }
+.finish-icon { font-size: 4rem; }
+
+.nav-tab.sec-sentences.active { background: var(–accent4); color: white; border-color: var(–accent4); box-shadow: 0 4px 14px rgba(244,132,95,0.4); }
+
+/* ── Read Sentences section ── */
+.sentence-level-tabs {
+display: flex; gap: 10px; justify-content: center; margin: 18px 16px 0;
+}
+.level-tab {
+font-family: ‘Fredoka One’, cursive; font-size: 1rem;
+padding: 10px 28px; border-radius: 30px; border: 2.5px solid var(–light);
+background: white; color: var(–mid); cursor: pointer; transition: all 0.18s;
+}
+.level-tab.active {
+background: var(–accent4); color: white; border-color: var(–accent4);
+box-shadow: 0 4px 12px rgba(244,132,95,0.35);
+}
+.level-tab:hover:not(.active) { border-color: var(–accent4); color: var(–accent4); }
+
+.sentence-level-page { display: none; }
+.sentence-level-page.active { display: block; }
+
+.sentence-group {
+background: white; border-radius: var(–radius);
+box-shadow: var(–shadow); border: 2px solid var(–light);
+margin: 16px 0; overflow: hidden;
+}
+.sentence-group-header {
+background: linear-gradient(135deg, #f0f4ff, #e4eaff);
+padding: 12px 18px; font-family: ‘Fredoka One’, cursive;
+font-size: 1rem; color: var(–accent2);
+border-bottom: 2px solid var(–light);
+display: flex; align-items: center; gap: 8px;
+}
+.sentence-row {
+display: flex; align-items: center; gap: 10px;
+padding: 11px 16px; border-bottom: 1px solid var(–light);
+transition: background 0.15s;
+}
+.sentence-row:last-child { border-bottom: none; }
+.sentence-row:hover { background: #f8faff; }
+.sentence-text {
+flex: 1; font-size: 1rem; font-weight: 600; color: var(–dark); line-height: 1.4;
+}
+.sentence-play-btn {
+background: linear-gradient(135deg, var(–accent2), #2d6cbf);
+border: none; border-radius: 50%; width: 36px; height: 36px;
+color: white; font-size: 1rem; cursor: pointer; flex-shrink: 0;
+display: flex; align-items: center; justify-content: center;
+box-shadow: 0 2px 6px rgba(74,144,217,0.3); transition: all 0.15s;
+}
+.sentence-play-btn:hover { transform: scale(1.1); }
+.sentence-play-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
+
+.sentence-level-intro {
+padding: 14px 18px 0; font-size: 0.9rem; color: var(–mid);
+font-weight: 600; line-height: 1.6; text-align: center;
+}
+
+/* Practice button for sentence groups */
+.sentence-practice-bar {
+padding: 10px 16px 12px;
+border-top: 2px dashed var(–light);
+background: linear-gradient(135deg, #fff5fb, #ffeaf6);
+display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+}
+
+/* Per-set practice button — inside letter block footer / word card */
+.set-practice-bar {
+padding: 12px 20px 14px; text-align: center;
+border-top: 2px dashed var(–light);
+background: linear-gradient(135deg, #fff5fb, #ffeaf6);
+}
+.set-practice-btn {
+font-family: ‘Fredoka One’, cursive; font-size: 0.95rem;
+padding: 9px 22px; border-radius: 30px; border: none;
+background: linear-gradient(135deg, #ff7eb3, #e040a0);
+color: white; cursor: pointer;
+box-shadow: 0 3px 0 rgba(180,20,100,0.35), 0 5px 14px rgba(224,64,160,0.25);
+transition: all 0.18s; display: inline-flex; align-items: center; gap: 8px;
+}
+.set-practice-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(180,20,100,0.35), 0 8px 18px rgba(224,64,160,0.3); }
+.set-practice-btn:active { transform: translateY(1px); }
+
+/* Practice button inside the wp1/wp2 word-display card */
+.wp-practice-bar {
+text-align: center; margin-top: 18px; padding-top: 16px;
+border-top: 2px dashed var(–light);
+display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+}
+
+/* Countdown ring on record button */
+.record-btn-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+.record-countdown {
+position: absolute; top: -6px; right: -6px;
+background: #ff4d6d; color: white;
+font-family: ‘Fredoka One’, cursive; font-size: 1rem;
+width: 26px; height: 26px; border-radius: 50%;
+display: none; align-items: center; justify-content: center;
+box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+.record-countdown.show { display: flex; }
+
+/* ── Test Yourself button (section level) ── */
+.section-test-bar {
+text-align: center; margin: 18px auto 4px; padding: 0 16px;
+}
+.test-btn {
+font-family: ‘Fredoka One’, cursive; font-size: 1.05rem;
+padding: 11px 28px; border-radius: 36px; border: none;
+background: linear-gradient(135deg, #5cb85c, #3a7a3a);
+color: white; cursor: pointer;
+box-shadow: 0 4px 0 rgba(30,100,30,0.4), 0 6px 18px rgba(92,184,92,0.3);
+transition: all 0.18s; display: inline-flex; align-items: center; gap: 9px;
+}
+.test-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(30,100,30,0.4), 0 10px 22px rgba(92,184,92,0.35); }
+.test-btn:active { transform: translateY(2px); }
+
+/* ── Judge buttons ── */
+.test-judge-row {
+display: flex; gap: 14px; justify-content: center; margin-top: 16px; flex-wrap: wrap;
+}
+.judge-btn {
+font-family: ‘Fredoka One’, cursive; font-size: 1.1rem;
+padding: 13px 32px; border-radius: 36px; border: none; cursor: pointer;
+transition: all 0.15s; flex: 1; max-width: 180px;
+}
+.judge-btn.correct {
+background: linear-gradient(135deg, #5cb85c, #3a7a3a); color: white;
+box-shadow: 0 4px 0 rgba(30,100,30,0.4), 0 6px 16px rgba(92,184,92,0.3);
+}
+.judge-btn.incorrect {
+background: linear-gradient(135deg, #e05555, #b02020); color: white;
+box-shadow: 0 4px 0 rgba(140,10,10,0.4), 0 6px 16px rgba(220,80,80,0.3);
+}
+.judge-btn:hover { transform: translateY(-2px) scale(1.03); }
+.judge-btn:active { transform: translateY(2px); }
+
+/* ── Results list ── */
+.result-item {
+display: flex; align-items: center; gap: 12px;
+padding: 9px 14px; border-radius: 12px; margin-bottom: 8px;
+font-weight: 700; font-size: 1rem;
+}
+.result-item.ok  { background: #e8faf0; color: #1a7a3a; border: 2px solid #a8e6b8; }
+.result-item.bad { background: #fdf0f0; color: #a02020; border: 2px solid #f0b8b8; }
+.result-item .ri-word { font-family: ‘Fredoka One’, cursive; font-size: 1.2rem; margin-right: 4px; }
+.result-item .ri-mark { font-size: 1.3rem; flex-shrink: 0; }
+.result-item .ri-play {
+margin-left: auto; background: none; border: none; cursor: pointer;
+font-size: 1rem; color: inherit; opacity: 0.7; padding: 2px 6px;
+}
+.result-item .ri-play:hover { opacity: 1; }
+
+/* Sentence mode in test overlay — smaller font, text wraps */
+.test-sentence-mode {
+font-size: 1.15rem !important; letter-spacing: 0 !important;
+line-height: 1.5 !important; word-break: normal !important;
+}
+
+/* Mic permission warning */
+.mic-warning {
+background: #fff4e0; border: 2px solid #f0c870; border-radius: 14px;
+padding: 14px 18px; font-size: 0.88rem; font-weight: 600; color: #806000;
+margin-top: 16px; display: none; line-height: 1.7; text-align: left;
+}
+.mic-warning.show { display: block; }
+.mic-warning code {
+background: rgba(0,0,0,0.08); border-radius: 5px; padding: 1px 6px;
+font-family: monospace; font-size: 0.85em; font-weight: 700;
+}
+
+/* ── VOICE SELECTOR ── */
+.voice-selector-bar {
+display: flex; align-items: center; justify-content: center;
+gap: 10px; margin: 10px auto 0; padding: 0 16px; flex-wrap: wrap;
+}
+.voice-selector-label {
+font-size: 0.82rem; font-weight: 700; color: var(–mid);
+text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+}
+.voice-select {
+font-family: ‘Nunito’, sans-serif; font-weight: 700; font-size: 0.88rem;
+padding: 7px 14px; border-radius: 24px;
+border: 2.5px solid var(–light); background: white; color: var(–dark);
+cursor: pointer; outline: none; transition: all 0.18s;
+box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+appearance: none; -webkit-appearance: none;
+background-image: url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘12’ height=‘8’ viewBox=‘0 0 12 8’%3E%3Cpath d=‘M1 1l5 5 5-5’ stroke=’%237a6f65’ stroke-width=‘2’ fill=‘none’ stroke-linecap=‘round’/%3E%3C/svg%3E”);
+background-repeat: no-repeat; background-position: right 12px center;
+padding-right: 32px;
+}
+.voice-select:hover, .voice-select:focus { border-color: var(–accent2); box-shadow: 0 3px 12px rgba(74,144,217,0.2); }
+
+/* ── SPELLING PRACTICE ── */
+.spell-practice-btn {
+font-family: ‘Fredoka One’, cursive; font-size: 0.95rem;
+padding: 9px 22px; border-radius: 30px; border: none;
+background: linear-gradient(135deg, #7eb8ff, #4a7fd4);
+color: white; cursor: pointer;
+box-shadow: 0 3px 0 rgba(30,80,180,0.3), 0 5px 14px rgba(74,127,212,0.25);
+transition: all 0.18s; display: inline-flex; align-items: center; gap: 8px;
+}
+.spell-practice-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(30,80,180,0.3), 0 8px 18px rgba(74,127,212,0.3); }
+.spell-practice-btn:active { transform: translateY(1px); }
+.spell-header-gradient { background: linear-gradient(135deg, #4a7fd4, #2a4fa0); }
+
+.spell-input-wrap { margin: 18px 0 10px; text-align: center; }
+.spell-input {
+font-family: ‘Nunito’, sans-serif; font-size: 1.3rem; font-weight: 700;
+padding: 12px 18px; border-radius: 16px; width: 100%; max-width: 420px;
+border: 3px solid var(–light); outline: none; box-sizing: border-box;
+transition: border-color 0.18s; color: var(–dark); background: #fafafa; text-align: center;
+}
+.spell-input:focus { border-color: #4a7fd4; background: white; }
+.spell-input.shake { animation: spellShake 0.4s ease; border-color: #e05555; }
+@keyframes spellShake {
+0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-7px); }
+40%{ transform:translateX(7px); }  60%{ transform:translateX(-5px); } 80%{ transform:translateX(5px); }
+}
+.spell-diff {
+font-family: ‘Fredoka One’, cursive; font-size: 1.6rem; letter-spacing: 4px;
+margin: 10px auto 4px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; min-height: 48px;
+}
+.spell-char {
+display: inline-flex; align-items: center; justify-content: center;
+width: 36px; height: 44px; border-radius: 10px; font-size: 1.3rem; border: 2px solid transparent;
+}
+.spell-char.correct { background: #d4f5d4; color: #1a7a1a; border-color: #7ac97a; }
+.spell-char.wrong   { background: #fdd;   color: #b00;    border-color: #f09090; }
+.spell-char.missing { background: #fff0cc; color: #a06000; border-color: #f0c060; font-size: 0.9rem; }
+.spell-char.extra   { background: #ffe0f0; color: #a0006a; border-color: #f090c0; }
+.spell-feedback-msg {
+font-family: ‘Nunito’, sans-serif; font-weight: 800; font-size: 1rem;
+margin: 8px 0 4px; min-height: 24px; text-align: center;
+}
+.spell-feedback-msg.correct { color: #1a7a1a; }
+.spell-feedback-msg.wrong   { color: #b00; }
+.spell-attempts {
+font-family: ‘Nunito’, sans-serif; font-size: 0.82rem; font-weight: 700;
+color: var(–mid); margin-bottom: 6px; text-align: center;
+}
+.spell-btn-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 14px; }
+.spell-check-btn {
+font-family: ‘Fredoka One’, cursive; font-size: 1rem;
+padding: 11px 28px; border-radius: 30px; border: none;
+background: linear-gradient(135deg, #4a7fd4, #2a4fa0); color: white; cursor: pointer;
+box-shadow: 0 3px 0 rgba(30,80,180,0.3); transition: all 0.18s;
+}
+.spell-check-btn:hover { transform: translateY(-2px); }
+.spell-check-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.spell-secondary-btn {
+font-family: ‘Fredoka One’, cursive; font-size: 0.92rem;
+padding: 10px 20px; border-radius: 30px; border: 2.5px solid var(–light);
+background: white; color: var(–dark); cursor: pointer; transition: all 0.18s;
+}
+.spell-secondary-btn:hover { border-color: #4a7fd4; color: #4a7fd4; }
+.spell-answer-reveal {
+font-family: ‘Fredoka One’, cursive; font-size: 1.4rem; color: #2a4fa0;
+background: #e8f0ff; border-radius: 14px; padding: 10px 22px;
+margin: 10px auto 4px; display: none; text-align: center; letter-spacing: 2px;
+}
+.spell-listen-btn {
+font-family: ‘Fredoka One’, cursive; font-size: 0.9rem;
+padding: 8px 18px; border-radius: 24px; border: none;
+background: linear-gradient(135deg, #ffb347, #e08020); color: white; cursor: pointer;
+box-shadow: 0 2px 0 rgba(160,80,0,0.3); transition: all 0.18s;
+display: inline-flex; align-items: center; gap: 6px;
+}
+.spell-listen-btn:hover { transform: translateY(-1px); }
+.spell-listen-btn.speaking { opacity: 0.6; }
+.sent-spelling-wrap .spell-input { font-size: 1.05rem; }
+.sent-spelling-wrap .spell-diff  { font-size: 1rem; letter-spacing: 2px; }
 </style>
+
 </head>
 <body>
 
@@ -866,6 +867,7 @@
 </div>
 
 <!-- SECTION 1 — ALPHABET -->
+
 <div class="section-page active" id="sec-alphabet">
   <p class="sec-intro">Tap any letter to hear its name — the way you say the alphabet.<br>
     <strong style="color:var(--accent2)">Blue = vowel</strong> &nbsp;·&nbsp; <strong style="color:var(--teal)">Green = consonant</strong>
@@ -874,6 +876,7 @@
 </div>
 
 <!-- SECTION 2 — LETTER SOUNDS -->
+
 <div class="section-page" id="sec-sounds">
   <p class="sec-intro">Tap any word to hear it spoken slowly. Listen for the sound that letter makes.<br>
     <strong style="color:var(--accent2)">Blue = vowel</strong> &nbsp;·&nbsp; <strong style="color:var(--teal)">Green = consonant</strong> &nbsp;·&nbsp; <strong style="color:var(--accent4)">Yellow = second sound</strong>
@@ -885,6 +888,7 @@
 </div>
 
 <!-- SECTION 3 — WORD PRONUNCIATION 1 -->
+
 <div class="section-page" id="sec-wp1">
   <div class="section-test-bar">
     <button class="test-btn" onclick="openTest('wp1')">🧪 Test Yourself — 10 random words</button>
@@ -924,6 +928,7 @@
 </div>
 
 <!-- SECTION 4 — WORD PRONUNCIATION 2 -->
+
 <div class="section-page" id="sec-wp2">
   <div class="section-test-bar">
     <button class="test-btn" onclick="openTest('wp2')">🧪 Test Yourself — 10 random words</button>
@@ -963,6 +968,7 @@
 </div>
 
 <!-- SECTION 5 — READ SENTENCES -->
+
 <div class="section-page" id="sec-sentences">
   <div class="speed-row" style="margin-bottom:6px">
     <span class="speed-label">Speed:</span>
@@ -995,6 +1001,7 @@
 <!-- ══════════════════════════════════════════
      SPELLING PRACTICE OVERLAY
 ══════════════════════════════════════════ -->
+
 <div class="practice-overlay" id="spellingOverlay">
   <div class="practice-header spell-header-gradient">
     <button class="practice-back" onclick="closeSpelling()" title="Back">←</button>
@@ -1051,6 +1058,7 @@
 <!-- ══════════════════════════════════════════
      PRACTICE MODE OVERLAY
 ══════════════════════════════════════════ -->
+
 <div class="practice-overlay" id="practiceOverlay">
 
   <div class="practice-header">
@@ -1063,83 +1071,85 @@
 
   <div class="practice-body">
 
-    <div class="practice-step-info">
-      <div class="step-counter" id="practiceStepCounter">Word 1 of 1</div>
-      <div class="practice-progress"><div class="practice-progress-fill" id="practiceProgressFill" style="width:0%"></div></div>
-    </div>
+```
+<div class="practice-step-info">
+  <div class="step-counter" id="practiceStepCounter">Word 1 of 1</div>
+  <div class="practice-progress"><div class="practice-progress-fill" id="practiceProgressFill" style="width:0%"></div></div>
+</div>
 
-    <!-- PHASE 0: Example (word 1 — listen only) -->
-    <div id="phaseExample">
-      <div class="practice-card">
-        <div class="practice-word-emoji" id="exampleEmoji"></div>
-        <div class="practice-word" id="exampleWord"></div>
-        <div class="practice-word-label">Example word — listen first</div>
-        <span class="phase-banner phase-listen">👂 Listen</span><br>
-        <div class="example-listen-row">
-          <div class="example-label">Hear how this word sounds.<br>Then tap the button below to start practising.</div>
-          <button class="listen-play-btn" id="examplePlayBtn" onclick="playExampleWord()">
-            <span>🔊</span> <span id="examplePlayLbl">Hear the word</span>
-          </button>
-          <button class="start-practice-btn" onclick="startPracticeWords()">
-            🎙️ Start Practising →
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- PHASE 1: Record -->
-    <div id="phaseRecord" style="display:none">
-      <div class="practice-card">
-        <div class="practice-word-emoji" id="recordEmoji"></div>
-        <div class="practice-word" id="recordWord"></div>
-        <div class="practice-word-label" id="recordWordLabel">Your turn — say this word</div>
-        <span class="phase-banner phase-record">🎙️ Record your voice</span>
-        <div class="record-controls">
-          <div class="record-btn-wrap">
-            <button class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙️</button>
-            <div class="record-countdown" id="recordCountdown">3</div>
-          </div>
-          <div class="record-hint" id="recordHint">Tap the mic — recording stops after 3 seconds</div>
-        </div>
-        <div class="mic-warning" id="micWarning" style="margin-top:16px"></div>
-      </div>
-    </div>
-
-    <!-- PHASE 2: Compare -->
-    <div id="phaseCompare" style="display:none">
-      <div class="practice-card">
-        <div class="practice-word-emoji" id="compareEmoji"></div>
-        <div class="practice-word" id="compareWord"></div>
-        <div class="practice-word-label">Compare your voice</div>
-        <span class="phase-banner phase-compare">🔍 Compare</span>
-        <div class="compare-controls">
-          <div class="feedback-badge" id="feedbackBadge"></div>
-          <div class="playback-row">
-            <button class="playback-btn my-voice" onclick="playMyRecording()">
-              🎧 My recording
-            </button>
-            <button class="playback-btn correct-voice" id="correctVoiceBtn" onclick="playCorrectWord()">
-              🔊 Correct word
-            </button>
-          </div>
-          <button class="rerecord-link" onclick="goBackToRecord()">↩ Record again</button>
-          <button class="practice-next-btn" id="practiceNextBtn" onclick="advancePractice()">
-            Next word →
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- FINISH -->
-    <div class="practice-finish" id="practiceFinish">
-      <div class="finish-icon">🏅</div>
-      <h2>Practice complete!</h2>
-      <p>Great work! You practised all the words in this set.<br>Head back and try another group.</p>
-      <br>
-      <button class="practice-next-btn" onclick="closePractice()" style="margin-top:10px">
-        ← Back to lessons
+<!-- PHASE 0: Example (word 1 — listen only) -->
+<div id="phaseExample">
+  <div class="practice-card">
+    <div class="practice-word-emoji" id="exampleEmoji"></div>
+    <div class="practice-word" id="exampleWord"></div>
+    <div class="practice-word-label">Example word — listen first</div>
+    <span class="phase-banner phase-listen">👂 Listen</span><br>
+    <div class="example-listen-row">
+      <div class="example-label">Hear how this word sounds.<br>Then tap the button below to start practising.</div>
+      <button class="listen-play-btn" id="examplePlayBtn" onclick="playExampleWord()">
+        <span>🔊</span> <span id="examplePlayLbl">Hear the word</span>
+      </button>
+      <button class="start-practice-btn" onclick="startPracticeWords()">
+        🎙️ Start Practising →
       </button>
     </div>
+  </div>
+</div>
+
+<!-- PHASE 1: Record -->
+<div id="phaseRecord" style="display:none">
+  <div class="practice-card">
+    <div class="practice-word-emoji" id="recordEmoji"></div>
+    <div class="practice-word" id="recordWord"></div>
+    <div class="practice-word-label" id="recordWordLabel">Your turn — say this word</div>
+    <span class="phase-banner phase-record">🎙️ Record your voice</span>
+    <div class="record-controls">
+      <div class="record-btn-wrap">
+        <button class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙️</button>
+        <div class="record-countdown" id="recordCountdown">3</div>
+      </div>
+      <div class="record-hint" id="recordHint">Tap the mic — recording stops after 3 seconds</div>
+    </div>
+    <div class="mic-warning" id="micWarning" style="margin-top:16px"></div>
+  </div>
+</div>
+
+<!-- PHASE 2: Compare -->
+<div id="phaseCompare" style="display:none">
+  <div class="practice-card">
+    <div class="practice-word-emoji" id="compareEmoji"></div>
+    <div class="practice-word" id="compareWord"></div>
+    <div class="practice-word-label">Compare your voice</div>
+    <span class="phase-banner phase-compare">🔍 Compare</span>
+    <div class="compare-controls">
+      <div class="feedback-badge" id="feedbackBadge"></div>
+      <div class="playback-row">
+        <button class="playback-btn my-voice" onclick="playMyRecording()">
+          🎧 My recording
+        </button>
+        <button class="playback-btn correct-voice" id="correctVoiceBtn" onclick="playCorrectWord()">
+          🔊 Correct word
+        </button>
+      </div>
+      <button class="rerecord-link" onclick="goBackToRecord()">↩ Record again</button>
+      <button class="practice-next-btn" id="practiceNextBtn" onclick="advancePractice()">
+        Next word →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- FINISH -->
+<div class="practice-finish" id="practiceFinish">
+  <div class="finish-icon">🏅</div>
+  <h2>Practice complete!</h2>
+  <p>Great work! You practised all the words in this set.<br>Head back and try another group.</p>
+  <br>
+  <button class="practice-next-btn" onclick="closePractice()" style="margin-top:10px">
+    ← Back to lessons
+  </button>
+</div>
+```
 
   </div><!-- /practice-body -->
 </div><!-- /practiceOverlay -->
@@ -1147,6 +1157,7 @@
 <!-- ══════════════════════════════════════════
      TEST YOURSELF OVERLAY
 ══════════════════════════════════════════ -->
+
 <div class="practice-overlay" id="testOverlay">
 
   <div class="practice-header" style="background:linear-gradient(135deg,#5cb85c,#3a7a3a)">
@@ -1159,66 +1170,68 @@
 
   <div class="practice-body">
 
-    <div class="practice-step-info">
-      <div class="step-counter" id="testStepCounter">Word 1 of 10</div>
-      <div class="practice-progress">
-        <div class="practice-progress-fill" id="testProgressFill" style="width:0%;background:linear-gradient(90deg,#5cb85c,#3a7a3a)"></div>
-      </div>
-    </div>
+```
+<div class="practice-step-info">
+  <div class="step-counter" id="testStepCounter">Word 1 of 10</div>
+  <div class="practice-progress">
+    <div class="practice-progress-fill" id="testProgressFill" style="width:0%;background:linear-gradient(90deg,#5cb85c,#3a7a3a)"></div>
+  </div>
+</div>
 
-    <!-- TEST RECORD PHASE -->
-    <div id="testPhaseRecord">
-      <div class="practice-card">
-        <div class="practice-word-emoji" id="testEmoji"></div>
-        <div class="practice-word" id="testWord"></div>
-        <div class="practice-word-label">Say this word out loud</div>
-        <span class="phase-banner phase-record">🎙️ Record your voice</span>
-        <div class="record-controls">
-          <div class="record-btn-wrap">
-            <button class="record-btn" id="testRecordBtn" onclick="testToggleRecording()">🎙️</button>
-            <div class="record-countdown" id="testCountdown">3</div>
-          </div>
-          <div class="record-hint" id="testRecordHint">Tap the mic — recording stops after 3 seconds</div>
-        </div>
-        <div class="mic-warning" id="testMicWarning" style="margin-top:16px"></div>
+<!-- TEST RECORD PHASE -->
+<div id="testPhaseRecord">
+  <div class="practice-card">
+    <div class="practice-word-emoji" id="testEmoji"></div>
+    <div class="practice-word" id="testWord"></div>
+    <div class="practice-word-label">Say this word out loud</div>
+    <span class="phase-banner phase-record">🎙️ Record your voice</span>
+    <div class="record-controls">
+      <div class="record-btn-wrap">
+        <button class="record-btn" id="testRecordBtn" onclick="testToggleRecording()">🎙️</button>
+        <div class="record-countdown" id="testCountdown">3</div>
       </div>
+      <div class="record-hint" id="testRecordHint">Tap the mic — recording stops after 3 seconds</div>
     </div>
+    <div class="mic-warning" id="testMicWarning" style="margin-top:16px"></div>
+  </div>
+</div>
 
-    <!-- TEST COMPARE PHASE -->
-    <div id="testPhaseCompare" style="display:none">
-      <div class="practice-card">
-        <div class="practice-word-emoji" id="testCompareEmoji"></div>
-        <div class="practice-word" id="testCompareWord"></div>
-        <div class="practice-word-label">Compare, then mark yourself</div>
-        <span class="phase-banner phase-compare">🔍 How did you do?</span>
-        <div class="compare-controls">
-          <div class="playback-row">
-            <button class="playback-btn my-voice" onclick="testPlayMyRecording()">🎧 My recording</button>
-            <button class="playback-btn correct-voice" id="testCorrectVoiceBtn" onclick="testPlayCorrectWord()">🔊 Correct word</button>
-          </div>
-          <div class="test-judge-row">
-            <button class="judge-btn correct" onclick="testJudge(true)">✅ Correct</button>
-            <button class="judge-btn incorrect" onclick="testJudge(false)">❌ Incorrect</button>
-          </div>
-        </div>
+<!-- TEST COMPARE PHASE -->
+<div id="testPhaseCompare" style="display:none">
+  <div class="practice-card">
+    <div class="practice-word-emoji" id="testCompareEmoji"></div>
+    <div class="practice-word" id="testCompareWord"></div>
+    <div class="practice-word-label">Compare, then mark yourself</div>
+    <span class="phase-banner phase-compare">🔍 How did you do?</span>
+    <div class="compare-controls">
+      <div class="playback-row">
+        <button class="playback-btn my-voice" onclick="testPlayMyRecording()">🎧 My recording</button>
+        <button class="playback-btn correct-voice" id="testCorrectVoiceBtn" onclick="testPlayCorrectWord()">🔊 Correct word</button>
+      </div>
+      <div class="test-judge-row">
+        <button class="judge-btn correct" onclick="testJudge(true)">✅ Correct</button>
+        <button class="judge-btn incorrect" onclick="testJudge(false)">❌ Incorrect</button>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- TEST RESULTS -->
-    <div id="testPhaseResults" style="display:none">
-      <div class="practice-card" style="text-align:left">
-        <div style="text-align:center;margin-bottom:20px">
-          <div style="font-size:3rem" id="testResultIcon">🏅</div>
-          <div class="practice-word" id="testResultScore" style="font-size:2rem"></div>
-          <div class="practice-word-label" id="testResultMsg"></div>
-        </div>
-        <div id="testResultList"></div>
-        <div style="text-align:center;margin-top:24px">
-          <button class="practice-next-btn" onclick="openTest(testSection)" style="margin-right:10px">🔁 Try again</button>
-          <button class="practice-next-btn" onclick="closeTest()" style="background:linear-gradient(135deg,var(--mid),#555)">← Back</button>
-        </div>
-      </div>
+<!-- TEST RESULTS -->
+<div id="testPhaseResults" style="display:none">
+  <div class="practice-card" style="text-align:left">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:3rem" id="testResultIcon">🏅</div>
+      <div class="practice-word" id="testResultScore" style="font-size:2rem"></div>
+      <div class="practice-word-label" id="testResultMsg"></div>
     </div>
+    <div id="testResultList"></div>
+    <div style="text-align:center;margin-top:24px">
+      <button class="practice-next-btn" onclick="openTest(testSection)" style="margin-right:10px">🔁 Try again</button>
+      <button class="practice-next-btn" onclick="closeTest()" style="background:linear-gradient(135deg,var(--mid),#555)">← Back</button>
+    </div>
+  </div>
+</div>
+```
 
   </div>
 </div>
@@ -1508,8 +1521,8 @@ const WP2_TILES = {
   // th (voiced)
   'this':  [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'s',w:'z.wav',t:'ending'}],
   'that':  [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
-  'these': [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'e',w:'iː as in eat.wav',t:'beginning'},{d:'se',w:'z.wav',t:'ending'}],
-  'those': [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'se',w:'z.wav',t:'ending'}],
+  'these': [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'e',w:'iː as in eat.wav',t:'beginning'},{d:'s',w:'z.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'those': [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'s',w:'z.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   // th (voiceless)
   'thin':  [{d:'th',w:'θ as in thin.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
   'think': [{d:'th',w:'θ as in thin.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'k',w:'k.wav',t:'ending'}],
@@ -1519,17 +1532,15 @@ const WP2_TILES = {
   'when':  [{d:'wh',w:'w.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
   'what':  [{d:'wh',w:'w.wav',t:'beginning'},{d:'a',w:'ɒ as in pot.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
   'why':   [{d:'wh',w:'w.wav',t:'beginning'},{d:'y',w:'aɪ as in ice.wav',t:'ending'}],
-  'where': [{d:'wh',w:'w.wav',t:'beginning'},{d:'ere',w:'ɛː as in where.wav',t:'ending'}],
+  'where': [{d:'wh',w:'w.wav',t:'beginning'},{d:'ere',w:null,tts:'air',t:'ending'}],
   // ph
-  'phone': [{d:'ph',w:'f.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'ne',w:'n.wav',t:'ending'}],
+  'phone': [{d:'ph',w:'f.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'photo': [{d:'ph',w:'f.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'o',w:'əʊ as in boat.wav',t:'ending'}],
   'graph': [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ph',w:'f.wav',t:'ending'}],
-  'elephant': [{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'e',w:'ɪ as in bit.wav',t:'beginning'},{d:'ph',w:'f.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'nt',w:'n.wav',t:'ending'}],
 
   // ── VOWEL PAIRS — LONG SOUNDS ──────────
   // ee
   'see':   [{d:'s',w:'s.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'ending'}],
-  'tree':  [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'ending'}],
   'bee':   [{d:'b',w:'b.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'ending'}],
   'feet':  [{d:'f',w:'f.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
   // ea (long ee sound)
@@ -1562,11 +1573,11 @@ const WP2_TILES = {
   'tie':   [{d:'t',w:'t.wav',t:'beginning'},{d:'ie',w:'aɪ as in ice.wav',t:'ending'}],
   'lie':   [{d:'l',w:'l.wav',t:'beginning'},{d:'ie',w:'aɪ as in ice.wav',t:'ending'}],
   'die':   [{d:'d',w:'d.wav',t:'beginning'},{d:'ie',w:'aɪ as in ice.wav',t:'ending'}],
-  // ue
-  'blue':  [{d:'bl',w:'b.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
-  'glue':  [{d:'gl',w:'g.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
-  'true':  [{d:'tr',w:'t.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
-  'clue':  [{d:'cl',w:'k.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
+  // ue — blends now split correctly
+  'blue':  [{d:'b',w:'b.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
+  'glue':  [{d:'g',w:'g.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
+  'true':  [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
+  'clue':  [{d:'k',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
 
   // ── VOWEL PAIRS — OTHER SOUNDS ─────────
   // oo (long /uː/)
@@ -1586,85 +1597,78 @@ const WP2_TILES = {
   // ou (aʊ sound)
   'out':   [{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
   'loud':  [{d:'l',w:'l.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
-  'sound': [{d:'s',w:'s.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'nd',w:'n.wav',t:'ending'}],
-  'found': [{d:'f',w:'f.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'nd',w:'n.wav',t:'ending'}],
+  'sound': [{d:'s',w:'s.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
+  'found': [{d:'f',w:'f.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
   'mouth': [{d:'m',w:'m.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'th',w:'θ as in thin.wav',t:'ending'}],
-  'count': [{d:'k',w:'k.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'nt',w:'n.wav',t:'ending'}],
-  // ou (other sounds — whole-word TTS fallback shown but tiles split as best we can)
-  'could': [{d:'c',w:'k.wav',t:'beginning'},{d:'oul',w:'ʊ as in book.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
-  'would': [{d:'w',w:'w.wav',t:'beginning'},{d:'oul',w:'ʊ as in book.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
-  'should':[{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'oul',w:'ʊ as in book.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'count': [{d:'k',w:'k.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  // ou (other sounds)
+  'could': [{d:'c',w:'k.wav',t:'beginning'},{d:'ou',w:'ʊ as in book.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'would': [{d:'w',w:'w.wav',t:'beginning'},{d:'ou',w:'ʊ as in book.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'should':[{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'ou',w:'ʊ as in book.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
   'your':  [{d:'y',w:'j as in yam.wav',t:'beginning'},{d:'our',w:'ɔː as in storm.wav',t:'ending'}],
   'four':  [{d:'f',w:'f.wav',t:'beginning'},{d:'our',w:'ɔː as in storm.wav',t:'ending'}],
   'pour':  [{d:'p',w:'p.wav',t:'beginning'},{d:'our',w:'ɔː as in storm.wav',t:'ending'}],
   // ow (aʊ)
   'cow':   [{d:'k',w:'k.wav',t:'beginning'},{d:'ow',w:'aʊ as in out.wav',t:'ending'}],
   'now':   [{d:'n',w:'n.wav',t:'beginning'},{d:'ow',w:'aʊ as in out.wav',t:'ending'}],
-  // ow (əʊ)
-  'snow':  [{d:'sn',w:'s.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
+  // ow (əʊ) — sn and other blends split correctly
+  'snow':  [{d:'s',w:'s.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
   'low':   [{d:'l',w:'l.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
   // oi
   'coin':  [{d:'k',w:'k.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
-  'join':  [{d:'dʒ',w:'dʒ as in jar.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'join':  [{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
   'boil':  [{d:'b',w:'b.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
   'soil':  [{d:'s',w:'s.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
   // oy
   'boy':   [{d:'b',w:'b.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
   'toy':   [{d:'t',w:'t.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
-  'enjoy': [{d:'en',w:'ɪ as in bit.wav',t:'beginning'},{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
-  'annoy': [{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'nn',w:'n.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
+  'enjoy': [{d:'e',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
+  'annoy': [{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
   // au
-  'author':[{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'th',w:'θ as in thin.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'ending'}],
-  'August':[{d:'Au',w:'ɔː as in storm.wav',t:'beginning'},{d:'g',w:'g.wav',t:'beginning'},{d:'ust',w:'ʌ as in but.wav',t:'ending'}],
+  'author':[{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'th',w:'θ as in thin.wav',t:'beginning'},{d:'e',w:'ɜː as in work.wav',t:'ending'},{d:'r',w:'r.wav',t:'ending'}],
+  'August':[{d:'Au',w:'ɔː as in storm.wav',t:'beginning'},{d:'g',w:'g.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'s',w:'s.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
   'auto':  [{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'o',w:'əʊ as in boat.wav',t:'ending'}],
   'haul':  [{d:'h',w:'h.wav',t:'beginning'},{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
   // aw
   'saw':   [{d:'s',w:'s.wav',t:'beginning'},{d:'aw',w:'ɔː as in storm.wav',t:'ending'}],
   'law':   [{d:'l',w:'l.wav',t:'beginning'},{d:'aw',w:'ɔː as in storm.wav',t:'ending'}],
   'paw':   [{d:'p',w:'p.wav',t:'beginning'},{d:'aw',w:'ɔː as in storm.wav',t:'ending'}],
-  'draw':  [{d:'dr',w:'d.wav',t:'beginning'},{d:'aw',w:'ɔː as in storm.wav',t:'ending'}],
+  'draw':  [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'aw',w:'ɔː as in storm.wav',t:'ending'}],
 
   // ── SILENT E ───────────────────────────
-  // -ake
   'cake':  [{d:'c',w:'k.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'make':  [{d:'m',w:'m.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'take':  [{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'lake':  [{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
-  // -ate
   'late':  [{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'mate':  [{d:'m',w:'m.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'gate':  [{d:'g',w:'g.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'hate':  [{d:'h',w:'h.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
-  // -ine
   'fine':  [{d:'f',w:'f.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'line':  [{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'mine':  [{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'nine':  [{d:'n',w:'n.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
-  // -ope
   'hope':  [{d:'h',w:'h.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'rope':  [{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'cope':  [{d:'k',w:'k.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'nope':  [{d:'n',w:'n.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
-  // -ute
   'cute':  [{d:'c',w:'k.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'mute':  [{d:'m',w:'m.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'tube':  [{d:'t',w:'t.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'cube':  [{d:'k',w:'k.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
-  // -ide
   'ride':  [{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'side':  [{d:'s',w:'s.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'hide':  [{d:'h',w:'h.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'wide':  [{d:'w',w:'w.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
-  // -ame
   'game':  [{d:'g',w:'g.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'name':  [{d:'n',w:'n.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'same':  [{d:'s',w:'s.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'came':  [{d:'k',w:'k.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
-  // -ore
   'more':  [{d:'m',w:'m.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
   'core':  [{d:'k',w:'k.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
   'sore':  [{d:'s',w:'s.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
   'bore':  [{d:'b',w:'b.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
+  'slide': [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
 
   // ── BEGINNING BLENDS ───────────────────
   // st
@@ -1703,7 +1707,7 @@ const WP2_TILES = {
   // pl
   'plan':  [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
   'plant': [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
-  'please':[{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'se',w:'z.wav',t:'ending'}],
+  'please':[{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'s',w:'z.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   // br
   'brown': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ow',w:'aʊ as in out.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
   'bring': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
@@ -1718,7 +1722,6 @@ const WP2_TILES = {
   'slip':  [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
   'slow':  [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
   'sleep': [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
-  'slide': [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   // sp
   'spin':  [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
   'spot':  [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
@@ -1726,77 +1729,68 @@ const WP2_TILES = {
   'spoon': [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
 
   // ── COMMON ENDINGS ─────────────────────
-  // ck
   'back':  [{d:'b',w:'b.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
   'duck':  [{d:'d',w:'d.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
   'pick':  [{d:'p',w:'p.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
   'rock':  [{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
-  // ll
   'ball':  [{d:'b',w:'b.wav',t:'beginning'},{d:'a',w:'ɔː as in storm.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
   'bell':  [{d:'b',w:'b.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
   'fill':  [{d:'f',w:'f.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
   'doll':  [{d:'d',w:'d.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
-  // ff
   'off':   [{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ff',w:'f.wav',t:'ending'}],
   'puff':  [{d:'p',w:'p.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'ff',w:'f.wav',t:'ending'}],
   'cliff': [{d:'k',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ff',w:'f.wav',t:'ending'}],
   'staff': [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ff',w:'f.wav',t:'ending'}],
-  // ss
   'miss':  [{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ss',w:'s.wav',t:'ending'}],
   'pass':  [{d:'p',w:'p.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ss',w:'s.wav',t:'ending'}],
   'bus':   [{d:'b',w:'b.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'s',w:'s.wav',t:'ending'}],
-  // zz
   'buzz':  [{d:'b',w:'b.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
-  'jazz':  [{d:'dʒ',w:'dʒ as in jar.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
+  'jazz':  [{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
   'fizz':  [{d:'f',w:'f.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
   'fuzz':  [{d:'f',w:'f.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
-  // tch
   'catch': [{d:'k',w:'k.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
   'match': [{d:'m',w:'m.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
   'watch': [{d:'w',w:'w.wav',t:'beginning'},{d:'a',w:'ɒ as in pot.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
   'pitch': [{d:'p',w:'p.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
-  // dge
   'bridge':[{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
   'edge':  [{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
   'badge': [{d:'b',w:'b.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
-  'judge': [{d:'dʒ',w:'dʒ as in jar.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
-  // ed endings (whole-word TTS is fine; tiles show the spelling pattern)
-  'jumped':  [{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'m',w:'m.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ed',w:'t.wav',t:'ending'}],
-  'played':  [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'beginning'},{d:'ed',w:'d.wav',t:'ending'}],
-  'looked':  [{d:'l',w:'l.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'beginning'},{d:'ed',w:'t.wav',t:'ending'}],
-  'helped':  [{d:'h',w:'h.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ed',w:'t.wav',t:'ending'}],
-  // ing endings
-  'going':   [{d:'g',w:'g.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'ing',w:'ɪ as in bit.wav',t:'ending'}],
-  'playing': [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'beginning'},{d:'ing',w:'ɪ as in bit.wav',t:'ending'}],
-  'looking': [{d:'l',w:'l.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'beginning'},{d:'ing',w:'ɪ as in bit.wav',t:'ending'}],
-  'eating':  [{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'ing',w:'ɪ as in bit.wav',t:'ending'}],
-  // -tion / -sion / -cian / -ture (complex; tiles show the pattern, whole-word TTS stays)
-  'nation':     [{d:'n',w:'n.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'tion',w:'ʃ as in she.wav',t:'ending'}],
-  'station':    [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'tion',w:'ʃ as in she.wav',t:'ending'}],
-  'action':     [{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'c',w:'k.wav',t:'beginning'},{d:'tion',w:'ʃ as in she.wav',t:'ending'}],
-  'mention':    [{d:'m',w:'m.wav',t:'beginning'},{d:'en',w:'e as in bet.wav',t:'beginning'},{d:'tion',w:'ʃ as in she.wav',t:'ending'}],
-  'motion':     [{d:'m',w:'m.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'tion',w:'ʃ as in she.wav',t:'ending'}],
-  'section':    [{d:'s',w:'s.wav',t:'beginning'},{d:'ec',w:'e as in bet.wav',t:'beginning'},{d:'tion',w:'ʃ as in she.wav',t:'ending'}],
-  'mission':    [{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ssion',w:'ʃ as in she.wav',t:'ending'}],
-  'session':    [{d:'s',w:'s.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'ssion',w:'ʃ as in she.wav',t:'ending'}],
-  'passion':    [{d:'p',w:'p.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ssion',w:'ʃ as in she.wav',t:'ending'}],
-  'tension':    [{d:'t',w:'t.wav',t:'beginning'},{d:'en',w:'e as in bet.wav',t:'beginning'},{d:'sion',w:'ʃ as in she.wav',t:'ending'}],
-  'vision':     [{d:'v',w:'v.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'sion',w:'ʒ as in pleasure.wav',t:'ending'}],
-  'division':   [{d:'d',w:'d.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'vi',w:'v.wav',t:'beginning'},{d:'sion',w:'ʒ as in pleasure.wav',t:'ending'}],
-  'musician':   [{d:'m',w:'m.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'si',w:'z.wav',t:'beginning'},{d:'cian',w:'ʃ as in she.wav',t:'ending'}],
-  'magician':   [{d:'m',w:'m.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'gi',w:'dʒ as in jar.wav',t:'beginning'},{d:'cian',w:'ʃ as in she.wav',t:'ending'}],
-  'technician': [{d:'t',w:'t.wav',t:'beginning'},{d:'ech',w:'e as in bet.wav',t:'beginning'},{d:'ni',w:'n.wav',t:'beginning'},{d:'cian',w:'ʃ as in she.wav',t:'ending'}],
-  'politician': [{d:'p',w:'p.wav',t:'beginning'},{d:'oli',w:'ɒ as in pot.wav',t:'beginning'},{d:'ti',w:'t.wav',t:'beginning'},{d:'cian',w:'ʃ as in she.wav',t:'ending'}],
-  'physician':  [{d:'ph',w:'f.wav',t:'beginning'},{d:'y',w:'ɪ as in bit.wav',t:'beginning'},{d:'si',w:'z.wav',t:'beginning'},{d:'cian',w:'ʃ as in she.wav',t:'ending'}],
-  'picture':    [{d:'p',w:'p.wav',t:'beginning'},{d:'ic',w:'ɪ as in bit.wav',t:'beginning'},{d:'ture',w:'tʃ as in chair.wav',t:'ending'}],
-  'nature':     [{d:'n',w:'n.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'ture',w:'tʃ as in chair.wav',t:'ending'}],
-  'future':     [{d:'f',w:'f.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'ture',w:'tʃ as in chair.wav',t:'ending'}],
-  'culture':    [{d:'k',w:'k.wav',t:'beginning'},{d:'ul',w:'ʌ as in but.wav',t:'beginning'},{d:'ture',w:'tʃ as in chair.wav',t:'ending'}],
-  'mixture':    [{d:'m',w:'m.wav',t:'beginning'},{d:'ix',w:'ɪ as in bit.wav',t:'beginning'},{d:'ture',w:'tʃ as in chair.wav',t:'ending'}],
-  'capture':    [{d:'k',w:'k.wav',t:'beginning'},{d:'ap',w:'æ as in bat.wav',t:'beginning'},{d:'ture',w:'tʃ as in chair.wav',t:'ending'}],
-  // dress is duplicated in WP2 — already covered above
+  'judge': [{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
+  // -ed endings
+  'jumped':  [{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'m',w:'m.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ed',w:null,tts:'t',t:'ending'}],
+  'played':  [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'beginning'},{d:'ed',w:null,tts:'d',t:'ending'}],
+  'looked':  [{d:'l',w:'l.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'beginning'},{d:'ed',w:null,tts:'t',t:'ending'}],
+  'helped':  [{d:'h',w:'h.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ed',w:null,tts:'t',t:'ending'}],
+  // -ing endings: i + ng (two separate phoneme tiles)
+  'going':   [{d:'g',w:'g.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
+  'playing': [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
+  'looking': [{d:'l',w:'l.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
+  'eating':  [{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
+  // -tion / -sion / -cian / -ture (suffix = one TTS tile)
+  'nation':     [{d:'n',w:'n.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'tion',w:null,tts:'shun',t:'ending'}],
+  'station':    [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'tion',w:null,tts:'shun',t:'ending'}],
+  'action':     [{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'c',w:'k.wav',t:'beginning'},{d:'tion',w:null,tts:'shun',t:'ending'}],
+  'mention':    [{d:'m',w:'m.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'tion',w:null,tts:'shun',t:'ending'}],
+  'motion':     [{d:'m',w:'m.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'tion',w:null,tts:'shun',t:'ending'}],
+  'section':    [{d:'s',w:'s.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'c',w:'k.wav',t:'beginning'},{d:'tion',w:null,tts:'shun',t:'ending'}],
+  'mission':    [{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ssion',w:null,tts:'shun',t:'ending'}],
+  'session':    [{d:'s',w:'s.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'ssion',w:null,tts:'shun',t:'ending'}],
+  'passion':    [{d:'p',w:'p.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ssion',w:null,tts:'shun',t:'ending'}],
+  'tension':    [{d:'t',w:'t.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'sion',w:null,tts:'shun',t:'ending'}],
+  'vision':     [{d:'v',w:'v.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'sion',w:null,tts:'zhun',t:'ending'}],
+  'division':   [{d:'d',w:'d.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'v',w:'v.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'sion',w:null,tts:'zhun',t:'ending'}],
+  'musician':   [{d:'m',w:'m.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'s',w:'z.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'cian',w:null,tts:'shun',t:'ending'}],
+  'magician':   [{d:'m',w:'m.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'g',w:'dʒ as in jar.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'cian',w:null,tts:'shun',t:'ending'}],
+  'technician': [{d:'t',w:'t.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'ch',w:'k.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'cian',w:null,tts:'shun',t:'ending'}],
+  'politician': [{d:'p',w:'p.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'cian',w:null,tts:'shun',t:'ending'}],
+  'physician':  [{d:'ph',w:'f.wav',t:'beginning'},{d:'y',w:'ɪ as in bit.wav',t:'beginning'},{d:'s',w:'z.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'cian',w:null,tts:'shun',t:'ending'}],
+  'picture':    [{d:'p',w:'p.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'c',w:'k.wav',t:'beginning'},{d:'ture',w:null,tts:'cher',t:'ending'}],
+  'nature':     [{d:'n',w:'n.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'ture',w:null,tts:'cher',t:'ending'}],
+  'future':     [{d:'f',w:'f.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'ture',w:null,tts:'cher',t:'ending'}],
+  'culture':    [{d:'k',w:'k.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ture',w:null,tts:'cher',t:'ending'}],
+  'mixture':    [{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'x',w:'ks.wav',t:'beginning'},{d:'ture',w:null,tts:'cher',t:'ending'}],
+  'capture':    [{d:'k',w:'k.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ture',w:null,tts:'cher',t:'ending'}],
 };
-
 function getWp2Tiles(word) {
   return WP2_TILES[word] || null;
 }
@@ -2187,11 +2181,16 @@ function renderWord(wp) {
         labelsEl.appendChild(lbl);
         // Tile
         const tile = document.createElement('div');
-        // Silent-e tiles get a muted look
-        if (tile_data.w === null) {
+        // Silent-e tiles and pure-TTS tiles
+        if (tile_data.w === null && !tile_data.tts) {
           tile.className = 'tile digraph';
           tile.style.opacity = '0.4';
           tile.title = 'Silent e — not pronounced';
+        } else if (tile_data.w === null && tile_data.tts) {
+          // Suffix chunk — use TTS to speak it
+          tile.className = 'tile ' + (tile_data.t === 'ending' ? 'ending' : 'beginning');
+          tile.onclick = () => { tile.classList.add('playing'); speakRaw(tile_data.tts, () => tile.classList.remove('playing')); };
+          tile.title = 'Tap to hear this sound';
         } else {
           tile.className = 'tile ' + (tile_data.t === 'ending' ? 'ending' : tile_data.t === 'digraph' ? 'digraph' : 'beginning');
           tile.onclick = () => playPhonemeWav(tile_data.w, tile);
@@ -3345,5 +3344,6 @@ buildSentences();
 selectFamily('wp1', 0);
 selectFamily('wp2', 0);
 </script>
+
 </body>
 </html>
