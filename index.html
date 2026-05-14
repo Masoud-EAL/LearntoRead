@@ -1484,8 +1484,322 @@ function getWp1Tiles(word) {
 }
 
 /* ══════════════════════════════════════════
-   DATA — WORD PRONUNCIATION 1
+   WP2 PHONEME TILE MAP
+   Each word → array of { display, wav, type }
+   type: 'beginning' | 'ending' | 'digraph' (controls tile colour)
+   Words are grouped into phoneme tiles (digraphs/vowel-teams = one tile).
 ══════════════════════════════════════════ */
+const WP2_TILES = {
+  // ── CONSONANT DIGRAPHS ──────────────────
+  // sh
+  'ship':  [{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'shop':  [{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'fish':  [{d:'f',w:'f.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'sh',w:'ʃ as in she.wav',t:'ending'}],
+  'dish':  [{d:'d',w:'d.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'sh',w:'ʃ as in she.wav',t:'ending'}],
+  'shed':  [{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'shell': [{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
+  // ch
+  'chip':  [{d:'ch',w:'tʃ as in chair.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'chat':  [{d:'ch',w:'tʃ as in chair.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'much':  [{d:'m',w:'m.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'ch',w:'tʃ as in chair.wav',t:'ending'}],
+  'rich':  [{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ch',w:'tʃ as in chair.wav',t:'ending'}],
+  'chop':  [{d:'ch',w:'tʃ as in chair.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'chest': [{d:'ch',w:'tʃ as in chair.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'s',w:'s.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  // th (voiced)
+  'this':  [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'s',w:'z.wav',t:'ending'}],
+  'that':  [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'these': [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'e',w:'iː as in eat.wav',t:'beginning'},{d:'se',w:'z.wav',t:'ending'}],
+  'those': [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'se',w:'z.wav',t:'ending'}],
+  // th (voiceless)
+  'thin':  [{d:'th',w:'θ as in thin.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'think': [{d:'th',w:'θ as in thin.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'k',w:'k.wav',t:'ending'}],
+  'bath':  [{d:'b',w:'b.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'th',w:'θ as in thin.wav',t:'ending'}],
+  'teeth': [{d:'t',w:'t.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'beginning'},{d:'th',w:'θ as in thin.wav',t:'ending'}],
+  // wh
+  'when':  [{d:'wh',w:'w.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'what':  [{d:'wh',w:'w.wav',t:'beginning'},{d:'a',w:'ɒ as in pot.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'why':   [{d:'wh',w:'w.wav',t:'beginning'},{d:'y',w:'aɪ as in ice.wav',t:'ending'}],
+  'where': [{d:'wh',w:'w.wav',t:'beginning'},{d:'ere',w:'ɛː as in where.wav',t:'ending'}],
+  // ph
+  'phone': [{d:'ph',w:'f.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'ne',w:'n.wav',t:'ending'}],
+  'photo': [{d:'ph',w:'f.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'o',w:'əʊ as in boat.wav',t:'ending'}],
+  'graph': [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ph',w:'f.wav',t:'ending'}],
+  'elephant': [{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'e',w:'ɪ as in bit.wav',t:'beginning'},{d:'ph',w:'f.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'nt',w:'n.wav',t:'ending'}],
+
+  // ── VOWEL PAIRS — LONG SOUNDS ──────────
+  // ee
+  'see':   [{d:'s',w:'s.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'ending'}],
+  'tree':  [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'ending'}],
+  'bee':   [{d:'b',w:'b.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'ending'}],
+  'feet':  [{d:'f',w:'f.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  // ea (long ee sound)
+  'eat':   [{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'team':  [{d:'t',w:'t.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'}],
+  'meat':  [{d:'m',w:'m.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'read':  [{d:'r',w:'r.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  // ai
+  'rain':  [{d:'r',w:'r.wav',t:'beginning'},{d:'ai',w:'eɪ as in bait.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'train': [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ai',w:'eɪ as in bait.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'mail':  [{d:'m',w:'m.wav',t:'beginning'},{d:'ai',w:'eɪ as in bait.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
+  'tail':  [{d:'t',w:'t.wav',t:'beginning'},{d:'ai',w:'eɪ as in bait.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
+  // ay
+  'day':   [{d:'d',w:'d.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'ending'}],
+  'play':  [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'ending'}],
+  'say':   [{d:'s',w:'s.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'ending'}],
+  'way':   [{d:'w',w:'w.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'ending'}],
+  // oa
+  'boat':  [{d:'b',w:'b.wav',t:'beginning'},{d:'oa',w:'əʊ as in boat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'coat':  [{d:'k',w:'k.wav',t:'beginning'},{d:'oa',w:'əʊ as in boat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'road':  [{d:'r',w:'r.wav',t:'beginning'},{d:'oa',w:'əʊ as in boat.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'soap':  [{d:'s',w:'s.wav',t:'beginning'},{d:'oa',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  // oe
+  'toe':   [{d:'t',w:'t.wav',t:'beginning'},{d:'oe',w:'əʊ as in boat.wav',t:'ending'}],
+  'goes':  [{d:'g',w:'g.wav',t:'beginning'},{d:'oe',w:'əʊ as in boat.wav',t:'beginning'},{d:'s',w:'z.wav',t:'ending'}],
+  'toes':  [{d:'t',w:'t.wav',t:'beginning'},{d:'oe',w:'əʊ as in boat.wav',t:'beginning'},{d:'s',w:'z.wav',t:'ending'}],
+  'hoe':   [{d:'h',w:'h.wav',t:'beginning'},{d:'oe',w:'əʊ as in boat.wav',t:'ending'}],
+  // ie
+  'pie':   [{d:'p',w:'p.wav',t:'beginning'},{d:'ie',w:'aɪ as in ice.wav',t:'ending'}],
+  'tie':   [{d:'t',w:'t.wav',t:'beginning'},{d:'ie',w:'aɪ as in ice.wav',t:'ending'}],
+  'lie':   [{d:'l',w:'l.wav',t:'beginning'},{d:'ie',w:'aɪ as in ice.wav',t:'ending'}],
+  'die':   [{d:'d',w:'d.wav',t:'beginning'},{d:'ie',w:'aɪ as in ice.wav',t:'ending'}],
+  // ue
+  'blue':  [{d:'bl',w:'b.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
+  'glue':  [{d:'gl',w:'g.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
+  'true':  [{d:'tr',w:'t.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
+  'clue':  [{d:'cl',w:'k.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
+
+  // ── VOWEL PAIRS — OTHER SOUNDS ─────────
+  // oo (long /uː/)
+  'moon':  [{d:'m',w:'m.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'food':  [{d:'f',w:'f.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'soon':  [{d:'s',w:'s.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'pool':  [{d:'p',w:'p.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
+  'cool':  [{d:'k',w:'k.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
+  'roof':  [{d:'r',w:'r.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'f',w:'f.wav',t:'ending'}],
+  // oo (short /ʊ/)
+  'book':  [{d:'b',w:'b.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'}],
+  'look':  [{d:'l',w:'l.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'}],
+  'cook':  [{d:'k',w:'k.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'}],
+  'foot':  [{d:'f',w:'f.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'good':  [{d:'g',w:'g.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'wood':  [{d:'w',w:'w.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  // ou (aʊ sound)
+  'out':   [{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'loud':  [{d:'l',w:'l.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'sound': [{d:'s',w:'s.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'nd',w:'n.wav',t:'ending'}],
+  'found': [{d:'f',w:'f.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'nd',w:'n.wav',t:'ending'}],
+  'mouth': [{d:'m',w:'m.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'th',w:'θ as in thin.wav',t:'ending'}],
+  'count': [{d:'k',w:'k.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'nt',w:'n.wav',t:'ending'}],
+  // ou (other sounds — whole-word TTS fallback shown but tiles split as best we can)
+  'could': [{d:'c',w:'k.wav',t:'beginning'},{d:'oul',w:'ʊ as in book.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'would': [{d:'w',w:'w.wav',t:'beginning'},{d:'oul',w:'ʊ as in book.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'should':[{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'oul',w:'ʊ as in book.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'your':  [{d:'y',w:'j as in yam.wav',t:'beginning'},{d:'our',w:'ɔː as in storm.wav',t:'ending'}],
+  'four':  [{d:'f',w:'f.wav',t:'beginning'},{d:'our',w:'ɔː as in storm.wav',t:'ending'}],
+  'pour':  [{d:'p',w:'p.wav',t:'beginning'},{d:'our',w:'ɔː as in storm.wav',t:'ending'}],
+  // ow (aʊ)
+  'cow':   [{d:'k',w:'k.wav',t:'beginning'},{d:'ow',w:'aʊ as in out.wav',t:'ending'}],
+  'now':   [{d:'n',w:'n.wav',t:'beginning'},{d:'ow',w:'aʊ as in out.wav',t:'ending'}],
+  // ow (əʊ)
+  'snow':  [{d:'sn',w:'s.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
+  'low':   [{d:'l',w:'l.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
+  // oi
+  'coin':  [{d:'k',w:'k.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'join':  [{d:'dʒ',w:'dʒ as in jar.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'boil':  [{d:'b',w:'b.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
+  'soil':  [{d:'s',w:'s.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
+  // oy
+  'boy':   [{d:'b',w:'b.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
+  'toy':   [{d:'t',w:'t.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
+  'enjoy': [{d:'en',w:'ɪ as in bit.wav',t:'beginning'},{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
+  'annoy': [{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'nn',w:'n.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
+  // au
+  'author':[{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'th',w:'θ as in thin.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'ending'}],
+  'August':[{d:'Au',w:'ɔː as in storm.wav',t:'beginning'},{d:'g',w:'g.wav',t:'beginning'},{d:'ust',w:'ʌ as in but.wav',t:'ending'}],
+  'auto':  [{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'o',w:'əʊ as in boat.wav',t:'ending'}],
+  'haul':  [{d:'h',w:'h.wav',t:'beginning'},{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
+  // aw
+  'saw':   [{d:'s',w:'s.wav',t:'beginning'},{d:'aw',w:'ɔː as in storm.wav',t:'ending'}],
+  'law':   [{d:'l',w:'l.wav',t:'beginning'},{d:'aw',w:'ɔː as in storm.wav',t:'ending'}],
+  'paw':   [{d:'p',w:'p.wav',t:'beginning'},{d:'aw',w:'ɔː as in storm.wav',t:'ending'}],
+  'draw':  [{d:'dr',w:'d.wav',t:'beginning'},{d:'aw',w:'ɔː as in storm.wav',t:'ending'}],
+
+  // ── SILENT E ───────────────────────────
+  // -ake
+  'cake':  [{d:'c',w:'k.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'make':  [{d:'m',w:'m.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'take':  [{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'lake':  [{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  // -ate
+  'late':  [{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'mate':  [{d:'m',w:'m.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'gate':  [{d:'g',w:'g.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'hate':  [{d:'h',w:'h.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  // -ine
+  'fine':  [{d:'f',w:'f.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'line':  [{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'mine':  [{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'nine':  [{d:'n',w:'n.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  // -ope
+  'hope':  [{d:'h',w:'h.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'rope':  [{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'cope':  [{d:'k',w:'k.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'nope':  [{d:'n',w:'n.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  // -ute
+  'cute':  [{d:'c',w:'k.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'mute':  [{d:'m',w:'m.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'tube':  [{d:'t',w:'t.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'cube':  [{d:'k',w:'k.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  // -ide
+  'ride':  [{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'side':  [{d:'s',w:'s.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'hide':  [{d:'h',w:'h.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'wide':  [{d:'w',w:'w.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  // -ame
+  'game':  [{d:'g',w:'g.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'name':  [{d:'n',w:'n.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'same':  [{d:'s',w:'s.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'came':  [{d:'k',w:'k.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  // -ore
+  'more':  [{d:'m',w:'m.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
+  'core':  [{d:'k',w:'k.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
+  'sore':  [{d:'s',w:'s.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
+  'bore':  [{d:'b',w:'b.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
+
+  // ── BEGINNING BLENDS ───────────────────
+  // st
+  'stop':  [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'step':  [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'stand': [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
+  'stick': [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
+  // bl
+  'black': [{d:'b',w:'b.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
+  'block': [{d:'b',w:'b.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
+  'blow':  [{d:'b',w:'b.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
+  // tr
+  'tree':  [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'ending'}],
+  'truck': [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
+  'trip':  [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  // dr
+  'drop':  [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'drum':  [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'}],
+  'dress': [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'ss',w:'s.wav',t:'ending'}],
+  'drink': [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'k',w:'k.wav',t:'ending'}],
+  // cl
+  'class': [{d:'k',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ss',w:'s.wav',t:'ending'}],
+  'clap':  [{d:'k',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'clock': [{d:'k',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
+  'clean': [{d:'k',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  // fl
+  'flag':  [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'g',w:'g.wav',t:'ending'}],
+  'flat':  [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'flip':  [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'fly':   [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'y',w:'aɪ as in ice.wav',t:'ending'}],
+  // gr
+  'green': [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'grab':  [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'}],
+  'grow':  [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
+  'great': [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ea',w:'eɪ as in bait.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  // pl
+  'plan':  [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'plant': [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  'please':[{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'se',w:'z.wav',t:'ending'}],
+  // br
+  'brown': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ow',w:'aʊ as in out.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'bring': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
+  'bread': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ea',w:'e as in bet.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'brush': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'sh',w:'ʃ as in she.wav',t:'ending'}],
+  // cr
+  'crab':  [{d:'k',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'}],
+  'cry':   [{d:'k',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'y',w:'aɪ as in ice.wav',t:'ending'}],
+  'crop':  [{d:'k',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'cross': [{d:'k',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ss',w:'s.wav',t:'ending'}],
+  // sl
+  'slip':  [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'slow':  [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
+  'sleep': [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'slide': [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  // sp
+  'spin':  [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'spot':  [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'speak': [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'}],
+  'spoon': [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+
+  // ── COMMON ENDINGS ─────────────────────
+  // ck
+  'back':  [{d:'b',w:'b.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
+  'duck':  [{d:'d',w:'d.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
+  'pick':  [{d:'p',w:'p.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
+  'rock':  [{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
+  // ll
+  'ball':  [{d:'b',w:'b.wav',t:'beginning'},{d:'a',w:'ɔː as in storm.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
+  'bell':  [{d:'b',w:'b.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
+  'fill':  [{d:'f',w:'f.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
+  'doll':  [{d:'d',w:'d.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
+  // ff
+  'off':   [{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ff',w:'f.wav',t:'ending'}],
+  'puff':  [{d:'p',w:'p.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'ff',w:'f.wav',t:'ending'}],
+  'cliff': [{d:'k',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ff',w:'f.wav',t:'ending'}],
+  'staff': [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ff',w:'f.wav',t:'ending'}],
+  // ss
+  'miss':  [{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ss',w:'s.wav',t:'ending'}],
+  'pass':  [{d:'p',w:'p.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ss',w:'s.wav',t:'ending'}],
+  'bus':   [{d:'b',w:'b.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'s',w:'s.wav',t:'ending'}],
+  // zz
+  'buzz':  [{d:'b',w:'b.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
+  'jazz':  [{d:'dʒ',w:'dʒ as in jar.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
+  'fizz':  [{d:'f',w:'f.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
+  'fuzz':  [{d:'f',w:'f.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
+  // tch
+  'catch': [{d:'k',w:'k.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
+  'match': [{d:'m',w:'m.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
+  'watch': [{d:'w',w:'w.wav',t:'beginning'},{d:'a',w:'ɒ as in pot.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
+  'pitch': [{d:'p',w:'p.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
+  // dge
+  'bridge':[{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
+  'edge':  [{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
+  'badge': [{d:'b',w:'b.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
+  'judge': [{d:'dʒ',w:'dʒ as in jar.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
+  // ed endings (whole-word TTS is fine; tiles show the spelling pattern)
+  'jumped':  [{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'m',w:'m.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ed',w:'t.wav',t:'ending'}],
+  'played':  [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'beginning'},{d:'ed',w:'d.wav',t:'ending'}],
+  'looked':  [{d:'l',w:'l.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'beginning'},{d:'ed',w:'t.wav',t:'ending'}],
+  'helped':  [{d:'h',w:'h.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ed',w:'t.wav',t:'ending'}],
+  // ing endings
+  'going':   [{d:'g',w:'g.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'ing',w:'ɪ as in bit.wav',t:'ending'}],
+  'playing': [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'beginning'},{d:'ing',w:'ɪ as in bit.wav',t:'ending'}],
+  'looking': [{d:'l',w:'l.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'beginning'},{d:'ing',w:'ɪ as in bit.wav',t:'ending'}],
+  'eating':  [{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'ing',w:'ɪ as in bit.wav',t:'ending'}],
+  // -tion / -sion / -cian / -ture (complex; tiles show the pattern, whole-word TTS stays)
+  'nation':     [{d:'n',w:'n.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'tion',w:'ʃ as in she.wav',t:'ending'}],
+  'station':    [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'tion',w:'ʃ as in she.wav',t:'ending'}],
+  'action':     [{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'c',w:'k.wav',t:'beginning'},{d:'tion',w:'ʃ as in she.wav',t:'ending'}],
+  'mention':    [{d:'m',w:'m.wav',t:'beginning'},{d:'en',w:'e as in bet.wav',t:'beginning'},{d:'tion',w:'ʃ as in she.wav',t:'ending'}],
+  'motion':     [{d:'m',w:'m.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'tion',w:'ʃ as in she.wav',t:'ending'}],
+  'section':    [{d:'s',w:'s.wav',t:'beginning'},{d:'ec',w:'e as in bet.wav',t:'beginning'},{d:'tion',w:'ʃ as in she.wav',t:'ending'}],
+  'mission':    [{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ssion',w:'ʃ as in she.wav',t:'ending'}],
+  'session':    [{d:'s',w:'s.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'ssion',w:'ʃ as in she.wav',t:'ending'}],
+  'passion':    [{d:'p',w:'p.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ssion',w:'ʃ as in she.wav',t:'ending'}],
+  'tension':    [{d:'t',w:'t.wav',t:'beginning'},{d:'en',w:'e as in bet.wav',t:'beginning'},{d:'sion',w:'ʃ as in she.wav',t:'ending'}],
+  'vision':     [{d:'v',w:'v.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'sion',w:'ʒ as in pleasure.wav',t:'ending'}],
+  'division':   [{d:'d',w:'d.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'vi',w:'v.wav',t:'beginning'},{d:'sion',w:'ʒ as in pleasure.wav',t:'ending'}],
+  'musician':   [{d:'m',w:'m.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'si',w:'z.wav',t:'beginning'},{d:'cian',w:'ʃ as in she.wav',t:'ending'}],
+  'magician':   [{d:'m',w:'m.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'gi',w:'dʒ as in jar.wav',t:'beginning'},{d:'cian',w:'ʃ as in she.wav',t:'ending'}],
+  'technician': [{d:'t',w:'t.wav',t:'beginning'},{d:'ech',w:'e as in bet.wav',t:'beginning'},{d:'ni',w:'n.wav',t:'beginning'},{d:'cian',w:'ʃ as in she.wav',t:'ending'}],
+  'politician': [{d:'p',w:'p.wav',t:'beginning'},{d:'oli',w:'ɒ as in pot.wav',t:'beginning'},{d:'ti',w:'t.wav',t:'beginning'},{d:'cian',w:'ʃ as in she.wav',t:'ending'}],
+  'physician':  [{d:'ph',w:'f.wav',t:'beginning'},{d:'y',w:'ɪ as in bit.wav',t:'beginning'},{d:'si',w:'z.wav',t:'beginning'},{d:'cian',w:'ʃ as in she.wav',t:'ending'}],
+  'picture':    [{d:'p',w:'p.wav',t:'beginning'},{d:'ic',w:'ɪ as in bit.wav',t:'beginning'},{d:'ture',w:'tʃ as in chair.wav',t:'ending'}],
+  'nature':     [{d:'n',w:'n.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'ture',w:'tʃ as in chair.wav',t:'ending'}],
+  'future':     [{d:'f',w:'f.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'ture',w:'tʃ as in chair.wav',t:'ending'}],
+  'culture':    [{d:'k',w:'k.wav',t:'beginning'},{d:'ul',w:'ʌ as in but.wav',t:'beginning'},{d:'ture',w:'tʃ as in chair.wav',t:'ending'}],
+  'mixture':    [{d:'m',w:'m.wav',t:'beginning'},{d:'ix',w:'ɪ as in bit.wav',t:'beginning'},{d:'ture',w:'tʃ as in chair.wav',t:'ending'}],
+  'capture':    [{d:'k',w:'k.wav',t:'beginning'},{d:'ap',w:'æ as in bat.wav',t:'beginning'},{d:'ture',w:'tʃ as in chair.wav',t:'ending'}],
+  // dress is duplicated in WP2 — already covered above
+};
+
+function getWp2Tiles(word) {
+  return WP2_TILES[word] || null;
+}
 const wp1Families = [
   { ending:'an', words:['man','can','pan','ran','fan','tan','van'] },
   { ending:'at', words:['cat','bat','hat','mat','rat','sat','pat'] },
@@ -1861,23 +2175,56 @@ function renderWord(wp) {
     document.getElementById(wp + '-hint').innerHTML =
       `The word <strong>"${word}"</strong> — the beginning is <strong>"${beg}"</strong> and the ending is <strong>"-${fam.ending}"</strong>.`;
   } else {
-    const patStart = word.indexOf(fam.ending);
-    const patLen   = fam.ending.length;
-    word.split('').forEach((letter, i) => {
-      const isPat = patStart >= 0 && i >= patStart && i < patStart + patLen;
-      const lbl = document.createElement('div');
-      lbl.className = 'tile-label-item ' + (isPat ? 'bl' : 'dg');
-      lbl.style.width = '68px';
-      if (i === patStart) lbl.textContent = 'pattern';
-      labelsEl.appendChild(lbl);
-      const tile = document.createElement('div');
-      tile.className = 'tile ' + (isPat ? 'beginning' : 'digraph');
-      tile.textContent = letter;
-      tile.style.animationDelay = (i * 0.07) + 's';
-      tile.onclick = () => speakRaw(letter);
-      tilesEl.appendChild(tile);
-    });
-    let hint = `The word is <strong>"${word}"</strong>. The orange letters show the pattern <strong>"${fam.ending}"</strong>. Tap each letter to hear its sound.`;
+    // WP2 whole-word mode — use phoneme tile map
+    const wp2tiles = getWp2Tiles(word);
+    if (wp2tiles) {
+      wp2tiles.forEach((tile_data, i) => {
+        // Label
+        const lbl = document.createElement('div');
+        lbl.className = 'tile-label-item ' + (tile_data.t === 'ending' ? 'el' : tile_data.t === 'digraph' ? 'dg' : 'bl');
+        lbl.style.width = '68px';
+        if (i === 0) lbl.textContent = 'start';
+        labelsEl.appendChild(lbl);
+        // Tile
+        const tile = document.createElement('div');
+        // Silent-e tiles get a muted look
+        if (tile_data.w === null) {
+          tile.className = 'tile digraph';
+          tile.style.opacity = '0.4';
+          tile.title = 'Silent e — not pronounced';
+        } else {
+          tile.className = 'tile ' + (tile_data.t === 'ending' ? 'ending' : tile_data.t === 'digraph' ? 'digraph' : 'beginning');
+          tile.onclick = () => playPhonemeWav(tile_data.w, tile);
+          tile.title = 'Tap to hear this sound';
+        }
+        tile.textContent = tile_data.d;
+        tile.style.animationDelay = (i * 0.07) + 's';
+        // Widen tile slightly for digraphs/multi-char displays
+        if (tile_data.d.length > 1) {
+          tile.style.width = Math.max(68, tile_data.d.length * 30) + 'px';
+        }
+        tilesEl.appendChild(tile);
+      });
+    } else {
+      // Fallback: letter-by-letter with speakRaw if word not in map
+      const patStart = word.indexOf(fam.ending);
+      const patLen   = fam.ending.length;
+      word.split('').forEach((letter, i) => {
+        const isPat = patStart >= 0 && i >= patStart && i < patStart + patLen;
+        const lbl = document.createElement('div');
+        lbl.className = 'tile-label-item ' + (isPat ? 'bl' : 'dg');
+        lbl.style.width = '68px';
+        if (i === patStart) lbl.textContent = 'pattern';
+        labelsEl.appendChild(lbl);
+        const tile = document.createElement('div');
+        tile.className = 'tile ' + (isPat ? 'beginning' : 'digraph');
+        tile.textContent = letter;
+        tile.style.animationDelay = (i * 0.07) + 's';
+        tile.onclick = () => speakRaw(letter);
+        tilesEl.appendChild(tile);
+      });
+    }
+    let hint = `The word is <strong>"${word}"</strong>. Tap each tile to hear its sound. Press <strong>Hear the word</strong> to hear the whole word.`;
     if (fam.patternHint) hint += '<br><br>' + fam.patternHint;
     document.getElementById(wp + '-hint').innerHTML = hint;
   }
