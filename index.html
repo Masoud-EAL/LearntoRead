@@ -1385,8 +1385,8 @@ const letterSoundData = [
   { l:'L', vowel:false, phonemeWav:'l.wav', sounds:[{ wav:'l.wav', label:'Sound — as in…', examples:['lap','leg','lip','lot','love'] }]},
   { l:'M', vowel:false, phonemeWav:'m.wav', sounds:[{ wav:'m.wav', label:'Sound — as in…', examples:['map','man','mud','most','me'] }]},
   { l:'N', vowel:false, phonemeWav:'n.wav', sounds:[{ wav:'n.wav', label:'Sound — as in…', examples:['net','not','nap','name','no'] }]},
-  { l:'O', vowel:true,  phonemeWav:'ɒ as in hot.wav', sounds:[
-    { wav:'ɒ as in hot.wav',  label:'Short o — as in…', examples:['odd','ox','octopus','olive'] },
+  { l:'O', vowel:true,  phonemeWav:'ɒ as in pot.wav', sounds:[
+    { wav:'ɒ as in pot.wav',  label:'Short o — as in…', examples:['odd','ox','octopus','olive'] },
     { wav:'əʊ as in boat.wav',label:'Long o — as in…',  examples:['open','over','old','only','order'] }
   ]},
   { l:'P', vowel:false, phonemeWav:'p.wav', sounds:[{ wav:'p.wav', label:'Sound — as in…', examples:['pan','pet','pin','pot','put'] }]},
@@ -1397,7 +1397,7 @@ const letterSoundData = [
     { wav:'z.wav', label:'"Z" sound — as in…', examples:['is','his','has','was','as'], note:'S sounds like Z in many very common words.' }
   ]},
   { l:'T', vowel:false, phonemeWav:'t.wav', sounds:[{ wav:'t.wav', label:'Sound — as in…', examples:['tap','top','tin','ten','tell'] }]},
-  { l:'U', vowel:true,  phonemeWav:'ʌ as in cup.wav', sounds:[{ wav:'ʌ as in cup.wav', label:'Short u — as in…', examples:['up','under','uncle','umbrella'] }]},
+  { l:'U', vowel:true,  phonemeWav:'ʌ as in but.wav', sounds:[{ wav:'ʌ as in but.wav', label:'Short u — as in…', examples:['up','under','uncle','umbrella'] }]},
   { l:'V', vowel:false, phonemeWav:'v.wav', sounds:[{ wav:'v.wav', label:'Sound — as in…', examples:['van','vet','vest','vine','voice'] }]},
   { l:'W', vowel:false, phonemeWav:'w.wav', sounds:[{ wav:'w.wav', label:'Sound — as in…', examples:['win','wet','was','want','word'] }]},
   { l:'X', vowel:false, phonemeWav:'ks.wav', sounds:[{ wav:'ks.wav', label:'Sound — as in…', examples:['box','fox','mix','fix','six'] }]},
@@ -1460,8 +1460,8 @@ const SHORT_VOWEL_WAV = {
   a: 'æ as in bat.wav',
   e: 'e as in bet.wav',
   i: 'ɪ as in bit.wav',
-  o: 'ɒ as in hot.wav',
-  u: 'ʌ as in cup.wav'
+  o: 'ɒ as in pot.wav',
+  u: 'ʌ as in but.wav'
 };
 
 // Per-word overrides for any consonant that needs a non-default sound
@@ -1672,14 +1672,10 @@ function buildSoundsSection() {
     const letterEl = document.createElement('div');
     letterEl.className = 'letter-block-letter tappable';
     letterEl.textContent = entry.l;
-    letterEl.title = 'Tap to hear the phoneme sound';
+    letterEl.title = 'Tap to hear the letter name';
     letterEl.onclick = () => {
-      if (entry.phonemeWav) {
-        playPhonemeWav(entry.phonemeWav, letterEl);
-      } else {
-        letterEl.classList.add('playing');
-        speakRaw(nameEntry ? nameEntry.name : entry.l, () => letterEl.classList.remove('playing'));
-      }
+      letterEl.classList.add('playing');
+      speakRaw(nameEntry ? nameEntry.name : entry.l, () => letterEl.classList.remove('playing'));
     };
 
     const descEl = document.createElement('div');
