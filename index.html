@@ -4,6 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WordLink — Learn to Read</title>
+ <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4a90d9">
+
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<link rel="icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -159,14 +171,6 @@
     letter-spacing: 1.5px; color: var(--mid); margin-bottom: 10px;
   }
   .sound-group + .sound-group .sound-group-label { color: var(--accent4); }
-  /* When label is a button (has phoneme audio) */
-  button.sound-group-label {
-    background: none; border: none; cursor: pointer; display: block;
-    padding: 4px 10px 4px 6px; border-radius: 8px; text-align: left;
-    transition: background 0.15s;
-  }
-  button.sound-group-label:hover { background: rgba(0,0,0,0.06); }
-  button.sound-group-label.playing { color: var(--accent2); }
 
   .sound-note {
     font-size: 0.78rem; color: var(--mid); font-weight: 600;
@@ -330,6 +334,489 @@
     .alpha-letter { font-size:2rem; }
     .letter-block-letter { font-size:2.4rem; }
   }
+
+  /* ════════════════════════════════
+     PRACTICE BUTTON (top of sections)
+  ════════════════════════════════ */
+  .practice-bar {
+    text-align: center; margin: 18px auto 0; padding: 0 16px;
+  }
+  .practice-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
+    padding: 11px 28px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, #ff7eb3, #e040a0);
+    color: white; cursor: pointer;
+    box-shadow: 0 4px 0 rgba(180,20,100,0.35), 0 6px 18px rgba(224,64,160,0.3);
+    transition: all 0.18s; display: inline-flex; align-items: center; gap: 9px;
+  }
+  .practice-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(180,20,100,0.35), 0 10px 22px rgba(224,64,160,0.35); }
+  .practice-btn:active { transform: translateY(2px); }
+
+  /* ════════════════════════════════
+     PRACTICE OVERLAY / PAGE
+  ════════════════════════════════ */
+  .practice-overlay {
+    display: none; position: fixed; inset: 0;
+    background: var(--bg); z-index: 100; overflow-y: auto;
+    padding: 0 0 40px;
+  }
+  .practice-overlay.active { display: block; }
+
+  .practice-header {
+    background: linear-gradient(135deg, #ff7eb3, #e040a0);
+    padding: 18px 20px 16px; display: flex; align-items: center;
+    gap: 14px; position: sticky; top: 0; z-index: 10;
+    box-shadow: 0 4px 16px rgba(224,64,160,0.3);
+  }
+  .practice-back {
+    background: rgba(255,255,255,0.25); border: none; border-radius: 50%;
+    width: 40px; height: 40px; font-size: 1.3rem; color: white;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background 0.15s;
+  }
+  .practice-back:hover { background: rgba(255,255,255,0.4); }
+  .practice-header-text { color: white; }
+  .practice-header-text h2 { font-family: 'Fredoka One', cursive; font-size: 1.4rem; line-height: 1; }
+  .practice-header-text p { font-size: 0.82rem; font-weight: 600; opacity: 0.88; margin-top: 3px; }
+
+  .practice-body { max-width: 580px; margin: 0 auto; padding: 24px 16px 0; }
+
+  /* Step indicator */
+  .practice-step-info {
+    text-align: center; margin-bottom: 20px;
+  }
+  .practice-step-info .step-counter {
+    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    color: var(--mid); letter-spacing: 1px;
+  }
+  .practice-progress {
+    height: 6px; background: var(--light); border-radius: 10px;
+    margin: 8px auto 0; max-width: 300px; overflow: hidden;
+  }
+  .practice-progress-fill {
+    height: 100%; border-radius: 10px;
+    background: linear-gradient(90deg, #ff7eb3, #e040a0);
+    transition: width 0.4s ease;
+  }
+
+  /* Word display card in practice */
+  .practice-card {
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow); border: 2px solid var(--light);
+    padding: 28px 24px 24px; text-align: center; position: relative; overflow: hidden;
+  }
+  .practice-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:5px;
+    background: linear-gradient(90deg, #ff7eb3, #e040a0, #ff7eb3);
+  }
+  .practice-word-emoji { font-size: 3rem; line-height: 1; margin-bottom: 10px; min-height: 1.1em; }
+  .practice-word {
+    font-family: 'Fredoka One', cursive; font-size: 3.2rem;
+    color: var(--dark); letter-spacing: 2px; margin-bottom: 6px;
+  }
+  .practice-word-label {
+    font-size: 0.78rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1.5px; color: var(--mid); margin-bottom: 20px;
+  }
+
+  /* Phase banners */
+  .phase-banner {
+    font-family: 'Fredoka One', cursive; font-size: 0.92rem;
+    padding: 7px 18px; border-radius: 24px; display: inline-block;
+    margin-bottom: 18px; letter-spacing: 0.5px;
+  }
+  .phase-listen  { background: #e8f5ff; color: var(--accent2); border: 2px solid #b4d8f8; }
+  .phase-record  { background: #fff0f8; color: #d0208a; border: 2px solid #f8b4dc; }
+  .phase-compare { background: #f0fff4; color: var(--accent3); border: 2px solid #a8e6b8; }
+
+  /* Example word (word 1 — listen only) */
+  .example-listen-row {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .example-label {
+    font-size: 0.82rem; font-weight: 700; color: var(--mid); text-align: center; line-height: 1.5;
+  }
+  .listen-play-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    padding: 11px 28px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, var(--accent2), #2d6cbf);
+    color: white; cursor: pointer;
+    box-shadow: 0 4px 0 rgba(30,80,180,0.35), 0 6px 16px rgba(74,144,217,0.3);
+    display: inline-flex; align-items: center; gap: 9px; transition: all 0.15s;
+  }
+  .listen-play-btn:hover { transform: translateY(-2px); }
+  .listen-play-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
+
+  .start-practice-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    padding: 11px 28px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, #e040a0, #bf1a80);
+    color: white; cursor: pointer; margin-top: 10px;
+    box-shadow: 0 4px 0 rgba(150,10,100,0.35), 0 6px 16px rgba(224,64,160,0.3);
+    display: inline-flex; align-items: center; gap: 9px; transition: all 0.15s;
+  }
+  .start-practice-btn:hover { transform: translateY(-2px); }
+
+  /* Recording controls */
+  .record-controls { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+  .record-btn {
+    width: 80px; height: 80px; border-radius: 50%; border: none;
+    background: linear-gradient(135deg, #ff4d6d, #c9003c);
+    color: white; font-size: 2rem; cursor: pointer;
+    box-shadow: 0 6px 0 rgba(150,0,40,0.4), 0 8px 24px rgba(255,77,109,0.4);
+    transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .record-btn:hover { transform: translateY(-3px) scale(1.05); }
+  .record-btn.recording {
+    animation: recordPulse 1s ease-in-out infinite;
+    background: linear-gradient(135deg, #ff1a1a, #990000);
+  }
+  @keyframes recordPulse {
+    0%   { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 0 rgba(255,26,26,0.5); }
+    70%  { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 20px rgba(255,26,26,0); }
+    100% { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 0 rgba(255,26,26,0); }
+  }
+  .record-hint { font-size: 0.85rem; font-weight: 700; color: var(--mid); }
+
+  /* Playback + compare row */
+  .compare-controls { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
+
+  .playback-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  .playback-btn {
+    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    padding: 10px 22px; border-radius: 36px; border: none;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.15s;
+  }
+  .playback-btn.my-voice {
+    background: linear-gradient(135deg, #fff0f8, #f8d6ee);
+    color: #d0208a; border: 2.5px solid #f0a8d8;
+  }
+  .playback-btn.my-voice:hover { background: linear-gradient(135deg, #f8c8e8, #f0a0d0); }
+  .playback-btn.correct-voice {
+    background: linear-gradient(135deg, var(--accent2), #2d6cbf);
+    color: white; box-shadow: 0 3px 0 rgba(30,80,180,0.35), 0 5px 14px rgba(74,144,217,0.3);
+  }
+  .playback-btn.correct-voice:hover { transform: translateY(-2px); }
+  .playback-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
+
+  /* Feedback badge */
+  .feedback-badge {
+    padding: 10px 22px; border-radius: 14px; font-weight: 800; font-size: 1rem;
+    display: none; align-items: center; gap: 10px;
+    animation: fadeIn 0.35s ease;
+  }
+  .feedback-badge.show { display: inline-flex; }
+  .feedback-badge.correct { background: #e8faf0; color: #1a7a3a; border: 2.5px solid #8ee0b4; }
+  .feedback-badge.try-again { background: #fff4e0; color: #a05000; border: 2.5px solid #f0c870; }
+  .feedback-badge.partial { background: #f0f4ff; color: #3050b0; border: 2.5px solid #a8b8f0; }
+
+  /* Re-record link */
+  .rerecord-link {
+    background: none; border: none; color: var(--mid); font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem; font-weight: 700; cursor: pointer; text-decoration: underline;
+    padding: 2px 6px;
+  }
+  .rerecord-link:hover { color: var(--dark); }
+
+  /* Next button */
+  .practice-next-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
+    padding: 13px 36px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, var(--accent3), #3a9a3a);
+    color: white; cursor: pointer; margin-top: 8px;
+    box-shadow: 0 4px 0 rgba(40,120,40,0.4), 0 6px 18px rgba(92,184,92,0.35);
+    display: inline-flex; align-items: center; gap: 10px; transition: all 0.15s;
+  }
+  .practice-next-btn:hover { transform: translateY(-2px); }
+  .practice-next-btn:active { transform: translateY(2px); }
+  .practice-next-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* Finish card */
+  .practice-finish {
+    text-align: center; padding: 40px 20px;
+    display: none;
+  }
+  .practice-finish.show { display: block; animation: fadeIn 0.5s ease; }
+  .practice-finish h2 { font-family: 'Fredoka One', cursive; font-size: 2rem; color: #e040a0; margin: 12px 0 8px; }
+  .practice-finish p { color: var(--mid); font-weight: 600; }
+  .finish-icon { font-size: 4rem; }
+
+
+  .nav-tab.sec-sentences.active { background: var(--accent4); color: white; border-color: var(--accent4); box-shadow: 0 4px 14px rgba(244,132,95,0.4); }
+
+  /* ── Read Sentences section ── */
+  .sentence-level-tabs {
+    display: flex; gap: 10px; justify-content: center; margin: 18px 16px 0;
+  }
+  .level-tab {
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    padding: 10px 28px; border-radius: 30px; border: 2.5px solid var(--light);
+    background: white; color: var(--mid); cursor: pointer; transition: all 0.18s;
+  }
+  .level-tab.active {
+    background: var(--accent4); color: white; border-color: var(--accent4);
+    box-shadow: 0 4px 12px rgba(244,132,95,0.35);
+  }
+  .level-tab:hover:not(.active) { border-color: var(--accent4); color: var(--accent4); }
+
+  .sentence-level-page { display: none; }
+  .sentence-level-page.active { display: block; }
+
+  .sentence-group {
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow); border: 2px solid var(--light);
+    margin: 16px 0; overflow: hidden;
+  }
+  .sentence-group-header {
+    background: linear-gradient(135deg, #f0f4ff, #e4eaff);
+    padding: 12px 18px; font-family: 'Fredoka One', cursive;
+    font-size: 1rem; color: var(--accent2);
+    border-bottom: 2px solid var(--light);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sentence-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 16px; border-bottom: 1px solid var(--light);
+    transition: background 0.15s;
+  }
+  .sentence-row:last-child { border-bottom: none; }
+  .sentence-row:hover { background: #f8faff; }
+  .sentence-text {
+    flex: 1; font-size: 1rem; font-weight: 600; color: var(--dark); line-height: 1.4;
+  }
+  .sentence-play-btn {
+    background: linear-gradient(135deg, var(--accent2), #2d6cbf);
+    border: none; border-radius: 50%; width: 36px; height: 36px;
+    color: white; font-size: 1rem; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(74,144,217,0.3); transition: all 0.15s;
+  }
+  .sentence-play-btn:hover { transform: scale(1.1); }
+  .sentence-play-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
+
+  .sentence-level-intro {
+    padding: 14px 18px 0; font-size: 0.9rem; color: var(--mid);
+    font-weight: 600; line-height: 1.6; text-align: center;
+  }
+
+  /* Practice button for sentence groups */
+  .sentence-practice-bar {
+    padding: 10px 16px 12px;
+    border-top: 2px dashed var(--light);
+    background: linear-gradient(135deg, #fff5fb, #ffeaf6);
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+  }
+
+  /* Per-set practice button — inside letter block footer / word card */
+  .set-practice-bar {
+    padding: 12px 20px 14px; text-align: center;
+    border-top: 2px dashed var(--light);
+    background: linear-gradient(135deg, #fff5fb, #ffeaf6);
+  }
+  .set-practice-btn {
+    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    padding: 9px 22px; border-radius: 30px; border: none;
+    background: linear-gradient(135deg, #ff7eb3, #e040a0);
+    color: white; cursor: pointer;
+    box-shadow: 0 3px 0 rgba(180,20,100,0.35), 0 5px 14px rgba(224,64,160,0.25);
+    transition: all 0.18s; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .set-practice-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(180,20,100,0.35), 0 8px 18px rgba(224,64,160,0.3); }
+  .set-practice-btn:active { transform: translateY(1px); }
+
+  /* Practice button inside the wp1/wp2 word-display card */
+  .wp-practice-bar {
+    text-align: center; margin-top: 18px; padding-top: 16px;
+    border-top: 2px dashed var(--light);
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+  }
+
+  /* Countdown ring on record button */
+  .record-btn-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+  .record-countdown {
+    position: absolute; top: -6px; right: -6px;
+    background: #ff4d6d; color: white;
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: none; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  }
+  .record-countdown.show { display: flex; }
+
+  /* ── Test Yourself button (section level) ── */
+  .section-test-bar {
+    text-align: center; margin: 18px auto 4px; padding: 0 16px;
+  }
+  .test-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
+    padding: 11px 28px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, #5cb85c, #3a7a3a);
+    color: white; cursor: pointer;
+    box-shadow: 0 4px 0 rgba(30,100,30,0.4), 0 6px 18px rgba(92,184,92,0.3);
+    transition: all 0.18s; display: inline-flex; align-items: center; gap: 9px;
+  }
+  .test-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(30,100,30,0.4), 0 10px 22px rgba(92,184,92,0.35); }
+  .test-btn:active { transform: translateY(2px); }
+
+  /* ── Judge buttons ── */
+  .test-judge-row {
+    display: flex; gap: 14px; justify-content: center; margin-top: 16px; flex-wrap: wrap;
+  }
+  .judge-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1.1rem;
+    padding: 13px 32px; border-radius: 36px; border: none; cursor: pointer;
+    transition: all 0.15s; flex: 1; max-width: 180px;
+  }
+  .judge-btn.correct {
+    background: linear-gradient(135deg, #5cb85c, #3a7a3a); color: white;
+    box-shadow: 0 4px 0 rgba(30,100,30,0.4), 0 6px 16px rgba(92,184,92,0.3);
+  }
+  .judge-btn.incorrect {
+    background: linear-gradient(135deg, #e05555, #b02020); color: white;
+    box-shadow: 0 4px 0 rgba(140,10,10,0.4), 0 6px 16px rgba(220,80,80,0.3);
+  }
+  .judge-btn:hover { transform: translateY(-2px) scale(1.03); }
+  .judge-btn:active { transform: translateY(2px); }
+
+  /* ── Results list ── */
+  .result-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 14px; border-radius: 12px; margin-bottom: 8px;
+    font-weight: 700; font-size: 1rem;
+  }
+  .result-item.ok  { background: #e8faf0; color: #1a7a3a; border: 2px solid #a8e6b8; }
+  .result-item.bad { background: #fdf0f0; color: #a02020; border: 2px solid #f0b8b8; }
+  .result-item .ri-word { font-family: 'Fredoka One', cursive; font-size: 1.2rem; margin-right: 4px; }
+  .result-item .ri-mark { font-size: 1.3rem; flex-shrink: 0; }
+  .result-item .ri-play {
+    margin-left: auto; background: none; border: none; cursor: pointer;
+    font-size: 1rem; color: inherit; opacity: 0.7; padding: 2px 6px;
+  }
+  .result-item .ri-play:hover { opacity: 1; }
+
+  /* Sentence mode in test overlay — smaller font, text wraps */
+  .test-sentence-mode {
+    font-size: 1.15rem !important; letter-spacing: 0 !important;
+    line-height: 1.5 !important; word-break: normal !important;
+  }
+
+  /* Mic permission warning */
+  .mic-warning {
+    background: #fff4e0; border: 2px solid #f0c870; border-radius: 14px;
+    padding: 14px 18px; font-size: 0.88rem; font-weight: 600; color: #806000;
+    margin-top: 16px; display: none; line-height: 1.7; text-align: left;
+  }
+  .mic-warning.show { display: block; }
+  .mic-warning code {
+    background: rgba(0,0,0,0.08); border-radius: 5px; padding: 1px 6px;
+    font-family: monospace; font-size: 0.85em; font-weight: 700;
+  }
+
+  /* ── VOICE SELECTOR ── */
+  .voice-selector-bar {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin: 10px auto 0; padding: 0 16px; flex-wrap: wrap;
+  }
+  .voice-selector-label {
+    font-size: 0.82rem; font-weight: 700; color: var(--mid);
+    text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+  }
+  .voice-select {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.88rem;
+    padding: 7px 14px; border-radius: 24px;
+    border: 2.5px solid var(--light); background: white; color: var(--dark);
+    cursor: pointer; outline: none; transition: all 0.18s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a6f65' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+    padding-right: 32px;
+  }
+  .voice-select:hover, .voice-select:focus { border-color: var(--accent2); box-shadow: 0 3px 12px rgba(74,144,217,0.2); }
+
+  /* ── SPELLING PRACTICE ── */
+  .spell-practice-btn {
+    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    padding: 9px 22px; border-radius: 30px; border: none;
+    background: linear-gradient(135deg, #7eb8ff, #4a7fd4);
+    color: white; cursor: pointer;
+    box-shadow: 0 3px 0 rgba(30,80,180,0.3), 0 5px 14px rgba(74,127,212,0.25);
+    transition: all 0.18s; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .spell-practice-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(30,80,180,0.3), 0 8px 18px rgba(74,127,212,0.3); }
+  .spell-practice-btn:active { transform: translateY(1px); }
+  .spell-header-gradient { background: linear-gradient(135deg, #4a7fd4, #2a4fa0); }
+
+  .spell-input-wrap { margin: 18px 0 10px; text-align: center; }
+  .spell-input {
+    font-family: 'Nunito', sans-serif; font-size: 1.3rem; font-weight: 700;
+    padding: 12px 18px; border-radius: 16px; width: 100%; max-width: 420px;
+    border: 3px solid var(--light); outline: none; box-sizing: border-box;
+    transition: border-color 0.18s; color: var(--dark); background: #fafafa; text-align: center;
+  }
+  .spell-input:focus { border-color: #4a7fd4; background: white; }
+  .spell-input.shake { animation: spellShake 0.4s ease; border-color: #e05555; }
+  @keyframes spellShake {
+    0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-7px); }
+    40%{ transform:translateX(7px); }  60%{ transform:translateX(-5px); } 80%{ transform:translateX(5px); }
+  }
+  .spell-diff {
+    font-family: 'Fredoka One', cursive; font-size: 1.6rem; letter-spacing: 4px;
+    margin: 10px auto 4px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; min-height: 48px;
+  }
+  .spell-char {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 44px; border-radius: 10px; font-size: 1.3rem; border: 2px solid transparent;
+  }
+  .spell-char.correct { background: #d4f5d4; color: #1a7a1a; border-color: #7ac97a; }
+  .spell-char.wrong   { background: #fdd;   color: #b00;    border-color: #f09090; }
+  .spell-char.missing { background: #fff0cc; color: #a06000; border-color: #f0c060; font-size: 0.9rem; }
+  .spell-char.extra   { background: #ffe0f0; color: #a0006a; border-color: #f090c0; }
+  .spell-feedback-msg {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
+    margin: 8px 0 4px; min-height: 24px; text-align: center;
+  }
+  .spell-feedback-msg.correct { color: #1a7a1a; }
+  .spell-feedback-msg.wrong   { color: #b00; }
+  .spell-attempts {
+    font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700;
+    color: var(--mid); margin-bottom: 6px; text-align: center;
+  }
+  .spell-btn-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 14px; }
+  .spell-check-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    padding: 11px 28px; border-radius: 30px; border: none;
+    background: linear-gradient(135deg, #4a7fd4, #2a4fa0); color: white; cursor: pointer;
+    box-shadow: 0 3px 0 rgba(30,80,180,0.3); transition: all 0.18s;
+  }
+  .spell-check-btn:hover { transform: translateY(-2px); }
+  .spell-check-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .spell-secondary-btn {
+    font-family: 'Fredoka One', cursive; font-size: 0.92rem;
+    padding: 10px 20px; border-radius: 30px; border: 2.5px solid var(--light);
+    background: white; color: var(--dark); cursor: pointer; transition: all 0.18s;
+  }
+  .spell-secondary-btn:hover { border-color: #4a7fd4; color: #4a7fd4; }
+  .spell-answer-reveal {
+    font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: #2a4fa0;
+    background: #e8f0ff; border-radius: 14px; padding: 10px 22px;
+    margin: 10px auto 4px; display: none; text-align: center; letter-spacing: 2px;
+  }
+  .spell-listen-btn {
+    font-family: 'Fredoka One', cursive; font-size: 0.9rem;
+    padding: 8px 18px; border-radius: 24px; border: none;
+    background: linear-gradient(135deg, #ffb347, #e08020); color: white; cursor: pointer;
+    box-shadow: 0 2px 0 rgba(160,80,0,0.3); transition: all 0.18s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .spell-listen-btn:hover { transform: translateY(-1px); }
+  .spell-listen-btn.speaking { opacity: 0.6; }
+  .sent-spelling-wrap .spell-input { font-size: 1.05rem; }
+  .sent-spelling-wrap .spell-diff  { font-size: 1rem; letter-spacing: 2px; }
 </style>
 </head>
 <body>
@@ -344,6 +831,15 @@
   <button class="nav-tab sec-sounds"          onclick="showSection('sounds',this)">🔊 Letter Sounds</button>
   <button class="nav-tab sec-words1"          onclick="showSection('wp1',this)">📖 Word Pronunciation 1</button>
   <button class="nav-tab sec-words2"          onclick="showSection('wp2',this)">📗 Word Pronunciation 2</button>
+  <button class="nav-tab sec-sentences"        onclick="showSection('sentences',this)">📝 Read Sentences</button>
+</div>
+
+<div class="voice-selector-bar" id="voiceSelectorBar">
+  <span class="voice-selector-label">🎙️ Voice:</span>
+  <select class="voice-select" id="voiceSelect" onchange="onVoiceSelectChange()">
+    <option value="female">Female</option>
+    <option value="male">Male</option>
+  </select>
 </div>
 
 <!-- SECTION 1 — ALPHABET -->
@@ -359,11 +855,17 @@
   <p class="sec-intro">Tap any word to hear it spoken slowly. Listen for the sound that letter makes.<br>
     <strong style="color:var(--accent2)">Blue = vowel</strong> &nbsp;·&nbsp; <strong style="color:var(--teal)">Green = consonant</strong> &nbsp;·&nbsp; <strong style="color:var(--accent4)">Yellow = second sound</strong>
   </p>
+  <div class="section-test-bar">
+    <button class="test-btn" onclick="openTest('sounds')">🧪 Test Yourself — 10 random words</button>
+  </div>
   <div class="sounds-wrap" id="soundsWrap"></div>
 </div>
 
 <!-- SECTION 3 — WORD PRONUNCIATION 1 -->
 <div class="section-page" id="sec-wp1">
+  <div class="section-test-bar">
+    <button class="test-btn" onclick="openTest('wp1')">🧪 Test Yourself — 10 random words</button>
+  </div>
   <div class="family-selector" id="wp1-selector"></div>
   <div class="main-card" id="wp1-page">
     <div class="family-title" id="wp1-title"></div>
@@ -382,6 +884,10 @@
           <button class="speed-opt" onclick="setSpeed(1.0,this)">Normal</button>
         </div>
       </div>
+      <div class="wp-practice-bar">
+        <button class="set-practice-btn" onclick="openPracticeForWp('wp1')">🎙️ Pronunciation practice</button>
+        <button class="spell-practice-btn" onclick="openSpellingForWp('wp1')">✏️ Spelling practice</button>
+      </div>
     </div>
     <div class="nav-row">
       <button class="wp-nav-btn" id="wp1-prev" onclick="navigate('wp1',-1)">← Back</button>
@@ -396,6 +902,9 @@
 
 <!-- SECTION 4 — WORD PRONUNCIATION 2 -->
 <div class="section-page" id="sec-wp2">
+  <div class="section-test-bar">
+    <button class="test-btn" onclick="openTest('wp2')">🧪 Test Yourself — 10 random words</button>
+  </div>
   <div id="wp2-selector-wrap"></div>
   <div class="main-card" id="wp2-page">
     <div class="family-title" id="wp2-title"></div>
@@ -414,6 +923,10 @@
           <button class="speed-opt" onclick="setSpeed(1.0,this)">Normal</button>
         </div>
       </div>
+      <div class="wp-practice-bar">
+        <button class="set-practice-btn" onclick="openPracticeForWp('wp2')">🎙️ Pronunciation practice</button>
+        <button class="spell-practice-btn" onclick="openSpellingForWp('wp2')">✏️ Spelling practice</button>
+      </div>
     </div>
     <div class="nav-row">
       <button class="wp-nav-btn" id="wp2-prev" onclick="navigate('wp2',-1)">← Back</button>
@@ -423,6 +936,267 @@
     <div class="hint-box"><div class="hint-icon">💡</div><p id="wp2-hint">Choose a word group above. Tap each letter tile to hear its sound. Press <strong>Hear the word</strong> to listen to the whole word.</p></div>
     <div class="trophy-msg" id="wp2-trophy"><div style="font-size:3rem">🏆</div><h2>Well done!</h2><p>You read all the words in this group.<br>Pick another group to keep going!</p></div>
     <div class="word-grid" id="wp2-grid"></div>
+  </div>
+</div>
+
+<!-- SECTION 5 — READ SENTENCES -->
+<div class="section-page" id="sec-sentences">
+  <div class="speed-row" style="margin-bottom:6px">
+    <span class="speed-label">Speed:</span>
+    <div class="speed-btns">
+      <button class="speed-opt sent-speed active" onclick="setSentSpeed(0.6,this)">Slow</button>
+      <button class="speed-opt sent-speed" onclick="setSentSpeed(0.85,this)">Medium</button>
+      <button class="speed-opt sent-speed" onclick="setSentSpeed(1.0,this)">Normal</button>
+    </div>
+  </div>
+  <div class="sentence-level-tabs">
+    <button class="level-tab active" onclick="showLevel(0,this)">Level 0 — Beginner</button>
+    <button class="level-tab"        onclick="showLevel(1,this)">Level 1 — Elementary</button>
+  </div>
+  <div class="sentence-level-page active" id="sent-level-0">
+    <p class="sentence-level-intro">Simple everyday sentences. Listen, then practise saying them aloud.</p>
+    <div class="section-test-bar">
+      <button class="test-btn" onclick="openTest('sent0')">🧪 Test Yourself — 10 random sentences</button>
+    </div>
+    <div id="sent-level-0-groups"></div>
+  </div>
+  <div class="sentence-level-page" id="sent-level-1">
+    <p class="sentence-level-intro">A little longer — using common spelling patterns from Word Pronunciation 2.</p>
+    <div class="section-test-bar">
+      <button class="test-btn" onclick="openTest('sent1')">🧪 Test Yourself — 10 random sentences</button>
+    </div>
+    <div id="sent-level-1-groups"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SPELLING PRACTICE OVERLAY
+══════════════════════════════════════════ -->
+<div class="practice-overlay" id="spellingOverlay">
+  <div class="practice-header spell-header-gradient">
+    <button class="practice-back" onclick="closeSpelling()" title="Back">←</button>
+    <div class="practice-header-text">
+      <h2 id="spellingTitle">✏️ Spelling Practice</h2>
+      <p id="spellingSubtitle">Listen · Write · Check</p>
+    </div>
+  </div>
+  <div class="practice-body">
+    <div class="practice-step-info">
+      <div class="step-counter" id="spellingStepCounter">Word 1 of 1</div>
+      <div class="practice-progress">
+        <div class="practice-progress-fill" id="spellingProgressFill" style="width:0%;background:linear-gradient(90deg,#4a7fd4,#2a4fa0)"></div>
+      </div>
+    </div>
+    <div id="spellingPhase">
+      <div class="practice-card">
+        <div class="practice-word-label" id="spellingWordLabel">Listen, then type what you hear</div>
+        <div style="text-align:center; margin: 12px 0 6px;">
+          <button class="spell-listen-btn" id="spellingListenBtn" onclick="spellingSpeak()">
+            🔊 <span id="spellingListenLbl">Hear it</span>
+          </button>
+        </div>
+        <div class="spell-input-wrap" id="spellingInputWrap">
+          <input class="spell-input" id="spellingInput" type="text" autocomplete="off"
+            autocorrect="off" autocapitalize="off" spellcheck="false"
+            placeholder="Type your answer here…"
+            onkeydown="if(event.key==='Enter') checkSpelling()">
+        </div>
+        <div class="spell-diff" id="spellingDiff"></div>
+        <div class="spell-feedback-msg" id="spellingFeedback"></div>
+        <div class="spell-attempts" id="spellingAttempts"></div>
+        <div class="spell-answer-reveal" id="spellingAnswer"></div>
+        <div class="spell-btn-row">
+          <button class="spell-check-btn" id="spellingCheckBtn" onclick="checkSpelling()">✔ Check</button>
+          <button class="spell-secondary-btn" id="spellingTryAgainBtn" onclick="spellingTryAgain()" style="display:none">↩ Try again</button>
+          <button class="spell-secondary-btn" id="spellingShowAnswerBtn" onclick="spellingShowAnswer()" style="display:none">👁 Show answer</button>
+          <button class="spell-secondary-btn" onclick="spellingNext()">Skip →</button>
+        </div>
+      </div>
+    </div>
+    <div class="practice-finish" id="spellingFinish" style="display:none">
+      <div class="finish-icon">🌟</div>
+      <h2>Spelling complete!</h2>
+      <p id="spellingFinishMsg">Great work!</p>
+      <br>
+      <button class="practice-next-btn" onclick="closeSpelling()" style="margin-top:10px; font-size:1.1rem; padding:14px 36px;">
+        ← Back to lessons
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PRACTICE MODE OVERLAY
+══════════════════════════════════════════ -->
+<div class="practice-overlay" id="practiceOverlay">
+
+  <div class="practice-header">
+    <button class="practice-back" onclick="closePractice()" title="Back">←</button>
+    <div class="practice-header-text">
+      <h2 id="practiceTitle">🎙️ Practice Reading</h2>
+      <p id="practiceSubtitle">Listen · Record · Compare</p>
+    </div>
+  </div>
+
+  <div class="practice-body">
+
+    <div class="practice-step-info">
+      <div class="step-counter" id="practiceStepCounter">Word 1 of 1</div>
+      <div class="practice-progress"><div class="practice-progress-fill" id="practiceProgressFill" style="width:0%"></div></div>
+    </div>
+
+    <!-- PHASE 0: Example (word 1 — listen only) -->
+    <div id="phaseExample">
+      <div class="practice-card">
+        <div class="practice-word-emoji" id="exampleEmoji"></div>
+        <div class="practice-word" id="exampleWord"></div>
+        <div class="practice-word-label">Example word — listen first</div>
+        <span class="phase-banner phase-listen">👂 Listen</span><br>
+        <div class="example-listen-row">
+          <div class="example-label">Hear how this word sounds.<br>Then tap the button below to start practising.</div>
+          <button class="listen-play-btn" id="examplePlayBtn" onclick="playExampleWord()">
+            <span>🔊</span> <span id="examplePlayLbl">Hear the word</span>
+          </button>
+          <button class="start-practice-btn" onclick="startPracticeWords()">
+            🎙️ Start Practising →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 1: Record -->
+    <div id="phaseRecord" style="display:none">
+      <div class="practice-card">
+        <div class="practice-word-emoji" id="recordEmoji"></div>
+        <div class="practice-word" id="recordWord"></div>
+        <div class="practice-word-label" id="recordWordLabel">Your turn — say this word</div>
+        <span class="phase-banner phase-record">🎙️ Record your voice</span>
+        <div class="record-controls">
+          <div class="record-btn-wrap">
+            <button class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙️</button>
+            <div class="record-countdown" id="recordCountdown">3</div>
+          </div>
+          <div class="record-hint" id="recordHint">Tap the mic — recording stops after 3 seconds</div>
+        </div>
+        <div class="mic-warning" id="micWarning" style="margin-top:16px"></div>
+      </div>
+    </div>
+
+    <!-- PHASE 2: Compare -->
+    <div id="phaseCompare" style="display:none">
+      <div class="practice-card">
+        <div class="practice-word-emoji" id="compareEmoji"></div>
+        <div class="practice-word" id="compareWord"></div>
+        <div class="practice-word-label">Compare your voice</div>
+        <span class="phase-banner phase-compare">🔍 Compare</span>
+        <div class="compare-controls">
+          <div class="feedback-badge" id="feedbackBadge"></div>
+          <div class="playback-row">
+            <button class="playback-btn my-voice" onclick="playMyRecording()">
+              🎧 My recording
+            </button>
+            <button class="playback-btn correct-voice" id="correctVoiceBtn" onclick="playCorrectWord()">
+              🔊 Correct word
+            </button>
+          </div>
+          <button class="rerecord-link" onclick="goBackToRecord()">↩ Record again</button>
+          <button class="practice-next-btn" id="practiceNextBtn" onclick="advancePractice()">
+            Next word →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINISH -->
+    <div class="practice-finish" id="practiceFinish">
+      <div class="finish-icon">🏅</div>
+      <h2>Practice complete!</h2>
+      <p>Great work! You practised all the words in this set.<br>Head back and try another group.</p>
+      <br>
+      <button class="practice-next-btn" onclick="closePractice()" style="margin-top:10px">
+        ← Back to lessons
+      </button>
+    </div>
+
+  </div><!-- /practice-body -->
+</div><!-- /practiceOverlay -->
+
+<!-- ══════════════════════════════════════════
+     TEST YOURSELF OVERLAY
+══════════════════════════════════════════ -->
+<div class="practice-overlay" id="testOverlay">
+
+  <div class="practice-header" style="background:linear-gradient(135deg,#5cb85c,#3a7a3a)">
+    <button class="practice-back" onclick="closeTest()" title="Back">←</button>
+    <div class="practice-header-text">
+      <h2 id="testTitle">🧪 Test Yourself</h2>
+      <p id="testSubtitle">10 random words</p>
+    </div>
+  </div>
+
+  <div class="practice-body">
+
+    <div class="practice-step-info">
+      <div class="step-counter" id="testStepCounter">Word 1 of 10</div>
+      <div class="practice-progress">
+        <div class="practice-progress-fill" id="testProgressFill" style="width:0%;background:linear-gradient(90deg,#5cb85c,#3a7a3a)"></div>
+      </div>
+    </div>
+
+    <!-- TEST RECORD PHASE -->
+    <div id="testPhaseRecord">
+      <div class="practice-card">
+        <div class="practice-word-emoji" id="testEmoji"></div>
+        <div class="practice-word" id="testWord"></div>
+        <div class="practice-word-label">Say this word out loud</div>
+        <span class="phase-banner phase-record">🎙️ Record your voice</span>
+        <div class="record-controls">
+          <div class="record-btn-wrap">
+            <button class="record-btn" id="testRecordBtn" onclick="testToggleRecording()">🎙️</button>
+            <div class="record-countdown" id="testCountdown">3</div>
+          </div>
+          <div class="record-hint" id="testRecordHint">Tap the mic — recording stops after 3 seconds</div>
+        </div>
+        <div class="mic-warning" id="testMicWarning" style="margin-top:16px"></div>
+      </div>
+    </div>
+
+    <!-- TEST COMPARE PHASE -->
+    <div id="testPhaseCompare" style="display:none">
+      <div class="practice-card">
+        <div class="practice-word-emoji" id="testCompareEmoji"></div>
+        <div class="practice-word" id="testCompareWord"></div>
+        <div class="practice-word-label">Compare, then mark yourself</div>
+        <span class="phase-banner phase-compare">🔍 How did you do?</span>
+        <div class="compare-controls">
+          <div class="playback-row">
+            <button class="playback-btn my-voice" onclick="testPlayMyRecording()">🎧 My recording</button>
+            <button class="playback-btn correct-voice" id="testCorrectVoiceBtn" onclick="testPlayCorrectWord()">🔊 Correct word</button>
+          </div>
+          <div class="test-judge-row">
+            <button class="judge-btn correct" onclick="testJudge(true)">✅ Correct</button>
+            <button class="judge-btn incorrect" onclick="testJudge(false)">❌ Incorrect</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEST RESULTS -->
+    <div id="testPhaseResults" style="display:none">
+      <div class="practice-card" style="text-align:left">
+        <div style="text-align:center;margin-bottom:20px">
+          <div style="font-size:3rem" id="testResultIcon">🏅</div>
+          <div class="practice-word" id="testResultScore" style="font-size:2rem"></div>
+          <div class="practice-word-label" id="testResultMsg"></div>
+        </div>
+        <div id="testResultList"></div>
+        <div style="text-align:center;margin-top:24px">
+          <button class="practice-next-btn" onclick="openTest(testSection)" style="margin-right:10px">🔁 Try again</button>
+          <button class="practice-next-btn" onclick="closeTest()" style="background:linear-gradient(135deg,var(--mid),#555)">← Back</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -437,40 +1211,52 @@ const EMOJI = {
   'ant':'🐜','bat':'🦇','bee':'🐝','bug':'🐛','cat':'🐱','cow':'🐄',
   'crab':'🦀','dog':'🐶','duck':'🦆','elephant':'🐘','fish':'🐟','fox':'🦊',
   'giraffe':'🦒','hen':'🐓','insect':'🐛','ox':'🐂','pig':'🐷',
-  'ram':'🐏','rat':'🐀','vet':'🩺',
+  'ram':'🐏','rat':'🐀',
+
   // People
-  'boy':'👦','dad':'👨','giant':'🧌','kid':'👦','king':'👑','man':'👨',
-  'men':'👥','uncle':'👴',
+  'boy':'👦','dad':'👨','giant':'👹','kid':'👦','king':'👑','man':'👨',
+  'men':'👥','uncle':'👨','vet':'👨‍⚕️','teacher':'👩‍🏫','student':'🧑‍🎓',
+
   // Food & drink
   'apple':'🍎','bun':'🧁','cake':'🎂','chip':'🍟','chop':'🥩','cup':'🥤',
-  'egg':'🥚','fig':'🍑','food':'🍱','ham':'🥩','ice':'🧊','jam':'🍯',
+  'egg':'🥚','fig':'🫒','food':'🍱','ham':'🥩','ice':'🧊','jam':'🍓',
   'meat':'🥩','pan':'🍳','pie':'🥧','pop':'🥤','yam':'🍠',
+
   // Nature & outdoors
   'day':'🌤️','lake':'🏞️','moon':'🌙','mud':'🟤','rain':'🌧️','snow':'❄️',
   'soil':'🌱','sun':'☀️','tree':'🌳','vine':'🌿',
+
   // Transport
-  'bus':'🚌','ship':'🚢','train':'🚂','truck':'🚚','van':'🚐',
+  'bus':'🚌','ship':'🚢','train':'🚂','truck':'🚚','van':'🚐','bike':'🚲',
+
   // Buildings & places
-  'city':'🏙️','den':'🏕️','shop':'🏪','zoo':'🦁',
+  'city':'🏙️','den':'🏕️','shop':'🏪','zoo':'🦁','class':'🏫',
+
   // Household objects
   'bag':'👜','bath':'🛁','bed':'🛏️','bell':'🔔','bin':'🗑️','book':'📚',
   'box':'📦','brush':'🪥','can':'🥫','clock':'🕐','dish':'🍽️','door':'🚪',
-  'fan':'🌀','jar':'🫙','kit':'🧰','lamp':'💡','map':'🗺️',
-  'mat':'🧹','mop':'🧹','mug':'☕','net':'🥅','pen':'✏️','phone':'📱',
-  'photo':'📷','pin':'📍','pot':'🪴','rope':'🪢','rug':'🪣','shell':'🐚',
+  'fan':'🪭','jar':'🫙','kit':'🧰','lamp':'💡','map':'🗺️',
+  'mat':'🟫','mop':'🧹','mug':'☕','net':'🥅','pen':'✏️','phone':'📱',
+  'photo':'📷','pin':'📍','pot':'🪴','rope':'🪢','rug':'🧶','shell':'🐚',
   'soap':'🧼','spoon':'🥄','tag':'🏷️','tin':'🥫','tube':'🧴',
   'umbrella':'☂️','watch':'⌚','wig':'👱',
+
   // Clothing
   'cap':'🧢','coat':'🧥','dress':'👗','hat':'🎩','tie':'👔','vest':'🦺',
+
   // Body parts
   'face':'😊','feet':'🦶','foot':'🦶','leg':'🦵','lip':'👄',
-  'mouth':'👄','paw':'🐾','teeth':'🦷','thumb':'👍','toe':'🦶','toes':'🦶',
+  'mouth':'👄','paw':'🐾','teeth':'🦷','thumb':'👍','toe':'🦶','toes':'🦶','ear':'👂',
+
   // Actions
   'cry':'😢','dig':'⛏️','draw':'✏️','drop':'💧','eat':'🍽️','fly':'🪰',
   'hop':'🦘','hug':'🤗','jump':'🦘','ride':'🏇','run':'🏃','sit':'🧘',
   'sleep':'😴','spin':'🌀','stop':'🛑','wag':'🐕',
+  'cut':'✂️','look':'👀','listen':'👂','help':'🆘','open':'📂','close':'🚪','write':'✍️','read':'📖','play':'🎮','work':'💼',
+
   // Sports & play
   'ball':'⚽','game':'🎮','pool':'🏊','slide':'🛝','toy':'🧸',
+
   // Objects & tools
   'add':'➕','boat':'⛵','bridge':'🌉','coin':'🪙','cube':'🧊',
   'dam':'🌊','doll':'🪆','dot':'🔵','drum':'🥁','flag':'🚩',
@@ -478,19 +1264,42 @@ const EMOJI = {
   'key':'🔑','lock':'🔒','love':'❤️','mail':'📬','match':'🔥',
   'mix':'🥣','rock':'🪨','roof':'🏠','saw':'🪚','shed':'🏚️',
   'six':'6️⃣','nine':'9️⃣','ten':'🔟','star':'⭐','stick':'🪵','wood':'🪵',
+  'ring':'💍',
+
   // Communication & media
   'chat':'💬','graph':'📊','ink':'🖊️','jazz':'🎷',
   'page':'📄','read':'📖','word':'📝',
+
   // Colours & visual concepts
   'blue':'🔵','black':'⬛','brown':'🟤','green':'🟢','red':'🔴',
-  'clue':'🔍','fire':'🔥','fizz':'🫧','hot':'🌡️',
+  'circle':'⚪','line':'📏',
+  'clue':'🔍','fire':'🔥','fizz':'🫧',
+
+  // Adjectives / concepts
+  'hot':'🥵','cold':'🥶','big':'🐘','small':'🐭','fast':'⚡','slow':'🐢','loud':'📢','quiet':'🤫','soft':'🧸',
+
   // Misc clear ones
   'ask':'❓','odd':'🤔','quiz':'❓','yes':'✅',
-  'year':'📅','zero':'0️⃣','zip':'🤐','zoo':'🦁','zoom':'🔍',
+  'year':'📅','zero':'0️⃣','zip':'🤐','zoom':'🔍',
   'cliff':'🏔️','road':'🛣️','sand':'🏖️',
   'step':'👣','tail':'🐈','team':'👥','trip':'✈️',
+
+  // Long I words
+  'rice':'🍚','kite':'🪁','life':'❤️','like':'👍','five':'5️⃣',
+
+  // Short O new words
+  'octopus':'🐙','olive':'🫒',
+
+  // Long O words
+  'orange':'🍊','open':'📂','order':'📋',
+
+  // Money / simple concepts
+  'cent':'🪙'
 };
-function emo(word) { return EMOJI[word.toLowerCase()] || ''; }
+
+function emo(word) {
+  return EMOJI[word.toLowerCase()] || '';
+}
 
 /* ══════════════════════════════════════════
    DATA — ALPHABET NAMES
@@ -527,46 +1336,81 @@ const letterNames = [
 /* ══════════════════════════════════════════
    DATA — LETTER SOUNDS
 ══════════════════════════════════════════ */
+// phonemeWav: the WAV file to play when the big letter is tapped.
+// For letters with two sounds, the first/main sound is used here.
 const letterSoundData = [
-  { l:'A', vowel:true,  sounds:[{ label:'Short a — as in…', examples:['ant','apple','ask','add'] }]},
-  { l:'B', vowel:false, sounds:[{ label:'Sound — as in…', examples:['bat','bag','bed','bus','big'] }]},
-  { l:'C', vowel:false, sounds:[
+  { l:'A', vowel:true,  phonemeWav:'æ as in bat.wav', sounds:[{ label:'Short a — as in…', examples:['ant','apple','ask','add'] }]},
+  { l:'B', vowel:false, phonemeWav:'b.wav', sounds:[{ label:'Sound — as in…', examples:['bat','bag','bed','bus','big'] }]},
+  { l:'C', vowel:false, phonemeWav:'k.wav', sounds:[
     { label:'Hard sound — as in…', examples:['cat','cup','cap','cut','come'] },
     { label:'Soft sound — as in…', examples:['city','cent','circle','face','ice'], note:'C makes this sound before e, i, or y.' }
   ]},
-  { l:'D', vowel:false, sounds:[{ label:'Sound — as in…', examples:['dog','dig','dad','day','door'] }]},
-  { l:'E', vowel:true,  sounds:[{ label:'Short e — as in…', examples:['egg','end','enter','empty'] }]},
-  { l:'F', vowel:false, sounds:[{ label:'Sound — as in…', examples:['fan','fig','fun','fish','foot'] }]},
-  { l:'G', vowel:false, sounds:[
+  { l:'D', vowel:false, phonemeWav:'d.wav', sounds:[{ label:'Sound — as in…', examples:['dog','dig','dad','day','door'] }]},
+  { l:'E', vowel:true,  phonemeWav:'e as in bet.wav', sounds:[{ label:'Short e — as in…', examples:['egg','end','enter','empty'] }]},
+  { l:'F', vowel:false, phonemeWav:'f.wav', sounds:[{ label:'Sound — as in…', examples:['fan','fig','fun','fish','foot'] }]},
+  { l:'G', vowel:false, phonemeWav:'g.wav', sounds:[
     { label:'Hard sound — as in…', examples:['gap','got','give','go','get'] },
     { label:'Soft sound — as in…', examples:['gem','giant','giraffe','age','page'], note:'G makes this sound before e, i, or y.' }
   ]},
-  { l:'H', vowel:false, sounds:[{ label:'Sound — as in…', examples:['hat','hop','him','her','hot'] }]},
-  { l:'I', vowel:true,  sounds:[{ label:'Short i — as in…', examples:['ink','in','ill','insect'] }]},
-  { l:'J', vowel:false, sounds:[{ label:'Sound — as in…', examples:['jam','job','jump','just','jar'] }]},
-  { l:'K', vowel:false, sounds:[{ label:'Sound — as in…', examples:['kit','kid','king','keep','kind'] }]},
-  { l:'L', vowel:false, sounds:[{ label:'Sound — as in…', examples:['lap','leg','lip','lot','love'] }]},
-  { l:'M', vowel:false, sounds:[{ label:'Sound — as in…', examples:['map','man','mud','most','me'] }]},
-  { l:'N', vowel:false, sounds:[{ label:'Sound — as in…', examples:['net','not','nap','name','no'] }]},
-  { l:'O', vowel:true,  sounds:[{ label:'Short o — as in…', examples:['odd','on','off','ox'] }]},
-  { l:'P', vowel:false, sounds:[{ label:'Sound — as in…', examples:['pan','pet','pin','pot','put'] }]},
-  { l:'Q', vowel:false, sounds:[{ label:'Sound — as in…', examples:['quiz','queen','quick','quiet','quit'], note:'Q is almost always followed by U in English.' }]},
-  { l:'R', vowel:false, sounds:[{ label:'Sound — as in…', examples:['ran','red','rip','run','road'] }]},
-  { l:'S', vowel:false, sounds:[
+  { l:'H', vowel:false, phonemeWav:'h.wav', sounds:[{ label:'Sound — as in…', examples:['hat','hop','him','her','hot'] }]},
+  { l:'I', vowel:true,  phonemeWav:'ɪ as in bit.wav', sounds:[{ label:'Short i — as in…', examples:['ink','in','ill','insect'] }, { label:'Long i — as in…', examples:['ice','rice','nice','kite','time','bike','five','life','like','write'] }]},
+  { l:'J', vowel:false, phonemeWav:'dʒ as in jar.wav', sounds:[{ label:'Sound — as in…', examples:['jam','job','jump','just','jar'] }]},
+  { l:'K', vowel:false, phonemeWav:'k.wav', sounds:[{ label:'Sound — as in…', examples:['kit','kid','king','keep','kind'] }]},
+  { l:'L', vowel:false, phonemeWav:'l.wav', sounds:[{ label:'Sound — as in…', examples:['lap','leg','lip','lot','love'] }]},
+  { l:'M', vowel:false, phonemeWav:'m.wav', sounds:[{ label:'Sound — as in…', examples:['map','man','mud','most','me'] }]},
+  { l:'N', vowel:false, phonemeWav:'n.wav', sounds:[{ label:'Sound — as in…', examples:['net','not','nap','name','no'] }]},
+  { l:'O', vowel:true,  phonemeWav:'ɒ as in hot.wav', sounds:[{ label:'Short o — as in…', examples:['odd','ox','octopus','olive'] }, { label:'Long o — as in…', examples:['open','over','old','only','order'] }]},
+  { l:'P', vowel:false, phonemeWav:'p.wav', sounds:[{ label:'Sound — as in…', examples:['pan','pet','pin','pot','put'] }]},
+  { l:'Q', vowel:false, phonemeWav:'k.wav', sounds:[{ label:'Sound — as in…', examples:['quiz','queen','quick','quiet','quit'], note:'Q is almost always followed by U in English.' }]},
+  { l:'R', vowel:false, phonemeWav:'r.wav', sounds:[{ label:'Sound — as in…', examples:['ran','red','rip','run','road'] }]},
+  { l:'S', vowel:false, phonemeWav:'s.wav', sounds:[
     { label:'"S" sound — as in…', examples:['sun','sit','sad','set','soft'] },
     { label:'"Z" sound — as in…', examples:['is','his','has','was','as'], note:'S sounds like Z in many very common words.' }
   ]},
-  { l:'T', vowel:false, sounds:[{ label:'Sound — as in…', examples:['tap','top','tin','ten','tell'] }]},
-  { l:'U', vowel:true,  sounds:[{ label:'Short u — as in…', examples:['up','under','uncle','umbrella'] }]},
-  { l:'V', vowel:false, sounds:[{ label:'Sound — as in…', examples:['van','vet','vest','vine','voice'] }]},
-  { l:'W', vowel:false, sounds:[{ label:'Sound — as in…', examples:['win','wet','was','want','word'] }]},
-  { l:'X', vowel:false, sounds:[{ label:'Sound — as in…', examples:['box','fox','mix','fix','six'] }]},
-  { l:'Y', vowel:false, sounds:[
+  { l:'T', vowel:false, phonemeWav:'t.wav', sounds:[{ label:'Sound — as in…', examples:['tap','top','tin','ten','tell'] }]},
+  { l:'U', vowel:true,  phonemeWav:'ʌ as in cup.wav', sounds:[{ label:'Short u — as in…', examples:['up','under','uncle','umbrella'] }]},
+  { l:'V', vowel:false, phonemeWav:'v.wav', sounds:[{ label:'Sound — as in…', examples:['van','vet','vest','vine','voice'] }]},
+  { l:'W', vowel:false, phonemeWav:'w.wav', sounds:[{ label:'Sound — as in…', examples:['win','wet','was','want','word'] }]},
+  { l:'X', vowel:false, phonemeWav:'ks.wav', sounds:[{ label:'Sound — as in…', examples:['box','fox','mix','fix','six'] }]},
+  { l:'Y', vowel:false, phonemeWav:'j as in yam.wav', sounds:[
     { label:'"Y" sound — as in…', examples:['yes','yet','you','your','year'] },
     { label:'"EE" sound — as in…', examples:['happy','very','baby','city','funny'], note:'Y sounds like "ee" at the end of most words.' }
   ]},
-  { l:'Z', vowel:false, sounds:[{ label:'Sound — as in…', examples:['zip','zoo','zero','zoom','zone'] }]},
+  { l:'Z', vowel:false, phonemeWav:'z.wav', sounds:[{ label:'Sound — as in…', examples:['zip','zoo','zero','zoom','zone'] }]},
 ];
+
+/* ══════════════════════════════════════════
+   PHONEME WAV PLAYBACK
+══════════════════════════════════════════ */
+const AUDIO_BASE = 'audio/';
+
+// Cache of Audio objects so repeated taps don't stack
+const _phonemeCache = {};
+
+function playPhonemeWav(filename, el) {
+  if (!filename) return;
+  const url = AUDIO_BASE + filename;
+  let audio = _phonemeCache[url];
+  if (!audio) {
+    audio = new Audio(url);
+    _phonemeCache[url] = audio;
+  }
+  audio.currentTime = 0;
+  if (el) {
+    el.classList.add('playing');
+    audio.onended = () => el.classList.remove('playing');
+    audio.onerror = () => {
+      el.classList.remove('playing');
+      // Graceful fallback: try TTS with the IPA label stripped to just the key word
+      // e.g. "æ as in bat.wav" → speak "bat"
+      const match = filename.match(/as in (\w+)/i);
+      if (match) speakRaw(match[1]);
+    };
+  }
+  audio.play().catch(() => {
+    if (el) el.classList.remove('playing');
+  });
+}
 
 /* ══════════════════════════════════════════
    DATA — WORD PRONUNCIATION 1
@@ -650,6 +1494,11 @@ const wp2Families = [
   { cat:'Common endings', ending:'dge', words:['bridge','edge','badge','judge'],  mode:'whole', patternHint:'<strong>dge</strong> makes a "j" sound — like in <em>bridge</em>. It always comes after a short vowel.' },
   { cat:'Common endings', ending:'ed',  words:['jumped','played','looked','helped'], mode:'whole', patternHint:'<strong>ed</strong> at the end can sound like "d" (played), "t" (looked), or "id" (wanted).' },
   { cat:'Common endings', ending:'ing', words:['going','playing','looking','eating'], mode:'whole', patternHint:'<strong>ing</strong> is added to verbs to show something is happening now.' },
+  // 6. Word endings — sounds like "shun" / "cher"
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'tion', words:['nation','station','action','mention','motion','section'], mode:'whole', patternHint:'<strong>tion</strong> sounds like "shun" — like in <em>nation</em>. It is one of the most common word endings in English.' },
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'sion', words:['mission','session','passion','tension','vision','division'], mode:'whole', patternHint:'<strong>sion</strong> can sound like "shun" (mission) or "zhun" (vision). Listen carefully to each word.' },
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'cian', words:['musician','magician','technician','politician','physician'], mode:'whole', patternHint:'<strong>cian</strong> sounds like "shun" — like in <em>musician</em>. It usually refers to a person with a skill.' },
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'ture', words:['picture','nature','future','culture','mixture','capture'], mode:'whole', patternHint:'<strong>ture</strong> sounds like "cher" — like in <em>picture</em>. Say it as one quick sound: "p-ik-cher".' },
 ];
 
 /* ══════════════════════════════════════════
@@ -660,6 +1509,53 @@ const wpState = {
   wp2: { familyIdx:0, wordIdx:0, seen:new Set() },
 };
 let speechRate = 0.6;
+var sentenceRate = 0.6;
+
+/* ══════════════════════════════════════════
+   VOICE SELECTION
+══════════════════════════════════════════ */
+let selectedVoiceGender = 'female';
+const VOICE_PITCH = { female: 1.2, male: 0.75 };
+const FEMALE_NAMES = /karen|catherine|zira|samantha|victoria|moira|fiona|tessa|kyoko|am[eé]lie|anna|serena|alice|joanna|salli|kimberly|kendra|ivy|aria|jenny|libby|mia|natasha|nicole|nicky|raveena|veena|allison|ava|\bfemale\b/i;
+const MALE_NAMES   = /daniel|david|james|tom|liam|george|oliver|nathan|gordon|bruce|rishi|arthur|matthew|mark|russell|wayne|fred|\bmale\b/i;
+
+function classifyVoice(voice) {
+  const n = voice.name || '';
+  if (FEMALE_NAMES.test(n)) return 'female';
+  if (MALE_NAMES.test(n))   return 'male';
+  return 'unknown';
+}
+function getEnglishVoices() {
+  const all = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  const au = all.filter(v => v.lang === 'en-AU');
+  const gb = all.filter(v => v.lang === 'en-GB');
+  const en = all.filter(v => v.lang && v.lang.startsWith('en'));
+  return au.length ? au : gb.length ? gb : en;
+}
+function pickVoice(gender) {
+  const voices = getEnglishVoices();
+  const match = voices.find(v => classifyVoice(v) === gender);
+  return match || voices[0] || null;
+}
+function onVoiceSelectChange() {
+  const sel = document.getElementById('voiceSelect');
+  if (sel) selectedVoiceGender = sel.value;
+}
+function applyVoice(utt) {
+  const v = pickVoice(selectedVoiceGender);
+  if (v) { utt.voice = v; utt.lang = v.lang; } else { utt.lang = 'en-AU'; }
+  utt.pitch = VOICE_PITCH[selectedVoiceGender] || 1.0;
+}
+function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+}
+(function() {
+  if (isMobileDevice()) {
+    var bar = document.getElementById('voiceSelectorBar');
+    if (bar) bar.style.display = 'none';
+  }
+})();
+if (window.speechSynthesis) { window.speechSynthesis.onvoiceschanged = function() {}; }
 
 /* ══════════════════════════════════════════
    SECTION SWITCH
@@ -705,37 +1601,31 @@ function buildSoundsSection() {
     const letterEl = document.createElement('div');
     letterEl.className = 'letter-block-letter tappable';
     letterEl.textContent = entry.l;
-    letterEl.title = 'Tap to hear the letter name';
+    letterEl.title = 'Tap to hear the phoneme sound';
     letterEl.onclick = () => {
-      letterEl.classList.add('playing');
-      speakRaw(nameEntry ? nameEntry.name : entry.l, () => letterEl.classList.remove('playing'));
+      if (entry.phonemeWav) {
+        playPhonemeWav(entry.phonemeWav, letterEl);
+      } else {
+        letterEl.classList.add('playing');
+        speakRaw(nameEntry ? nameEntry.name : entry.l, () => letterEl.classList.remove('playing'));
+      }
     };
 
     const descEl = document.createElement('div');
     descEl.className = 'letter-block-desc';
-    descEl.innerHTML = `<h3>${entry.l} — ${entry.vowel ? 'Vowel' : 'Consonant'}</h3><p>Tap the letter to hear its name. Tap a sound button to hear the sound. Tap a word to hear it spoken.</p>`;
+    descEl.innerHTML = `<h3>${entry.l} — ${entry.vowel ? 'Vowel' : 'Consonant'}</h3><p>Tap the letter to hear its sound. Tap a word to hear it spoken.</p>`;
 
     hdr.appendChild(letterEl);
     hdr.appendChild(descEl);
     block.appendChild(hdr);
 
-    entry.sounds.forEach((sg, sgIdx) => {
+    entry.sounds.forEach(sg => {
       const grp = document.createElement('div');
       grp.className = 'sound-group';
 
-      // Sound label — now a tappable button that plays the phoneme
-      const lbl = document.createElement('button');
-      lbl.className = 'sound-group-label sound-group-btn';
-      lbl.title = 'Tap to hear this sound';
-      const phonemeKey = entry.l + '_' + sgIdx;
-      const phonemeFile = LETTER_PHONEME[phonemeKey];
-      lbl.innerHTML = (phonemeFile ? '🔉 ' : '') + sg.label;
-      if (phonemeFile) {
-        lbl.onclick = () => {
-          lbl.classList.add('playing');
-          playPhoneme(phonemeFile, () => lbl.classList.remove('playing'));
-        };
-      }
+      const lbl = document.createElement('div');
+      lbl.className = 'sound-group-label';
+      lbl.textContent = sg.label;
       grp.appendChild(lbl);
 
       const pills = document.createElement('div');
@@ -748,12 +1638,7 @@ function buildSoundsSection() {
         pill.onclick = () => {
           block.querySelectorAll('.example-pill').forEach(p => p.classList.remove('playing'));
           pill.classList.add('playing');
-          const phonemes = PHONEME_MAP[word.toLowerCase()];
-          if (phonemes && phonemes.length) {
-            playPhonemes(phonemes, () => pill.classList.remove('playing'));
-          } else {
-            speakRaw(word, () => pill.classList.remove('playing'));
-          }
+          speakRaw(word, () => pill.classList.remove('playing'));
         };
         pills.appendChild(pill);
       });
@@ -767,6 +1652,20 @@ function buildSoundsSection() {
       }
       block.appendChild(grp);
     });
+
+    // Practice button for this letter's words
+    const allWords = entry.sounds.flatMap(sg => sg.examples);
+    if (allWords.length >= 2) {
+      const practiceBar = document.createElement('div');
+      practiceBar.className = 'set-practice-bar';
+      const pb = document.createElement('button');
+      pb.className = 'set-practice-btn';
+      pb.innerHTML = '🎙️ Practise these words';
+      pb.onclick = () => openPractice(allWords, `🔊 Letter ${entry.l} — sounds`);
+      practiceBar.appendChild(pb);
+      block.appendChild(practiceBar);
+    }
+
     wrap.appendChild(block);
   });
 }
@@ -828,6 +1727,10 @@ function selectFamily(wp, idx) {
   document.getElementById(wp + '-trophy').classList.remove('show');
   renderWord(wp);
   renderGrid(wp);
+  if (wp === 'wp2') {
+    const display = document.getElementById('wp2-page');
+    if (display) setTimeout(function(){ display.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
+  }
 }
 
 /* ══════════════════════════════════════════
@@ -960,6 +1863,7 @@ function speakCurrent(wp) {
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(word);
   utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  applyVoice(utt);
   btn.classList.add('speaking'); lbl.textContent = 'Listening…';
   utt.onend = utt.onerror = () => { btn.classList.remove('speaking'); lbl.textContent = 'Hear the word'; };
   window.speechSynthesis.speak(utt);
@@ -971,277 +1875,1033 @@ function speakRaw(text, onEnd) {
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(text);
   utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  applyVoice(utt);
   utt.onend = utt.onerror = () => { if (onEnd) onEnd(); };
   window.speechSynthesis.speak(utt);
 }
 
-/* ══════════════════════════════════════════
-   PHONEME AUDIO MAP
-   Each word maps to an ordered list of .wav filenames.
-   Files live in ./audio/ folder on GitHub.
-   Schwa (ə) uses ʌ as in but.wav as closest available.
-══════════════════════════════════════════ */
-const AUDIO_PATH = './audio/';
-const PHONEME_MAP = {
-  // ── A ──
-  'ant':      ['æ as in bat.wav','n.wav','t.wav'],
-  'apple':    ['æ as in bat.wav','p.wav','l.wav'],
-  'ask':      ['æ as in bat.wav','s.wav','k.wav'],
-  'add':      ['æ as in bat.wav','d.wav'],
-  // ── I long ──
-  'ice':      ['aɪ as in ice.wav','s.wav'],
-  'rice':     ['r.wav','aɪ as in ice.wav','s.wav'],
-  'nice':     ['n.wav','aɪ as in ice.wav','s.wav'],
-  'kite':     ['k.wav','aɪ as in ice.wav','t.wav'],
-  'time':     ['t.wav','aɪ as in ice.wav','m.wav'],
-  'bike':     ['b.wav','aɪ as in ice.wav','k.wav'],
-  'five':     ['f.wav','aɪ as in ice.wav','v.wav'],
-  'life':     ['l.wav','aɪ as in ice.wav','f.wav'],
-  'like':     ['l.wav','aɪ as in ice.wav','k.wav'],
-  'write':    ['r.wav','aɪ as in ice.wav','t.wav'],
-  // ── B ──
-  'bat':      ['b.wav','æ as in bat.wav','t.wav'],
-  'bag':      ['b.wav','æ as in bat.wav','g.wav'],
-  'bed':      ['b.wav','e as in bet.wav','d.wav'],
-  'bus':      ['b.wav','ʌ as in but.wav','s.wav'],
-  'big':      ['b.wav','ɪ as in bit.wav','g.wav'],
-  // ── C hard ──
-  'cat':      ['k.wav','æ as in bat.wav','t.wav'],
-  'cup':      ['k.wav','ʌ as in but.wav','p.wav'],
-  'cap':      ['k.wav','æ as in bat.wav','p.wav'],
-  'cut':      ['k.wav','ʌ as in but.wav','t.wav'],
-  'come':     ['k.wav','ʌ as in but.wav','m.wav'],
-  // ── C soft ──
-  'city':     ['s.wav','ɪ as in bit.wav','t.wav','iː as in eat.wav'],
-  'cent':     ['s.wav','e as in bet.wav','n.wav','t.wav'],
-  'circle':   ['s.wav','ɜː as in work.wav','k.wav','l.wav'],
-  'face':     ['f.wav','eɪ as in bait.wav','s.wav'],
-  // ── D ──
-  'dog':      ['d.wav','ɒ as in pot.wav','g.wav'],
-  'dig':      ['d.wav','ɪ as in bit.wav','g.wav'],
-  'dad':      ['d.wav','æ as in bat.wav','d.wav'],
-  'day':      ['d.wav','eɪ as in bait.wav'],
-  'door':     ['d.wav','ɔː as in storm.wav'],
-  // ── E ──
-  'egg':      ['e as in bet.wav','g.wav'],
-  'end':      ['e as in bet.wav','n.wav','d.wav'],
-  'enter':    ['e as in bet.wav','n.wav','t.wav','ɜː as in work.wav'],
-  'empty':    ['e as in bet.wav','m.wav','p.wav','t.wav','iː as in eat.wav'],
-  // ── F ──
-  'fan':      ['f.wav','æ as in bat.wav','n.wav'],
-  'fig':      ['f.wav','ɪ as in bit.wav','g.wav'],
-  'fun':      ['f.wav','ʌ as in but.wav','n.wav'],
-  'fish':     ['f.wav','ɪ as in bit.wav','ʃ as in she.wav'],
-  'foot':     ['f.wav','ʊ as in book.wav','t.wav'],
-  // ── G hard ──
-  'gap':      ['g.wav','æ as in bat.wav','p.wav'],
-  'got':      ['g.wav','ɒ as in pot.wav','t.wav'],
-  'give':     ['g.wav','ɪ as in bit.wav','v.wav'],
-  'go':       ['g.wav','əʊ as in boat.wav'],
-  'get':      ['g.wav','e as in bet.wav','t.wav'],
-  // ── G soft ──
-  'gem':      ['dʒ as in jar.wav','e as in bet.wav','m.wav'],
-  'giant':    ['dʒ as in jar.wav','aɪ as in ice.wav','ʌ as in but.wav','n.wav','t.wav'],
-  'giraffe':  ['dʒ as in jar.wav','ɜː as in work.wav','f.wav'],
-  'age':      ['eɪ as in bait.wav','dʒ as in jar.wav'],
-  'page':     ['p.wav','eɪ as in bait.wav','dʒ as in jar.wav'],
-  // ── H ──
-  'hat':      ['h.wav','æ as in bat.wav','t.wav'],
-  'hop':      ['h.wav','ɒ as in pot.wav','p.wav'],
-  'him':      ['h.wav','ɪ as in bit.wav','m.wav'],
-  'her':      ['h.wav','ɜː as in work.wav'],
-  'hot':      ['h.wav','ɒ as in pot.wav','t.wav'],
-  // ── I short ──
-  'ink':      ['ɪ as in bit.wav','ŋ as in sing.wav','k.wav'],
-  'in':       ['ɪ as in bit.wav','n.wav'],
-  'ill':      ['ɪ as in bit.wav','l.wav'],
-  'insect':   ['ɪ as in bit.wav','n.wav','s.wav','e as in bet.wav','k.wav','t.wav'],
-  // ── J ──
-  'jam':      ['dʒ as in jar.wav','æ as in bat.wav','m.wav'],
-  'job':      ['dʒ as in jar.wav','ɒ as in pot.wav','b.wav'],
-  'jump':     ['dʒ as in jar.wav','ʌ as in but.wav','m.wav','p.wav'],
-  'just':     ['dʒ as in jar.wav','ʌ as in but.wav','s.wav','t.wav'],
-  'jar':      ['dʒ as in jar.wav','ɑː as in hard.wav'],
-  // ── K ──
-  'kit':      ['k.wav','ɪ as in bit.wav','t.wav'],
-  'kid':      ['k.wav','ɪ as in bit.wav','d.wav'],
-  'king':     ['k.wav','ɪ as in bit.wav','ŋ as in sing.wav'],
-  'keep':     ['k.wav','iː as in eat.wav','p.wav'],
-  'kind':     ['k.wav','aɪ as in ice.wav','n.wav','d.wav'],
-  // ── L ──
-  'lap':      ['l.wav','æ as in bat.wav','p.wav'],
-  'leg':      ['l.wav','e as in bet.wav','g.wav'],
-  'lip':      ['l.wav','ɪ as in bit.wav','p.wav'],
-  'lot':      ['l.wav','ɒ as in pot.wav','t.wav'],
-  'love':     ['l.wav','ʌ as in but.wav','v.wav'],
-  // ── M ──
-  'map':      ['m.wav','æ as in bat.wav','p.wav'],
-  'man':      ['m.wav','æ as in bat.wav','n.wav'],
-  'mud':      ['m.wav','ʌ as in but.wav','d.wav'],
-  'most':     ['m.wav','əʊ as in boat.wav','s.wav','t.wav'],
-  'me':       ['m.wav','iː as in eat.wav'],
-  // ── N ──
-  'net':      ['n.wav','e as in bet.wav','t.wav'],
-  'not':      ['n.wav','ɒ as in pot.wav','t.wav'],
-  'nap':      ['n.wav','æ as in bat.wav','p.wav'],
-  'name':     ['n.wav','eɪ as in bait.wav','m.wav'],
-  'no':       ['n.wav','əʊ as in boat.wav'],
-  // ── O short ──
-  'odd':      ['ɒ as in pot.wav','d.wav'],
-  'on':       ['ɒ as in pot.wav','n.wav'],
-  'off':      ['ɒ as in pot.wav','f.wav'],
-  'ox':       ['ɒ as in pot.wav','ks.wav'],
-  'octopus':  ['ɒ as in pot.wav','k.wav','t.wav','ʌ as in but.wav','p.wav','ʌ as in but.wav','s.wav'],
-  'olive':    ['ɒ as in pot.wav','l.wav','ɪ as in bit.wav','v.wav'],
-  // ── O long ──
-  'orange':   ['ɒ as in pot.wav','r.wav','ɪ as in bit.wav','n.wav','dʒ as in jar.wav'],
-  'october':  ['ɒ as in pot.wav','k.wav','t.wav','əʊ as in boat.wav','b.wav','ɜː as in work.wav'],
-  'open':     ['əʊ as in boat.wav','p.wav','ʌ as in but.wav','n.wav'],
-  'over':     ['əʊ as in boat.wav','v.wav','ɜː as in work.wav'],
-  'old':      ['əʊ as in boat.wav','l.wav','d.wav'],
-  'only':     ['əʊ as in boat.wav','n.wav','l.wav','iː as in eat.wav'],
-  'oven':     ['ʌ as in but.wav','v.wav','ʌ as in but.wav','n.wav'],
-  'order':    ['ɔː as in storm.wav','d.wav','ɜː as in work.wav'],
-  // ── P ──
-  'pan':      ['p.wav','æ as in bat.wav','n.wav'],
-  'pet':      ['p.wav','e as in bet.wav','t.wav'],
-  'pin':      ['p.wav','ɪ as in bit.wav','n.wav'],
-  'pot':      ['p.wav','ɒ as in pot.wav','t.wav'],
-  'put':      ['p.wav','ʊ as in book.wav','t.wav'],
-  // ── Q ──
-  'quiz':     ['kw.wav','ɪ as in bit.wav','z.wav'],
-  'queen':    ['kw.wav','iː as in eat.wav','n.wav'],
-  'quick':    ['kw.wav','ɪ as in bit.wav','k.wav'],
-  'quiet':    ['kw.wav','aɪ as in ice.wav','ʌ as in but.wav','t.wav'],
-  'quit':     ['kw.wav','ɪ as in bit.wav','t.wav'],
-  // ── R ──
-  'ran':      ['r.wav','æ as in bat.wav','n.wav'],
-  'red':      ['r.wav','e as in bet.wav','d.wav'],
-  'rip':      ['r.wav','ɪ as in bit.wav','p.wav'],
-  'run':      ['r.wav','ʌ as in but.wav','n.wav'],
-  'road':     ['r.wav','əʊ as in boat.wav','d.wav'],
-  // ── S "s" ──
-  'sun':      ['s.wav','ʌ as in but.wav','n.wav'],
-  'sit':      ['s.wav','ɪ as in bit.wav','t.wav'],
-  'sad':      ['s.wav','æ as in bat.wav','d.wav'],
-  'set':      ['s.wav','e as in bet.wav','t.wav'],
-  'soft':     ['s.wav','ɒ as in pot.wav','f.wav','t.wav'],
-  // ── S "z" ──
-  'is':       ['ɪ as in bit.wav','z.wav'],
-  'his':      ['h.wav','ɪ as in bit.wav','z.wav'],
-  'has':      ['h.wav','æ as in bat.wav','z.wav'],
-  'was':      ['w.wav','ɒ as in pot.wav','z.wav'],
-  'as':       ['æ as in bat.wav','z.wav'],
-  // ── T ──
-  'tap':      ['t.wav','æ as in bat.wav','p.wav'],
-  'top':      ['t.wav','ɒ as in pot.wav','p.wav'],
-  'tin':      ['t.wav','ɪ as in bit.wav','n.wav'],
-  'ten':      ['t.wav','e as in bet.wav','n.wav'],
-  'tell':     ['t.wav','e as in bet.wav','l.wav'],
-  // ── U ──
-  'up':       ['ʌ as in but.wav','p.wav'],
-  'under':    ['ʌ as in but.wav','n.wav','d.wav','ɜː as in work.wav'],
-  'uncle':    ['ʌ as in but.wav','ŋ as in sing.wav','k.wav','l.wav'],
-  'umbrella': ['ʌ as in but.wav','m.wav','b.wav','r.wav','e as in bet.wav','l.wav','ʌ as in but.wav'],
-  // ── V ──
-  'van':      ['v.wav','æ as in bat.wav','n.wav'],
-  'vet':      ['v.wav','e as in bet.wav','t.wav'],
-  'vest':     ['v.wav','e as in bet.wav','s.wav','t.wav'],
-  'vine':     ['v.wav','aɪ as in ice.wav','n.wav'],
-  'voice':    ['v.wav','ɔɪ as in boil.wav','s.wav'],
-  // ── W ──
-  'win':      ['w.wav','ɪ as in bit.wav','n.wav'],
-  'wet':      ['w.wav','e as in bet.wav','t.wav'],
-  'want':     ['w.wav','ɒ as in pot.wav','n.wav','t.wav'],
-  'word':     ['w.wav','ɜː as in work.wav','d.wav'],
-  // ── X ──
-  'box':      ['b.wav','ɒ as in pot.wav','ks.wav'],
-  'fox':      ['f.wav','ɒ as in pot.wav','ks.wav'],
-  'mix':      ['m.wav','ɪ as in bit.wav','ks.wav'],
-  'fix':      ['f.wav','ɪ as in bit.wav','ks.wav'],
-  'six':      ['s.wav','ɪ as in bit.wav','ks.wav'],
-  // ── Y "y" ──
-  'yes':      ['j as in yam.wav','e as in bet.wav','s.wav'],
-  'yet':      ['j as in yam.wav','e as in bet.wav','t.wav'],
-  'you':      ['j as in yam.wav','uː as in pool.wav'],
-  'your':     ['j as in yam.wav','ɔː as in storm.wav'],
-  'year':     ['j as in yam.wav','ɪə as in fear.wav'],
-  // ── Y "ee" ──
-  'happy':    ['h.wav','æ as in bat.wav','p.wav','iː as in eat.wav'],
-  'very':     ['v.wav','e as in bet.wav','r.wav','iː as in eat.wav'],
-  'baby':     ['b.wav','eɪ as in bait.wav','b.wav','iː as in eat.wav'],
-  'funny':    ['f.wav','ʌ as in but.wav','n.wav','iː as in eat.wav'],
-  // ── Z ──
-  'zip':      ['z.wav','ɪ as in bit.wav','p.wav'],
-  'zoo':      ['z.wav','uː as in pool.wav'],
-  'zero':     ['z.wav','ɪə as in fear.wav','r.wav','əʊ as in boat.wav'],
-  'zoom':     ['z.wav','uː as in pool.wav','m.wav'],
-  'zone':     ['z.wav','əʊ as in boat.wav','n.wav'],
-};
-
-/* Phoneme map for letter tile — which sound to play when tapping the letter block.
-   Each entry: letter + soundIndex (0-based) -> phoneme file */
-const LETTER_PHONEME = {
-  'A_0': 'æ as in bat.wav',
-  'B_0': 'b.wav',
-  'C_0': 'k.wav',        // hard C
-  'C_1': 's.wav',        // soft C
-  'D_0': 'd.wav',
-  'E_0': 'e as in bet.wav',
-  'F_0': 'f.wav',
-  'G_0': 'g.wav',        // hard G
-  'G_1': 'dʒ as in jar.wav', // soft G
-  'H_0': 'h.wav',
-  'I_0': 'ɪ as in bit.wav',  // short I
-  'I_1': 'aɪ as in ice.wav', // long I
-  'J_0': 'dʒ as in jar.wav',
-  'K_0': 'k.wav',
-  'L_0': 'l.wav',
-  'M_0': 'm.wav',
-  'N_0': 'n.wav',
-  'O_0': 'ɒ as in pot.wav',  // short O
-  'O_1': 'əʊ as in boat.wav',// long O
-  'P_0': 'p.wav',
-  'Q_0': 'kw.wav',
-  'R_0': 'r.wav',
-  'S_0': 's.wav',
-  'S_1': 'z.wav',
-  'T_0': 't.wav',
-  'U_0': 'ʌ as in but.wav',
-  'V_0': 'v.wav',
-  'W_0': 'w.wav',
-  'X_0': 'ks.wav',
-  'Y_0': 'j as in yam.wav',
-  'Y_1': 'iː as in eat.wav',
-  'Z_0': 'z.wav',
-};
-
-/* Play a sequence of phoneme audio files one after another */
-function playPhonemes(files, onEnd) {
-  if (!files || files.length === 0) { if (onEnd) onEnd(); return; }
-  var idx = 0;
-  function playNext() {
-    if (idx >= files.length) { if (onEnd) onEnd(); return; }
-    var audio = new Audio(AUDIO_PATH + encodeURIComponent(files[idx]));
-    idx++;
-    audio.onended = playNext;
-    audio.onerror = playNext; // skip missing file, continue sequence
-    audio.play().catch(playNext);
-  }
-  playNext();
-}
-
-/* Play single phoneme file */
-function playPhoneme(file, onEnd) {
-  var audio = new Audio(AUDIO_PATH + encodeURIComponent(file));
-  audio.onended = function() { if (onEnd) onEnd(); };
-  audio.onerror = function() { if (onEnd) onEnd(); };
-  audio.play().catch(function() { if (onEnd) onEnd(); });
-}
-
 function setSpeed(rate, el) {
-  document.querySelectorAll('.speed-opt').forEach(b => b.classList.remove('active'));
+  speechRate = rate;
+  document.querySelectorAll('.speed-opt:not(.sent-speed)').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
+}
+function setSentSpeed(rate, el) {
+  sentenceRate = rate;
+  document.querySelectorAll('.sent-speed').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ══════════════════════════════════════════
+   PRACTICE MODE — getUserMedia + MediaRecorder
+   Works on GitHub Pages / any real https:// host.
+   Flow: example (listen) -> record 3 s auto -> compare -> next
+══════════════════════════════════════════ */
+
+var pWords    = [];
+var pIdx      = 0;
+var pAudio    = null;
+var pIsSent   = false;  // true when practising sentences (longer recording)   // recorded Audio element
+var pStream   = null;   // MediaStream
+var pRecorder = null;   // MediaRecorder
+var pChunks   = [];
+var pTimer    = null;
+
+/* ── Open ── */
+function openPractice(words, label) {
+  if (!words || words.length < 1) { alert('Need at least 1 item to practise.'); return; }
+  pWords  = words.slice();
+  pIdx    = 0;
+  pAudio  = null;
+  pIsSent = words.some(function(w){ return w.indexOf(' ') !== -1; });
+  document.getElementById('practiceTitle').textContent    = 'Practice Reading';
+  document.getElementById('practiceSubtitle').textContent = label || '';
+  pCleanup();
+  if (pIsSent) {
+    showRecord();   // sentences: skip example, practise all from the first one
+  } else {
+    showExample();  // words: keep the listen-first example phase
+  }
+  document.getElementById('practiceOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function openPracticeForWp(wp) {
+  var families = wp === 'wp1' ? wp1Families : wp2Families;
+  var fam = families[wpState[wp].familyIdx];
+  var lbl = wp === 'wp1' ? ('Word group -' + fam.ending) : ('Word group ' + fam.ending);
+  openPractice(fam.words.slice(), lbl);
+}
+
+function closePractice() {
+  pCleanup();
+  document.getElementById('practiceOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function pCleanup() {
+  if (pTimer)    { clearInterval(pTimer); pTimer = null; }
+  if (pRecorder && pRecorder.state !== 'inactive') {
+    try { pRecorder.stop(); } catch(e) {}
+  }
+  pRecorder = null;
+  if (pStream)   { pStream.getTracks().forEach(function(t){ t.stop(); }); pStream = null; }
+  pChunks = [];
+}
+
+/* ── Phase helpers ── */
+function hideAllPhases() {
+  ['phaseExample','phaseRecord','phaseCompare','practiceFinish'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.style.display = 'none'; el.classList.remove('show'); }
+  });
+}
+
+function setProgress() {
+  var total = pWords.length;
+  var label = pIsSent ? 'Sentence' : 'Word';
+  document.getElementById('practiceStepCounter').textContent =
+    (!pIsSent && pIdx === 0)
+      ? ('Example — word 1 of ' + total)
+      : (label + ' ' + (pIdx + 1) + ' of ' + total);
+  var pct = total > 1 ? (pIdx / (total - 1)) * 100 : 100;
+  document.getElementById('practiceProgressFill').style.width = pct + '%';
+}
+
+/* ── PHASE 0: Example ── */
+function showExample() {
+  hideAllPhases();
+  setProgress();
+  var word = pWords[0];
+  document.getElementById('exampleEmoji').textContent   = pIsSent ? '' : emo(word);
+  document.getElementById('exampleEmoji').style.display = pIsSent ? 'none' : '';
+  document.getElementById('exampleWord').textContent    = word;
+  document.getElementById('exampleWord').classList.toggle('test-sentence-mode', pIsSent);
+  document.getElementById('examplePlayLbl').textContent = pIsSent ? 'Hear the sentence' : 'Hear the word';
+  document.getElementById('examplePlayBtn').classList.remove('speaking');
+  document.getElementById('phaseExample').style.display = '';
+}
+
+function playExampleWord() {
+  var word = pWords[0];
+  var btn  = document.getElementById('examplePlayBtn');
+  var lbl  = document.getElementById('examplePlayLbl');
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(word);
+  utt.rate = pIsSent ? 0.85 : speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  applyVoice(utt);
+  btn.classList.add('speaking');
+  lbl.textContent = pIsSent ? 'Listening...' : 'Listening...';
+  utt.onend = utt.onerror = function() {
+    btn.classList.remove('speaking');
+    lbl.textContent = pIsSent ? 'Hear the sentence' : 'Hear the word';
+  };
+  window.speechSynthesis.speak(utt);
+}
+
+function startPracticeWords() {
+  pIdx = 1;
+  showRecord();
+}
+
+/* ── PHASE 1: Record ── */
+function showRecord() {
+  hideAllPhases();
+  setProgress();
+  pCleanup();
+  pAudio = null;
+  var word = pWords[pIdx];
+  document.getElementById('recordEmoji').textContent     = pIsSent ? '' : emo(word);
+  document.getElementById('recordEmoji').style.display   = pIsSent ? 'none' : '';
+  document.getElementById('recordWord').textContent      = word;
+  document.getElementById('recordWord').classList.toggle('test-sentence-mode', pIsSent);
+  document.getElementById('recordWordLabel').textContent = pIsSent ? 'Your turn — read this sentence' : 'Your turn — say this word';
+  document.getElementById('recordBtn').classList.remove('recording');
+  document.getElementById('recordBtn').innerHTML         = '🎙️';
+  document.getElementById('recordHint').textContent      = pIsSent
+    ? 'Tap the mic — recording stops after 10 seconds'
+    : 'Tap the mic — recording stops after 3 seconds';
+  document.getElementById('recordCountdown').classList.remove('show');
+  var w = document.getElementById('micWarning');
+  w.innerHTML = ''; w.classList.remove('show');
+  document.getElementById('phaseRecord').style.display = '';
+}
+
+function toggleRecording() {
+  if (pRecorder && pRecorder.state === 'recording') {
+    pStopRec();
+  } else {
+    pStartRec();
+  }
+}
+
+function pStartRec() {
+  var warn = document.getElementById('micWarning');
+  warn.innerHTML = ''; warn.classList.remove('show');
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    warn.innerHTML = '⚠️ Your browser does not support microphone access. Use Chrome or Edge on a desktop.';
+    warn.classList.add('show');
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+    .then(function(stream) {
+      pStream  = stream;
+      pChunks  = [];
+
+      var mimeType = '';
+      if (window.MediaRecorder) {
+        ['audio/webm;codecs=opus','audio/webm','audio/ogg'].forEach(function(t) {
+          if (!mimeType && MediaRecorder.isTypeSupported(t)) mimeType = t;
+        });
+      }
+
+      try {
+        pRecorder = mimeType ? new MediaRecorder(stream, {mimeType: mimeType}) : new MediaRecorder(stream);
+      } catch(e) {
+        pRecorder = new MediaRecorder(stream);
+      }
+
+      pRecorder.ondataavailable = function(e) {
+        if (e.data && e.data.size > 0) pChunks.push(e.data);
+      };
+
+      pRecorder.onstop = function() {
+        pStream.getTracks().forEach(function(t){ t.stop(); });
+        pStream = null;
+        if (pChunks.length === 0) { showRecord(); return; }
+        var blob = new Blob(pChunks, { type: pRecorder.mimeType || 'audio/webm' });
+        pAudio = new Audio(URL.createObjectURL(blob));
+        showCompare();
+      };
+
+      pRecorder.start(100);
+
+      document.getElementById('recordBtn').classList.add('recording');
+      document.getElementById('recordBtn').innerHTML = '⏹';
+      document.getElementById('recordHint').textContent = '● Recording...';
+
+      var secs = pIsSent ? 10 : 3;
+      var cd = document.getElementById('recordCountdown');
+      cd.textContent = secs; cd.classList.add('show');
+      pTimer = setInterval(function() {
+        secs--;
+        if (secs <= 0) { pStopRec(); }
+        else { cd.textContent = secs; }
+      }, 1000);
+    })
+    .catch(function(err) {
+      var n = err && err.name ? err.name : 'Error';
+      var msg = '⚠️ Microphone error: <strong>' + n + '</strong><br>';
+      if (n === 'NotAllowedError' || n === 'PermissionDeniedError') {
+        msg += 'Click the 🔒 icon in the address bar, set Microphone to <strong>Allow</strong>, then <strong>reload the page</strong> and try again.';
+      } else if (n === 'NotFoundError') {
+        msg += 'No microphone found on this device.';
+      } else if (n === 'NotReadableError') {
+        msg += 'Microphone is in use by another app (Zoom, Teams, etc.). Close it and try again.';
+      } else {
+        msg += 'Please check your browser and system microphone settings.';
+      }
+      warn.innerHTML = msg; warn.classList.add('show');
+    });
+}
+
+function pStopRec() {
+  if (pTimer) { clearInterval(pTimer); pTimer = null; }
+  document.getElementById('recordCountdown').classList.remove('show');
+  if (pRecorder && pRecorder.state === 'recording') {
+    try { pRecorder.stop(); } catch(e) {}
+  }
+  document.getElementById('recordBtn').classList.remove('recording');
+  document.getElementById('recordBtn').innerHTML = '🎙️';
+}
+
+/* ── PHASE 2: Compare ── */
+function showCompare() {
+  hideAllPhases();
+  var word = pWords[pIdx];
+  document.getElementById('compareEmoji').textContent  = pIsSent ? '' : emo(word);
+  document.getElementById('compareEmoji').style.display = pIsSent ? 'none' : '';
+  document.getElementById('compareWord').textContent   = word;
+  document.getElementById('compareWord').classList.toggle('test-sentence-mode', pIsSent);
+  document.getElementById('correctVoiceBtn').textContent = pIsSent ? '🔊 Correct sentence' : '🔊 Correct word';
+  document.getElementById('feedbackBadge').className   = 'feedback-badge';
+  document.getElementById('feedbackBadge').innerHTML   = '';
+  var isLast = pIdx >= pWords.length - 1;
+  document.getElementById('practiceNextBtn').textContent = isLast ? '✓ Finish' : 'Next →';
+  document.getElementById('phaseCompare').style.display = '';
+}
+
+function playMyRecording() {
+  if (!pAudio) return;
+  pAudio.currentTime = 0; pAudio.play();
+}
+
+function playCorrectWord() {
+  var word = pWords[pIdx];
+  var btn  = document.getElementById('correctVoiceBtn');
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(word);
+  utt.rate = pIsSent ? 0.85 : speechRate; utt.pitch = 1.0; utt.lang = 'en-AU';
+  applyVoice(utt);
+  btn.classList.add('speaking');
+  utt.onend = utt.onerror = function() { btn.classList.remove('speaking'); };
+  window.speechSynthesis.speak(utt);
+}
+
+function goBackToRecord() { showRecord(); }
+
+function advancePractice() {
+  pIdx++;
+  if (pIdx >= pWords.length) {
+    hideAllPhases();
+    var fin = document.getElementById('practiceFinish');
+    fin.style.display = ''; fin.classList.add('show');
+    document.getElementById('practiceProgressFill').style.width = '100%';
+    document.getElementById('practiceStepCounter').textContent  = 'All done! 🎉';
+    return;
+  }
+  setProgress();
+  showRecord();
+}
+
+/* ══════════════════════════════════════════
+   TEST YOURSELF MODE
+══════════════════════════════════════════ */
+
+var testSection  = '';
+var testWords    = [];   // 10 shuffled words
+var testIdx      = 0;
+var testResults  = [];   // [{word, correct, audio}]
+var tAudio       = null;
+var tStream      = null;
+var tRecorder    = null;
+var tChunks      = [];
+var tTimer       = null;
+
+/* ── Helpers ── */
+function getAllWordsForSection(section) {
+  var words = [];
+  if (section === 'sounds') {
+    letterSoundData.forEach(function(entry) {
+      entry.sounds.forEach(function(sg) { sg.examples.forEach(function(w){ words.push(w); }); });
+    });
+  } else if (section === 'wp1') {
+    wp1Families.forEach(function(f){ f.words.forEach(function(w){ words.push(w); }); });
+  } else if (section === 'wp2') {
+    wp2Families.forEach(function(f){ f.words.forEach(function(w){ words.push(w); }); });
+  } else if (section === 'sent0') {
+    sentenceData[0].forEach(function(g){ g.sentences.forEach(function(s){ words.push(s); }); });
+  } else if (section === 'sent1') {
+    sentenceData[1].forEach(function(g){ g.sentences.forEach(function(s){ words.push(s); }); });
+  }
+  // deduplicate
+  return words.filter(function(w,i,a){ return a.indexOf(w) === i; });
+}
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+/* ── Open / Close ── */
+function openTest(section) {
+  testSection = section;
+  var pool = getAllWordsForSection(section);
+  testWords  = shuffle(pool).slice(0, 10);
+  testIdx    = 0;
+  testResults= [];
+  tAudio     = null;
+
+  var labels = { sounds:'🔊 Letter Sounds', wp1:'📖 Word Pronunciation 1', wp2:'📗 Word Pronunciation 2', sent0:'📝 Read Sentences — Level 0', sent1:'📝 Read Sentences — Level 1' };
+  document.getElementById('testTitle').textContent    = '🧪 Test Yourself';
+  document.getElementById('testSubtitle').textContent = labels[section] || '';
+
+  // Sentence mode: larger text, no emoji, slower TTS
+  var isSent = (section === 'sent0' || section === 'sent1');
+  document.getElementById('testWord').classList.toggle('test-sentence-mode', isSent);
+  document.getElementById('testCompareWord').classList.toggle('test-sentence-mode', isSent);
+
+  tCleanup();
+  testShowRecord();
+  document.getElementById('testOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeTest() {
+  tCleanup();
+  document.getElementById('testOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function tCleanup() {
+  if (tTimer)    { clearInterval(tTimer); tTimer = null; }
+  if (tRecorder && tRecorder.state !== 'inactive') { try { tRecorder.stop(); } catch(e){} }
+  tRecorder = null;
+  if (tStream)   { tStream.getTracks().forEach(function(t){ t.stop(); }); tStream = null; }
+  tChunks = [];
+}
+
+function testHideAll() {
+  ['testPhaseRecord','testPhaseCompare','testPhaseResults'].forEach(function(id){
+    document.getElementById(id).style.display = 'none';
+  });
+}
+
+function testSetProgress() {
+  document.getElementById('testStepCounter').textContent = 'Word ' + (testIdx+1) + ' of ' + testWords.length;
+  document.getElementById('testProgressFill').style.width = ((testIdx / testWords.length) * 100) + '%';
+}
+
+/* ── Record phase ── */
+function testShowRecord() {
+  testHideAll();
+  tCleanup();
+  tAudio = null;
+  testSetProgress();
+  var word = testWords[testIdx];
+  var isSent = (testSection === 'sent0' || testSection === 'sent1');
+  document.getElementById('testEmoji').textContent      = isSent ? '' : emo(word);
+  document.getElementById('testEmoji').style.display    = isSent ? 'none' : '';
+  document.getElementById('testWord').textContent       = word;
+  document.getElementById('testRecordBtn').classList.remove('recording');
+  document.getElementById('testRecordBtn').innerHTML    = '🎙️';
+  document.getElementById('testRecordHint').textContent = isSent
+    ? 'Tap the mic — recording stops after 10 seconds'
+    : 'Tap the mic — recording stops after 3 seconds';
+  document.getElementById('testCountdown').classList.remove('show');
+  var w = document.getElementById('testMicWarning');
+  w.innerHTML = ''; w.classList.remove('show');
+  document.getElementById('testPhaseRecord').style.display = '';
+}
+
+function testToggleRecording() {
+  if (tRecorder && tRecorder.state === 'recording') {
+    tStopRec();
+  } else {
+    tStartRec();
+  }
+}
+
+function tStartRec() {
+  var warn = document.getElementById('testMicWarning');
+  warn.innerHTML = ''; warn.classList.remove('show');
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    warn.innerHTML = '⚠️ Microphone not supported. Use Chrome or Edge on a desktop.';
+    warn.classList.add('show'); return;
+  }
+
+  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+    .then(function(stream) {
+      tStream = stream; tChunks = [];
+      var mimeType = '';
+      if (window.MediaRecorder) {
+        ['audio/webm;codecs=opus','audio/webm','audio/ogg'].forEach(function(t){
+          if (!mimeType && MediaRecorder.isTypeSupported(t)) mimeType = t;
+        });
+      }
+      try { tRecorder = mimeType ? new MediaRecorder(stream,{mimeType:mimeType}) : new MediaRecorder(stream); }
+      catch(e) { tRecorder = new MediaRecorder(stream); }
+
+      tRecorder.ondataavailable = function(e){ if (e.data && e.data.size>0) tChunks.push(e.data); };
+      tRecorder.onstop = function() {
+        tStream.getTracks().forEach(function(t){ t.stop(); }); tStream = null;
+        if (tChunks.length === 0) { testShowRecord(); return; }
+        var blob = new Blob(tChunks, { type: tRecorder.mimeType || 'audio/webm' });
+        tAudio = new Audio(URL.createObjectURL(blob));
+        testShowCompare();
+      };
+      tRecorder.start(100);
+
+      document.getElementById('testRecordBtn').classList.add('recording');
+      document.getElementById('testRecordBtn').innerHTML = '⏹';
+      document.getElementById('testRecordHint').textContent = '● Recording...';
+
+      var isSent = (testSection === 'sent0' || testSection === 'sent1');
+      var secs = isSent ? 10 : 3;
+      var cd = document.getElementById('testCountdown');
+      cd.textContent = secs; cd.classList.add('show');
+      tTimer = setInterval(function(){
+        secs--;
+        if (secs <= 0) { tStopRec(); } else { cd.textContent = secs; }
+      }, 1000);
+    })
+    .catch(function(err) {
+      var n = err && err.name ? err.name : 'Error';
+      var msg = '⚠️ Microphone error: <strong>' + n + '</strong><br>';
+      if (n === 'NotAllowedError' || n === 'PermissionDeniedError') {
+        msg += 'Allow microphone in your browser settings, then reload and try again.';
+      } else if (n === 'NotFoundError') {
+        msg += 'No microphone found.';
+      } else if (n === 'NotReadableError') {
+        msg += 'Mic in use by another app. Close it and try again.';
+      } else { msg += 'Check browser and system mic settings.'; }
+      var w = document.getElementById('testMicWarning');
+      w.innerHTML = msg; w.classList.add('show');
+    });
+}
+
+function tStopRec() {
+  if (tTimer) { clearInterval(tTimer); tTimer = null; }
+  document.getElementById('testCountdown').classList.remove('show');
+  if (tRecorder && tRecorder.state === 'recording') { try { tRecorder.stop(); } catch(e){} }
+  document.getElementById('testRecordBtn').classList.remove('recording');
+  document.getElementById('testRecordBtn').innerHTML = '🎙️';
+}
+
+/* ── Compare phase ── */
+function testShowCompare() {
+  testHideAll();
+  var word = testWords[testIdx];
+  var isSent = (testSection === 'sent0' || testSection === 'sent1');
+  document.getElementById('testCompareEmoji').textContent = isSent ? '' : emo(word);
+  document.getElementById('testCompareEmoji').style.display = isSent ? 'none' : '';
+  document.getElementById('testCompareWord').textContent  = word;
+  document.getElementById('testCorrectVoiceBtn').textContent = isSent ? '🔊 Correct sentence' : '🔊 Correct word';
+  document.getElementById('testPhaseCompare').style.display = '';
+}
+
+function testPlayMyRecording() {
+  if (!tAudio) return;
+  tAudio.currentTime = 0; tAudio.play();
+}
+
+function testPlayCorrectWord() {
+  var word = testWords[testIdx];
+  var btn  = document.getElementById('testCorrectVoiceBtn');
+  var isSent = (testSection === 'sent0' || testSection === 'sent1');
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(word);
+  utt.rate = isSent ? 0.85 : speechRate; utt.pitch = 1.0; utt.lang = 'en-AU';
+  applyVoice(utt);
+  btn.classList.add('speaking');
+  utt.onend = utt.onerror = function(){ btn.classList.remove('speaking'); };
+  window.speechSynthesis.speak(utt);
+}
+
+function testJudge(correct) {
+  testResults.push({ word: testWords[testIdx], correct: correct, audio: tAudio });
+  testIdx++;
+  if (testIdx >= testWords.length) {
+    testShowResults();
+  } else {
+    testShowRecord();
+  }
+}
+
+/* ── Results phase ── */
+function testShowResults() {
+  testHideAll();
+  document.getElementById('testProgressFill').style.width = '100%';
+  document.getElementById('testStepCounter').textContent  = 'Done!';
+
+  var score = testResults.filter(function(r){ return r.correct; }).length;
+  var total = testResults.length;
+  var pct   = Math.round((score / total) * 100);
+
+  var icon = pct === 100 ? '🏆' : pct >= 70 ? '🌟' : pct >= 50 ? '👍' : '💪';
+  var msg  = pct === 100 ? 'Perfect score!' : pct >= 70 ? 'Great work!' : pct >= 50 ? 'Good effort — keep practising!' : 'Keep going — practice makes perfect!';
+
+  document.getElementById('testResultIcon').textContent  = icon;
+  document.getElementById('testResultScore').textContent = score + ' / ' + total + ' correct';
+  document.getElementById('testResultMsg').textContent   = msg;
+
+  var list = document.getElementById('testResultList');
+  list.innerHTML = '';
+  testResults.forEach(function(r, i) {
+    var div = document.createElement('div');
+    div.className = 'result-item ' + (r.correct ? 'ok' : 'bad');
+    var em = emo(r.word);
+    div.innerHTML =
+      '<span class="ri-mark">' + (r.correct ? '✅' : '❌') + '</span>' +
+      '<span class="ri-word">' + r.word + '</span>' +
+      (em ? '<span>' + em + '</span>' : '') +
+      '<button class="ri-play" onclick="testPlayResult(' + i + ')" title="Hear correct pronunciation">🔊</button>';
+    list.appendChild(div);
+  });
+
+  document.getElementById('testPhaseResults').style.display = '';
+}
+
+function testPlayResult(i) {
+  var word = testResults[i].word;
+  var isSent = (testSection === 'sent0' || testSection === 'sent1');
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(word);
+  utt.rate = isSent ? 0.85 : speechRate; utt.pitch = 1.0; utt.lang = 'en-AU';
+  applyVoice(utt);
+  window.speechSynthesis.speak(utt);
+}
+
+/* ══════════════════════════════════════════
+   READ SENTENCES — DATA
+══════════════════════════════════════════ */
+
+const sentenceData = {
+  0: [
+    {
+      topic: '👤 About me — name',
+      sentences: [
+        'My name is David.',
+        'I spell my name D-A-V-I-D.',
+      ]
+    },
+    {
+      topic: '🌏 About me — background',
+      sentences: [
+        'I am 30 years old.',
+        'I am from Vietnam.',
+        'I am from Ho Chi Minh City.',
+        'I speak Vietnamese and a little English.',
+      ]
+    },
+    {
+      topic: '🏫 My class',
+      sentences: [
+        "My teacher's name is Sarah.",
+        'I go to English class on Mondays.',
+        'I go to English class on Wednesdays.',
+        'I go to English class on Thursdays.',
+        'I go to English class from 9:00 to 2:30.',
+      ]
+    },
+    {
+      topic: '🏠 Where I live',
+      sentences: [
+        'I live in Springvale.',
+        'My address is 25 King Street, Springvale, Victoria, 3171.',
+      ]
+    },
+    {
+      topic: '👨‍👩‍👧‍👦 My family',
+      sentences: [
+        'I am married.',
+        'I have two children.',
+        'I have one son and one daughter.',
+        'There are four people in my family.',
+        'I have one brother and one sister.',
+      ]
+    },
+    {
+      topic: '📅 Today',
+      sentences: [
+        'Today is Monday.',
+        'The date is 20 April 2026.',
+        'The weather is sunny and warm.',
+        'My birthday is on 15 June 1995.',
+      ]
+    },
+    {
+      topic: '🎒 My bag',
+      sentences: [
+        'I have a book in my bag.',
+        'I have a pen in my bag.',
+        'I have a phone in my bag.',
+        'I have a notebook in my bag.',
+      ]
+    },
+    {
+      topic: '❤️ What I like',
+      sentences: [
+        'My weekend is good.',
+        'I like football.',
+        'I like music.',
+        'I like cooking.',
+        'My favourite colour is blue.',
+        'My favourite fruit is apple.',
+        'My favourite food is rice and chicken.',
+      ]
+    },
+    {
+      topic: '📱 My details',
+      sentences: [
+        'My phone number is 0400 123 456.',
+        'I came to Australia in 2022.',
+      ]
+    },
+    {
+      topic: '⏰ My day',
+      sentences: [
+        'I wake up at 7:00 every day.',
+        'I wake up at 8:30 on weekends.',
+      ]
+    },
+    {
+      topic: '✅ What I can do',
+      sentences: [
+        'I can drive.',
+        'I can cook.',
+        'I can clean.',
+        'I can use a computer.',
+        'I can speak a little English.',
+      ]
+    },
+    {
+      topic: '🌟 My goals',
+      sentences: [
+        'I want to learn English.',
+        'I want to speak to people.',
+        'I want to find a good job.',
+        'I want to help my children with school.',
+      ]
+    },
+  ],
+  1: [
+    {
+      topic: '🔊 sh, ch, th, ph words',
+      sentences: [
+        'She shops at the fish shop on the main street.',
+        'I think the children should share the chocolate chip cookies.',
+        'The phone photo shows a dolphin near the shore.',
+        'He checks his phone when he gets to the station.',
+      ]
+    },
+    {
+      topic: '🌧️ ee, ea, ai, ay words',
+      sentences: [
+        'I eat a meal of meat and green beans each day.',
+        'The train came in the rain on a Tuesday.',
+        'She reads to her team by the tree every day.',
+        'I wait at the train station and play games on my phone.',
+      ]
+    },
+    {
+      topic: '🚣 oa, ow, oo words',
+      sentences: [
+        'I wear a coat when it rains and I row my boat on the road trip.',
+        'The cook took a good look at the food on the stove.',
+        'The moon shines cool light over the roof of the school.',
+        'I know how to grow my own food in the backyard.',
+      ]
+    },
+    {
+      topic: '✨ Silent e words',
+      sentences: [
+        'I like to bake a cake and make some juice at home.',
+        'We ride our bikes on the wide path by the lake.',
+        'I hope to find a safe place to hide my phone case.',
+        'She came late but gave me a nice name tag to use.',
+      ]
+    },
+    {
+      topic: '🔗 Blends — st, tr, bl, cl, gr',
+      sentences: [
+        'I stop at the store and grab a green plant for my class.',
+        'She claps and steps to the strong beat of the drum.',
+        'The train track goes straight through the black bluffs.',
+        'I try to stay clean and tidy at the start of each day.',
+      ]
+    },
+    {
+      topic: '📝 -tion, -sion, -ture, -cian words',
+      sentences: [
+        'The nation has a new station for the next generation.',
+        'I have a question about the action in that section of the book.',
+        'The musician played with passion at the television station.',
+        'Take a picture of the nature and capture the future.',
+        'I need more information about the division of the class.',
+      ]
+    },
+    {
+      topic: '🔚 -ck, -tch, -dge, -ing, -ed endings',
+      sentences: [
+        'I picked up a black duck by the bridge and watched it swim.',
+        'She matched her bag with her jacket and looked very smart.',
+        'The children are playing, learning and reading every day.',
+        'He jumped and clapped when he watched his team win.',
+        'I walked along the edge of the dock and caught a fish.',
+      ]
+    },
+    {
+      topic: '🗣️ Talking about yourself',
+      sentences: [
+        'My vision is to get a good education for my children.',
+        'I have a passion for cooking and I want to study nutrition.',
+        'The action I take today shapes the future of my family.',
+        'I go to the doctor, the physician checks my blood pressure.',
+        'I feel a mixture of tension and excitement about my future.',
+      ]
+    },
+  ]
+};
+
+/* ══════════════════════════════════════════
+   READ SENTENCES — BUILD
+══════════════════════════════════════════ */
+
+function showLevel(level, btn) {
+  document.querySelectorAll('.level-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.sentence-level-page').forEach(p => p.classList.remove('active'));
+  document.getElementById('sent-level-' + level).classList.add('active');
+}
+
+function buildSentences() {
+  [0, 1].forEach(function(level) {
+    var container = document.getElementById('sent-level-' + level + '-groups');
+    container.innerHTML = '';
+    sentenceData[level].forEach(function(group) {
+      // Group card
+      var card = document.createElement('div');
+      card.className = 'sentence-group';
+
+      // Header
+      var header = document.createElement('div');
+      header.className = 'sentence-group-header';
+      header.textContent = group.topic;
+      card.appendChild(header);
+
+      // Sentence rows
+      group.sentences.forEach(function(sent) {
+        var row = document.createElement('div');
+        row.className = 'sentence-row';
+
+        var text = document.createElement('div');
+        text.className = 'sentence-text';
+        text.textContent = sent;
+
+        var playBtn = document.createElement('button');
+        playBtn.className = 'sentence-play-btn';
+        playBtn.innerHTML = '🔊';
+        playBtn.title = 'Hear this sentence';
+        playBtn.onclick = (function(s, b) {
+          return function() { speakSentence(s, b); };
+        })(sent, playBtn);
+
+        row.appendChild(text);
+        row.appendChild(playBtn);
+        card.appendChild(row);
+      });
+
+      // Practice button for this group
+      var practiceBar = document.createElement('div');
+      practiceBar.className = 'sentence-practice-bar';
+      var pb = document.createElement('button');
+      pb.className = 'set-practice-btn';
+      pb.innerHTML = '🎙️ Pronunciation practice';
+      pb.onclick = (function(sentences, topic) {
+        return function() { openPractice(sentences, topic); };
+      })(group.sentences.slice(), group.topic);
+      practiceBar.appendChild(pb);
+
+      var sb = document.createElement('button');
+      sb.className = 'spell-practice-btn';
+      sb.innerHTML = '✏️ Spelling practice';
+      sb.onclick = (function(sentences, topic) {
+        return function() { openSpelling(sentences, topic); };
+      })(group.sentences.slice(), group.topic);
+      practiceBar.appendChild(sb);
+
+      card.appendChild(practiceBar);
+
+      container.appendChild(card);
+    });
+  });
+}
+
+function speakSentence(text, btn) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(text);
+  utt.rate = sentenceRate; utt.pitch = 1.0; utt.lang = 'en-AU';
+  applyVoice(utt);
+  if (btn) {
+    btn.classList.add('speaking');
+    utt.onend = utt.onerror = function() { btn.classList.remove('speaking'); };
+  }
+  window.speechSynthesis.speak(utt);
+}
+
+/* ══════════════════════════════════════════
+   SPELLING PRACTICE
+══════════════════════════════════════════ */
+var spWords    = [];
+var spIdx      = 0;
+var spAttempts = 0;
+var spIsSent   = false;
+var spCorrect  = 0;
+var MAX_ATTEMPTS = 3;
+
+function openSpellingForWp(wp) {
+  var families = wp === 'wp1' ? wp1Families : wp2Families;
+  var fam = families[wpState[wp].familyIdx];
+  if (!fam) { alert('Choose a word group first.'); return; }
+  var lbl = wp === 'wp1' ? ('Word group -' + fam.ending) : ('Word group ' + fam.ending);
+  openSpelling(fam.words.slice(), lbl);
+}
+
+function openSpelling(words, label) {
+  if (!words || words.length < 1) { alert('No words to practise.'); return; }
+  spWords   = words.slice();
+  spIdx     = 0;
+  spCorrect = 0;
+  spIsSent  = words.some(function(w) { return w.indexOf(' ') !== -1; });
+  document.getElementById('spellingTitle').textContent    = '✏️ Spelling Practice';
+  document.getElementById('spellingSubtitle').textContent = label || '';
+  document.getElementById('spellingPhase').style.display  = '';
+  var fin = document.getElementById('spellingFinish');
+  fin.style.display = 'none'; fin.classList.remove('show');
+  document.getElementById('spellingOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  spLoadItem();
+  setTimeout(spellingSpeak, 400);
+}
+
+function closeSpelling() {
+  document.getElementById('spellingOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+  window.speechSynthesis && window.speechSynthesis.cancel();
+}
+
+function spLoadItem() {
+  spAttempts = 0;
+  var total  = spWords.length;
+  var label  = spIsSent ? 'Sentence' : 'Word';
+  document.getElementById('spellingStepCounter').textContent = label + ' ' + (spIdx + 1) + ' of ' + total;
+  var pct = total > 1 ? (spIdx / (total - 1)) * 100 : 100;
+  document.getElementById('spellingProgressFill').style.width = pct + '%';
+  document.getElementById('spellingWordLabel').textContent = spIsSent
+    ? 'Listen, then type the sentence exactly'
+    : 'Listen, then type the word';
+  var inp = document.getElementById('spellingInput');
+  inp.value = ''; inp.disabled = false; inp.classList.remove('shake');
+  inp.placeholder = spIsSent ? 'Type the sentence here…' : 'Type the word here…';
+  document.getElementById('spellingDiff').innerHTML       = '';
+  document.getElementById('spellingFeedback').textContent = '';
+  document.getElementById('spellingFeedback').className   = 'spell-feedback-msg';
+  document.getElementById('spellingAttempts').textContent = '';
+  document.getElementById('spellingAnswer').style.display = 'none';
+  document.getElementById('spellingCheckBtn').disabled    = false;
+  document.getElementById('spellingTryAgainBtn').style.display   = 'none';
+  document.getElementById('spellingShowAnswerBtn').style.display = 'none';
+  document.getElementById('spellingListenLbl').textContent = 'Hear it';
+  document.getElementById('spellingListenBtn').classList.remove('speaking');
+  inp.parentElement.className = spIsSent ? 'spell-input-wrap sent-spelling-wrap' : 'spell-input-wrap';
+  setTimeout(function() { inp.focus(); }, 100);
+}
+
+function spellingSpeak() {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var word = spWords[spIdx];
+  var utt  = new SpeechSynthesisUtterance(word);
+  utt.rate = spIsSent ? sentenceRate : speechRate;
+  utt.pitch = 1.0; utt.lang = 'en-AU';
+  applyVoice(utt);
+  var btn = document.getElementById('spellingListenBtn');
+  var lbl = document.getElementById('spellingListenLbl');
+  btn.classList.add('speaking'); lbl.textContent = 'Listening…';
+  utt.onend = utt.onerror = function() {
+    btn.classList.remove('speaking'); lbl.textContent = 'Hear it again';
+  };
+  window.speechSynthesis.speak(utt);
+}
+
+function checkSpelling() {
+  var answer = spWords[spIdx];
+  var typed  = document.getElementById('spellingInput').value;
+  var isCorrect = spIsSent ? (typed.trim() === answer.trim()) : (typed.trim().toLowerCase() === answer.trim().toLowerCase());
+  spAttempts++;
+  renderDiff(answer, typed, spIsSent);
+  var feedback = document.getElementById('spellingFeedback');
+  var attemptsLeft = MAX_ATTEMPTS - spAttempts;
+
+  if (isCorrect) {
+    spCorrect++;
+    feedback.textContent = '✅ Correct!'; feedback.className = 'spell-feedback-msg correct';
+    document.getElementById('spellingAttempts').textContent = '';
+    document.getElementById('spellingCheckBtn').disabled = true;
+    document.getElementById('spellingTryAgainBtn').style.display   = 'none';
+    document.getElementById('spellingShowAnswerBtn').style.display = 'none';
+    document.getElementById('spellingInput').disabled = true;
+    setTimeout(spellingNext, 1200);
+  } else {
+    var inp = document.getElementById('spellingInput');
+    inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake');
+    if (spAttempts >= MAX_ATTEMPTS) {
+      feedback.textContent = '❌ Not quite.'; feedback.className = 'spell-feedback-msg wrong';
+      document.getElementById('spellingAttempts').textContent = 'No attempts left.';
+      document.getElementById('spellingCheckBtn').disabled = true;
+      document.getElementById('spellingTryAgainBtn').style.display   = 'none';
+      document.getElementById('spellingShowAnswerBtn').style.display = '';
+      inp.disabled = true;
+    } else {
+      feedback.textContent = '❌ Not quite — try again!'; feedback.className = 'spell-feedback-msg wrong';
+      document.getElementById('spellingAttempts').textContent =
+        attemptsLeft + ' attempt' + (attemptsLeft === 1 ? '' : 's') + ' left';
+      document.getElementById('spellingTryAgainBtn').style.display   = '';
+      document.getElementById('spellingShowAnswerBtn').style.display = spAttempts >= 2 ? '' : 'none';
+    }
+  }
+}
+
+function renderDiff(answer, typed, isSent) {
+  var container = document.getElementById('spellingDiff');
+  container.innerHTML = '';
+  var a = isSent ? answer : answer.toLowerCase();
+  var t = isSent ? typed  : typed.toLowerCase();
+  // LCS diff
+  var m = a.length, n = t.length;
+  var dp = [];
+  for (var i = 0; i <= m; i++) { dp[i] = []; for (var j = 0; j <= n; j++) dp[i][j] = 0; }
+  for (var i = 1; i <= m; i++)
+    for (var j = 1; j <= n; j++)
+      dp[i][j] = a[i-1] === t[j-1] ? dp[i-1][j-1] + 1 : Math.max(dp[i-1][j], dp[i][j-1]);
+  var ops = []; var i = m, j = n;
+  while (i > 0 || j > 0) {
+    if (i > 0 && j > 0 && a[i-1] === t[j-1]) { ops.unshift({type:'match', char:typed[j-1]}); i--; j--; }
+    else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) { ops.unshift({type:'insert', char:typed[j-1]}); j--; }
+    else { ops.unshift({type:'delete', char:answer[i-1]}); i--; }
+  }
+  ops.forEach(function(op) {
+    var span = document.createElement('span');
+    span.className = 'spell-char';
+    if (op.type === 'match')  { span.classList.add('correct'); span.textContent = op.char; }
+    else if (op.type === 'insert') { span.classList.add('extra');   span.textContent = op.char; span.title = 'Extra letter'; }
+    else { span.classList.add('missing'); span.textContent = op.char; span.title = 'Missing: ' + op.char; }
+    container.appendChild(span);
+  });
+}
+
+function spellingTryAgain() {
+  var inp = document.getElementById('spellingInput');
+  inp.disabled = false; inp.classList.remove('shake'); inp.value = '';
+  document.getElementById('spellingDiff').innerHTML       = '';
+  document.getElementById('spellingFeedback').textContent = '';
+  document.getElementById('spellingFeedback').className   = 'spell-feedback-msg';
+  document.getElementById('spellingTryAgainBtn').style.display = 'none';
+  document.getElementById('spellingCheckBtn').disabled = false;
+  inp.focus();
+}
+
+function spellingShowAnswer() {
+  var el = document.getElementById('spellingAnswer');
+  el.textContent = spWords[spIdx]; el.style.display = '';
+  document.getElementById('spellingShowAnswerBtn').style.display = 'none';
+}
+
+function spellingNext() {
+  spIdx++;
+  if (spIdx >= spWords.length) { spShowFinish(); }
+  else { spLoadItem(); setTimeout(spellingSpeak, 300); }
+}
+
+function spShowFinish() {
+  document.getElementById('spellingPhase').style.display = 'none';
+  var fin = document.getElementById('spellingFinish');
+  fin.style.display = ''; fin.classList.add('show');
+  var label = spIsSent ? 'sentences' : 'words';
+  document.getElementById('spellingFinishMsg').textContent =
+    'You spelled ' + spCorrect + ' out of ' + spWords.length + ' ' + label + ' correctly. Great work!';
 }
 
 /* ══════════════════════════════════════════
@@ -1251,6 +2911,7 @@ buildNameGrid();
 buildSoundsSection();
 buildWp1Selector();
 buildWp2Selector();
+buildSentences();
 selectFamily('wp1', 0);
 selectFamily('wp2', 0);
 </script>
