@@ -1839,14 +1839,14 @@ const wp2Families = [
   { cat:'Vowel pairs — other sounds', ending:'au', words:['author','August','auto','haul'], mode:'whole', patternHint:'<strong>au</strong> makes an "aw" sound — like in <em>author</em>.' },
   { cat:'Vowel pairs — other sounds', ending:'aw', words:['saw','law','paw','draw'], mode:'whole', patternHint:'<strong>aw</strong> makes the same sound as <strong>au</strong> — like in <em>saw</em>.' },
   // 3. Silent e
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ake', words:['cake','make','take','lake'], mode:'split', splitAt:1 },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ate', words:['late','mate','gate','hate'], mode:'split', splitAt:1 },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ine', words:['fine','line','mine','nine'], mode:'split', splitAt:1 },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ope', words:['hope','rope','cope','nope'], mode:'split', splitAt:1 },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ute', words:['cute','mute','tube','cube'], mode:'split', splitAt:1 },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ide', words:['ride','side','hide','wide'], mode:'split', splitAt:1 },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ame', words:['game','name','same','came'], mode:'split', splitAt:1 },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ore', words:['more','core','sore','bore'], mode:'split', splitAt:1 },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ake', words:['cake','make','take','lake'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ate', words:['late','mate','gate','hate'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ine', words:['fine','line','mine','nine'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ope', words:['hope','rope','cope','nope'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ute', words:['cute','mute','tube','cube'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ide', words:['ride','side','hide','wide'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ame', words:['game','name','same','came'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ore', words:['more','core','sore','bore'], mode:'whole' },
   // 4. Beginning blends
   { cat:'Beginning blends  (both sounds heard)', ending:'st', words:['stop','step','stand','stick'], mode:'whole', patternHint:'<strong>st</strong> = s + t. Both sounds are heard. Try slowly: <em>s… t… stop.</em>' },
   { cat:'Beginning blends  (both sounds heard)', ending:'bl', words:['black','blue','block','blow'],  mode:'whole', patternHint:'<strong>bl</strong> = b + l. Try slowly: <em>b… l… black.</em>' },
@@ -2128,7 +2128,7 @@ function renderWord(wp) {
   if (wp === 'wp1') {
     titleEl.innerHTML = `Word group: <strong>-${fam.ending}</strong>`;
   } else {
-    let tl = fam.mode === 'split' ? '-' + fam.ending : fam.ending;
+    let tl = (fam.mode === 'split' || fam.cat.startsWith('Silent')) ? '-' + fam.ending : fam.ending;
     if (fam.ending === 'th' && fam.words.includes('this')) tl = 'th (with voice)';
     if (fam.ending === 'th' && fam.words.includes('thin')) tl = 'th (air only)';
     titleEl.innerHTML = `Word group: <strong>${tl}</strong>`;
