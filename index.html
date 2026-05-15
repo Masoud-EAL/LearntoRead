@@ -277,6 +277,15 @@
   .tile.digraph   { background:linear-gradient(135deg,#f5f0ff,#e8d6ff); color:var(--purple);  border:2.5px solid #d4b4f4; }
   .tile:hover { transform:translateY(-4px); }
   .tile.playing { transform:translateY(-4px) scale(1.1); filter: brightness(1.12); box-shadow:0 6px 4px rgba(0,0,0,0.15), 0 8px 18px rgba(0,0,0,0.12); }
+  .tile.silent {
+    background: #d0d0d8 !important;
+    color: #888 !important;
+    border-color: #b0b0bc !important;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.08) !important;
+    cursor: default !important;
+    opacity: 0.75;
+  }
+  .tile.silent:hover { transform: none !important; box-shadow: 0 3px 0 rgba(0,0,0,0.08) !important; }
 
   @keyframes tilePop {
     from { transform:scale(0.5) translateY(20px); opacity:0; }
@@ -1523,7 +1532,7 @@ const WP2_TILES = {
   // ph
   'phone': [{d:'ph',w:'f.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'photo': [{d:'ph',w:'f.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'o',w:'əʊ as in boat.wav',t:'ending'}],
-  'graph': [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ph',w:'f.wav',t:'ending'}],
+  'graph': [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'ph',w:'f.wav',t:'ending'}],
 
   // ── VOWEL PAIRS — LONG SOUNDS ──────────
   // ee
@@ -1537,7 +1546,7 @@ const WP2_TILES = {
   'read':  [{d:'r',w:'r.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
   // ai
   'rain':  [{d:'r',w:'r.wav',t:'beginning'},{d:'ai',w:'eɪ as in bait.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
-  'train': [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ai',w:'eɪ as in bait.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'train': [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ai',w:'eɪ as in bait.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'}],
   'mail':  [{d:'m',w:'m.wav',t:'beginning'},{d:'ai',w:'eɪ as in bait.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
   'tail':  [{d:'t',w:'t.wav',t:'beginning'},{d:'ai',w:'eɪ as in bait.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
   // ay
@@ -1547,7 +1556,7 @@ const WP2_TILES = {
   'way':   [{d:'w',w:'w.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'ending'}],
   // oa
   'boat':  [{d:'b',w:'b.wav',t:'beginning'},{d:'oa',w:'əʊ as in boat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
-  'coat':  [{d:'k',w:'k.wav',t:'beginning'},{d:'oa',w:'əʊ as in boat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'coat':  [{d:'c',w:'k.wav',t:'beginning'},{d:'oa',w:'əʊ as in boat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
   'road':  [{d:'r',w:'r.wav',t:'beginning'},{d:'oa',w:'əʊ as in boat.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
   'soap':  [{d:'s',w:'s.wav',t:'beginning'},{d:'oa',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
   // oe
@@ -1560,11 +1569,11 @@ const WP2_TILES = {
   'tie':   [{d:'t',w:'t.wav',t:'beginning'},{d:'ie',w:'aɪ as in ice.wav',t:'ending'}],
   'lie':   [{d:'l',w:'l.wav',t:'beginning'},{d:'ie',w:'aɪ as in ice.wav',t:'ending'}],
   'die':   [{d:'d',w:'d.wav',t:'beginning'},{d:'ie',w:'aɪ as in ice.wav',t:'ending'}],
-  // ue — blends now split correctly
+  // ue
   'blue':  [{d:'b',w:'b.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
   'glue':  [{d:'g',w:'g.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
   'true':  [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
-  'clue':  [{d:'k',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
+  'clue':  [{d:'c',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
 
   // ── VOWEL PAIRS — OTHER SOUNDS ─────────
   // oo (long /uː/)
@@ -1572,12 +1581,12 @@ const WP2_TILES = {
   'food':  [{d:'f',w:'f.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
   'soon':  [{d:'s',w:'s.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
   'pool':  [{d:'p',w:'p.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
-  'cool':  [{d:'k',w:'k.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
+  'cool':  [{d:'c',w:'k.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
   'roof':  [{d:'r',w:'r.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'f',w:'f.wav',t:'ending'}],
   // oo (short /ʊ/)
   'book':  [{d:'b',w:'b.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'}],
   'look':  [{d:'l',w:'l.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'}],
-  'cook':  [{d:'k',w:'k.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'}],
+  'cook':  [{d:'c',w:'k.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'}],
   'foot':  [{d:'f',w:'f.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
   'good':  [{d:'g',w:'g.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
   'wood':  [{d:'w',w:'w.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
@@ -1587,22 +1596,22 @@ const WP2_TILES = {
   'sound': [{d:'s',w:'s.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
   'found': [{d:'f',w:'f.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
   'mouth': [{d:'m',w:'m.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'th',w:'θ as in thin.wav',t:'ending'}],
-  'count': [{d:'k',w:'k.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
-  // ou (other sounds)
-  'could': [{d:'c',w:'k.wav',t:'beginning'},{d:'ou',w:'ʊ as in book.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
-  'would': [{d:'w',w:'w.wav',t:'beginning'},{d:'ou',w:'ʊ as in book.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
-  'should':[{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'ou',w:'ʊ as in book.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'count': [{d:'c',w:'k.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  // ou — silent l words
+  'could': [{d:'c',w:'k.wav',t:'beginning'},{d:'ou',w:'ʊ as in book.wav',t:'beginning'},{d:'l',w:null,t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
+  'would': [{d:'w',w:'w.wav',t:'beginning'},{d:'ou',w:'ʊ as in book.wav',t:'beginning'},{d:'l',w:null,t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
+  'should':[{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'ou',w:'ʊ as in book.wav',t:'beginning'},{d:'l',w:null,t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
   'your':  [{d:'y',w:'j as in yam.wav',t:'beginning'},{d:'our',w:'ɔː as in storm.wav',t:'ending'}],
   'four':  [{d:'f',w:'f.wav',t:'beginning'},{d:'our',w:'ɔː as in storm.wav',t:'ending'}],
   'pour':  [{d:'p',w:'p.wav',t:'beginning'},{d:'our',w:'ɔː as in storm.wav',t:'ending'}],
   // ow (aʊ)
-  'cow':   [{d:'k',w:'k.wav',t:'beginning'},{d:'ow',w:'aʊ as in out.wav',t:'ending'}],
+  'cow':   [{d:'c',w:'k.wav',t:'beginning'},{d:'ow',w:'aʊ as in out.wav',t:'ending'}],
   'now':   [{d:'n',w:'n.wav',t:'beginning'},{d:'ow',w:'aʊ as in out.wav',t:'ending'}],
-  // ow (əʊ) — sn and other blends split correctly
+  // ow (əʊ)
   'snow':  [{d:'s',w:'s.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
   'low':   [{d:'l',w:'l.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
   // oi
-  'coin':  [{d:'k',w:'k.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'coin':  [{d:'c',w:'k.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
   'join':  [{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
   'boil':  [{d:'b',w:'b.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
   'soil':  [{d:'s',w:'s.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
@@ -1610,10 +1619,10 @@ const WP2_TILES = {
   'boy':   [{d:'b',w:'b.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
   'toy':   [{d:'t',w:'t.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
   'enjoy': [{d:'e',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
-  'annoy': [{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
+  'annoy': [{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'nn',w:'n.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
   // au
   'author':[{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'th',w:'θ as in thin.wav',t:'beginning'},{d:'e',w:'ɜː as in work.wav',t:'ending'},{d:'r',w:'r.wav',t:'ending'}],
-  'August':[{d:'Au',w:'ɔː as in storm.wav',t:'beginning'},{d:'g',w:'g.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'s',w:'s.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  'August':[{d:'Au',w:'ɔː as in storm.wav',t:'beginning'},{d:'g',w:'g.wav',t:'ending'},{d:'u',w:'ʌ as in but.wav',t:'ending'},{d:'s',w:'s.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
   'auto':  [{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'o',w:'əʊ as in boat.wav',t:'ending'}],
   'haul':  [{d:'h',w:'h.wav',t:'beginning'},{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
   // aw
@@ -1637,12 +1646,12 @@ const WP2_TILES = {
   'nine':  [{d:'n',w:'n.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'hope':  [{d:'h',w:'h.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'rope':  [{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
-  'cope':  [{d:'k',w:'k.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'cope':  [{d:'c',w:'k.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'nope':  [{d:'n',w:'n.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
-  'cute':  [{d:'c',w:'k.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
-  'mute':  [{d:'m',w:'m.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
-  'tube':  [{d:'t',w:'t.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
-  'cube':  [{d:'k',w:'k.wav',t:'beginning'},{d:'u',w:'juː.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'cute':  [{d:'c',w:'k.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'mute':  [{d:'m',w:'m.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'tube':  [{d:'t',w:'t.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'cube':  [{d:'c',w:'k.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'ride':  [{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'side':  [{d:'s',w:'s.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'hide':  [{d:'h',w:'h.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
@@ -1650,70 +1659,71 @@ const WP2_TILES = {
   'game':  [{d:'g',w:'g.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'name':  [{d:'n',w:'n.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'same':  [{d:'s',w:'s.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
-  'came':  [{d:'k',w:'k.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'came':  [{d:'c',w:'k.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'more':  [{d:'m',w:'m.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
-  'core':  [{d:'k',w:'k.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
+  'core':  [{d:'c',w:'k.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
   'sore':  [{d:'s',w:'s.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
   'bore':  [{d:'b',w:'b.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
-  'slide': [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'slide': [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'ending'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
 
   // ── BEGINNING BLENDS ───────────────────
+  // Blend consonants = 'beginning', vowel and everything after = 'ending'
   // st
-  'stop':  [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
-  'step':  [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
-  'stand': [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
-  'stick': [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
+  'stop':  [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
+  'step':  [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
+  'stand': [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
+  'stick': [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ck',w:'k.wav',t:'ending'}],
   // bl
-  'black': [{d:'b',w:'b.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
-  'block': [{d:'b',w:'b.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
+  'black': [{d:'b',w:'b.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'ck',w:'k.wav',t:'ending'}],
+  'block': [{d:'b',w:'b.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'ending'},{d:'ck',w:'k.wav',t:'ending'}],
   'blow':  [{d:'b',w:'b.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
   // tr
   'tree':  [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'ending'}],
-  'truck': [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
-  'trip':  [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'truck': [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'ending'},{d:'ck',w:'k.wav',t:'ending'}],
+  'trip':  [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
   // dr
-  'drop':  [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
-  'drum':  [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'}],
-  'dress': [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'ss',w:'s.wav',t:'ending'}],
-  'drink': [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'k',w:'k.wav',t:'ending'}],
+  'drop':  [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
+  'drum':  [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'ending'},{d:'m',w:'m.wav',t:'ending'}],
+  'dress': [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'ending'},{d:'ss',w:'s.wav',t:'ending'}],
+  'drink': [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'},{d:'k',w:'k.wav',t:'ending'}],
   // cl
-  'class': [{d:'k',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ss',w:'s.wav',t:'ending'}],
-  'clap':  [{d:'k',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
-  'clock': [{d:'k',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
-  'clean': [{d:'k',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'class': [{d:'c',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'ss',w:'s.wav',t:'ending'}],
+  'clap':  [{d:'c',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
+  'clock': [{d:'c',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'ending'},{d:'ck',w:'k.wav',t:'ending'}],
+  'clean': [{d:'c',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'}],
   // fl
-  'flag':  [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'g',w:'g.wav',t:'ending'}],
-  'flat':  [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
-  'flip':  [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'flag':  [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'g',w:'g.wav',t:'ending'}],
+  'flat':  [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  'flip':  [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
   'fly':   [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'y',w:'aɪ as in ice.wav',t:'ending'}],
   // gr
-  'green': [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
-  'grab':  [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'}],
+  'green': [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'}],
+  'grab':  [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'b',w:'b.wav',t:'ending'}],
   'grow':  [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
-  'great': [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ea',w:'eɪ as in bait.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'great': [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ea',w:'eɪ as in bait.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
   // pl
-  'plan':  [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
-  'plant': [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
-  'please':[{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'s',w:'z.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'plan':  [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'}],
+  'plant': [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  'please':[{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'ending'},{d:'s',w:'z.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   // br
-  'brown': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ow',w:'aʊ as in out.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
-  'bring': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
-  'bread': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ea',w:'e as in bet.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
-  'brush': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'sh',w:'ʃ as in she.wav',t:'ending'}],
+  'brown': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ow',w:'aʊ as in out.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'}],
+  'bring': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
+  'bread': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ea',w:'e as in bet.wav',t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
+  'brush': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'ending'},{d:'sh',w:'ʃ as in she.wav',t:'ending'}],
   // cr
-  'crab':  [{d:'k',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'}],
-  'cry':   [{d:'k',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'y',w:'aɪ as in ice.wav',t:'ending'}],
-  'crop':  [{d:'k',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
-  'cross': [{d:'k',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ss',w:'s.wav',t:'ending'}],
+  'crab':  [{d:'c',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'b',w:'b.wav',t:'ending'}],
+  'cry':   [{d:'c',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'y',w:'aɪ as in ice.wav',t:'ending'}],
+  'crop':  [{d:'c',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
+  'cross': [{d:'c',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'ending'},{d:'ss',w:'s.wav',t:'ending'}],
   // sl
-  'slip':  [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'slip':  [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
   'slow':  [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
-  'sleep': [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'sleep': [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
   // sp
-  'spin':  [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
-  'spot':  [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
-  'speak': [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'}],
-  'spoon': [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'spin':  [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'}],
+  'spot':  [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  'speak': [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'ending'},{d:'k',w:'k.wav',t:'ending'}],
+  'spoon': [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'}],
 
   // ── COMMON ENDINGS ─────────────────────
   'back':  [{d:'b',w:'b.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
@@ -1726,8 +1736,8 @@ const WP2_TILES = {
   'doll':  [{d:'d',w:'d.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
   'off':   [{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ff',w:'f.wav',t:'ending'}],
   'puff':  [{d:'p',w:'p.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'ff',w:'f.wav',t:'ending'}],
-  'cliff': [{d:'k',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ff',w:'f.wav',t:'ending'}],
-  'staff': [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ff',w:'f.wav',t:'ending'}],
+  'cliff': [{d:'c',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ff',w:'f.wav',t:'ending'}],
+  'staff': [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'ff',w:'f.wav',t:'ending'}],
   'miss':  [{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ss',w:'s.wav',t:'ending'}],
   'pass':  [{d:'p',w:'p.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ss',w:'s.wav',t:'ending'}],
   'bus':   [{d:'b',w:'b.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'s',w:'s.wav',t:'ending'}],
@@ -1735,11 +1745,11 @@ const WP2_TILES = {
   'jazz':  [{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
   'fizz':  [{d:'f',w:'f.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
   'fuzz':  [{d:'f',w:'f.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
-  'catch': [{d:'k',w:'k.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
+  'catch': [{d:'c',w:'k.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
   'match': [{d:'m',w:'m.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
   'watch': [{d:'w',w:'w.wav',t:'beginning'},{d:'a',w:'ɒ as in pot.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
   'pitch': [{d:'p',w:'p.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
-  'bridge':[{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
+  'bridge':[{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
   'edge':  [{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
   'badge': [{d:'b',w:'b.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
   'judge': [{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
@@ -1748,7 +1758,7 @@ const WP2_TILES = {
   'played':  [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'beginning'},{d:'ed',w:null,tts:'d',t:'ending'}],
   'looked':  [{d:'l',w:'l.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'beginning'},{d:'ed',w:null,tts:'t',t:'ending'}],
   'helped':  [{d:'h',w:'h.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ed',w:null,tts:'t',t:'ending'}],
-  // -ing endings: i + ng (two separate phoneme tiles)
+  // -ing endings: i + ng (two phoneme tiles)
   'going':   [{d:'g',w:'g.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
   'playing': [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
   'looking': [{d:'l',w:'l.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
@@ -1774,9 +1784,9 @@ const WP2_TILES = {
   'picture':    [{d:'p',w:'p.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'c',w:'k.wav',t:'beginning'},{d:'ture',w:null,tts:'cher',t:'ending'}],
   'nature':     [{d:'n',w:'n.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'ture',w:null,tts:'cher',t:'ending'}],
   'future':     [{d:'f',w:'f.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'ture',w:null,tts:'cher',t:'ending'}],
-  'culture':    [{d:'k',w:'k.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ture',w:null,tts:'cher',t:'ending'}],
+  'culture':    [{d:'c',w:'k.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ture',w:null,tts:'cher',t:'ending'}],
   'mixture':    [{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'x',w:'ks.wav',t:'beginning'},{d:'ture',w:null,tts:'cher',t:'ending'}],
-  'capture':    [{d:'k',w:'k.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ture',w:null,tts:'cher',t:'ending'}],
+  'capture':    [{d:'c',w:'k.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ture',w:null,tts:'cher',t:'ending'}],
 };
 function getWp2Tiles(word) {
   return WP2_TILES[word] || null;
@@ -2168,11 +2178,10 @@ function renderWord(wp) {
         labelsEl.appendChild(lbl);
         // Tile
         const tile = document.createElement('div');
-        // Silent-e tiles and pure-TTS tiles
+        // Silent tiles (w:null, no tts) — grey, no interaction
         if (tile_data.w === null && !tile_data.tts) {
-          tile.className = 'tile digraph';
-          tile.style.opacity = '0.4';
-          tile.title = 'Silent e — not pronounced';
+          tile.className = 'tile silent';
+          tile.title = 'Silent — not pronounced';
         } else if (tile_data.w === null && tile_data.tts) {
           // Suffix chunk — use TTS to speak it
           tile.className = 'tile ' + (tile_data.t === 'ending' ? 'ending' : 'beginning');
