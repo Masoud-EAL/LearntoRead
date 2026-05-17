@@ -277,6 +277,20 @@
   .tile.digraph   { background:linear-gradient(135deg,#f5f0ff,#e8d6ff); color:var(--purple);  border:2.5px solid #d4b4f4; }
   .tile:hover { transform:translateY(-4px); }
   .tile.playing { transform:translateY(-4px) scale(1.1); filter: brightness(1.12); box-shadow:0 6px 4px rgba(0,0,0,0.15), 0 8px 18px rgba(0,0,0,0.12); }
+  .tile.neutral {
+    background: linear-gradient(135deg,#e8f0ff,#d0e0ff);
+    border-color: #a0b8f0;
+    color: #2a4a8a;
+    box-shadow: 0 4px 0 #7090d0, 0 5px 12px rgba(80,120,220,0.18);
+  }
+  .tile.neutral:hover { border-color: #6080d0; box-shadow: 0 6px 0 #6080d0, 0 8px 18px rgba(80,120,220,0.28); }
+  .tile.focus-tile {
+    background: linear-gradient(135deg,#fff7f0,#ffe4d6);
+    border-color: #f4c5b4;
+    color: var(--accent1);
+    box-shadow: 0 4px 0 #e8a090, 0 5px 12px rgba(220,100,60,0.18);
+  }
+  .tile.focus-tile:hover { border-color: var(--accent1); box-shadow: 0 6px 0 #e8a090, 0 8px 18px rgba(220,100,60,0.28); }
   .tile.silent {
     background: #d0d0d8 !important;
     color: #888 !important;
@@ -1814,68 +1828,68 @@ const wp1Families = [
 ══════════════════════════════════════════ */
 const wp2Families = [
   // 1. Consonant digraphs
-  { cat:'Consonant pairs  (two letters, one sound)', ending:'sh', words:['ship','shop','fish','dish','shed','shell'], mode:'whole', patternHint:'<strong>sh</strong> makes one sound — like a quiet "shh". You can hear it at the start or end of a word.' },
-  { cat:'Consonant pairs  (two letters, one sound)', ending:'ch', words:['chip','chat','much','rich','chop','chest'], mode:'whole', patternHint:'<strong>ch</strong> makes one sound — like in <em>chip</em>. It can come at the start or end of a word.' },
-  { cat:'Consonant pairs  (two letters, one sound)', ending:'th', words:['this','that','these','those'], mode:'whole', patternHint:'This <strong>th</strong> uses your voice — put your finger on your throat and feel it buzz. Try: <em>this… that…</em>' },
-  { cat:'Consonant pairs  (two letters, one sound)', ending:'th', words:['thin','think','bath','teeth'], mode:'whole', patternHint:'This <strong>th</strong> uses only air — no voice. Put your tongue between your teeth and blow. Try: <em>thin… think…</em>' },
-  { cat:'Consonant pairs  (two letters, one sound)', ending:'wh', words:['when','what','why','where'], mode:'whole', patternHint:'<strong>wh</strong> usually makes a "w" sound — like in <em>when</em> and <em>what</em>.' },
-  { cat:'Consonant pairs  (two letters, one sound)', ending:'ph', words:['phone','photo','graph','elephant'], mode:'whole', patternHint:'<strong>ph</strong> makes an "f" sound — like in <em>phone</em>. It comes from Greek words.' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'sh', focus:['sh'], words:['ship','shop','fish','dish','shed','shell'], mode:'whole', patternHint:'<strong>sh</strong> makes one sound — like a quiet "shh". You can hear it at the start or end of a word.' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'ch', focus:['ch'], words:['chip','chat','much','rich','chop','chest'], mode:'whole', patternHint:'<strong>ch</strong> makes one sound — like in <em>chip</em>. It can come at the start or end of a word.' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'th', focus:['th'], words:['this','that','these','those'], mode:'whole', patternHint:'This <strong>th</strong> uses your voice — put your finger on your throat and feel it buzz. Try: <em>this… that…</em>' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'th', focus:['th'], words:['thin','think','bath','teeth'], mode:'whole', patternHint:'This <strong>th</strong> uses only air — no voice. Put your tongue between your teeth and blow. Try: <em>thin… think…</em>' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'wh', focus:['wh'], words:['when','what','why','where'], mode:'whole', patternHint:'<strong>wh</strong> usually makes a "w" sound — like in <em>when</em> and <em>what</em>.' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'ph', focus:['ph'], words:['phone','photo','graph','elephant'], mode:'whole', patternHint:'<strong>ph</strong> makes an "f" sound — like in <em>phone</em>. It comes from Greek words.' },
   // 2a. Long vowel pairs
-  { cat:'Vowel pairs — long sounds', ending:'ee', words:['see','tree','bee','feet'], mode:'whole', patternHint:'<strong>ee</strong> makes a long "ee" sound — like in <em>see</em>.' },
-  { cat:'Vowel pairs — long sounds', ending:'ea', words:['eat','team','meat','read'], mode:'whole', patternHint:'<strong>ea</strong> makes a long "ee" sound — like in <em>eat</em>.' },
-  { cat:'Vowel pairs — long sounds', ending:'ai', words:['rain','train','mail','tail'], mode:'whole', patternHint:'<strong>ai</strong> makes a long "ay" sound — like in <em>rain</em>.' },
-  { cat:'Vowel pairs — long sounds', ending:'ay', words:['day','play','say','way'], mode:'whole', patternHint:'<strong>ay</strong> makes a long "ay" sound — like in <em>day</em>.' },
-  { cat:'Vowel pairs — long sounds', ending:'oa', words:['boat','coat','road','soap'], mode:'whole', patternHint:'<strong>oa</strong> makes a long "oh" sound — like in <em>boat</em>.' },
-  { cat:'Vowel pairs — long sounds', ending:'oe', words:['toe','goes','toes','hoe'], mode:'whole', patternHint:'<strong>oe</strong> makes a long "oh" sound — like in <em>toe</em>.' },
-  { cat:'Vowel pairs — long sounds', ending:'ie', words:['pie','tie','lie','die'], mode:'whole', patternHint:'<strong>ie</strong> makes a long "eye" sound — like in <em>pie</em>.' },
-  { cat:'Vowel pairs — long sounds', ending:'ue', words:['blue','glue','true','clue'], mode:'whole', patternHint:'<strong>ue</strong> makes a long "oo" or "you" sound — like in <em>blue</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ee', focus:['ee'], words:['see','tree','bee','feet'], mode:'whole', patternHint:'<strong>ee</strong> makes a long "ee" sound — like in <em>see</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ea', focus:['ea'], words:['eat','team','meat','read'], mode:'whole', patternHint:'<strong>ea</strong> makes a long "ee" sound — like in <em>eat</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ai', focus:['ai'], words:['rain','train','mail','tail'], mode:'whole', patternHint:'<strong>ai</strong> makes a long "ay" sound — like in <em>rain</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ay', focus:['ay'], words:['day','play','say','way'], mode:'whole', patternHint:'<strong>ay</strong> makes a long "ay" sound — like in <em>day</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'oa', focus:['oa'], words:['boat','coat','road','soap'], mode:'whole', patternHint:'<strong>oa</strong> makes a long "oh" sound — like in <em>boat</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'oe', focus:['oe'], words:['toe','goes','toes','hoe'], mode:'whole', patternHint:'<strong>oe</strong> makes a long "oh" sound — like in <em>toe</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ie', focus:['ie'], words:['pie','tie','lie','die'], mode:'whole', patternHint:'<strong>ie</strong> makes a long "eye" sound — like in <em>pie</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ue', focus:['ue'], words:['blue','glue','true','clue'], mode:'whole', patternHint:'<strong>ue</strong> makes a long "oo" or "you" sound — like in <em>blue</em>.' },
   // 2b. Other vowel pairs
-  { cat:'Vowel pairs — other sounds', ending:'oo', words:['moon','food','soon','pool','cool','roof'], mode:'whole', patternHint:'<strong>oo</strong> here makes a long sound — like in <em>moon</em>. Say it with a long "oo".' },
-  { cat:'Vowel pairs — other sounds', ending:'oo', words:['book','look','cook','foot','good','wood'], mode:'whole', patternHint:'<strong>oo</strong> here makes a short sound — like in <em>book</em>. The lips round but the sound is shorter.' },
-  { cat:'Vowel pairs — other sounds', ending:'ou', words:['out','loud','sound','found','mouth','count'], mode:'whole', patternHint:'<strong>ou</strong> here makes an "ow" sound — like in <em>out</em>.' },
-  { cat:'Vowel pairs — other sounds', ending:'ou', words:['could','would','should','your','four','pour'], mode:'whole', patternHint:'<strong>ou</strong> here makes different sounds — "ood" in <em>could</em>, "or" in <em>four</em>. Listen carefully to each word.' },
-  { cat:'Vowel pairs — other sounds', ending:'ow', words:['cow','now','snow','low'], mode:'whole', patternHint:'<strong>ow</strong> can sound like "ow" in <em>cow</em>, or "oh" in <em>snow</em>. Both are common.' },
-  { cat:'Vowel pairs — other sounds', ending:'oi', words:['coin','join','boil','soil'], mode:'whole', patternHint:'<strong>oi</strong> makes an "oy" sound — like in <em>coin</em>.' },
-  { cat:'Vowel pairs — other sounds', ending:'oy', words:['boy','toy','enjoy','annoy'], mode:'whole', patternHint:'<strong>oy</strong> makes the same sound as <strong>oi</strong> — like in <em>boy</em>.' },
-  { cat:'Vowel pairs — other sounds', ending:'au', words:['author','August','auto','haul'], mode:'whole', patternHint:'<strong>au</strong> makes an "aw" sound — like in <em>author</em>.' },
-  { cat:'Vowel pairs — other sounds', ending:'aw', words:['saw','law','paw','draw'], mode:'whole', patternHint:'<strong>aw</strong> makes the same sound as <strong>au</strong> — like in <em>saw</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'oo', focus:['oo'], words:['moon','food','soon','pool','cool','roof'], mode:'whole', patternHint:'<strong>oo</strong> here makes a long sound — like in <em>moon</em>. Say it with a long "oo".' },
+  { cat:'Vowel pairs — other sounds', ending:'oo', focus:['oo'], words:['book','look','cook','foot','good','wood'], mode:'whole', patternHint:'<strong>oo</strong> here makes a short sound — like in <em>book</em>. The lips round but the sound is shorter.' },
+  { cat:'Vowel pairs — other sounds', ending:'ou', focus:['ou'], words:['out','loud','sound','found','mouth','count'], mode:'whole', patternHint:'<strong>ou</strong> here makes an "ow" sound — like in <em>out</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'ou', focus:['ou'], words:['could','would','should','your','four','pour'], mode:'whole', patternHint:'<strong>ou</strong> here makes different sounds — "ood" in <em>could</em>, "or" in <em>four</em>. Listen carefully to each word.' },
+  { cat:'Vowel pairs — other sounds', ending:'ow', focus:['ow'], words:['cow','now','snow','low'], mode:'whole', patternHint:'<strong>ow</strong> can sound like "ow" in <em>cow</em>, or "oh" in <em>snow</em>. Both are common.' },
+  { cat:'Vowel pairs — other sounds', ending:'oi', focus:['oi'], words:['coin','join','boil','soil'], mode:'whole', patternHint:'<strong>oi</strong> makes an "oy" sound — like in <em>coin</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'oy', focus:['oy'], words:['boy','toy','enjoy','annoy'], mode:'whole', patternHint:'<strong>oy</strong> makes the same sound as <strong>oi</strong> — like in <em>boy</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'au', focus:['au'], words:['author','August','auto','haul'], mode:'whole', patternHint:'<strong>au</strong> makes an "aw" sound — like in <em>author</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'aw', focus:['aw'], words:['saw','law','paw','draw'], mode:'whole', patternHint:'<strong>aw</strong> makes the same sound as <strong>au</strong> — like in <em>saw</em>.' },
   // 3. Silent e
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ake', words:['cake','make','take','lake'], mode:'whole' },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ate', words:['late','mate','gate','hate'], mode:'whole' },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ine', words:['fine','line','mine','nine'], mode:'whole' },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ope', words:['hope','rope','cope','nope'], mode:'whole' },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ute', words:['cute','mute','tube','cube'], mode:'whole' },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ide', words:['ride','side','hide','wide'], mode:'whole' },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ame', words:['game','name','same','came'], mode:'whole' },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ore', words:['more','core','sore','bore'], mode:'whole' },
-  // 4. Beginning blends
-  { cat:'Beginning blends  (both sounds heard)', ending:'st', words:['stop','step','stand','stick'], mode:'whole', patternHint:'<strong>st</strong> = s + t. Both sounds are heard. Try slowly: <em>s… t… stop.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'bl', words:['black','blue','block','blow'],  mode:'whole', patternHint:'<strong>bl</strong> = b + l. Try slowly: <em>b… l… black.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'tr', words:['tree','train','truck','trip'],  mode:'whole', patternHint:'<strong>tr</strong> = t + r. Try slowly: <em>t… r… tree.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'dr', words:['drop','drum','dress','drink'], mode:'whole', patternHint:'<strong>dr</strong> = d + r. Try slowly: <em>d… r… drop.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'cl', words:['class','clap','clock','clean'], mode:'whole', patternHint:'<strong>cl</strong> = c + l. Try slowly: <em>c… l… class.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'fl', words:['flag','flat','flip','fly'],    mode:'whole', patternHint:'<strong>fl</strong> = f + l. Try slowly: <em>f… l… flag.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'gr', words:['green','grab','grow','great'], mode:'whole', patternHint:'<strong>gr</strong> = g + r. Try slowly: <em>g… r… green.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'pl', words:['play','plan','plant','please'],mode:'whole', patternHint:'<strong>pl</strong> = p + l. Try slowly: <em>p… l… play.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'br', words:['brown','bring','bread','brush'],mode:'whole', patternHint:'<strong>br</strong> = b + r. Try slowly: <em>b… r… brown.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'cr', words:['crab','cry','crop','cross'],   mode:'whole', patternHint:'<strong>cr</strong> = c + r. Try slowly: <em>c… r… crab.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'sl', words:['slip','slow','sleep','slide'], mode:'whole', patternHint:'<strong>sl</strong> = s + l. Try slowly: <em>s… l… slip.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'sp', words:['spin','spot','speak','spoon'], mode:'whole', patternHint:'<strong>sp</strong> = s + p. Try slowly: <em>s… p… spin.</em>' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ake', focus:['e'], words:['cake','make','take','lake'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ate', focus:['e'], words:['late','mate','gate','hate'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ine', focus:['e'], words:['fine','line','mine','nine'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ope', focus:['e'], words:['hope','rope','cope','nope'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ute', focus:['e'], words:['cute','mute','tube','cube'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ide', focus:['e'], words:['ride','side','hide','wide'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ame', focus:['e'], words:['game','name','same','came'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ore', focus:['e'], words:['more','core','sore','bore'], mode:'whole' },
+  // 4. Beginning blends — focus = the two blend consonants as separate tiles
+  { cat:'Beginning blends  (both sounds heard)', ending:'st', focus:['s','t'], words:['stop','step','stand','stick'], mode:'whole', patternHint:'<strong>st</strong> = s + t. Both sounds are heard. Try slowly: <em>s… t… stop.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'bl', focus:['b','l'], words:['black','blue','block','blow'],  mode:'whole', patternHint:'<strong>bl</strong> = b + l. Try slowly: <em>b… l… black.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'tr', focus:['t','r'], words:['tree','train','truck','trip'],  mode:'whole', patternHint:'<strong>tr</strong> = t + r. Try slowly: <em>t… r… tree.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'dr', focus:['d','r'], words:['drop','drum','dress','drink'], mode:'whole', patternHint:'<strong>dr</strong> = d + r. Try slowly: <em>d… r… drop.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'cl', focus:['c','l'], words:['class','clap','clock','clean'], mode:'whole', patternHint:'<strong>cl</strong> = c + l. Try slowly: <em>c… l… class.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'fl', focus:['f','l'], words:['flag','flat','flip','fly'],    mode:'whole', patternHint:'<strong>fl</strong> = f + l. Try slowly: <em>f… l… flag.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'gr', focus:['g','r'], words:['green','grab','grow','great'], mode:'whole', patternHint:'<strong>gr</strong> = g + r. Try slowly: <em>g… r… green.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'pl', focus:['p','l'], words:['play','plan','plant','please'],mode:'whole', patternHint:'<strong>pl</strong> = p + l. Try slowly: <em>p… l… play.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'br', focus:['b','r'], words:['brown','bring','bread','brush'],mode:'whole', patternHint:'<strong>br</strong> = b + r. Try slowly: <em>b… r… brown.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'cr', focus:['c','r'], words:['crab','cry','crop','cross'],   mode:'whole', patternHint:'<strong>cr</strong> = c + r. Try slowly: <em>c… r… crab.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'sl', focus:['s','l'], words:['slip','slow','sleep','slide'], mode:'whole', patternHint:'<strong>sl</strong> = s + l. Try slowly: <em>s… l… slip.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'sp', focus:['s','p'], words:['spin','spot','speak','spoon'], mode:'whole', patternHint:'<strong>sp</strong> = s + p. Try slowly: <em>s… p… spin.</em>' },
   // 5. Common endings
-  { cat:'Common endings', ending:'ck',  words:['back','duck','pick','rock'],      mode:'whole', patternHint:'<strong>ck</strong> makes a "k" sound. The two letters work as one.' },
-  { cat:'Common endings', ending:'ll',  words:['ball','bell','fill','doll'],      mode:'whole', patternHint:'<strong>ll</strong> makes a single "l" sound.' },
-  { cat:'Common endings', ending:'ff',  words:['off','puff','cliff','staff'],     mode:'whole', patternHint:'<strong>ff</strong> makes a single "f" sound.' },
-  { cat:'Common endings', ending:'ss',  words:['miss','pass','bus','dress'],      mode:'whole', patternHint:'<strong>ss</strong> makes a single "s" sound.' },
-  { cat:'Common endings', ending:'zz',  words:['buzz','jazz','fizz','fuzz'],      mode:'whole', patternHint:'<strong>zz</strong> makes a single "z" sound.' },
-  { cat:'Common endings', ending:'tch', words:['catch','match','watch','pitch'],  mode:'whole', patternHint:'<strong>tch</strong> makes a "ch" sound — like in <em>catch</em>. It always comes after a short vowel.' },
-  { cat:'Common endings', ending:'dge', words:['bridge','edge','badge','judge'],  mode:'whole', patternHint:'<strong>dge</strong> makes a "j" sound — like in <em>bridge</em>. It always comes after a short vowel.' },
-  { cat:'Common endings', ending:'ed',  words:['jumped','played','looked','helped'], mode:'whole', patternHint:'<strong>ed</strong> at the end can sound like "d" (played), "t" (looked), or "id" (wanted).' },
-  { cat:'Common endings', ending:'ing', words:['going','playing','looking','eating'], mode:'whole', patternHint:'<strong>ing</strong> is added to verbs to show something is happening now.' },
+  { cat:'Common endings', ending:'ck',  focus:['ck'],  words:['back','duck','pick','rock'],      mode:'whole', patternHint:'<strong>ck</strong> makes a "k" sound. The two letters work as one.' },
+  { cat:'Common endings', ending:'ll',  focus:['ll'],  words:['ball','bell','fill','doll'],      mode:'whole', patternHint:'<strong>ll</strong> makes a single "l" sound.' },
+  { cat:'Common endings', ending:'ff',  focus:['ff'],  words:['off','puff','cliff','staff'],     mode:'whole', patternHint:'<strong>ff</strong> makes a single "f" sound.' },
+  { cat:'Common endings', ending:'ss',  focus:['ss'],  words:['miss','pass','bus','dress'],      mode:'whole', patternHint:'<strong>ss</strong> makes a single "s" sound.' },
+  { cat:'Common endings', ending:'zz',  focus:['zz'],  words:['buzz','jazz','fizz','fuzz'],      mode:'whole', patternHint:'<strong>zz</strong> makes a single "z" sound.' },
+  { cat:'Common endings', ending:'tch', focus:['tch'], words:['catch','match','watch','pitch'],  mode:'whole', patternHint:'<strong>tch</strong> makes a "ch" sound — like in <em>catch</em>. It always comes after a short vowel.' },
+  { cat:'Common endings', ending:'dge', focus:['dge'], words:['bridge','edge','badge','judge'],  mode:'whole', patternHint:'<strong>dge</strong> makes a "j" sound — like in <em>bridge</em>. It always comes after a short vowel.' },
+  { cat:'Common endings', ending:'ed',  focus:['ed'],  words:['jumped','played','looked','helped'], mode:'whole', patternHint:'<strong>ed</strong> at the end can sound like "d" (played), "t" (looked), or "id" (wanted).' },
+  { cat:'Common endings', ending:'ing', focus:['i','ng'], words:['going','playing','looking','eating'], mode:'whole', patternHint:'<strong>ing</strong> is added to verbs to show something is happening now.' },
   // 6. Word endings — sounds like "shun" / "cher"
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'tion', words:['nation','station','action','mention','motion','section'], mode:'whole', patternHint:'<strong>tion</strong> sounds like "shun" — like in <em>nation</em>. It is one of the most common word endings in English.' },
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'sion', words:['mission','session','passion','tension','vision','division'], mode:'whole', patternHint:'<strong>sion</strong> can sound like "shun" (mission) or "zhun" (vision). Listen carefully to each word.' },
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'cian', words:['musician','magician','technician','politician','physician'], mode:'whole', patternHint:'<strong>cian</strong> sounds like "shun" — like in <em>musician</em>. It usually refers to a person with a skill.' },
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'ture', words:['picture','nature','future','culture','mixture','capture'], mode:'whole', patternHint:'<strong>ture</strong> sounds like "cher" — like in <em>picture</em>. Say it as one quick sound: "p-ik-cher".' },
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'tion',  focus:['tion'],  words:['nation','station','action','mention','motion','section'], mode:'whole', patternHint:'<strong>tion</strong> sounds like "shun" — like in <em>nation</em>. It is one of the most common word endings in English.' },
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'sion',  focus:['sion','ssion'],  words:['mission','session','passion','tension','vision','division'], mode:'whole', patternHint:'<strong>sion</strong> can sound like "shun" (mission) or "zhun" (vision). Listen carefully to each word.' },
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'cian',  focus:['cian'],  words:['musician','magician','technician','politician','physician'], mode:'whole', patternHint:'<strong>cian</strong> sounds like "shun" — like in <em>musician</em>. It usually refers to a person with a skill.' },
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'ture',  focus:['ture'],  words:['picture','nature','future','culture','mixture','capture'], mode:'whole', patternHint:'<strong>ture</strong> sounds like "cher" — like in <em>picture</em>. Say it as one quick sound: "p-ik-cher".' },
 ];
 
 /* ══════════════════════════════════════════
@@ -2171,25 +2185,22 @@ function renderWord(wp) {
     const wp2tiles = getWp2Tiles(word);
     if (wp2tiles) {
       wp2tiles.forEach((tile_data, i) => {
-        // Label
-        const lbl = document.createElement('div');
-        lbl.className = 'tile-label-item ' + (tile_data.t === 'ending' ? 'el' : tile_data.t === 'digraph' ? 'dg' : 'bl');
-        lbl.style.width = '68px';
-        if (i === 0) lbl.textContent = 'start';
-        labelsEl.appendChild(lbl);
         // Tile
         const tile = document.createElement('div');
+        const focusSet = new Set((fam.focus || []).map(f => f.toLowerCase()));
+        const isFocus = focusSet.has(tile_data.d.toLowerCase());
+
         // Silent tiles (w:null, no tts) — grey, no interaction
         if (tile_data.w === null && !tile_data.tts) {
           tile.className = 'tile silent';
           tile.title = 'Silent — not pronounced';
         } else if (tile_data.w === null && tile_data.tts) {
-          // Suffix chunk — use TTS to speak it
-          tile.className = 'tile ' + (tile_data.t === 'ending' ? 'ending' : 'beginning');
+          // Suffix chunk — TTS, always focus colour (it's the pattern tile)
+          tile.className = 'tile focus-tile';
           tile.onclick = () => { tile.classList.add('playing'); speakRaw(tile_data.tts, () => tile.classList.remove('playing')); };
           tile.title = 'Tap to hear this sound';
         } else {
-          tile.className = 'tile ' + (tile_data.t === 'ending' ? 'ending' : tile_data.t === 'digraph' ? 'digraph' : 'beginning');
+          tile.className = 'tile ' + (isFocus ? 'focus-tile' : 'neutral');
           tile.onclick = () => playPhonemeWav(tile_data.w, tile);
           tile.title = 'Tap to hear this sound';
         }
