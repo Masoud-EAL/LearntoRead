@@ -864,7 +864,7 @@
   .sent-spelling-wrap .spell-input { font-size: 1.05rem; }
   .sent-spelling-wrap .spell-diff  { font-size: 1rem; letter-spacing: 2px; }
 
-   /* ── TEACHER GAME BUTTON ── */
+  /* ── TEACHER GAME BUTTON ── */
   .teacher-game-btn {
     position: fixed; bottom: 18px; right: 18px; z-index: 200;
     background: rgba(30,20,60,0.82); color: #a090cc;
@@ -877,6 +877,7 @@
 </style>
 </head>
 <body>
+<a href="game.html" class="teacher-game-btn" title="Teacher: open Kahoot-style game">🎮 Kahoot-style Game</a>
 
 <header>
   <h1>Word<span>Link</span></h1>
@@ -936,8 +937,8 @@
       <div class="speed-row">
         <span class="speed-label">Speed:</span>
         <div class="speed-btns">
-          <button class="speed-opt active" onclick="setSpeed(0.6,this)">Slow</button>
-          <button class="speed-opt" onclick="setSpeed(0.85,this)">Medium</button>
+          <button class="speed-opt active" onclick="setSpeed(0.5,this)">Slow</button>
+          <button class="speed-opt" onclick="setSpeed(0.7,this)">Medium</button>
           <button class="speed-opt" onclick="setSpeed(1.0,this)">Normal</button>
         </div>
       </div>
@@ -975,8 +976,8 @@
       <div class="speed-row">
         <span class="speed-label">Speed:</span>
         <div class="speed-btns">
-          <button class="speed-opt active" onclick="setSpeed(0.6,this)">Slow</button>
-          <button class="speed-opt" onclick="setSpeed(0.85,this)">Medium</button>
+          <button class="speed-opt active" onclick="setSpeed(0.5,this)">Slow</button>
+          <button class="speed-opt" onclick="setSpeed(0.7,this)">Medium</button>
           <button class="speed-opt" onclick="setSpeed(1.0,this)">Normal</button>
         </div>
       </div>
@@ -1001,8 +1002,8 @@
   <div class="speed-row" style="margin-bottom:6px">
     <span class="speed-label">Speed:</span>
     <div class="speed-btns">
-      <button class="speed-opt sent-speed active" onclick="setSentSpeed(0.6,this)">Slow</button>
-      <button class="speed-opt sent-speed" onclick="setSentSpeed(0.85,this)">Medium</button>
+      <button class="speed-opt sent-speed active" onclick="setSentSpeed(0.5,this)">Slow</button>
+      <button class="speed-opt sent-speed" onclick="setSentSpeed(0.7,this)">Medium</button>
       <button class="speed-opt sent-speed" onclick="setSentSpeed(1.0,this)">Normal</button>
     </div>
   </div>
@@ -1910,8 +1911,8 @@ const wpState = {
   wp1: { familyIdx:0, wordIdx:0, seen:new Set() },
   wp2: { familyIdx:0, wordIdx:0, seen:new Set() },
 };
-let speechRate = 0.6;
-var sentenceRate = 0.6;
+let speechRate = 0.5;
+var sentenceRate = 0.5;
 
 /* ══════════════════════════════════════════
    VOICE SELECTION
@@ -1981,7 +1982,7 @@ function buildNameGrid() {
     card.onclick = () => {
       document.querySelectorAll('.alpha-card').forEach(c => c.classList.remove('playing'));
       card.classList.add('playing');
-      speakRaw(item.name, () => card.classList.remove('playing'));
+      speakRaw(item.name, () => card.classList.remove('playing'), 0.7);
     };
     grid.appendChild(card);
   });
@@ -2318,11 +2319,11 @@ function speakCurrent(wp) {
   s.seen.add(`${s.familyIdx}-${s.wordIdx}`);
 }
 
-function speakRaw(text, onEnd) {
+function speakRaw(text, onEnd, rate) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(text);
-  utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  utt.rate = rate !== undefined ? rate : speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
   applyVoice(utt);
   utt.onend = utt.onerror = () => { if (onEnd) onEnd(); };
   window.speechSynthesis.speak(utt);
