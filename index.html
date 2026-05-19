@@ -177,6 +177,28 @@
     font-style: italic; margin-top: 8px;
   }
 
+  /* Phoneme tile button shown at top of each sound group */
+  .phoneme-tile-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'Fredoka One', cursive; font-size: 1.55rem; line-height: 1;
+    width: 52px; height: 58px; border-radius: 12px; cursor: pointer;
+    border: 2.5px solid var(--light); background: white; color: var(--teal);
+    box-shadow: 0 3px 0 rgba(0,0,0,0.10), 0 4px 10px rgba(0,0,0,0.07);
+    transition: all 0.16s; margin-bottom: 10px;
+    user-select: none;
+  }
+  .letter-block.vowel .phoneme-tile-btn { color: var(--accent2); }
+  .sound-group + .sound-group .phoneme-tile-btn { color: var(--accent4); border-color: #f0c870; }
+  .phoneme-tile-btn:hover { transform: translateY(-3px) scale(1.07); box-shadow: 0 6px 16px rgba(43,170,138,0.25); border-color: var(--teal); }
+  .letter-block.vowel .phoneme-tile-btn:hover { box-shadow: 0 6px 16px rgba(74,144,217,0.25); border-color: var(--accent2); }
+  .sound-group + .sound-group .phoneme-tile-btn:hover { border-color: var(--accent4); box-shadow: 0 6px 16px rgba(240,180,41,0.25); }
+  .phoneme-tile-btn.playing {
+    background: linear-gradient(135deg,#e8faf5,#c8f0e4); border-color: var(--teal);
+    transform: translateY(-3px) scale(1.1); box-shadow: 0 7px 18px rgba(43,170,138,0.35);
+  }
+  .letter-block.vowel .phoneme-tile-btn.playing { background: linear-gradient(135deg,#eef5ff,#d6e8ff); border-color: var(--accent2); box-shadow: 0 7px 18px rgba(74,144,217,0.35); }
+  .sound-group + .sound-group .phoneme-tile-btn.playing { background: linear-gradient(135deg,#fffde8,#fff0b0); border-color: var(--accent4); box-shadow: 0 7px 18px rgba(240,180,41,0.35); }
+
   .example-pills { display: flex; flex-wrap: wrap; gap: 8px; }
 
   .example-pill {
@@ -254,6 +276,30 @@
   .tile.ending    { background:linear-gradient(135deg,#eef5ff,#d6e8ff); color:var(--accent2); border:2.5px solid #b4d0f4; }
   .tile.digraph   { background:linear-gradient(135deg,#f5f0ff,#e8d6ff); color:var(--purple);  border:2.5px solid #d4b4f4; }
   .tile:hover { transform:translateY(-4px); }
+  .tile.playing { transform:translateY(-4px) scale(1.1); filter: brightness(1.12); box-shadow:0 6px 4px rgba(0,0,0,0.15), 0 8px 18px rgba(0,0,0,0.12); }
+  .tile.neutral {
+    background: linear-gradient(135deg,#e8f0ff,#d0e0ff);
+    border-color: #a0b8f0;
+    color: var(--accent2);
+    box-shadow: 0 4px 0 #7090d0, 0 5px 12px rgba(80,120,220,0.18);
+  }
+  .tile.neutral:hover { border-color: #6080d0; box-shadow: 0 6px 0 #6080d0, 0 8px 18px rgba(80,120,220,0.28); }
+  .tile.focus-tile {
+    background: linear-gradient(135deg,#fff7f0,#ffe4d6);
+    border-color: #f4c5b4;
+    color: var(--accent1);
+    box-shadow: 0 4px 0 #e8a090, 0 5px 12px rgba(220,100,60,0.18);
+  }
+  .tile.focus-tile:hover { border-color: var(--accent1); box-shadow: 0 6px 0 #e8a090, 0 8px 18px rgba(220,100,60,0.28); }
+  .tile.silent {
+    background: #d0d0d8 !important;
+    color: #888 !important;
+    border-color: #b0b0bc !important;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.08) !important;
+    cursor: default !important;
+    opacity: 0.75;
+  }
+  .tile.silent:hover { transform: none !important; box-shadow: 0 3px 0 rgba(0,0,0,0.08) !important; }
 
   @keyframes tilePop {
     from { transform:scale(0.5) translateY(20px); opacity:0; }
@@ -817,9 +863,21 @@
   .spell-listen-btn.speaking { opacity: 0.6; }
   .sent-spelling-wrap .spell-input { font-size: 1.05rem; }
   .sent-spelling-wrap .spell-diff  { font-size: 1rem; letter-spacing: 2px; }
+
+  /* ── TEACHER GAME BUTTON ── */
+  .teacher-game-btn {
+    position: fixed; bottom: 18px; right: 18px; z-index: 200;
+    background: rgba(30,20,60,0.82); color: #a090cc;
+    border: 1px solid rgba(160,140,220,0.25); border-radius: 50px;
+    padding: 7px 16px; font-size: 0.75rem; font-weight: 700;
+    cursor: pointer; text-decoration: none; letter-spacing: 0.3px;
+    backdrop-filter: blur(8px); transition: all 0.2s; opacity: 0.7;
+  }
+  .teacher-game-btn:hover { opacity: 1; background: rgba(50,30,100,0.92); color: #c8b8ff; border-color: rgba(160,140,220,0.5); }
 </style>
 </head>
 <body>
+<a href="game.html" class="teacher-game-btn" title="Teacher: open Kahoot-style game">🎮 Kahoot-style Game</a>
 
 <header>
   <h1>Word<span>Link</span></h1>
@@ -879,8 +937,8 @@
       <div class="speed-row">
         <span class="speed-label">Speed:</span>
         <div class="speed-btns">
-          <button class="speed-opt active" onclick="setSpeed(0.6,this)">Slow</button>
-          <button class="speed-opt" onclick="setSpeed(0.85,this)">Medium</button>
+          <button class="speed-opt active" onclick="setSpeed(0.5,this)">Slow</button>
+          <button class="speed-opt" onclick="setSpeed(0.7,this)">Medium</button>
           <button class="speed-opt" onclick="setSpeed(1.0,this)">Normal</button>
         </div>
       </div>
@@ -918,8 +976,8 @@
       <div class="speed-row">
         <span class="speed-label">Speed:</span>
         <div class="speed-btns">
-          <button class="speed-opt active" onclick="setSpeed(0.6,this)">Slow</button>
-          <button class="speed-opt" onclick="setSpeed(0.85,this)">Medium</button>
+          <button class="speed-opt active" onclick="setSpeed(0.5,this)">Slow</button>
+          <button class="speed-opt" onclick="setSpeed(0.7,this)">Medium</button>
           <button class="speed-opt" onclick="setSpeed(1.0,this)">Normal</button>
         </div>
       </div>
@@ -944,8 +1002,8 @@
   <div class="speed-row" style="margin-bottom:6px">
     <span class="speed-label">Speed:</span>
     <div class="speed-btns">
-      <button class="speed-opt sent-speed active" onclick="setSentSpeed(0.6,this)">Slow</button>
-      <button class="speed-opt sent-speed" onclick="setSentSpeed(0.85,this)">Medium</button>
+      <button class="speed-opt sent-speed active" onclick="setSentSpeed(0.5,this)">Slow</button>
+      <button class="speed-opt sent-speed" onclick="setSentSpeed(0.7,this)">Medium</button>
       <button class="speed-opt sent-speed" onclick="setSentSpeed(1.0,this)">Normal</button>
     </div>
   </div>
@@ -1312,7 +1370,7 @@ const letterNames = [
   {l:'E',name:'e',         vowel:true},
   {l:'F',name:'ef',        vowel:false},
   {l:'G',name:'jee',       vowel:false},
-  {l:'H',name:'aych',      vowel:false},
+  {l:'H',name:'aitch',      vowel:false},
   {l:'I',name:'eye',       vowel:true},
   {l:'J',name:'jay',       vowel:false},
   {l:'K',name:'kay',       vowel:false},
@@ -1336,50 +1394,430 @@ const letterNames = [
 /* ══════════════════════════════════════════
    DATA — LETTER SOUNDS
 ══════════════════════════════════════════ */
+// phonemeWav: the WAV file to play when the big letter is tapped.
+// For letters with two sounds, the first/main sound is used here.
 const letterSoundData = [
-  { l:'A', vowel:true,  sounds:[{ label:'Short a — as in…', examples:['ant','apple','ask','add'] }]},
-  { l:'B', vowel:false, sounds:[{ label:'Sound — as in…', examples:['bat','bag','bed','bus','big'] }]},
-  { l:'C', vowel:false, sounds:[
-    { label:'Hard sound — as in…', examples:['cat','cup','cap','cut','come'] },
-    { label:'Soft sound — as in…', examples:['city','cent','circle','face','ice'], note:'C makes this sound before e, i, or y.' }
+  { l:'A', vowel:true,  phonemeWav:'æ as in bat.wav', sounds:[{ wav:'æ as in bat.wav', label:'Short a — as in…', examples:['ant','apple','ask','add'] }]},
+  { l:'B', vowel:false, phonemeWav:'b.wav', sounds:[{ wav:'b.wav', label:'Sound — as in…', examples:['bat','bag','bed','bus','big'] }]},
+  { l:'C', vowel:false, phonemeWav:'k.wav', sounds:[
+    { wav:'k.wav',  label:'Hard sound — as in…', examples:['cat','cup','cap','cut','come'] },
+    { wav:'s.wav',  label:'Soft sound — as in…', examples:['city','cent','circle','face','ice'], note:'C makes this sound before e, i, or y.' }
   ]},
-  { l:'D', vowel:false, sounds:[{ label:'Sound — as in…', examples:['dog','dig','dad','day','door'] }]},
-  { l:'E', vowel:true,  sounds:[{ label:'Short e — as in…', examples:['egg','end','enter','empty'] }]},
-  { l:'F', vowel:false, sounds:[{ label:'Sound — as in…', examples:['fan','fig','fun','fish','foot'] }]},
-  { l:'G', vowel:false, sounds:[
-    { label:'Hard sound — as in…', examples:['gap','got','give','go','get'] },
-    { label:'Soft sound — as in…', examples:['gem','giant','giraffe','age','page'], note:'G makes this sound before e, i, or y.' }
+  { l:'D', vowel:false, phonemeWav:'d.wav', sounds:[{ wav:'d.wav', label:'Sound — as in…', examples:['dog','dig','dad','day','door'] }]},
+  { l:'E', vowel:true,  phonemeWav:'e as in bet.wav', sounds:[{ wav:'e as in bet.wav', label:'Short e — as in…', examples:['egg','end','enter','empty'] }]},
+  { l:'F', vowel:false, phonemeWav:'f.wav', sounds:[{ wav:'f.wav', label:'Sound — as in…', examples:['fan','fig','fun','fish','foot'] }]},
+  { l:'G', vowel:false, phonemeWav:'g.wav', sounds:[
+    { wav:'g.wav',              label:'Hard sound — as in…', examples:['gap','got','give','go','get'] },
+    { wav:'dʒ as in jar.wav',  label:'Soft sound — as in…', examples:['gem','giant','giraffe','age','page'], note:'G makes this sound before e, i, or y.' }
   ]},
-  { l:'H', vowel:false, sounds:[{ label:'Sound — as in…', examples:['hat','hop','him','her','hot'] }]},
-  { l:'I', vowel:true,  sounds:[{ label:'Short i — as in…', examples:['ink','in','ill','insect'] }, { label:'Long i — as in…', examples:['ice','rice','nice','kite','time','bike','five','life','like','write'] }]},
-  { l:'J', vowel:false, sounds:[{ label:'Sound — as in…', examples:['jam','job','jump','just','jar'] }]},
-  { l:'K', vowel:false, sounds:[{ label:'Sound — as in…', examples:['kit','kid','king','keep','kind'] }]},
-  { l:'L', vowel:false, sounds:[{ label:'Sound — as in…', examples:['lap','leg','lip','lot','love'] }]},
-  { l:'M', vowel:false, sounds:[{ label:'Sound — as in…', examples:['map','man','mud','most','me'] }]},
-  { l:'N', vowel:false, sounds:[{ label:'Sound — as in…', examples:['net','not','nap','name','no'] }]},
-  { l:'O', vowel:true,  sounds:[{ label:'Short o — as in…', examples:['odd','ox','octopus','olive'] }, { label:'Long o — as in…', examples:['open','over','old','only','order'] }]},
-  { l:'P', vowel:false, sounds:[{ label:'Sound — as in…', examples:['pan','pet','pin','pot','put'] }]},
-  { l:'Q', vowel:false, sounds:[{ label:'Sound — as in…', examples:['quiz','queen','quick','quiet','quit'], note:'Q is almost always followed by U in English.' }]},
-  { l:'R', vowel:false, sounds:[{ label:'Sound — as in…', examples:['ran','red','rip','run','road'] }]},
-  { l:'S', vowel:false, sounds:[
-    { label:'"S" sound — as in…', examples:['sun','sit','sad','set','soft'] },
-    { label:'"Z" sound — as in…', examples:['is','his','has','was','as'], note:'S sounds like Z in many very common words.' }
+  { l:'H', vowel:false, phonemeWav:'h.wav', sounds:[{ wav:'h.wav', label:'Sound — as in…', examples:['hat','hop','him','her','hot'] }]},
+  { l:'I', vowel:true,  phonemeWav:'ɪ as in bit.wav', sounds:[
+    { wav:'ɪ as in bit.wav',  label:'Short i — as in…', examples:['ink','in','ill','insect'] },
+    { wav:'aɪ as in ice.wav', label:'Long i — as in…',  examples:['ice','rice','nice','kite','time','bike','five','life','like','write'] }
   ]},
-  { l:'T', vowel:false, sounds:[{ label:'Sound — as in…', examples:['tap','top','tin','ten','tell'] }]},
-  { l:'U', vowel:true,  sounds:[{ label:'Short u — as in…', examples:['up','under','uncle','umbrella'] }]},
-  { l:'V', vowel:false, sounds:[{ label:'Sound — as in…', examples:['van','vet','vest','vine','voice'] }]},
-  { l:'W', vowel:false, sounds:[{ label:'Sound — as in…', examples:['win','wet','was','want','word'] }]},
-  { l:'X', vowel:false, sounds:[{ label:'Sound — as in…', examples:['box','fox','mix','fix','six'] }]},
-  { l:'Y', vowel:false, sounds:[
-    { label:'"Y" sound — as in…', examples:['yes','yet','you','your','year'] },
-    { label:'"EE" sound — as in…', examples:['happy','very','baby','city','funny'], note:'Y sounds like "ee" at the end of most words.' }
+  { l:'J', vowel:false, phonemeWav:'dʒ as in jar.wav', sounds:[{ wav:'dʒ as in jar.wav', label:'Sound — as in…', examples:['jam','job','jump','just','jar'] }]},
+  { l:'K', vowel:false, phonemeWav:'k.wav', sounds:[{ wav:'k.wav', label:'Sound — as in…', examples:['kit','kid','king','keep','kind'] }]},
+  { l:'L', vowel:false, phonemeWav:'l.wav', sounds:[{ wav:'l.wav', label:'Sound — as in…', examples:['lap','leg','lip','lot','love'] }]},
+  { l:'M', vowel:false, phonemeWav:'m.wav', sounds:[{ wav:'m.wav', label:'Sound — as in…', examples:['map','man','mud','most','me'] }]},
+  { l:'N', vowel:false, phonemeWav:'n.wav', sounds:[{ wav:'n.wav', label:'Sound — as in…', examples:['net','not','nap','name','no'] }]},
+  { l:'O', vowel:true,  phonemeWav:'ɒ as in pot.wav', sounds:[
+    { wav:'ɒ as in pot.wav',  label:'Short o — as in…', examples:['odd','ox','octopus','olive'] },
+    { wav:'əʊ as in boat.wav',label:'Long o — as in…',  examples:['open','over','old','only','order'] }
   ]},
-  { l:'Z', vowel:false, sounds:[{ label:'Sound — as in…', examples:['zip','zoo','zero','zoom','zone'] }]},
+  { l:'P', vowel:false, phonemeWav:'p.wav', sounds:[{ wav:'p.wav', label:'Sound — as in…', examples:['pan','pet','pin','pot','put'] }]},
+  { l:'Q', vowel:false, phonemeWav:'k.wav', sounds:[{ wav:'k.wav', label:'Sound — as in…', examples:['quiz','queen','quick','quiet','quit'], note:'Q is almost always followed by U in English.' }]},
+  { l:'R', vowel:false, phonemeWav:'r.wav', sounds:[{ wav:'r.wav', label:'Sound — as in…', examples:['ran','red','rip','run','road'] }]},
+  { l:'S', vowel:false, phonemeWav:'s.wav', sounds:[
+    { wav:'s.wav', label:'"S" sound — as in…', examples:['sun','sit','sad','set','soft'] },
+    { wav:'z.wav', label:'"Z" sound — as in…', examples:['is','his','has','was','as'], note:'S sounds like Z in many very common words.' }
+  ]},
+  { l:'T', vowel:false, phonemeWav:'t.wav', sounds:[{ wav:'t.wav', label:'Sound — as in…', examples:['tap','top','tin','ten','tell'] }]},
+  { l:'U', vowel:true,  phonemeWav:'ʌ as in but.wav', sounds:[{ wav:'ʌ as in but.wav', label:'Short u — as in…', examples:['up','under','uncle','umbrella'] }]},
+  { l:'V', vowel:false, phonemeWav:'v.wav', sounds:[{ wav:'v.wav', label:'Sound — as in…', examples:['van','vet','vest','vine','voice'] }]},
+  { l:'W', vowel:false, phonemeWav:'w.wav', sounds:[{ wav:'w.wav', label:'Sound — as in…', examples:['win','wet','was','want','word'] }]},
+  { l:'X', vowel:false, phonemeWav:'ks.wav', sounds:[{ wav:'ks.wav', label:'Sound — as in…', examples:['box','fox','mix','fix','six'] }]},
+  { l:'Y', vowel:false, phonemeWav:'j as in yam.wav', sounds:[
+    { wav:'j as in yam.wav', label:'"Y" sound — as in…', examples:['yes','yet','you','your','year'] },
+    { wav:'iː as in eat.wav', label:'"EE" sound — as in…', examples:['happy','very','baby','city','funny'], note:'Y sounds like "ee" at the end of most words.' }
+  ]},
+  { l:'Z', vowel:false, phonemeWav:'z.wav', sounds:[{ wav:'z.wav', label:'Sound — as in…', examples:['zip','zoo','zero','zoom','zone'] }]},
 ];
 
 /* ══════════════════════════════════════════
-   DATA — WORD PRONUNCIATION 1
+   PHONEME WAV PLAYBACK
 ══════════════════════════════════════════ */
+const AUDIO_BASE = 'audio/';
+
+// Cache of Audio objects so repeated taps don't stack
+const _phonemeCache = {};
+
+function playPhonemeWav(filename, el) {
+  if (!filename) return;
+  const url = AUDIO_BASE + filename;
+  let audio = _phonemeCache[url];
+  if (!audio) {
+    audio = new Audio(url);
+    _phonemeCache[url] = audio;
+  }
+  audio.currentTime = 0;
+  if (el) {
+    el.classList.add('playing');
+    audio.onended = () => el.classList.remove('playing');
+    audio.onerror = () => {
+      el.classList.remove('playing');
+      // Graceful fallback: try TTS with the IPA label stripped to just the key word
+      // e.g. "æ as in bat.wav" → speak "bat"
+      const match = filename.match(/as in (\w+)/i);
+      if (match) speakRaw(match[1]);
+    };
+  }
+  audio.play().catch(() => {
+    if (el) el.classList.remove('playing');
+  });
+}
+
+/* ══════════════════════════════════════════
+   WP1 PHONEME MAP
+   All WP1 words are short-vowel CVC/CVCe patterns.
+   Returns array of { display, wav } tiles for a given word.
+══════════════════════════════════════════ */
+
+// Simple consonant → WAV (for WP1 context)
+const CONSONANT_WAV = {
+  b:'b.wav', c:'k.wav', d:'d.wav', f:'f.wav', g:'g.wav', h:'h.wav',
+  j:'dʒ as in jar.wav', k:'k.wav', l:'l.wav', m:'m.wav', n:'n.wav',
+  p:'p.wav', r:'r.wav', s:'s.wav', t:'t.wav', v:'v.wav', w:'w.wav',
+  x:'ks.wav', y:'j as in yam.wav', z:'z.wav'
+};
+
+// Short vowel → WAV (all WP1 vowels are short)
+const SHORT_VOWEL_WAV = {
+  a: 'æ as in bat.wav',
+  e: 'e as in bet.wav',
+  i: 'ɪ as in bit.wav',
+  o: 'ɒ as in pot.wav',
+  u: 'ʌ as in but.wav'
+};
+
+// Per-word overrides for any consonant that needs a non-default sound
+const WP1_OVERRIDE = {
+  // 'can' → c = k (already default), no overrides needed
+  // All WP1 words use standard short-vowel + hard consonant patterns
+};
+
+function getWp1Tiles(word) {
+  const tiles = [];
+  for (let i = 0; i < word.length; i++) {
+    const ch = word[i].toLowerCase();
+    const wav = WP1_OVERRIDE[word + '_' + i]
+      || SHORT_VOWEL_WAV[ch]
+      || CONSONANT_WAV[ch]
+      || null;
+    tiles.push({ display: word[i], wav });
+  }
+  return tiles;
+}
+
+/* ══════════════════════════════════════════
+   WP2 PHONEME TILE MAP
+   Each word → array of { display, wav, type }
+   type: 'beginning' | 'ending' | 'digraph' (controls tile colour)
+   Words are grouped into phoneme tiles (digraphs/vowel-teams = one tile).
+══════════════════════════════════════════ */
+const WP2_TILES = {
+  // ── CONSONANT DIGRAPHS ──────────────────
+  // sh
+  'ship':  [{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'shop':  [{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'fish':  [{d:'f',w:'f.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'sh',w:'ʃ as in she.wav',t:'ending'}],
+  'dish':  [{d:'d',w:'d.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'sh',w:'ʃ as in she.wav',t:'ending'}],
+  'shed':  [{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'shell': [{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
+  // ch
+  'chip':  [{d:'ch',w:'tʃ as in chair.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'chat':  [{d:'ch',w:'tʃ as in chair.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'much':  [{d:'m',w:'m.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'ch',w:'tʃ as in chair.wav',t:'ending'}],
+  'rich':  [{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ch',w:'tʃ as in chair.wav',t:'ending'}],
+  'chop':  [{d:'ch',w:'tʃ as in chair.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'chest': [{d:'ch',w:'tʃ as in chair.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'s',w:'s.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  // th (voiced)
+  'this':  [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'s',w:'s.wav',t:'ending'}],
+  'that':  [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'these': [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'e',w:'iː as in eat.wav',t:'beginning'},{d:'s',w:'z.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'those': [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'s',w:'z.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  // th (voiceless)
+  'thin':  [{d:'th',w:'θ as in thin.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'think': [{d:'th',w:'θ as in thin.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'k',w:'k.wav',t:'ending'}],
+  'bath':  [{d:'b',w:'b.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'th',w:'θ as in thin.wav',t:'ending'}],
+  'teeth': [{d:'t',w:'t.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'beginning'},{d:'th',w:'θ as in thin.wav',t:'ending'}],
+  // wh
+  'when':  [{d:'wh',w:'w.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'what':  [{d:'wh',w:'w.wav',t:'beginning'},{d:'a',w:'ɒ as in pot.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'why':   [{d:'wh',w:'w.wav',t:'beginning'},{d:'y',w:'aɪ as in ice.wav',t:'ending'}],
+  'where': [{d:'wh',w:'w.wav',t:'beginning'},{d:'ere',w:null,tts:'air',t:'ending'}],
+  // ph
+  'phone': [{d:'ph',w:'f.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'photo': [{d:'ph',w:'f.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'o',w:'əʊ as in boat.wav',t:'ending'}],
+  'graph': [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'ph',w:'f.wav',t:'ending'}],
+
+  // ── VOWEL PAIRS — LONG SOUNDS ──────────
+  // ee
+  'see':   [{d:'s',w:'s.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'ending'}],
+  'bee':   [{d:'b',w:'b.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'ending'}],
+  'feet':  [{d:'f',w:'f.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  // ea (long ee sound)
+  'eat':   [{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'team':  [{d:'t',w:'t.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'}],
+  'meat':  [{d:'m',w:'m.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'read':  [{d:'r',w:'r.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  // ai
+  'rain':  [{d:'r',w:'r.wav',t:'beginning'},{d:'ai',w:'eɪ as in bait.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'train': [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ai',w:'eɪ as in bait.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'}],
+  'mail':  [{d:'m',w:'m.wav',t:'beginning'},{d:'ai',w:'eɪ as in bait.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
+  'tail':  [{d:'t',w:'t.wav',t:'beginning'},{d:'ai',w:'eɪ as in bait.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
+  // ay
+  'day':   [{d:'d',w:'d.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'ending'}],
+  'play':  [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'ending'}],
+  'say':   [{d:'s',w:'s.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'ending'}],
+  'way':   [{d:'w',w:'w.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'ending'}],
+  // oa
+  'boat':  [{d:'b',w:'b.wav',t:'beginning'},{d:'oa',w:'əʊ as in boat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'coat':  [{d:'c',w:'k.wav',t:'beginning'},{d:'oa',w:'əʊ as in boat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'road':  [{d:'r',w:'r.wav',t:'beginning'},{d:'oa',w:'əʊ as in boat.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'soap':  [{d:'s',w:'s.wav',t:'beginning'},{d:'oa',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  // oe
+  'toe':   [{d:'t',w:'t.wav',t:'beginning'},{d:'oe',w:'əʊ as in boat.wav',t:'ending'}],
+  'goes':  [{d:'g',w:'g.wav',t:'beginning'},{d:'oe',w:'əʊ as in boat.wav',t:'beginning'},{d:'s',w:'z.wav',t:'ending'}],
+  'toes':  [{d:'t',w:'t.wav',t:'beginning'},{d:'oe',w:'əʊ as in boat.wav',t:'beginning'},{d:'s',w:'z.wav',t:'ending'}],
+  'hoe':   [{d:'h',w:'h.wav',t:'beginning'},{d:'oe',w:'əʊ as in boat.wav',t:'ending'}],
+  // ie
+  'pie':   [{d:'p',w:'p.wav',t:'beginning'},{d:'ie',w:'aɪ as in ice.wav',t:'ending'}],
+  'tie':   [{d:'t',w:'t.wav',t:'beginning'},{d:'ie',w:'aɪ as in ice.wav',t:'ending'}],
+  'lie':   [{d:'l',w:'l.wav',t:'beginning'},{d:'ie',w:'aɪ as in ice.wav',t:'ending'}],
+  'die':   [{d:'d',w:'d.wav',t:'beginning'},{d:'ie',w:'aɪ as in ice.wav',t:'ending'}],
+  // ue
+  'blue':  [{d:'b',w:'b.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
+  'glue':  [{d:'g',w:'g.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
+  'true':  [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
+  'clue':  [{d:'c',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ue',w:'uː as in pool.wav',t:'ending'}],
+
+  // ── VOWEL PAIRS — OTHER SOUNDS ─────────
+  // oo (long /uː/)
+  'moon':  [{d:'m',w:'m.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'food':  [{d:'f',w:'f.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'soon':  [{d:'s',w:'s.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'pool':  [{d:'p',w:'p.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
+  'cool':  [{d:'c',w:'k.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
+  'roof':  [{d:'r',w:'r.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'beginning'},{d:'f',w:'f.wav',t:'ending'}],
+  // oo (short /ʊ/)
+  'book':  [{d:'b',w:'b.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'}],
+  'look':  [{d:'l',w:'l.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'}],
+  'cook':  [{d:'c',w:'k.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'}],
+  'foot':  [{d:'f',w:'f.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'good':  [{d:'g',w:'g.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'wood':  [{d:'w',w:'w.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  // ou (aʊ sound)
+  'out':   [{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
+  'loud':  [{d:'l',w:'l.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
+  'sound': [{d:'s',w:'s.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
+  'found': [{d:'f',w:'f.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
+  'mouth': [{d:'m',w:'m.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'th',w:'θ as in thin.wav',t:'ending'}],
+  'count': [{d:'c',w:'k.wav',t:'beginning'},{d:'ou',w:'aʊ as in out.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  // ou — silent l words
+  'could': [{d:'c',w:'k.wav',t:'beginning'},{d:'ou',w:'ʊ as in book.wav',t:'beginning'},{d:'l',w:null,t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
+  'would': [{d:'w',w:'w.wav',t:'beginning'},{d:'ou',w:'ʊ as in book.wav',t:'beginning'},{d:'l',w:null,t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
+  'should':[{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'ou',w:'ʊ as in book.wav',t:'beginning'},{d:'l',w:null,t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
+  'your':  [{d:'y',w:'j as in yam.wav',t:'beginning'},{d:'our',w:'ɔː as in storm.wav',t:'ending'}],
+  'four':  [{d:'f',w:'f.wav',t:'beginning'},{d:'our',w:'ɔː as in storm.wav',t:'ending'}],
+  'pour':  [{d:'p',w:'p.wav',t:'beginning'},{d:'our',w:'ɔː as in storm.wav',t:'ending'}],
+  // ow (aʊ)
+  'cow':   [{d:'c',w:'k.wav',t:'beginning'},{d:'ow',w:'aʊ as in out.wav',t:'ending'}],
+  'now':   [{d:'n',w:'n.wav',t:'beginning'},{d:'ow',w:'aʊ as in out.wav',t:'ending'}],
+  // ow (əʊ)
+  'snow':  [{d:'s',w:'s.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
+  'low':   [{d:'l',w:'l.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
+  // oi
+  'coin':  [{d:'c',w:'k.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'join':  [{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  'boil':  [{d:'b',w:'b.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
+  'soil':  [{d:'s',w:'s.wav',t:'beginning'},{d:'oi',w:'ɔɪ as in boil.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
+  // oy
+  'boy':   [{d:'b',w:'b.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
+  'toy':   [{d:'t',w:'t.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
+  'enjoy': [{d:'e',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
+  'annoy': [{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'nn',w:'n.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
+  // au
+  'author':[{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'th',w:'θ as in thin.wav',t:'beginning'},{d:'e',w:'ɜː as in work.wav',t:'ending'},{d:'r',w:'r.wav',t:'ending'}],
+  'August':[{d:'Au',w:'ɔː as in storm.wav',t:'beginning'},{d:'g',w:'g.wav',t:'ending'},{d:'u',w:'ʌ as in but.wav',t:'ending'},{d:'s',w:'s.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  'auto':  [{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'o',w:'əʊ as in boat.wav',t:'ending'}],
+  'haul':  [{d:'h',w:'h.wav',t:'beginning'},{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'l',w:'l.wav',t:'ending'}],
+  // aw
+  'saw':   [{d:'s',w:'s.wav',t:'beginning'},{d:'aw',w:'ɔː as in storm.wav',t:'ending'}],
+  'law':   [{d:'l',w:'l.wav',t:'beginning'},{d:'aw',w:'ɔː as in storm.wav',t:'ending'}],
+  'paw':   [{d:'p',w:'p.wav',t:'beginning'},{d:'aw',w:'ɔː as in storm.wav',t:'ending'}],
+  'draw':  [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'aw',w:'ɔː as in storm.wav',t:'ending'}],
+
+  // ── SILENT E ───────────────────────────
+  'cake':  [{d:'c',w:'k.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'make':  [{d:'m',w:'m.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'take':  [{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'lake':  [{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'k',w:'k.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'late':  [{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'mate':  [{d:'m',w:'m.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'gate':  [{d:'g',w:'g.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'hate':  [{d:'h',w:'h.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'fine':  [{d:'f',w:'f.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'line':  [{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'mine':  [{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'nine':  [{d:'n',w:'n.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'hope':  [{d:'h',w:'h.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'rope':  [{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'cope':  [{d:'c',w:'k.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'nope':  [{d:'n',w:'n.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'cute':  [{d:'c',w:'k.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'mute':  [{d:'m',w:'m.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'tube':  [{d:'t',w:'t.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'cube':  [{d:'c',w:'k.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'ride':  [{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'side':  [{d:'s',w:'s.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'hide':  [{d:'h',w:'h.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'wide':  [{d:'w',w:'w.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'game':  [{d:'g',w:'g.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'name':  [{d:'n',w:'n.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'same':  [{d:'s',w:'s.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'came':  [{d:'c',w:'k.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'more':  [{d:'m',w:'m.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
+  'core':  [{d:'c',w:'k.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
+  'sore':  [{d:'s',w:'s.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
+  'bore':  [{d:'b',w:'b.wav',t:'beginning'},{d:'or',w:'ɔː as in storm.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
+  'slide': [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'ending'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+
+  // ── BEGINNING BLENDS ───────────────────
+  // Blend consonants = 'beginning', vowel and everything after = 'ending'
+  // st
+  'stop':  [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
+  'step':  [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
+  'stand': [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
+  'stick': [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ck',w:'k.wav',t:'ending'}],
+  // bl
+  'black': [{d:'b',w:'b.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'ck',w:'k.wav',t:'ending'}],
+  'block': [{d:'b',w:'b.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'ending'},{d:'ck',w:'k.wav',t:'ending'}],
+  'blow':  [{d:'b',w:'b.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
+  // tr
+  'tree':  [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'ending'}],
+  'truck': [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'ending'},{d:'ck',w:'k.wav',t:'ending'}],
+  'trip':  [{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
+  // dr
+  'drop':  [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
+  'drum':  [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'ending'},{d:'m',w:'m.wav',t:'ending'}],
+  'dress': [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'ending'},{d:'ss',w:'s.wav',t:'ending'}],
+  'drink': [{d:'d',w:'d.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'},{d:'k',w:'k.wav',t:'ending'}],
+  // cl
+  'class': [{d:'c',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'ss',w:'s.wav',t:'ending'}],
+  'clap':  [{d:'c',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
+  'clock': [{d:'c',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'ending'},{d:'ck',w:'k.wav',t:'ending'}],
+  'clean': [{d:'c',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'}],
+  // fl
+  'flag':  [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'g',w:'g.wav',t:'ending'}],
+  'flat':  [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  'flip':  [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
+  'fly':   [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'y',w:'aɪ as in ice.wav',t:'ending'}],
+  // gr
+  'green': [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'}],
+  'grab':  [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'b',w:'b.wav',t:'ending'}],
+  'grow':  [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
+  'great': [{d:'g',w:'g.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ea',w:'eɪ as in bait.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  // pl
+  'plan':  [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'}],
+  'plant': [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  'please':[{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'ending'},{d:'s',w:'z.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  // br
+  'brown': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ow',w:'aʊ as in out.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'}],
+  'bring': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
+  'bread': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'ea',w:'e as in bet.wav',t:'ending'},{d:'d',w:'d.wav',t:'ending'}],
+  'brush': [{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'ending'},{d:'sh',w:'ʃ as in she.wav',t:'ending'}],
+  // cr
+  'crab':  [{d:'c',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'b',w:'b.wav',t:'ending'}],
+  'cry':   [{d:'c',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'y',w:'aɪ as in ice.wav',t:'ending'}],
+  'crop':  [{d:'c',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
+  'cross': [{d:'c',w:'k.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'ending'},{d:'ss',w:'s.wav',t:'ending'}],
+  // sl
+  'slip':  [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
+  'slow':  [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ow',w:'əʊ as in boat.wav',t:'ending'}],
+  'sleep': [{d:'s',w:'s.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ee',w:'iː as in eat.wav',t:'ending'},{d:'p',w:'p.wav',t:'ending'}],
+  // sp
+  'spin':  [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'}],
+  'spot':  [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  'speak': [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ea',w:'iː as in eat.wav',t:'ending'},{d:'k',w:'k.wav',t:'ending'}],
+  'spoon': [{d:'s',w:'s.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'oo',w:'uː as in pool.wav',t:'ending'},{d:'n',w:'n.wav',t:'ending'}],
+
+  // ── COMMON ENDINGS ─────────────────────
+  'back':  [{d:'b',w:'b.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
+  'duck':  [{d:'d',w:'d.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
+  'pick':  [{d:'p',w:'p.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
+  'rock':  [{d:'r',w:'r.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ck',w:'k.wav',t:'ending'}],
+  'ball':  [{d:'b',w:'b.wav',t:'beginning'},{d:'a',w:'ɔː as in storm.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
+  'bell':  [{d:'b',w:'b.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
+  'fill':  [{d:'f',w:'f.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
+  'doll':  [{d:'d',w:'d.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
+  'off':   [{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'ff',w:'f.wav',t:'ending'}],
+  'puff':  [{d:'p',w:'p.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'ff',w:'f.wav',t:'ending'}],
+  'cliff': [{d:'c',w:'k.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ff',w:'f.wav',t:'ending'}],
+  'staff': [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'ending'},{d:'ff',w:'f.wav',t:'ending'}],
+  'miss':  [{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ss',w:'s.wav',t:'ending'}],
+  'pass':  [{d:'p',w:'p.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ss',w:'s.wav',t:'ending'}],
+  'bus':   [{d:'b',w:'b.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'s',w:'s.wav',t:'ending'}],
+  'buzz':  [{d:'b',w:'b.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
+  'jazz':  [{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
+  'fizz':  [{d:'f',w:'f.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
+  'fuzz':  [{d:'f',w:'f.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'zz',w:'z.wav',t:'ending'}],
+  'catch': [{d:'c',w:'k.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
+  'match': [{d:'m',w:'m.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
+  'watch': [{d:'w',w:'w.wav',t:'beginning'},{d:'a',w:'ɒ as in pot.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
+  'pitch': [{d:'p',w:'p.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'tch',w:'tʃ as in chair.wav',t:'ending'}],
+  'bridge':[{d:'b',w:'b.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
+  'edge':  [{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
+  'badge': [{d:'b',w:'b.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
+  'judge': [{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'dge',w:'dʒ as in jar.wav',t:'ending'}],
+  // -ed endings
+  'jumped':  [{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'m',w:'m.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ed',w:null,tts:'t',t:'ending'}],
+  'played':  [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'beginning'},{d:'ed',w:null,tts:'d',t:'ending'}],
+  'looked':  [{d:'l',w:'l.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'beginning'},{d:'ed',w:null,tts:'t',t:'ending'}],
+  'helped':  [{d:'h',w:'h.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ed',w:null,tts:'t',t:'ending'}],
+  // -ing endings: i + ng (two phoneme tiles)
+  'going':   [{d:'g',w:'g.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
+  'playing': [{d:'p',w:'p.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ay',w:'eɪ as in bait.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
+  'looking': [{d:'l',w:'l.wav',t:'beginning'},{d:'oo',w:'ʊ as in book.wav',t:'beginning'},{d:'k',w:'k.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
+  'eating':  [{d:'ea',w:'iː as in eat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'ending'},{d:'ng',w:'ŋ as in sing.wav',t:'ending'}],
+  // -tion / -sion / -cian / -ture (suffix = one TTS tile)
+  'elephant':   [{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'e',w:'ɪ as in bit.wav',t:'beginning'},{d:'ph',w:'f.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'t',w:'t.wav',t:'ending'}],
+  'nation':     [{d:'n',w:'n.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'tion',w:null,tts:'shen',t:'ending'}],
+  'station':    [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'tion',w:null,tts:'shen',t:'ending'}],
+  'action':     [{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'c',w:'k.wav',t:'beginning'},{d:'tion',w:null,tts:'shen',t:'ending'}],
+  'mention':    [{d:'m',w:'m.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'tion',w:null,tts:'shen',t:'ending'}],
+  'motion':     [{d:'m',w:'m.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'tion',w:null,tts:'shen',t:'ending'}],
+  'section':    [{d:'s',w:'s.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'c',w:'k.wav',t:'beginning'},{d:'tion',w:null,tts:'shen',t:'ending'}],
+  'mission':    [{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ssion',w:null,tts:'shen',t:'ending'}],
+  'session':    [{d:'s',w:'s.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'ssion',w:null,tts:'shen',t:'ending'}],
+  'passion':    [{d:'p',w:'p.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ssion',w:null,tts:'shen',t:'ending'}],
+  'tension':    [{d:'t',w:'t.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'sion',w:null,tts:'shen',t:'ending'}],
+  'vision':     [{d:'v',w:'v.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'sion',w:null,tts:'zhen',t:'ending'}],
+  'division':   [{d:'d',w:'d.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'v',w:'v.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'sion',w:null,tts:'zhen',t:'ending'}],
+  'musician':   [{d:'m',w:'m.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'s',w:'z.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'cian',w:null,tts:'shen',t:'ending'}],
+  'magician':   [{d:'m',w:'m.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'g',w:'dʒ as in jar.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'cian',w:null,tts:'shen',t:'ending'}],
+  'technician': [{d:'t',w:'t.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'ch',w:'k.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'cian',w:null,tts:'shen',t:'ending'}],
+  'politician': [{d:'p',w:'p.wav',t:'beginning'},{d:'o',w:'ɒ as in pot.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'cian',w:null,tts:'shen',t:'ending'}],
+  'physician':  [{d:'ph',w:'f.wav',t:'beginning'},{d:'y',w:'ɪ as in bit.wav',t:'beginning'},{d:'s',w:'z.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'cian',w:null,tts:'shen',t:'ending'}],
+  'picture':    [{d:'p',w:'p.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'c',w:'k.wav',t:'beginning'},{d:'ture',w:null,tts:'chur',t:'ending'}],
+  'nature':     [{d:'n',w:'n.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'ture',w:null,tts:'chur',t:'ending'}],
+  'future':     [{d:'f',w:'f.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'ture',w:null,tts:'chur',t:'ending'}],
+  'culture':    [{d:'c',w:'k.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ture',w:null,tts:'chur',t:'ending'}],
+  'mixture':    [{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'x',w:'ks.wav',t:'beginning'},{d:'ture',w:null,tts:'chur',t:'ending'}],
+  'capture':    [{d:'c',w:'k.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ture',w:null,tts:'chur',t:'ending'}],
+};
+function getWp2Tiles(word) {
+  return WP2_TILES[word] || null;
+}
 const wp1Families = [
   { ending:'an', words:['man','can','pan','ran','fan','tan','van'] },
   { ending:'at', words:['cat','bat','hat','mat','rat','sat','pat'] },
@@ -1402,68 +1840,68 @@ const wp1Families = [
 ══════════════════════════════════════════ */
 const wp2Families = [
   // 1. Consonant digraphs
-  { cat:'Consonant pairs  (two letters, one sound)', ending:'sh', words:['ship','shop','fish','dish','shed','shell'], mode:'whole', patternHint:'<strong>sh</strong> makes one sound — like a quiet "shh". You can hear it at the start or end of a word.' },
-  { cat:'Consonant pairs  (two letters, one sound)', ending:'ch', words:['chip','chat','much','rich','chop','chest'], mode:'whole', patternHint:'<strong>ch</strong> makes one sound — like in <em>chip</em>. It can come at the start or end of a word.' },
-  { cat:'Consonant pairs  (two letters, one sound)', ending:'th', words:['this','that','these','those'], mode:'whole', patternHint:'This <strong>th</strong> uses your voice — put your finger on your throat and feel it buzz. Try: <em>this… that…</em>' },
-  { cat:'Consonant pairs  (two letters, one sound)', ending:'th', words:['thin','think','bath','teeth'], mode:'whole', patternHint:'This <strong>th</strong> uses only air — no voice. Put your tongue between your teeth and blow. Try: <em>thin… think…</em>' },
-  { cat:'Consonant pairs  (two letters, one sound)', ending:'wh', words:['when','what','why','where'], mode:'whole', patternHint:'<strong>wh</strong> usually makes a "w" sound — like in <em>when</em> and <em>what</em>.' },
-  { cat:'Consonant pairs  (two letters, one sound)', ending:'ph', words:['phone','photo','graph','elephant'], mode:'whole', patternHint:'<strong>ph</strong> makes an "f" sound — like in <em>phone</em>. It comes from Greek words.' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'sh', focus:['sh'], words:['ship','shop','fish','dish','shed','shell'], mode:'whole', patternHint:'<strong>sh</strong> makes one sound — like a quiet "shh". You can hear it at the start or end of a word.' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'ch', focus:['ch'], words:['chip','chat','much','rich','chop','chest'], mode:'whole', patternHint:'<strong>ch</strong> makes one sound — like in <em>chip</em>. It can come at the start or end of a word.' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'th', focus:['th'], words:['this','that','these','those'], mode:'whole', patternHint:'This <strong>th</strong> uses your voice — put your finger on your throat and feel it buzz. Try: <em>this… that…</em>' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'th', focus:['th'], words:['thin','think','bath','teeth'], mode:'whole', patternHint:'This <strong>th</strong> uses only air — no voice. Put your tongue between your teeth and blow. Try: <em>thin… think…</em>' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'wh', focus:['wh'], words:['when','what','why','where'], mode:'whole', patternHint:'<strong>wh</strong> usually makes a "w" sound — like in <em>when</em> and <em>what</em>.' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'ph', focus:['ph'], words:['phone','photo','graph','elephant'], mode:'whole', patternHint:'<strong>ph</strong> makes an "f" sound — like in <em>phone</em>. It comes from Greek words.' },
   // 2a. Long vowel pairs
-  { cat:'Vowel pairs — long sounds', ending:'ee', words:['see','tree','bee','feet'], mode:'whole', patternHint:'<strong>ee</strong> makes a long "ee" sound — like in <em>see</em>.' },
-  { cat:'Vowel pairs — long sounds', ending:'ea', words:['eat','team','meat','read'], mode:'whole', patternHint:'<strong>ea</strong> makes a long "ee" sound — like in <em>eat</em>.' },
-  { cat:'Vowel pairs — long sounds', ending:'ai', words:['rain','train','mail','tail'], mode:'whole', patternHint:'<strong>ai</strong> makes a long "ay" sound — like in <em>rain</em>.' },
-  { cat:'Vowel pairs — long sounds', ending:'ay', words:['day','play','say','way'], mode:'whole', patternHint:'<strong>ay</strong> makes a long "ay" sound — like in <em>day</em>.' },
-  { cat:'Vowel pairs — long sounds', ending:'oa', words:['boat','coat','road','soap'], mode:'whole', patternHint:'<strong>oa</strong> makes a long "oh" sound — like in <em>boat</em>.' },
-  { cat:'Vowel pairs — long sounds', ending:'oe', words:['toe','goes','toes','hoe'], mode:'whole', patternHint:'<strong>oe</strong> makes a long "oh" sound — like in <em>toe</em>.' },
-  { cat:'Vowel pairs — long sounds', ending:'ie', words:['pie','tie','lie','die'], mode:'whole', patternHint:'<strong>ie</strong> makes a long "eye" sound — like in <em>pie</em>.' },
-  { cat:'Vowel pairs — long sounds', ending:'ue', words:['blue','glue','true','clue'], mode:'whole', patternHint:'<strong>ue</strong> makes a long "oo" or "you" sound — like in <em>blue</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ee', focus:['ee'], words:['see','tree','bee','feet'], mode:'whole', patternHint:'<strong>ee</strong> makes a long "ee" sound — like in <em>see</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ea', focus:['ea'], words:['eat','team','meat','read'], mode:'whole', patternHint:'<strong>ea</strong> makes a long "ee" sound — like in <em>eat</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ai', focus:['ai'], words:['rain','train','mail','tail'], mode:'whole', patternHint:'<strong>ai</strong> makes a long "ay" sound — like in <em>rain</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ay', focus:['ay'], words:['day','play','say','way'], mode:'whole', patternHint:'<strong>ay</strong> makes a long "ay" sound — like in <em>day</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'oa', focus:['oa'], words:['boat','coat','road','soap'], mode:'whole', patternHint:'<strong>oa</strong> makes a long "oh" sound — like in <em>boat</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'oe', focus:['oe'], words:['toe','goes','toes','hoe'], mode:'whole', patternHint:'<strong>oe</strong> makes a long "oh" sound — like in <em>toe</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ie', focus:['ie'], words:['pie','tie','lie','die'], mode:'whole', patternHint:'<strong>ie</strong> makes a long "eye" sound — like in <em>pie</em>.' },
+  { cat:'Vowel pairs — long sounds', ending:'ue', focus:['ue'], words:['blue','glue','true','clue'], mode:'whole', patternHint:'<strong>ue</strong> makes a long "oo" or "you" sound — like in <em>blue</em>.' },
   // 2b. Other vowel pairs
-  { cat:'Vowel pairs — other sounds', ending:'oo', words:['moon','food','soon','pool','cool','roof'], mode:'whole', patternHint:'<strong>oo</strong> here makes a long sound — like in <em>moon</em>. Say it with a long "oo".' },
-  { cat:'Vowel pairs — other sounds', ending:'oo', words:['book','look','cook','foot','good','wood'], mode:'whole', patternHint:'<strong>oo</strong> here makes a short sound — like in <em>book</em>. The lips round but the sound is shorter.' },
-  { cat:'Vowel pairs — other sounds', ending:'ou', words:['out','loud','sound','found','mouth','count'], mode:'whole', patternHint:'<strong>ou</strong> here makes an "ow" sound — like in <em>out</em>.' },
-  { cat:'Vowel pairs — other sounds', ending:'ou', words:['could','would','should','your','four','pour'], mode:'whole', patternHint:'<strong>ou</strong> here makes different sounds — "ood" in <em>could</em>, "or" in <em>four</em>. Listen carefully to each word.' },
-  { cat:'Vowel pairs — other sounds', ending:'ow', words:['cow','now','snow','low'], mode:'whole', patternHint:'<strong>ow</strong> can sound like "ow" in <em>cow</em>, or "oh" in <em>snow</em>. Both are common.' },
-  { cat:'Vowel pairs — other sounds', ending:'oi', words:['coin','join','boil','soil'], mode:'whole', patternHint:'<strong>oi</strong> makes an "oy" sound — like in <em>coin</em>.' },
-  { cat:'Vowel pairs — other sounds', ending:'oy', words:['boy','toy','enjoy','annoy'], mode:'whole', patternHint:'<strong>oy</strong> makes the same sound as <strong>oi</strong> — like in <em>boy</em>.' },
-  { cat:'Vowel pairs — other sounds', ending:'au', words:['author','August','auto','haul'], mode:'whole', patternHint:'<strong>au</strong> makes an "aw" sound — like in <em>author</em>.' },
-  { cat:'Vowel pairs — other sounds', ending:'aw', words:['saw','law','paw','draw'], mode:'whole', patternHint:'<strong>aw</strong> makes the same sound as <strong>au</strong> — like in <em>saw</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'oo', focus:['oo'], words:['moon','food','soon','pool','cool','roof'], mode:'whole', patternHint:'<strong>oo</strong> here makes a long sound — like in <em>moon</em>. Say it with a long "oo".' },
+  { cat:'Vowel pairs — other sounds', ending:'oo', focus:['oo'], words:['book','look','cook','foot','good','wood'], mode:'whole', patternHint:'<strong>oo</strong> here makes a short sound — like in <em>book</em>. The lips round but the sound is shorter.' },
+  { cat:'Vowel pairs — other sounds', ending:'ou', focus:['ou'], words:['out','loud','sound','found','mouth','count'], mode:'whole', patternHint:'<strong>ou</strong> here makes an "ow" sound — like in <em>out</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'ou', focus:['ou'], words:['could','would','should','your','four','pour'], mode:'whole', patternHint:'<strong>ou</strong> here makes different sounds — "ood" in <em>could</em>, "or" in <em>four</em>. Listen carefully to each word.' },
+  { cat:'Vowel pairs — other sounds', ending:'ow', focus:['ow'], words:['cow','now','snow','low'], mode:'whole', patternHint:'<strong>ow</strong> can sound like "ow" in <em>cow</em>, or "oh" in <em>snow</em>. Both are common.' },
+  { cat:'Vowel pairs — other sounds', ending:'oi', focus:['oi'], words:['coin','join','boil','soil'], mode:'whole', patternHint:'<strong>oi</strong> makes an "oy" sound — like in <em>coin</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'oy', focus:['oy'], words:['boy','toy','enjoy','annoy'], mode:'whole', patternHint:'<strong>oy</strong> makes the same sound as <strong>oi</strong> — like in <em>boy</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'au', focus:['au'], words:['author','August','auto','haul'], mode:'whole', patternHint:'<strong>au</strong> makes an "aw" sound — like in <em>author</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'aw', focus:['aw'], words:['saw','law','paw','draw'], mode:'whole', patternHint:'<strong>aw</strong> makes the same sound as <strong>au</strong> — like in <em>saw</em>.' },
   // 3. Silent e
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ake', words:['cake','make','take','lake'], mode:'split', splitAt:1 },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ate', words:['late','mate','gate','hate'], mode:'split', splitAt:1 },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ine', words:['fine','line','mine','nine'], mode:'split', splitAt:1 },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ope', words:['hope','rope','cope','nope'], mode:'split', splitAt:1 },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ute', words:['cute','mute','tube','cube'], mode:'split', splitAt:1 },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ide', words:['ride','side','hide','wide'], mode:'split', splitAt:1 },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ame', words:['game','name','same','came'], mode:'split', splitAt:1 },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ore', words:['more','core','sore','bore'], mode:'split', splitAt:1 },
-  // 4. Beginning blends
-  { cat:'Beginning blends  (both sounds heard)', ending:'st', words:['stop','step','stand','stick'], mode:'whole', patternHint:'<strong>st</strong> = s + t. Both sounds are heard. Try slowly: <em>s… t… stop.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'bl', words:['black','blue','block','blow'],  mode:'whole', patternHint:'<strong>bl</strong> = b + l. Try slowly: <em>b… l… black.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'tr', words:['tree','train','truck','trip'],  mode:'whole', patternHint:'<strong>tr</strong> = t + r. Try slowly: <em>t… r… tree.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'dr', words:['drop','drum','dress','drink'], mode:'whole', patternHint:'<strong>dr</strong> = d + r. Try slowly: <em>d… r… drop.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'cl', words:['class','clap','clock','clean'], mode:'whole', patternHint:'<strong>cl</strong> = c + l. Try slowly: <em>c… l… class.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'fl', words:['flag','flat','flip','fly'],    mode:'whole', patternHint:'<strong>fl</strong> = f + l. Try slowly: <em>f… l… flag.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'gr', words:['green','grab','grow','great'], mode:'whole', patternHint:'<strong>gr</strong> = g + r. Try slowly: <em>g… r… green.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'pl', words:['play','plan','plant','please'],mode:'whole', patternHint:'<strong>pl</strong> = p + l. Try slowly: <em>p… l… play.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'br', words:['brown','bring','bread','brush'],mode:'whole', patternHint:'<strong>br</strong> = b + r. Try slowly: <em>b… r… brown.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'cr', words:['crab','cry','crop','cross'],   mode:'whole', patternHint:'<strong>cr</strong> = c + r. Try slowly: <em>c… r… crab.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'sl', words:['slip','slow','sleep','slide'], mode:'whole', patternHint:'<strong>sl</strong> = s + l. Try slowly: <em>s… l… slip.</em>' },
-  { cat:'Beginning blends  (both sounds heard)', ending:'sp', words:['spin','spot','speak','spoon'], mode:'whole', patternHint:'<strong>sp</strong> = s + p. Try slowly: <em>s… p… spin.</em>' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ake', focus:['e'], words:['cake','make','take','lake'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ate', focus:['e'], words:['late','mate','gate','hate'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ine', focus:['e'], words:['fine','line','mine','nine'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ope', focus:['e'], words:['hope','rope','cope','nope'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ute', focus:['e'], words:['cute','mute','tube','cube'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ide', focus:['e'], words:['ride','side','hide','wide'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ame', focus:['e'], words:['game','name','same','came'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ore', focus:['e'], words:['more','core','sore','bore'], mode:'whole' },
+  // 4. Beginning blends — focus = the two blend consonants as separate tiles
+  { cat:'Beginning blends  (both sounds heard)', ending:'st', focus:['s','t'], words:['stop','step','stand','stick'], mode:'whole', patternHint:'<strong>st</strong> = s + t. Both sounds are heard. Try slowly: <em>s… t… stop.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'bl', focus:['b','l'], words:['black','blue','block','blow'],  mode:'whole', patternHint:'<strong>bl</strong> = b + l. Try slowly: <em>b… l… black.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'tr', focus:['t','r'], words:['tree','train','truck','trip'],  mode:'whole', patternHint:'<strong>tr</strong> = t + r. Try slowly: <em>t… r… tree.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'dr', focus:['d','r'], words:['drop','drum','dress','drink'], mode:'whole', patternHint:'<strong>dr</strong> = d + r. Try slowly: <em>d… r… drop.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'cl', focus:['c','l'], words:['class','clap','clock','clean'], mode:'whole', patternHint:'<strong>cl</strong> = c + l. Try slowly: <em>c… l… class.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'fl', focus:['f','l'], words:['flag','flat','flip','fly'],    mode:'whole', patternHint:'<strong>fl</strong> = f + l. Try slowly: <em>f… l… flag.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'gr', focus:['g','r'], words:['green','grab','grow','great'], mode:'whole', patternHint:'<strong>gr</strong> = g + r. Try slowly: <em>g… r… green.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'pl', focus:['p','l'], words:['play','plan','plant','please'],mode:'whole', patternHint:'<strong>pl</strong> = p + l. Try slowly: <em>p… l… play.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'br', focus:['b','r'], words:['brown','bring','bread','brush'],mode:'whole', patternHint:'<strong>br</strong> = b + r. Try slowly: <em>b… r… brown.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'cr', focus:['c','r'], words:['crab','cry','crop','cross'],   mode:'whole', patternHint:'<strong>cr</strong> = c + r. Try slowly: <em>c… r… crab.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'sl', focus:['s','l'], words:['slip','slow','sleep','slide'], mode:'whole', patternHint:'<strong>sl</strong> = s + l. Try slowly: <em>s… l… slip.</em>' },
+  { cat:'Beginning blends  (both sounds heard)', ending:'sp', focus:['s','p'], words:['spin','spot','speak','spoon'], mode:'whole', patternHint:'<strong>sp</strong> = s + p. Try slowly: <em>s… p… spin.</em>' },
   // 5. Common endings
-  { cat:'Common endings', ending:'ck',  words:['back','duck','pick','rock'],      mode:'whole', patternHint:'<strong>ck</strong> makes a "k" sound. The two letters work as one.' },
-  { cat:'Common endings', ending:'ll',  words:['ball','bell','fill','doll'],      mode:'whole', patternHint:'<strong>ll</strong> makes a single "l" sound.' },
-  { cat:'Common endings', ending:'ff',  words:['off','puff','cliff','staff'],     mode:'whole', patternHint:'<strong>ff</strong> makes a single "f" sound.' },
-  { cat:'Common endings', ending:'ss',  words:['miss','pass','bus','dress'],      mode:'whole', patternHint:'<strong>ss</strong> makes a single "s" sound.' },
-  { cat:'Common endings', ending:'zz',  words:['buzz','jazz','fizz','fuzz'],      mode:'whole', patternHint:'<strong>zz</strong> makes a single "z" sound.' },
-  { cat:'Common endings', ending:'tch', words:['catch','match','watch','pitch'],  mode:'whole', patternHint:'<strong>tch</strong> makes a "ch" sound — like in <em>catch</em>. It always comes after a short vowel.' },
-  { cat:'Common endings', ending:'dge', words:['bridge','edge','badge','judge'],  mode:'whole', patternHint:'<strong>dge</strong> makes a "j" sound — like in <em>bridge</em>. It always comes after a short vowel.' },
-  { cat:'Common endings', ending:'ed',  words:['jumped','played','looked','helped'], mode:'whole', patternHint:'<strong>ed</strong> at the end can sound like "d" (played), "t" (looked), or "id" (wanted).' },
-  { cat:'Common endings', ending:'ing', words:['going','playing','looking','eating'], mode:'whole', patternHint:'<strong>ing</strong> is added to verbs to show something is happening now.' },
+  { cat:'Common endings', ending:'ck',  focus:['ck'],  words:['back','duck','pick','rock'],      mode:'whole', patternHint:'<strong>ck</strong> makes a "k" sound. The two letters work as one.' },
+  { cat:'Common endings', ending:'ll',  focus:['ll'],  words:['ball','bell','fill','doll'],      mode:'whole', patternHint:'<strong>ll</strong> makes a single "l" sound.' },
+  { cat:'Common endings', ending:'ff',  focus:['ff'],  words:['off','puff','cliff','staff'],     mode:'whole', patternHint:'<strong>ff</strong> makes a single "f" sound.' },
+  { cat:'Common endings', ending:'ss',  focus:['ss'],  words:['miss','pass','bus','dress'],      mode:'whole', patternHint:'<strong>ss</strong> makes a single "s" sound.' },
+  { cat:'Common endings', ending:'zz',  focus:['zz'],  words:['buzz','jazz','fizz','fuzz'],      mode:'whole', patternHint:'<strong>zz</strong> makes a single "z" sound.' },
+  { cat:'Common endings', ending:'tch', focus:['tch'], words:['catch','match','watch','pitch'],  mode:'whole', patternHint:'<strong>tch</strong> makes a "ch" sound — like in <em>catch</em>. It always comes after a short vowel.' },
+  { cat:'Common endings', ending:'dge', focus:['dge'], words:['bridge','edge','badge','judge'],  mode:'whole', patternHint:'<strong>dge</strong> makes a "j" sound — like in <em>bridge</em>. It always comes after a short vowel.' },
+  { cat:'Common endings', ending:'ed',  focus:['ed'],  words:['jumped','played','looked','helped'], mode:'whole', patternHint:'<strong>ed</strong> at the end can sound like "d" (played), "t" (looked), or "id" (wanted).' },
+  { cat:'Common endings', ending:'ing', focus:['i','ng'], words:['going','playing','looking','eating'], mode:'whole', patternHint:'<strong>ing</strong> is added to verbs to show something is happening now.' },
   // 6. Word endings — sounds like "shun" / "cher"
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'tion', words:['nation','station','action','mention','motion','section'], mode:'whole', patternHint:'<strong>tion</strong> sounds like "shun" — like in <em>nation</em>. It is one of the most common word endings in English.' },
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'sion', words:['mission','session','passion','tension','vision','division'], mode:'whole', patternHint:'<strong>sion</strong> can sound like "shun" (mission) or "zhun" (vision). Listen carefully to each word.' },
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'cian', words:['musician','magician','technician','politician','physician'], mode:'whole', patternHint:'<strong>cian</strong> sounds like "shun" — like in <em>musician</em>. It usually refers to a person with a skill.' },
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'ture', words:['picture','nature','future','culture','mixture','capture'], mode:'whole', patternHint:'<strong>ture</strong> sounds like "cher" — like in <em>picture</em>. Say it as one quick sound: "p-ik-cher".' },
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'tion',  focus:['tion'],  words:['nation','station','action','mention','motion','section'], mode:'whole', patternHint:'<strong>tion</strong> sounds like "shun" — like in <em>nation</em>. It is one of the most common word endings in English.' },
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'sion',  focus:['sion','ssion'],  words:['mission','session','passion','tension','vision','division'], mode:'whole', patternHint:'<strong>sion</strong> can sound like "shun" (mission) or "zhun" (vision). Listen carefully to each word.' },
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'cian',  focus:['cian'],  words:['musician','magician','technician','politician','physician'], mode:'whole', patternHint:'<strong>cian</strong> sounds like "shun" — like in <em>musician</em>. It usually refers to a person with a skill.' },
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'ture',  focus:['ture'],  words:['picture','nature','future','culture','mixture','capture'], mode:'whole', patternHint:'<strong>ture</strong> sounds like "cher" — like in <em>picture</em>. Say it as one quick sound: "p-ik-cher".' },
 ];
 
 /* ══════════════════════════════════════════
@@ -1473,8 +1911,8 @@ const wpState = {
   wp1: { familyIdx:0, wordIdx:0, seen:new Set() },
   wp2: { familyIdx:0, wordIdx:0, seen:new Set() },
 };
-let speechRate = 0.6;
-var sentenceRate = 0.6;
+let speechRate = 0.5;
+var sentenceRate = 0.5;
 
 /* ══════════════════════════════════════════
    VOICE SELECTION
@@ -1544,7 +1982,7 @@ function buildNameGrid() {
     card.onclick = () => {
       document.querySelectorAll('.alpha-card').forEach(c => c.classList.remove('playing'));
       card.classList.add('playing');
-      speakRaw(item.name, () => card.classList.remove('playing'));
+      speakRaw(item.name, () => card.classList.remove('playing'), 0.7);
     };
     grid.appendChild(card);
   });
@@ -1574,7 +2012,7 @@ function buildSoundsSection() {
 
     const descEl = document.createElement('div');
     descEl.className = 'letter-block-desc';
-    descEl.innerHTML = `<h3>${entry.l} — ${entry.vowel ? 'Vowel' : 'Consonant'}</h3><p>Tap the letter to hear its name. Tap a word to hear it spoken.</p>`;
+    descEl.innerHTML = `<h3>${entry.l} — ${entry.vowel ? 'Vowel' : 'Consonant'}</h3><p>Tap the letter to hear its sound. Tap a word to hear it spoken.</p>`;
 
     hdr.appendChild(letterEl);
     hdr.appendChild(descEl);
@@ -1583,6 +2021,16 @@ function buildSoundsSection() {
     entry.sounds.forEach(sg => {
       const grp = document.createElement('div');
       grp.className = 'sound-group';
+
+      // Phoneme tile for this specific sound group
+      if (sg.wav) {
+        const tileBtn = document.createElement('button');
+        tileBtn.className = 'phoneme-tile-btn';
+        tileBtn.textContent = entry.l;
+        tileBtn.title = 'Tap to hear this sound';
+        tileBtn.onclick = () => playPhonemeWav(sg.wav, tileBtn);
+        grp.appendChild(tileBtn);
+      }
 
       const lbl = document.createElement('div');
       lbl.className = 'sound-group-label';
@@ -1707,7 +2155,7 @@ function renderWord(wp) {
   if (wp === 'wp1') {
     titleEl.innerHTML = `Word group: <strong>-${fam.ending}</strong>`;
   } else {
-    let tl = fam.mode === 'split' ? '-' + fam.ending : fam.ending;
+    let tl = (fam.mode === 'split' || fam.cat.startsWith('Silent')) ? '-' + fam.ending : fam.ending;
     if (fam.ending === 'th' && fam.words.includes('this')) tl = 'th (with voice)';
     if (fam.ending === 'th' && fam.words.includes('thin')) tl = 'th (air only)';
     titleEl.innerHTML = `Word group: <strong>${tl}</strong>`;
@@ -1720,6 +2168,7 @@ function renderWord(wp) {
 
   if (wp === 'wp1' || fam.mode === 'split') {
     const splitAt = fam.splitAt ?? (word.length - fam.ending.length);
+    const tiles = (wp === 'wp1') ? getWp1Tiles(word) : null;
     word.split('').forEach((letter, i) => {
       const isEnd = i >= splitAt;
       const lbl = document.createElement('div');
@@ -1732,30 +2181,69 @@ function renderWord(wp) {
       tile.className = 'tile ' + (isEnd ? 'ending' : 'beginning');
       tile.textContent = letter;
       tile.style.animationDelay = (i * 0.07) + 's';
-      tile.onclick = () => speakRaw(letter);
+      if (wp === 'wp1' && tiles && tiles[i] && tiles[i].wav) {
+        tile.onclick = () => playPhonemeWav(tiles[i].wav, tile);
+        tile.title = 'Tap to hear the phoneme';
+      } else {
+        tile.onclick = () => speakRaw(letter);
+      }
       tilesEl.appendChild(tile);
     });
     const beg = word.slice(0, splitAt);
     document.getElementById(wp + '-hint').innerHTML =
       `The word <strong>"${word}"</strong> — the beginning is <strong>"${beg}"</strong> and the ending is <strong>"-${fam.ending}"</strong>.`;
   } else {
-    const patStart = word.indexOf(fam.ending);
-    const patLen   = fam.ending.length;
-    word.split('').forEach((letter, i) => {
-      const isPat = patStart >= 0 && i >= patStart && i < patStart + patLen;
-      const lbl = document.createElement('div');
-      lbl.className = 'tile-label-item ' + (isPat ? 'bl' : 'dg');
-      lbl.style.width = '68px';
-      if (i === patStart) lbl.textContent = 'pattern';
-      labelsEl.appendChild(lbl);
-      const tile = document.createElement('div');
-      tile.className = 'tile ' + (isPat ? 'beginning' : 'digraph');
-      tile.textContent = letter;
-      tile.style.animationDelay = (i * 0.07) + 's';
-      tile.onclick = () => speakRaw(letter);
-      tilesEl.appendChild(tile);
-    });
-    let hint = `The word is <strong>"${word}"</strong>. The orange letters show the pattern <strong>"${fam.ending}"</strong>. Tap each letter to hear its sound.`;
+    // WP2 whole-word mode — use phoneme tile map
+    const wp2tiles = getWp2Tiles(word);
+    if (wp2tiles) {
+      wp2tiles.forEach((tile_data, i) => {
+        // Tile
+        const tile = document.createElement('div');
+        const focusSet = new Set((fam.focus || []).map(f => f.toLowerCase()));
+        const isFocus = focusSet.has(tile_data.d.toLowerCase());
+
+        // Silent tiles (w:null, no tts) — grey, no interaction
+        if (tile_data.w === null && !tile_data.tts) {
+          tile.className = 'tile silent';
+          tile.title = 'Silent — not pronounced';
+        } else if (tile_data.w === null && tile_data.tts) {
+          // Suffix chunk — TTS, always focus colour (it's the pattern tile)
+          tile.className = 'tile focus-tile';
+          tile.onclick = () => { tile.classList.add('playing'); speakRaw(tile_data.tts, () => tile.classList.remove('playing')); };
+          tile.title = 'Tap to hear this sound';
+        } else {
+          tile.className = 'tile ' + (isFocus ? 'focus-tile' : 'neutral');
+          tile.onclick = () => playPhonemeWav(tile_data.w, tile);
+          tile.title = 'Tap to hear this sound';
+        }
+        tile.textContent = tile_data.d;
+        tile.style.animationDelay = (i * 0.07) + 's';
+        // Widen tile slightly for digraphs/multi-char displays
+        if (tile_data.d.length > 1) {
+          tile.style.width = Math.max(68, tile_data.d.length * 30) + 'px';
+        }
+        tilesEl.appendChild(tile);
+      });
+    } else {
+      // Fallback: letter-by-letter with speakRaw if word not in map
+      const patStart = word.indexOf(fam.ending);
+      const patLen   = fam.ending.length;
+      word.split('').forEach((letter, i) => {
+        const isPat = patStart >= 0 && i >= patStart && i < patStart + patLen;
+        const lbl = document.createElement('div');
+        lbl.className = 'tile-label-item ' + (isPat ? 'bl' : 'dg');
+        lbl.style.width = '68px';
+        if (i === patStart) lbl.textContent = 'pattern';
+        labelsEl.appendChild(lbl);
+        const tile = document.createElement('div');
+        tile.className = 'tile ' + (isPat ? 'beginning' : 'digraph');
+        tile.textContent = letter;
+        tile.style.animationDelay = (i * 0.07) + 's';
+        tile.onclick = () => speakRaw(letter);
+        tilesEl.appendChild(tile);
+      });
+    }
+    let hint = `The word is <strong>"${word}"</strong>. Tap each tile to hear its sound. Press <strong>Hear the word</strong> to hear the whole word.`;
     if (fam.patternHint) hint += '<br><br>' + fam.patternHint;
     document.getElementById(wp + '-hint').innerHTML = hint;
   }
@@ -1831,11 +2319,11 @@ function speakCurrent(wp) {
   s.seen.add(`${s.familyIdx}-${s.wordIdx}`);
 }
 
-function speakRaw(text, onEnd) {
+function speakRaw(text, onEnd, rate) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(text);
-  utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  utt.rate = rate !== undefined ? rate : speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
   applyVoice(utt);
   utt.onend = utt.onerror = () => { if (onEnd) onEnd(); };
   window.speechSynthesis.speak(utt);
