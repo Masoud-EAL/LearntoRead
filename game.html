@@ -844,19 +844,23 @@ function playCountdownMusic() {
   stopMusic();
   currentMusicType = 'countdown';
   const ctx = getAudioCtx();
-  const pulseNotes = [196, 220, 246.9, 261.6];
-  const bpm = 140; const beat = 60 / bpm;
-  function loop(startTime) {
+  const melody = [392, 440, 523.3, 440, 392, 349.2];
+  const beat = 0.42;
+
+  function loop() {
     if (currentMusicType !== 'countdown' || !musicOn) return;
-    pulseNotes.forEach((f, i) => {
-      const t = startTime + i * beat * 0.5;
-      musicNodes.push(playTone(ctx, f, t, beat * 0.3, 0.08, 'square'));
-      musicNodes.push(playTone(ctx, f / 2, t, beat * 0.4, 0.06, 'triangle'));
+    const start = ctx.currentTime + 0.05;
+
+    melody.forEach((f, i) => {
+      const t = start + i * beat;
+      // soft warm marimba-ish feel
+      musicNodes.push(playTone(ctx, f, t, 0.22, 0.018, 'triangle'));
+      musicNodes.push(playTone(ctx, f * 2, t, 0.12, 0.008, 'sine'));
     });
-    const loopDur = pulseNotes.length * beat * 0.5;
-    setTimeout(() => loop(ctx.currentTime), (loopDur - 0.08) * 1000);
+
+    setTimeout(loop, melody.length * beat * 1000);
   }
-  loop(ctx.currentTime);
+  loop();
 }
 
 function playWinnerFanfare() {
@@ -1027,7 +1031,7 @@ function playQuestion() {
     document.getElementById('q-hint').textContent = 'Students type the missing word';
   } else {
     document.getElementById('q-text').textContent = '🔊 Listen and spell the word';
-    document.getElementById('q-hint').textContent = `(Word: ${q.word})`;
+    document.getElementById('q-hint').textContent = 'Listen carefully and spell the word';
   }
 
   // Push question to Firebase
@@ -1040,7 +1044,6 @@ function playQuestion() {
   roomRef.child('answers').remove();
 
   showScreen('screen-teacher-game');
-  playCountdownMusic();
   startTeacherTimer();
   teacherSpeak();
   listenForAnswers();
@@ -1052,9 +1055,15 @@ function teacherSpeak() {
   hearBtn.classList.add('playing');
   const utt = new SpeechSynthesisUtterance(q.type === 'sentence' ? q.sentence : q.word);
   utt.rate = 0.7; utt.lang = 'en-AU';
-  utt.onend = utt.onerror = () => hearBtn.classList.remove('playing');
+  utt.onend = utt.onerror = () => {
+    hearBtn.classList.remove('playing');
+    if (musicOn && currentMusicType !== 'countdown') {
+      setTimeout(() => playCountdownMusic(), 250);
+    }
+  };
   window.speechSynthesis.cancel();
   window.speechSynthesis.speak(utt);
+  setTimeout(() => { if (musicOn) playCountdownMusic(); }, 1200);
 }
 
 function startTeacherTimer() {
@@ -1097,7 +1106,7 @@ function listenForAnswers() {
       bar.innerHTML = `
         <span class="name">${ans.name}</span>
         <span class="ans ${revealed ? (isCorrect ? 'correct' : 'wrong') : 'pending'}">
-          ${revealed ? ans.answer || '(no answer)' : '✏️ answered'}
+          ${revealed ? (ans.answer || '(no answer)') : '✏️ Answer submitted'}
         </span>
         ${revealed ? `<span style="font-size:1rem">${isCorrect ? '✅' : '❌'}</span>` : ''}
       `;
@@ -1268,7 +1277,6 @@ function listenForGameState() {
 
 function showStudentQuestion(q, startedAt) {
   stopMusic();
-  playCountdownMusic();
   answered = false;
   document.getElementById('student-answer-input').value = '';
   document.getElementById('student-submit-btn').disabled = false;
