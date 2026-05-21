@@ -3364,5 +3364,10 @@ buildSentences();
 selectFamily('wp1', 0);
 selectFamily('wp2', 0);
 </script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+}
+</script>
 </body>
 </html>
