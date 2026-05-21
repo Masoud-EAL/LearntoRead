@@ -594,7 +594,22 @@ function goHome(){ stopMusic(); cleanupListeners(); showScreen('screen-home'); p
 function goTeacher(){ role='teacher'; buildBank(); loadCustomQuestions(); createRoom(); }
 function makeCode(){ const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let r=''; for(let i=0;i<4;i++) r+=c[Math.floor(Math.random()*c.length)]; return r; }
 
+function cleanupOldRooms(){
+  const AGE_24H = Date.now() - 24 * 60 * 60 * 1000;
+  const AGE_2H  = Date.now() -  2 * 60 * 60 * 1000;
+  db.ref('rooms').once('value', snap => {
+    const rooms = snap.val() || {};
+    Object.entries(rooms).forEach(([code, room]) => {
+      const created = room.createdAt || 0;
+      if (created < AGE_24H || (room.status === 'finished' && created < AGE_2H)) {
+        db.ref('rooms/' + code).remove();
+      }
+    });
+  });
+}
+
 function createRoom(){
+  cleanupOldRooms();
   roomCode=makeCode(); roomRef=db.ref('rooms/'+roomCode);
   roomRef.set({status:'lobby',createdAt:Date.now(),questionIdx:-1,revealed:false});
   document.getElementById('room-code-display').textContent=roomCode;
