@@ -866,13 +866,13 @@
 
   /* ── TRANSLATION ── */
   .word-translation {
-    font-family: 'Noto Nastaliq Urdu','Noto Sans Arabic','Noto Sans SC','Noto Sans Khmer','Noto Sans Myanmar','Noto Sans Devanagari','Noto Sans',sans-serif;
+    font-family: 'Noto Sans Arabic','Noto Sans SC','Noto Sans Khmer','Noto Sans Myanmar','Noto Sans Devanagari','Noto Sans',sans-serif;
     font-size: 1.5rem; color: var(--mid);
     text-align: center; min-height: 1.6em; margin: 2px 0 4px;
     transition: opacity 0.2s;
   }
   .sentence-translation {
-    font-family: 'Noto Nastaliq Urdu','Noto Sans Arabic','Noto Sans SC','Noto Sans Khmer','Noto Sans Myanmar','Noto Sans Devanagari','Noto Sans',sans-serif;
+    font-family: 'Noto Sans Arabic','Noto Sans SC','Noto Sans Khmer','Noto Sans Myanmar','Noto Sans Devanagari','Noto Sans',sans-serif;
     font-size: 0.9rem; color: var(--mid);
     margin-top: 4px; line-height: 1.7;
   }
@@ -1397,6 +1397,17 @@ function emo(word) {
 let translations = null;
 const RTL_LANGS = new Set(['fa', 'ur']);
 
+// Per-language font families (Urdu gets Nastaliq; all others use the CSS default)
+const LANG_FONT = {
+  'ur': "'Noto Nastaliq Urdu','Noto Sans Arabic',sans-serif",
+  'fa': "'Noto Sans Arabic',sans-serif",
+  'zh': "'Noto Sans SC',sans-serif",
+  'km': "'Noto Sans Khmer',sans-serif",
+  'my': "'Noto Sans Myanmar',sans-serif",
+  'hi': "'Noto Sans Devanagari',sans-serif",
+  'vi': "sans-serif",
+};
+
 function onLangChange() {
   const lang = document.getElementById('langSelect').value;
   if (!lang) {
@@ -1422,14 +1433,17 @@ function updateAllTranslations() {
   const lang = document.getElementById('langSelect').value;
   const dir = RTL_LANGS.has(lang) ? 'rtl' : 'ltr';
   const sentAlign = dir === 'rtl' ? 'right' : 'left';
+  const font = LANG_FONT[lang] || '';
   document.querySelectorAll('[data-trword]').forEach(el => {
     el.textContent = tw(el.dataset.trword);
     el.style.direction = dir;
+    if (font) el.style.fontFamily = font;
   });
   document.querySelectorAll('[data-trkey]').forEach(el => {
     el.textContent = ts(el.dataset.trkey);
     el.style.direction = dir;
     el.style.textAlign = sentAlign;
+    if (font) el.style.fontFamily = font;
   });
 }
 
@@ -2333,6 +2347,8 @@ function renderWord(wp) {
     trDiv.dataset.trword = word;
     const lang = document.getElementById('langSelect').value;
     trDiv.style.direction = RTL_LANGS.has(lang) ? 'rtl' : 'ltr';
+    const font = LANG_FONT[lang];
+    if (font) trDiv.style.fontFamily = font;
   }
 
   document.getElementById(wp + '-counter').textContent = `${s.wordIdx + 1} / ${fam.words.length}`;
