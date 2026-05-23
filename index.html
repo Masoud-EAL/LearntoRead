@@ -2042,8 +2042,11 @@ function isMobileDevice() {
 }
 (function() {
   if (isMobileDevice()) {
-    var bar = document.getElementById('voiceSelectorBar');
-    if (bar) bar.style.display = 'none';
+    // Hide the voice selector parts only — keep the language dropdown visible
+    var label = document.querySelector('.voice-selector-label');
+    var voiceSel = document.getElementById('voiceSelect');
+    if (label) label.style.display = 'none';
+    if (voiceSel) voiceSel.style.display = 'none';
   }
 })();
 if (window.speechSynthesis) { window.speechSynthesis.onvoiceschanged = function() {}; }
