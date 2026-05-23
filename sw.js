@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v2';
+const CACHE = 'learntoread-v3';
 
 const PRECACHE = [
   './',
@@ -51,6 +51,12 @@ const PRECACHE = [
   './audio/ʒ as in pleasure.wav',
   './audio/θ as in thin.wav',
   './translations/fa.json',
+  './translations/vi.json',
+  './translations/zh.json',
+  './translations/ur.json',
+  './translations/km.json',
+  './translations/my.json',
+  './translations/hi.json',
 ];
 
 self.addEventListener('install', e => {

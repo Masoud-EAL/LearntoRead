@@ -16,7 +16,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="icon" href="icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Khmer:wght@400;700&family=Noto+Sans+Myanmar:wght@400;700&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #fdf6ec;
@@ -866,15 +866,15 @@
 
   /* ── TRANSLATION ── */
   .word-translation {
-    font-family: 'Noto Sans Arabic', 'Noto Sans', sans-serif;
-    font-size: 1.1rem; color: var(--mid); direction: rtl;
-    text-align: center; min-height: 1.4em; margin: 2px 0 4px;
+    font-family: 'Noto Nastaliq Urdu','Noto Sans Arabic','Noto Sans SC','Noto Sans Khmer','Noto Sans Myanmar','Noto Sans Devanagari','Noto Sans',sans-serif;
+    font-size: 1.5rem; color: var(--mid);
+    text-align: center; min-height: 1.6em; margin: 2px 0 4px;
     transition: opacity 0.2s;
   }
   .sentence-translation {
-    font-family: 'Noto Sans Arabic', 'Noto Sans', sans-serif;
-    font-size: 0.88rem; color: var(--mid); direction: rtl;
-    text-align: right; margin-top: 4px; line-height: 1.6;
+    font-family: 'Noto Nastaliq Urdu','Noto Sans Arabic','Noto Sans SC','Noto Sans Khmer','Noto Sans Myanmar','Noto Sans Devanagari','Noto Sans',sans-serif;
+    font-size: 0.9rem; color: var(--mid);
+    margin-top: 4px; line-height: 1.7;
   }
   .lang-select {
     font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700;
@@ -921,6 +921,12 @@
   <select class="lang-select" id="langSelect" onchange="onLangChange()">
     <option value="">🌐 Translation: Off</option>
     <option value="fa">🇦🇫 فارسی / Dari</option>
+    <option value="vi">🇻🇳 Tiếng Việt</option>
+    <option value="zh">🇨🇳 中文</option>
+    <option value="ur">🇵🇰 اردو</option>
+    <option value="km">🇰🇭 ភាសាខ្មែរ</option>
+    <option value="my">🇲🇲 မြန်မာ</option>
+    <option value="hi">🇮🇳 हिंदी</option>
   </select>
 </div>
 
@@ -1389,6 +1395,7 @@ function emo(word) {
    TRANSLATION
 ══════════════════════════════════════════ */
 let translations = null;
+const RTL_LANGS = new Set(['fa', 'ur']);
 
 function onLangChange() {
   const lang = document.getElementById('langSelect').value;
@@ -1397,10 +1404,10 @@ function onLangChange() {
     updateAllTranslations();
     return;
   }
-  fetch('translations/' + lang + '.json')
-    .then(r => r.json())
+  fetch('./translations/' + lang + '.json')
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then(data => { translations = data; updateAllTranslations(); })
-    .catch(() => { translations = null; });
+    .catch(err => { console.error('Translation load failed:', err); translations = null; });
 }
 
 function tw(word) {
@@ -1412,11 +1419,17 @@ function ts(sentence) {
 }
 
 function updateAllTranslations() {
+  const lang = document.getElementById('langSelect').value;
+  const dir = RTL_LANGS.has(lang) ? 'rtl' : 'ltr';
+  const sentAlign = dir === 'rtl' ? 'right' : 'left';
   document.querySelectorAll('[data-trword]').forEach(el => {
     el.textContent = tw(el.dataset.trword);
+    el.style.direction = dir;
   });
   document.querySelectorAll('[data-trkey]').forEach(el => {
     el.textContent = ts(el.dataset.trkey);
+    el.style.direction = dir;
+    el.style.textAlign = sentAlign;
   });
 }
 
@@ -2315,7 +2328,12 @@ function renderWord(wp) {
 
   // Translation under emoji
   const trDiv = document.getElementById(wp + '-translation');
-  if (trDiv) { trDiv.textContent = tw(word); trDiv.dataset.trword = word; }
+  if (trDiv) {
+    trDiv.textContent = tw(word);
+    trDiv.dataset.trword = word;
+    const lang = document.getElementById('langSelect').value;
+    trDiv.style.direction = RTL_LANGS.has(lang) ? 'rtl' : 'ltr';
+  }
 
   document.getElementById(wp + '-counter').textContent = `${s.wordIdx + 1} / ${fam.words.length}`;
   document.getElementById(wp + '-prev').disabled = s.wordIdx === 0;
