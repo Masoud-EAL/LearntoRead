@@ -16,7 +16,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="icon" href="icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #fdf6ec;
@@ -864,6 +864,26 @@
   .sent-spelling-wrap .spell-input { font-size: 1.05rem; }
   .sent-spelling-wrap .spell-diff  { font-size: 1rem; letter-spacing: 2px; }
 
+  /* ── TRANSLATION ── */
+  .word-translation {
+    font-family: 'Noto Sans Arabic', 'Noto Sans', sans-serif;
+    font-size: 1.1rem; color: var(--mid); direction: rtl;
+    text-align: center; min-height: 1.4em; margin: 2px 0 4px;
+    transition: opacity 0.2s;
+  }
+  .sentence-translation {
+    font-family: 'Noto Sans Arabic', 'Noto Sans', sans-serif;
+    font-size: 0.88rem; color: var(--mid); direction: rtl;
+    text-align: right; margin-top: 4px; line-height: 1.6;
+  }
+  .lang-select {
+    font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700;
+    border: 2px solid var(--light); border-radius: 20px;
+    padding: 4px 10px; background: white; color: var(--dark);
+    cursor: pointer; outline: none; margin-left: 12px;
+  }
+  .lang-select:focus { border-color: var(--accent2); }
+
   /* ── TEACHER GAME BUTTON ── */
   .teacher-game-btn {
     position: fixed; bottom: 18px; right: 18px; z-index: 200;
@@ -898,6 +918,10 @@
     <option value="female">Female</option>
     <option value="male">Male</option>
   </select>
+  <select class="lang-select" id="langSelect" onchange="onLangChange()">
+    <option value="">🌐 Translation: Off</option>
+    <option value="fa">🇦🇫 فارسی / Dari</option>
+  </select>
 </div>
 
 <!-- SECTION 1 — ALPHABET -->
@@ -931,6 +955,7 @@
       <div class="tile-labels" id="wp1-labels"></div>
       <div class="letter-tiles" id="wp1-tiles"></div>
       <div class="word-emoji-display" id="wp1-emoji"></div>
+      <div class="word-translation" id="wp1-translation"></div>
       <button class="audio-btn" id="wp1-audioBtn" onclick="speakCurrent('wp1')">
         <span>🔊</span> <span id="wp1-audioLbl">Hear the word</span>
       </button>
@@ -970,6 +995,7 @@
       <div class="tile-labels" id="wp2-labels"></div>
       <div class="letter-tiles" id="wp2-tiles"></div>
       <div class="word-emoji-display" id="wp2-emoji"></div>
+      <div class="word-translation" id="wp2-translation"></div>
       <button class="audio-btn" id="wp2-audioBtn" onclick="speakCurrent('wp2')">
         <span>🔊</span> <span id="wp2-audioLbl">Hear the word</span>
       </button>
@@ -1357,6 +1383,41 @@ const EMOJI = {
 
 function emo(word) {
   return EMOJI[word.toLowerCase()] || '';
+}
+
+/* ══════════════════════════════════════════
+   TRANSLATION
+══════════════════════════════════════════ */
+let translations = null;
+
+function onLangChange() {
+  const lang = document.getElementById('langSelect').value;
+  if (!lang) {
+    translations = null;
+    updateAllTranslations();
+    return;
+  }
+  fetch('translations/' + lang + '.json')
+    .then(r => r.json())
+    .then(data => { translations = data; updateAllTranslations(); })
+    .catch(() => { translations = null; });
+}
+
+function tw(word) {
+  return (translations && translations.words && translations.words[word]) || '';
+}
+
+function ts(sentence) {
+  return (translations && translations.sentences && translations.sentences[sentence]) || '';
+}
+
+function updateAllTranslations() {
+  document.querySelectorAll('[data-trword]').forEach(el => {
+    el.textContent = tw(el.dataset.trword);
+  });
+  document.querySelectorAll('[data-trkey]').forEach(el => {
+    el.textContent = ts(el.dataset.trkey);
+  });
 }
 
 /* ══════════════════════════════════════════
@@ -2252,6 +2313,10 @@ function renderWord(wp) {
   const emojiDiv = document.getElementById(wp + '-emoji');
   if (emojiDiv) emojiDiv.textContent = emo(word);
 
+  // Translation under emoji
+  const trDiv = document.getElementById(wp + '-translation');
+  if (trDiv) { trDiv.textContent = tw(word); trDiv.dataset.trword = word; }
+
   document.getElementById(wp + '-counter').textContent = `${s.wordIdx + 1} / ${fam.words.length}`;
   document.getElementById(wp + '-prev').disabled = s.wordIdx === 0;
   document.getElementById(wp + '-next').disabled = s.wordIdx === fam.words.length - 1;
@@ -3116,7 +3181,12 @@ function buildSentences() {
 
         var text = document.createElement('div');
         text.className = 'sentence-text';
-        text.textContent = sent;
+        text.appendChild(document.createTextNode(sent));
+        var trEl = document.createElement('div');
+        trEl.className = 'sentence-translation';
+        trEl.dataset.trkey = sent;
+        trEl.textContent = ts(sent);
+        text.appendChild(trEl);
 
         var playBtn = document.createElement('button');
         playBtn.className = 'sentence-play-btn';
