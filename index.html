@@ -820,7 +820,7 @@
   }
   .spell-char.correct { background: #d4f5d4; color: #1a7a1a; border-color: #7ac97a; }
   .spell-char.wrong   { background: #fdd;   color: #b00;    border-color: #f09090; }
-  .spell-char.missing { background: #fff0cc; color: #a06000; border-color: #f0c060; font-size: 0.9rem; }
+  .spell-char.missing { background: #f0f0f0; color: #999;    border-color: #ccc;    font-size: 0.9rem; }
   .spell-char.extra   { background: #ffe0f0; color: #a0006a; border-color: #f090c0; }
   .spell-feedback-msg {
     font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
@@ -3423,7 +3423,7 @@ function renderDiff(answer, typed, isSent) {
     span.className = 'spell-char';
     if (op.type === 'match')  { span.classList.add('correct'); span.textContent = op.char; }
     else if (op.type === 'insert') { span.classList.add('extra');   span.textContent = op.char; span.title = 'Extra letter'; }
-    else { span.classList.add('missing'); span.textContent = op.char; span.title = 'Missing: ' + op.char; }
+    else { span.classList.add('missing'); span.textContent = '_'; }
     container.appendChild(span);
   });
 }
