@@ -264,6 +264,8 @@ select.game-input{cursor:pointer;}
         <button class="q-type-tab" onclick="selectSoloType('spelling',this)">All Spelling</button>
         <button class="q-type-tab" onclick="selectSoloType('custom',this)">Custom</button>
         <button class="q-type-tab" onclick="selectSoloType('unscramble',this)">Unscramble</button>
+        <button class="q-type-tab" onclick="selectSoloType('gramscramble',this)">Grammar</button>
+        <button class="q-type-tab" onclick="selectSoloType('translate',this)">Translate</button>
         <button class="q-type-tab" onclick="selectSoloType('all',this)">All</button>
       </div>
       <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="solo-count-display">Loading…</div>
@@ -271,6 +273,15 @@ select.game-input{cursor:pointer;}
         <label style="font-size:.8rem;color:var(--muted);">Questions:</label>
         <input type="number" class="game-input" id="solo-q-limit" value="10" min="1" max="50"
           style="width:70px;padding:6px 10px;font-size:.9rem;margin-bottom:0;" oninput="updateSoloCountDisplay()">
+      </div>
+      <div id="solo-lang-wrap" style="display:none;margin-top:10px;display:none;align-items:center;gap:10px;">
+        <label style="font-size:.8rem;color:var(--muted);">Your language:</label>
+        <select id="solo-lang-pick" class="game-input" style="width:auto;padding:6px 10px;font-size:.9rem;margin-bottom:0;" onchange="localStorage.setItem('translateLang',this.value)">
+          <option value="vi">Tiếng Việt</option><option value="fa">فارسی</option>
+          <option value="ar">العربية</option><option value="zh">中文</option>
+          <option value="hi">हिन्दी</option><option value="ur">اردو</option>
+          <option value="km">ខ្មែរ</option><option value="my">မြန်မာ</option>
+        </select>
       </div>
     </div>
     <button class="btn btn-gold btn-lg" onclick="startSoloGame()">▶ Start Practice</button>
@@ -310,6 +321,8 @@ select.game-input{cursor:pointer;}
           <button class="q-type-tab" onclick="selectQType('spelling',this)">All Spelling</button>
           <button class="q-type-tab" onclick="selectQType('custom',this)">Custom</button>
           <button class="q-type-tab" onclick="selectQType('unscramble',this)">Unscramble</button>
+          <button class="q-type-tab" onclick="selectQType('gramscramble',this)">Grammar</button>
+          <button class="q-type-tab" onclick="selectQType('translate',this)">Translate</button>
           <button class="q-type-tab" onclick="selectQType('all',this)">All</button>
         </div>
         <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="q-count-display">Loading…</div>
@@ -391,6 +404,13 @@ select.game-input{cursor:pointer;}
     <div class="field-label">Your Name</div>
     <input class="game-input" id="join-name" maxlength="18" placeholder="Enter your name"
       onkeydown="if(event.key==='Enter')joinGame()">
+    <div class="field-label" style="margin-top:2px;">Language (for Translate games)</div>
+    <select class="game-input" id="join-lang" onchange="localStorage.setItem('translateLang',this.value)" style="margin-bottom:14px;">
+      <option value="vi">Tiếng Việt (Vietnamese)</option><option value="fa">فارسی (Farsi)</option>
+      <option value="ar">العربية (Arabic)</option><option value="zh">中文 (Chinese)</option>
+      <option value="hi">हिन्दी (Hindi)</option><option value="ur">اردو (Urdu)</option>
+      <option value="km">ខ្មែរ (Khmer)</option><option value="my">မြန်မာ (Burmese)</option>
+    </select>
     <div class="err-msg" id="join-error"></div>
     <button class="btn btn-accent" style="width:100%;" onclick="joinGame()">Join →</button>
   </div>
@@ -414,6 +434,10 @@ select.game-input{cursor:pointer;}
     <div id="s-q-emoji" style="font-size:3.2rem;line-height:1;margin:6px 0 10px;text-align:center;min-height:1em;"></div>
     <div class="s-q-text" id="s-q-text">…</div>
     <button class="s-hear-btn" id="s-hear-btn" onclick="studentSpeak()">🔊 Hear it again</button>
+  </div>
+  <div id="translate-hint-wrap" style="display:none;width:100%;max-width:500px;text-align:center;">
+    <button class="btn btn-ghost btn-sm" id="hint-btn" onclick="showHint()">💡 Hint</button>
+    <div id="hint-text" style="color:var(--gold);font-family:'Fredoka One',cursive;font-size:1rem;margin-top:6px;min-height:1.2rem;word-break:break-word;"></div>
   </div>
   <div id="ans-input-section" class="ans-input-wrap">
     <input class="game-input" id="student-ans-input" placeholder="Type your answer…"
@@ -529,7 +553,45 @@ const UNSCRAMBLE_SENTENCES=[
   'I wake up at 7:00 every day.',
 ];
 
-let questionBank={wp1:[],wp2:[],sentences:[],numbers:[],days:[],months:[],weather:[],fruits:[],body:[],custom:[],unscramble:[]};
+const LEVEL0_SENTENCES=[
+  {en:'My name is David.',fa:'اسم من دیوید است.',vi:'Tên tôi là David.',zh:'我的名字是大卫。',ar:'اسمي ديفيد.',hi:'मेरा नाम डेविड है।',ur:'میرا نام ڈیوڈ ہے۔',km:'ឈ្មោះខ្ញុំគឺ David។',my:'ကျွန်တော်နာမည်က David ပါ။'},
+  {en:'I am from Vietnam.',fa:'من اهل ویتنام هستم.',vi:'Tôi đến từ Việt Nam.',zh:'我来自越南。',ar:'أنا من فيتنام.',hi:'मैं वियतनाम से हूँ।',ur:'میں ویتنام سے ہوں۔',km:'ខ្ញុំមកពីវៀតណាម។',my:'ကျွန်တော် ဗီယက်နမ်ကပါ။'},
+  {en:'I live in Springvale.',fa:'من در اسپرینگویل زندگی می‌کنم.',vi:'Tôi sống ở Springvale.',zh:'我住在斯普林维尔。',ar:'أنا أعيش في سبرينغفيل.',hi:'मैं स्प्रिंगवेल में रहता हूँ।',ur:'میں اسپرنگویل میں رہتا ہوں۔',km:'ខ្ញុំរស់នៅ Springvale។',my:'ကျွန်တော် Springvale မှာနေပါတယ်။'},
+  {en:'I am married.',fa:'من متأهل هستم.',vi:'Tôi đã kết hôn.',zh:'我已婚。',ar:'أنا متزوج.',hi:'मैं शादीशुदा हूँ।',ur:'میں شادی شدہ ہوں۔',km:'ខ្ញុំបានរៀបការ។',my:'ကျွန်တော် အိမ်ထောင်ရှိပါတယ်။'},
+  {en:'I have two children.',fa:'من دو فرزند دارم.',vi:'Tôi có hai con.',zh:'我有两个孩子。',ar:'لدي طفلان.',hi:'मेरे दो बच्चे हैं।',ur:'میرے دو بچے ہیں۔',km:'ខ្ញុំមានកូនពីរនាក់។',my:'ကျွန်တော် ကလေးနှစ်ယောက်ရှိပါတယ်။'},
+  {en:'Today is Monday.',fa:'امروز دوشنبه است.',vi:'Hôm nay là thứ Hai.',zh:'今天是星期一。',ar:'اليوم هو الاثنين.',hi:'आज सोमवार है।',ur:'آج سوموار ہے۔',km:'ថ្ងៃនេះជាថ្ងៃច័ន្ទ។',my:'ဒီနေ့ တနင်္လာနေ့ပါ။'},
+  {en:'The weather is sunny and warm.',fa:'هوا آفتابی و گرم است.',vi:'Thời tiết nắng và ấm.',zh:'天气晴朗而温暖。',ar:'الطقس مشمس ودافئ.',hi:'मौसम धूप और गर्म है।',ur:'موسم دھوپ اور گرم ہے۔',km:'អាកាសធាតុថ្ងៃស្រស់ ហើយក្តៅ។',my:'မိုးလေဝသ နေပူပြီး နွေးပါတယ်။'},
+  {en:'I have a book in my bag.',fa:'من یک کتاب در کیفم دارم.',vi:'Tôi có một quyển sách trong túi.',zh:'我的包里有一本书。',ar:'لدي كتاب في حقيبتي.',hi:'मेरे बैग में एक किताब है।',ur:'میرے بیگ میں ایک کتاب ہے۔',km:'ខ្ញុំមានសៀវភៅក្នុងថង់។',my:'ကျွန်တော် အိတ်ထဲမှာ စာအုပ်တစ်အုပ်ရှိပါတယ်။'},
+  {en:'I have a pen in my bag.',fa:'من یک خودکار در کیفم دارم.',vi:'Tôi có một cái bút trong túi.',zh:'我的包里有一支笔。',ar:'لدي قلم في حقيبتي.',hi:'मेरे बैग में एक कलम है।',ur:'میرے بیگ میں ایک قلم ہے۔',km:'ខ្ញុំមានប៉ិចក្នុងថង់។',my:'ကျွန်တော် အိတ်ထဲမှာ ဘောပင်တစ်ချောင်းရှိပါတယ်။'},
+  {en:'I have a phone in my bag.',fa:'من یک تلفن در کیفم دارم.',vi:'Tôi có một cái điện thoại trong túi.',zh:'我的包里有一部手机。',ar:'لدي هاتف في حقيبتي.',hi:'मेरे बैग में एक फोन है।',ur:'میرے بیگ میں ایک فون ہے۔',km:'ខ្ញុំមានទូរសព្ទក្នុងថង់។',my:'ကျွန်တော် အိတ်ထဲမှာ ဖုန်းတစ်လုံးရှိပါတယ်။'},
+  {en:'I have a notebook in my bag.',fa:'من یک دفتر در کیفم دارم.',vi:'Tôi có một quyển vở trong túi.',zh:'我的包里有一本笔记本。',ar:'لدي دفتر في حقيبتي.',hi:'मेरे बैग में एक नोटबुक है।',ur:'میرے بیگ میں ایک نوٹ بک ہے۔',km:'ខ្ញុំមានសៀវភៅកត់ត្រាក្នុងថង់។',my:'ကျွန်တော် အိတ်ထဲမှာ မှတ်စုစာအုပ်တစ်အုပ်ရှိပါတယ်။'},
+  {en:'I like football.',fa:'من فوتبال دوست دارم.',vi:'Tôi thích bóng đá.',zh:'我喜欢足球。',ar:'أحب كرة القدم.',hi:'मुझे फुटबॉल पसंद है।',ur:'مجھے فٹبال پسند ہے۔',km:'ខ្ញុំចូលចិត្តបាល់ទាត់។',my:'ကျွန်တော် ဘောလုံးကြိုက်ပါတယ်။'},
+  {en:'I like music.',fa:'من موسیقی دوست دارم.',vi:'Tôi thích âm nhạc.',zh:'我喜欢音乐。',ar:'أحب الموسيقى.',hi:'मुझे संगीत पसंद है।',ur:'مجھے موسیقی پسند ہے۔',km:'ខ្ញុំចូលចិត្តតន្ត្រី។',my:'ကျွန်တော် တေးဂီတကြိုက်ပါတယ်။'},
+  {en:'I like cooking.',fa:'من آشپزی دوست دارم.',vi:'Tôi thích nấu ăn.',zh:'我喜欢烹饪。',ar:'أحب الطبخ.',hi:'मुझे खाना पकाना पसंद है।',ur:'مجھے کھانا پکانا پسند ہے۔',km:'ខ្ញុំចូលចិត្តធ្វើម្ហូប។',my:'ကျွန်တော် ချက်ပြုတ်ခြင်းကြိုက်ပါတယ်။'},
+  {en:'My favourite colour is blue.',fa:'رنگ مورد علاقه من آبی است.',vi:'Màu yêu thích của tôi là màu xanh.',zh:'我最喜欢的颜色是蓝色。',ar:'لوني المفضل هو الأزرق.',hi:'मेरा पसंदीदा रंग नीला है।',ur:'میرا پسندیدہ رنگ نیلا ہے۔',km:'ពណ៌ដែលខ្ញុំចូលចិត្តគឺពណ៌ខៀវ។',my:'ကျွန်တော်အကြိုက်ဆုံး အရောင်က အပြာရောင်ပါ။'},
+  {en:'My favourite fruit is apple.',fa:'میوه مورد علاقه من سیب است.',vi:'Trái cây yêu thích của tôi là táo.',zh:'我最喜欢的水果是苹果。',ar:'فاكهتي المفضلة هي التفاح.',hi:'मेरा पसंदीदा फल सेब है।',ur:'میرا پسندیدہ پھل سیب ہے۔',km:'ផ្លែឈើដែលខ្ញុំចូលចិត្តគឺផ្លែប៉ោម។',my:'ကျွန်တော်အကြိုက်ဆုံး သစ်သီးက ပန်းသီးပါ။'},
+  {en:'My favourite food is rice and chicken.',fa:'غذای مورد علاقه من برنج و مرغ است.',vi:'Món ăn yêu thích của tôi là cơm và gà.',zh:'我最喜欢的食物是米饭和鸡肉。',ar:'طعامي المفضل هو الأرز والدجاج.',hi:'मेरा पसंदीदा खाना चावल और चिकन है।',ur:'میرا پسندیدہ کھانا چاول اور مرغی ہے۔',km:'អាហារដែលខ្ញុំចូលចិត្តគឺបាយ និងមាន់។',my:'ကျွန်တော်အကြိုက်ဆုံး အစားအစာက ထမင်းနဲ့ကြက်သားပါ။'},
+  {en:'I came to Australia in 2022.',fa:'من در سال ۲۰۲۲ به استرالیا آمدم.',vi:'Tôi đến Úc vào năm 2022.',zh:'我在2022年来到澳大利亚。',ar:'جئت إلى أستراليا عام 2022.',hi:'मैं 2022 में ऑस्ट्रेलिया आया।',ur:'میں 2022 میں آسٹریلیا آیا۔',km:'ខ្ញុំបានមកដល់អូស្ត្រាលីក្នុងឆ្នាំ 2022។',my:'ကျွန်တော် 2022 ခုနှစ်မှာ ဩစတြေးလျားကိုရောက်ခဲ့ပါတယ်။'},
+  {en:'I can drive.',fa:'من می‌توانم رانندگی کنم.',vi:'Tôi có thể lái xe.',zh:'我会开车。',ar:'أستطيع القيادة.',hi:'मैं गाड़ी चला सकता हूँ।',ur:'میں گاڑی چلا سکتا ہوں۔',km:'ខ្ញុំអាចបើកបរបាន។',my:'ကျွန်တော် ကားမောင်းနိုင်ပါတယ်။'},
+  {en:'I can cook.',fa:'من می‌توانم آشپزی کنم.',vi:'Tôi có thể nấu ăn.',zh:'我会做饭。',ar:'أستطيع الطبخ.',hi:'मैं खाना बना सकता हूँ।',ur:'میں کھانا پکا سکتا ہوں۔',km:'ខ្ញុំអាចធ្វើម្ហូបបាន។',my:'ကျွန်တော် ချက်ပြုတ်နိုင်ပါတယ်။'},
+  {en:'I can clean.',fa:'من می‌توانم تمیز کنم.',vi:'Tôi có thể dọn dẹp.',zh:'我会打扫。',ar:'أستطيع التنظيف.',hi:'मैं सफाई कर सकता हूँ।',ur:'میں صفائی کر سکتا ہوں۔',km:'ខ្ញុំអាចសម្អាតបាន។',my:'ကျွန်တော် သန့်ရှင်းရေးလုပ်နိုင်ပါတယ်။'},
+  {en:'I can use a computer.',fa:'من می‌توانم از کامپیوتر استفاده کنم.',vi:'Tôi có thể sử dụng máy tính.',zh:'我会使用电脑。',ar:'أستطيع استخدام الحاسوب.',hi:'मैं कंप्यूटर इस्तेमाल कर सकता हूँ।',ur:'میں کمپیوٹر استعمال کر سکتا ہوں۔',km:'ខ្ញុំអាចប្រើកុំព្យូទ័របាន។',my:'ကျွန်တော် ကွန်ပျူတာသုံးနိုင်ပါတယ်။'},
+  {en:'I can speak a little English.',fa:'من می‌توانم کمی انگلیسی صحبت کنم.',vi:'Tôi có thể nói một chút tiếng Anh.',zh:'我能说一点英语。',ar:'أستطيع التحدث بالإنجليزية قليلاً.',hi:'मैं थोड़ी अंग्रेजी बोल सकता हूँ।',ur:'میں تھوڑی انگریزی بول سکتا ہوں۔',km:'ខ្ញុំអាចនិយាយភាសាអង់គ្លេសបន្តិចបាន។',my:'ကျွန်တော် အင်္ဂလိပ်စာ နည်းနည်းပြောနိုင်ပါတယ်။'},
+  {en:'I want to learn English.',fa:'من می‌خواهم انگلیسی یاد بگیرم.',vi:'Tôi muốn học tiếng Anh.',zh:'我想学英语。',ar:'أريد تعلم الإنجليزية.',hi:'मैं अंग्रेजी सीखना चाहता हूँ।',ur:'میں انگریزی سیکھنا چاہتا ہوں۔',km:'ខ្ញុំចង់រៀនភាសាអង់គ្លេស។',my:'ကျွန်တော် အင်္ဂလိပ်စာသင်ယူချင်ပါတယ်။'},
+  {en:'I want to speak to people.',fa:'من می‌خواهم با مردم صحبت کنم.',vi:'Tôi muốn nói chuyện với mọi người.',zh:'我想和人们交流。',ar:'أريد التحدث مع الناس.',hi:'मैं लोगों से बात करना चाहता हूँ।',ur:'میں لوگوں سے بات کرنا چاہتا ہوں۔',km:'ខ្ញុំចង់និយាយជាមួយមនុស្ស។',my:'ကျွန်တော် လူများနဲ့ပြောဆိုချင်ပါတယ်။'},
+  {en:'I want to find a good job.',fa:'من می‌خواهم یک شغل خوب پیدا کنم.',vi:'Tôi muốn tìm một công việc tốt.',zh:'我想找一份好工作。',ar:'أريد إيجاد عمل جيد.',hi:'मैं एक अच्छी नौकरी ढूंढना चाहता हूँ।',ur:'میں ایک اچھی نوکری ڈھونڈنا چاہتا ہوں۔',km:'ខ្ញុំចង់រកការងារល្អ។',my:'ကျွန်တော် အလုပ်ကောင်းကောင်းရှာချင်ပါတယ်။'},
+  {en:'My weekend is good.',fa:'آخر هفته من خوب است.',vi:'Cuối tuần của tôi rất tốt.',zh:'我的周末过得很好。',ar:'عطلة نهاية أسبوعي جيدة.',hi:'मेरा सप्ताहांत अच्छा है।',ur:'میرا ویک اینڈ اچھا ہے۔',km:'ចុងសប្តាហ៍របស់ខ្ញុំល្អ។',my:'ကျွန်တော် ရေစက်ကောင်းပါတယ်။'},
+  {en:'I go to English class on Mondays.',fa:'من روزهای دوشنبه به کلاس انگلیسی می‌روم.',vi:'Tôi đi học tiếng Anh vào thứ Hai.',zh:'我每周一去上英语课。',ar:'أذهب إلى صف الإنجليزية يوم الاثنين.',hi:'मैं सोमवार को अंग्रेजी कक्षा जाता हूँ।',ur:'میں پیر کو انگریزی کلاس جاتا ہوں۔',km:'ខ្ញុំទៅថ្នាក់អង់គ្លេសរៀងរាល់ថ្ងៃច័ន្ទ។',my:'ကျွန်တော် တနင်္လာနေ့တိုင်း အင်္ဂလိပ်စာတန်းသွားပါတယ်။'},
+  {en:'There are four people in my family.',fa:'در خانواده من چهار نفر هستند.',vi:'Gia đình tôi có bốn người.',zh:'我家有四口人。',ar:'هناك أربعة أشخاص في عائلتي.',hi:'मेरे परिवार में चार लोग हैं।',ur:'میرے خاندان میں چار لوگ ہیں۔',km:'គ្រួសាររបស់ខ្ញុំមានបួននាក់។',my:'ကျွန်တော်မိသားစုမှာ လူလေးယောက်ရှိပါတယ်။'},
+  {en:'I want to help my children with school.',fa:'من می‌خواهم به فرزندانم با درس کمک کنم.',vi:'Tôi muốn giúp con tôi với việc học.',zh:'我想帮助我的孩子学习。',ar:'أريد مساعدة أطفالي في المدرسة.',hi:'मैं अपने बच्चों की पढ़ाई में मदद करना चाहता हूँ।',ur:'میں اپنے بچوں کی پڑھائی میں مدد کرنا چاہتا ہوں۔',km:'ខ្ញុំចង់ជួយកូនរបស់ខ្ញុំក្នុងការសិក្សា។',my:'ကျွန်တော် ကလေးများကို ကျောင်းနဲ့ပတ်သက်ပြီး ကူညီချင်ပါတယ်။'},
+  {en:'I have one son and one daughter.',fa:'من یک پسر و یک دختر دارم.',vi:'Tôi có một con trai và một con gái.',zh:'我有一个儿子和一个女儿。',ar:'لدي ابن واحد وابنة واحدة.',hi:'मेरा एक बेटा और एक बेटी है।',ur:'میرا ایک بیٹا اور ایک بیٹی ہے۔',km:'ខ្ញុំមានកូនប្រុសម្នាក់ និងកូនស្រីម្នាក់។',my:'ကျွန်တော် သားတစ်ယောက်နဲ့ သမီးတစ်ယောက်ရှိပါတယ်။'},
+  {en:'I have one brother and one sister.',fa:'من یک برادر و یک خواهر دارم.',vi:'Tôi có một anh/em trai và một chị/em gái.',zh:'我有一个兄弟和一个姐妹。',ar:'لدي أخ واحد وأخت واحدة.',hi:'मेरा एक भाई और एक बहन है।',ur:'میرا ایک بھائی اور ایک بہن ہے۔',km:'ខ្ញុំមានបងប្រុស/ប្អូនប្រុសម្នាក់ និងបងស្រី/ប្អូនស្រីម្នាក់។',my:'ကျွန်တော် ညီ/အစ်ကိုတစ်ယောက်နဲ့ ညီမ/အစ်မတစ်ယောက်ရှိပါတယ်။'},
+  {en:'I speak Vietnamese and a little English.',fa:'من ویتنامی و کمی انگلیسی صحبت می‌کنم.',vi:'Tôi nói tiếng Việt và một chút tiếng Anh.',zh:'我说越南语和一点英语。',ar:'أتحدث الفيتنامية وقليلاً من الإنجليزية.',hi:'मैं वियतनामी और थोड़ी अंग्रेजी बोलता हूँ।',ur:'میں ویتنامی اور تھوڑی انگریزی بولتا ہوں۔',km:'ខ្ញុំនិយាយភាសាវៀតណាម និងភាសាអង់គ្លេសបន្តិច។',my:'ကျွန်တော် ဗီယက်နမ်ဘာသာနဲ့ အင်္ဂလိပ်စာနည်းနည်းပြောနိုင်ပါတယ်။'},
+  {en:'I wake up at 7:00 every day.',fa:'من هر روز ساعت ۷:۰۰ بیدار می‌شوم.',vi:'Tôi thức dậy lúc 7:00 mỗi ngày.',zh:'我每天七点起床。',ar:'أستيقظ الساعة 7:00 كل يوم.',hi:'मैं हर दिन 7:00 बजे उठता हूँ।',ur:'میں ہر روز 7:00 بجے اٹھتا ہوں۔',km:'ខ្ញុំភ្ញាក់ពីដំណេកម៉ោង 7:00 រៀងរាល់ថ្ងៃ។',my:'ကျွန်တော် နေ့တိုင်း မနက် 7:00 မှာ နိုးပါတယ်။'},
+];
+const LANG_NAMES={vi:'Tiếng Việt',fa:'فارسی',ar:'العربية',zh:'中文',hi:'हिन्दी',ur:'اردو',km:'ខ្មែរ',my:'မြန်မာ'};
+
+let questionBank={wp1:[],wp2:[],sentences:[],numbers:[],days:[],months:[],weather:[],fruits:[],body:[],custom:[],unscramble:[],gramscramble:[],translate:[]};
 function buildBank(){
   questionBank.wp1=WP1_WORDS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.wp2=WP2_WORDS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
@@ -541,6 +603,8 @@ function buildBank(){
   questionBank.fruits=SPELL_FRUITS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.body=SPELL_BODY.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.unscramble=UNSCRAMBLE_SENTENCES.map(s=>({type:'unscramble',sentence:s,answer:s,words:s.trim().split(/\s+/)}));
+  questionBank.gramscramble=UNSCRAMBLE_SENTENCES.map(s=>({type:'gramscramble',sentence:s,answer:s,words:s.trim().split(/\s+/)}));
+  questionBank.translate=LEVEL0_SENTENCES.map(s=>({type:'translate',en:s.en,answer:s.en,translations:{fa:s.fa,vi:s.vi,zh:s.zh,ar:s.ar,hi:s.hi,ur:s.ur,km:s.km,my:s.my}}));
 }
 function getQuestions(type,limit){
   const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body];
@@ -557,6 +621,8 @@ function getQuestions(type,limit){
   else if(type==='spelling') pool=allSpelling;
   else if(type==='custom') pool=[...questionBank.custom];
   else if(type==='unscramble') pool=[...questionBank.unscramble];
+  else if(type==='gramscramble') pool=[...questionBank.gramscramble];
+  else if(type==='translate') pool=[...questionBank.translate];
   else pool=[...questionBank.wp1,...questionBank.wp2,...questionBank.sentences,...allSpelling,...questionBank.custom];
   shuffle(pool);
   return pool.slice(0,limit);
@@ -574,6 +640,7 @@ let answerListener=null,gameListener=null;
 const TIMER_DURATION=30;
 let totalPlayers=0;
 let soloMode=false,soloQuestions=[],soloQIdx=0,soloSelectedType='wp1';
+let hintLevel=0;
 
 const EMOJI={
   'ant':'🐜','bat':'🦇','bee':'🐝','bug':'🐛','cat':'🐱','cow':'🐄','crab':'🦀','dog':'🐶','duck':'🦆','elephant':'🐘','fish':'🐟','fox':'🦊','hen':'🐓','pig':'🐷','ram':'🐏','rat':'🐀',
@@ -801,14 +868,16 @@ function playQuestion(){
   stopMusic(); revealed=false; answered=false;
   const q=currentQuestions[currentQIdx],total=currentQuestions.length;
   document.getElementById('game-prog').textContent='Question '+(currentQIdx+1)+' of '+total;
-  document.getElementById('q-badge').textContent=q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':'WORD';
-  document.getElementById('q-hint').textContent=q.type==='sentence'?'Students type the missing word':q.type==='unscramble'?'Students arrange word tiles':'';
+  const noAudio=q.type==='gramscramble'||q.type==='translate';
+  document.getElementById('q-badge').textContent=q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':'WORD';
+  document.getElementById('q-hint').textContent=q.type==='sentence'?'Students type the missing word':q.type==='unscramble'||q.type==='gramscramble'?'Students arrange word tiles':q.type==='translate'?'Students type the English sentence':'';
   document.getElementById('ans-bars').innerHTML='';
   document.getElementById('reveal-btn').style.display='';
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('q-emoji').textContent=q.type==='word'?emo(q.word):'';
-  document.getElementById('q-text').textContent=q.type==='sentence'?q.display:q.type==='unscramble'?q.sentence:'🔊 Listen and spell the word';
+  document.getElementById('q-text').textContent=q.type==='sentence'?q.display:q.type==='unscramble'||q.type==='gramscramble'?q.sentence:q.type==='translate'?q.en:'🔊 Listen and spell the word';
+  document.getElementById('hear-btn').style.display=noAudio?'none':'';
   roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:Date.now(),revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
   showScreen('screen-teacher-game');
@@ -820,6 +889,7 @@ function playQuestion(){
 
 function teacherSpeak(){
   const q=currentQuestions[currentQIdx],btn=document.getElementById('hear-btn');
+  if(q.type==='gramscramble'||q.type==='translate') return;
   btn.classList.add('playing');
   const spokenText=q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.word;
   const utt=new SpeechSynthesisUtterance(spokenText);
@@ -868,7 +938,8 @@ function renderRevealResults(answers,q){
   const bars=document.getElementById('ans-bars');
   const correct=[],wrong=[];
   Object.values(answers).forEach(ans=>{
-    (normalize(ans.answer)===normalize(q.answer)?correct:wrong).push(ans);
+    const ok=q.type==='translate'?fuzzyMatch(ans.answer,q.answer):normalize(ans.answer)===normalize(q.answer);
+    (ok?correct:wrong).push(ans);
   });
   bars.innerHTML=`
     <div class="rgroup">
@@ -899,7 +970,7 @@ function revealAnswers(){
         // phone locked mid-game, dropping the Firebase connection and triggering
         // onDisconnect().remove() which deleted their players entry.
         updates['players/'+pid+'/name']=ans.name;
-        const isCorrect=normalize(ans.answer)===normalize(q.answer);
+        const isCorrect=q.type==='translate'?fuzzyMatch(ans.answer,q.answer):normalize(ans.answer)===normalize(q.answer);
         if(isCorrect){
           const bonus=Math.max(0,Math.round((ans.timeLeft||0)*50)),pts=100+bonus;
           // Use explicit accumulated value so a reconnected player keeps their prior score.
@@ -981,6 +1052,8 @@ function initStudent(){
   document.getElementById('music-btn').style.display='none';
   const urlCode=new URLSearchParams(window.location.search).get('join');
   if(urlCode) document.getElementById('join-code').value=urlCode.toUpperCase();
+  const storedLang=localStorage.getItem('translateLang')||'vi';
+  document.getElementById('join-lang').value=storedLang;
   showScreen('screen-student-join'); stopMusic();
 }
 
@@ -1053,6 +1126,14 @@ function showMidStudentLeaderboard(){
   });
 }
 
+function showHint(){
+  if(!currentStudentQ||currentStudentQ.type!=='translate') return;
+  const words=currentStudentQ.en.split(' ');
+  hintLevel=Math.min(hintLevel+1,words.length);
+  document.getElementById('hint-text').textContent=words.slice(0,hintLevel).join(' ')+(hintLevel<words.length?' …':'');
+  if(hintLevel>=words.length) document.getElementById('hint-btn').disabled=true;
+}
+
 /* SOLO PRACTICE */
 function initSolo(){
   soloMode=true; role='student';
@@ -1065,6 +1146,12 @@ function selectSoloType(type,el){
   soloSelectedType=type;
   document.querySelectorAll('#screen-solo-setup .q-type-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
+  const lw=document.getElementById('solo-lang-wrap');
+  lw.style.display=type==='translate'?'flex':'none';
+  if(type==='translate'){
+    const stored=localStorage.getItem('translateLang')||'vi';
+    document.getElementById('solo-lang-pick').value=stored;
+  }
   updateSoloCountDisplay();
 }
 function updateSoloCountDisplay(){
@@ -1076,6 +1163,9 @@ function updateSoloCountDisplay(){
   display.textContent=pool.length+' available — '+Math.min(pool.length,limit)+' will be used';
 }
 function startSoloGame(){
+  if(soloSelectedType==='translate'){
+    localStorage.setItem('translateLang',document.getElementById('solo-lang-pick').value);
+  }
   const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
   soloQuestions=getQuestions(soloSelectedType,limit);
   if(!soloQuestions.length){showToast('No questions available!');return;}
@@ -1084,7 +1174,7 @@ function startSoloGame(){
 }
 function showSoloResult(submittedAns,correctAns,timeLeft){
   clearInterval(studentTimerInt); stopMusic();
-  const isCorrect=normalize(submittedAns)===normalize(correctAns);
+  const isCorrect=currentStudentQ&&currentStudentQ.type==='translate'?fuzzyMatch(submittedAns,correctAns):normalize(submittedAns)===normalize(correctAns);
   const pts=isCorrect?100+Math.max(0,Math.round((timeLeft||0)*50)):0;
   myScore+=pts;
   document.getElementById('result-icon').textContent=isCorrect?'🎉':'😔';
@@ -1116,17 +1206,34 @@ function showSoloFinal(){
 }
 
 function showStudentQuestion(q,startedAt){
-  stopMusic(); answered=false;
+  stopMusic(); answered=false; hintLevel=0;
   document.getElementById('student-ans-input').value='';
   document.getElementById('submitted-msg').textContent='';
-  const isUnscramble=q.type==='unscramble';
-  document.getElementById('ans-input-section').style.display=isUnscramble?'none':'';
-  document.getElementById('unscramble-section').style.display=isUnscramble?'flex':'none';
-  document.getElementById('student-submit-btn').disabled=isUnscramble; // enabled by checkAllPlaced
-  document.getElementById('s-q-type').textContent=isUnscramble?'UNSCRAMBLE — arrange the word tiles':q.type==='sentence'?'SENTENCE — type the missing word':'WORD — listen and spell it';
+  const isTile=q.type==='unscramble'||q.type==='gramscramble';
+  const isTranslate=q.type==='translate';
+  document.getElementById('ans-input-section').style.display=isTile?'none':'';
+  document.getElementById('unscramble-section').style.display=isTile?'flex':'none';
+  document.getElementById('translate-hint-wrap').style.display=isTranslate?'':'none';
+  document.getElementById('hint-text').textContent='';
+  document.getElementById('hint-btn').disabled=false;
+  document.getElementById('hint-btn').textContent='💡 Hint';
+  document.getElementById('student-submit-btn').disabled=isTile;
+  document.getElementById('s-hear-btn').style.display=(q.type==='gramscramble'||isTranslate)?'none':'';
+  document.getElementById('s-q-type').textContent=
+    isTile?(q.type==='gramscramble'?'GRAMMAR — arrange words in order':'UNSCRAMBLE — arrange the word tiles'):
+    isTranslate?'TRANSLATE — type the English sentence':
+    q.type==='sentence'?'SENTENCE — type the missing word':'WORD — listen and spell it';
   document.getElementById('s-q-emoji').textContent=q.type==='word'?emo(q.word):'';
-  document.getElementById('s-q-text').textContent=isUnscramble?'Put the words in the right order:':q.type==='sentence'?q.display:'🔊 Listen carefully…';
-  if(isUnscramble){
+  if(isTranslate){
+    const lang=localStorage.getItem('translateLang')||'vi';
+    const t=q.translations&&q.translations[lang]?q.translations[lang]:(q.en||q.answer);
+    document.getElementById('s-q-text').textContent=t;
+    document.getElementById('student-ans-input').placeholder='Type the English sentence…';
+  } else {
+    document.getElementById('s-q-text').textContent=isTile?'Put the words in the correct order:':q.type==='sentence'?q.display:'🔊 Listen carefully…';
+    document.getElementById('student-ans-input').placeholder='Type your answer…';
+  }
+  if(isTile){
     const words=Array.isArray(q.words)?q.words:Object.values(q.words||{});
     renderUnscrambleTiles(words);
   }
@@ -1138,6 +1245,7 @@ let currentStudentQ=null;
 function studentSpeak(q){
   currentStudentQ=q||currentStudentQ;
   if(!currentStudentQ) return;
+  if(currentStudentQ.type==='gramscramble'||currentStudentQ.type==='translate') return;
   const text=currentStudentQ.type==='sentence'?currentStudentQ.sentence.replace('___',currentStudentQ.blank):currentStudentQ.type==='unscramble'?currentStudentQ.sentence:currentStudentQ.word;
   if(!text) return;
   const utt=new SpeechSynthesisUtterance(text);
@@ -1157,7 +1265,7 @@ function submitAnswer(auto){
   if(answered) return; answered=true; clearInterval(studentTimerInt);
   const elapsed=parseInt(document.getElementById('student-timer').textContent)||0;
   let ans;
-  if(currentStudentQ&&currentStudentQ.type==='unscramble'){
+  if(currentStudentQ&&(currentStudentQ.type==='unscramble'||currentStudentQ.type==='gramscramble')){
     ans=Array.from(document.querySelectorAll('#answer-area .word-tile')).map(t=>t.dataset.word).join(' ');
   } else {
     ans=(document.getElementById('student-ans-input').value||'').trim();
@@ -1266,7 +1374,7 @@ function showStudentResult(correctAnswer){
   clearInterval(studentTimerInt); stopMusic();
   roomRef.child('answers/'+playerId).once('value',snap=>{
     const myData=snap.val()||{},myAnswer=(myData.answer||'').trim();
-    const isCorrect=normalize(myAnswer)===normalize(correctAnswer);
+    const isCorrect=currentStudentQ&&currentStudentQ.type==='translate'?fuzzyMatch(myAnswer,correctAnswer):normalize(myAnswer)===normalize(correctAnswer);
     const pts=isCorrect?100+Math.max(0,Math.round((myData.timeLeft||0)*50)):0;
     myScore+=pts;
     document.getElementById('result-icon').textContent=isCorrect?'🎉':'😔';
@@ -1326,6 +1434,8 @@ function updateQForm(){ const type=document.getElementById('new-q-type').value; 
 
 /* UTILS */
 function normalize(s){return(s||'').toLowerCase().trim().replace(/[^a-z0-9]/g,'');}
+function levenshtein(a,b){const m=a.length,n=b.length,dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);return dp[m][n];}
+function fuzzyMatch(sub,correct){const s=(sub||'').toLowerCase().replace(/[^a-z0-9 ]/g,'').trim(),c=(correct||'').toLowerCase().replace(/[^a-z0-9 ]/g,'').trim();if(s===c)return true;return levenshtein(s,c)<=Math.max(2,Math.floor(c.length/8));}
 function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
 function showToast(msg,dur){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur||2200);}
 function cleanupListeners(){if(roomRef)roomRef.off();clearInterval(timerInterval);clearInterval(studentTimerInt);window.speechSynthesis&&window.speechSynthesis.cancel();}
