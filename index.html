@@ -1357,7 +1357,7 @@ const EMOJI = {
   'ring':'💍',
 
   // Communication & media
-  'chat':'💬','graph':'📊','ink':'🖊️','jazz':'🎷',
+  'chat':'💬','flute':'🪈','graph':'📊','ink':'🖊️','jazz':'🎷',
   'page':'📄','read':'📖','word':'📝',
 
   // Colours & visual concepts
@@ -1415,7 +1415,7 @@ function onLangChange() {
     updateAllTranslations();
     return;
   }
-  fetch('./translations/' + lang + '.json')
+  fetch('./translations/' + lang + '.json', {cache: 'no-store'})
     .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then(data => { translations = data; updateAllTranslations(); })
     .catch(err => { console.error('Translation load failed:', err); translations = null; });
@@ -1764,7 +1764,7 @@ const WP2_TILES = {
   'nope':  [{d:'n',w:'n.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'cute':  [{d:'c',w:'k.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'mute':  [{d:'m',w:'m.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
-  'tube':  [{d:'t',w:'t.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'flute': [{d:'f',w:'f.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'cube':  [{d:'c',w:'k.wav',t:'beginning'},{d:'u',w:'uː as in pool.wav',t:'beginning'},{d:'b',w:'b.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'ride':  [{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'side':  [{d:'s',w:'s.wav',t:'beginning'},{d:'i',w:'aɪ as in ice.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
@@ -1958,7 +1958,7 @@ const wp2Families = [
   { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ate', focus:['e'], words:['late','mate','gate','hate'], mode:'whole' },
   { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ine', focus:['e'], words:['fine','line','mine','nine'], mode:'whole' },
   { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ope', focus:['e'], words:['hope','rope','cope','nope'], mode:'whole' },
-  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ute', focus:['e'], words:['cute','mute','tube','cube'], mode:'whole' },
+  { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ute', focus:['e'], words:['cute','mute','flute'], mode:'whole' },
   { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ide', focus:['e'], words:['ride','side','hide','wide'], mode:'whole' },
   { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ame', focus:['e'], words:['game','name','same','came'], mode:'whole' },
   { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ore', focus:['e'], words:['more','core','sore','bore'], mode:'whole' },
@@ -1979,7 +1979,7 @@ const wp2Families = [
   { cat:'Common endings', ending:'ck',  focus:['ck'],  words:['back','duck','pick','rock'],      mode:'whole', patternHint:'<strong>ck</strong> makes a "k" sound. The two letters work as one.' },
   { cat:'Common endings', ending:'ll',  focus:['ll'],  words:['ball','bell','fill','doll'],      mode:'whole', patternHint:'<strong>ll</strong> makes a single "l" sound.' },
   { cat:'Common endings', ending:'ff',  focus:['ff'],  words:['off','puff','cliff','staff'],     mode:'whole', patternHint:'<strong>ff</strong> makes a single "f" sound.' },
-  { cat:'Common endings', ending:'ss',  focus:['ss'],  words:['miss','pass','bus','dress'],      mode:'whole', patternHint:'<strong>ss</strong> makes a single "s" sound.' },
+  { cat:'Common endings', ending:'ss',  focus:['ss'],  words:['miss','pass','dress'],      mode:'whole', patternHint:'<strong>ss</strong> makes a single "s" sound.' },
   { cat:'Common endings', ending:'zz',  focus:['zz'],  words:['buzz','jazz','fizz','fuzz'],      mode:'whole', patternHint:'<strong>zz</strong> makes a single "z" sound.' },
   { cat:'Common endings', ending:'tch', focus:['tch'], words:['catch','match','watch','pitch'],  mode:'whole', patternHint:'<strong>tch</strong> makes a "ch" sound — like in <em>catch</em>. It always comes after a short vowel.' },
   { cat:'Common endings', ending:'dge', focus:['dge'], words:['bridge','edge','badge','judge'],  mode:'whole', patternHint:'<strong>dge</strong> makes a "j" sound — like in <em>bridge</em>. It always comes after a short vowel.' },
