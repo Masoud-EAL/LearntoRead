@@ -195,7 +195,9 @@ select.game-input{cursor:pointer;}
 .rnames{display:flex;flex-wrap:wrap;gap:8px;min-height:18px;}
 .rname-chip{padding:7px 16px;border-radius:50px;font-weight:700;font-size:.92rem;}
 .rname-chip.ok{background:rgba(0,200,83,.18);color:var(--green);border:1.5px solid rgba(0,200,83,.5);}
+.rname-chip.partial{background:rgba(245,166,35,.18);color:var(--gold);border:1.5px solid rgba(245,166,35,.5);}
 .rname-chip.no{background:rgba(233,69,96,.12);color:var(--accent);border:1.5px solid rgba(233,69,96,.4);}
+.partial-answer{color:var(--gold);}
 </style>
 </head>
 <body>
@@ -939,24 +941,40 @@ function listenForAnswers(){
 
 function renderRevealResults(answers,q){
   const bars=document.getElementById('ans-bars');
-  const correct=[],wrong=[];
-  Object.values(answers).forEach(ans=>{
-    const ok=q.type==='translate'?fuzzyMatch(ans.answer,q.answer):normalize(ans.answer)===normalize(q.answer);
-    (ok?correct:wrong).push(ans);
-  });
-  bars.innerHTML=`
-    <div class="rgroup">
-      <div class="rgroup-label" style="color:var(--green)">✅ Correct (${correct.length})</div>
-      <div class="rnames">${correct.length
-        ?correct.map(a=>`<span class="rname-chip ok">${a.name}</span>`).join('')
-        :'<span style="color:var(--muted);font-size:.85rem;">No one got it</span>'}</div>
-    </div>
-    <div class="rgroup">
-      <div class="rgroup-label" style="color:var(--accent)">❌ Wrong (${wrong.length})</div>
-      <div class="rnames">${wrong.length
-        ?wrong.map(a=>`<span class="rname-chip no">${a.name} <span style="opacity:.6;font-weight:400;">${a.answer||'(blank)'}</span></span>`).join('')
-        :'<span style="color:var(--muted);font-size:.85rem;">Everyone got it! 🎉</span>'}</div>
-    </div>`;
+  if(q.type==='translate'){
+    const correct=[],partial=[],wrong=[];
+    Object.values(answers).forEach(ans=>{
+      const r=translateScore(ans.answer,q.answer,ans.timeLeft||0);
+      (r.tier==='correct'?correct:r.tier==='partial'?partial:wrong).push({...ans,_pts:r.pts});
+    });
+    bars.innerHTML=`
+      <div class="rgroup">
+        <div class="rgroup-label" style="color:var(--green)">✅ Correct (${correct.length})</div>
+        <div class="rnames">${correct.length?correct.map(a=>`<span class="rname-chip ok">${a.name}</span>`).join(''):'<span style="color:var(--muted);font-size:.85rem;">No one</span>'}</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-label" style="color:var(--gold)">🌟 Partly correct (${partial.length})</div>
+        <div class="rnames">${partial.length?partial.map(a=>`<span class="rname-chip partial">${a.name} <span style="opacity:.6;font-weight:400;">${a.answer||'(blank)'}</span></span>`).join(''):'<span style="color:var(--muted);font-size:.85rem;">No one</span>'}</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-label" style="color:var(--accent)">❌ Wrong (${wrong.length})</div>
+        <div class="rnames">${wrong.length?wrong.map(a=>`<span class="rname-chip no">${a.name} <span style="opacity:.6;font-weight:400;">${a.answer||'(blank)'}</span></span>`).join(''):'<span style="color:var(--muted);font-size:.85rem;">Everyone got points! 🎉</span>'}</div>
+      </div>`;
+  } else {
+    const correct=[],wrong=[];
+    Object.values(answers).forEach(ans=>{
+      (normalize(ans.answer)===normalize(q.answer)?correct:wrong).push(ans);
+    });
+    bars.innerHTML=`
+      <div class="rgroup">
+        <div class="rgroup-label" style="color:var(--green)">✅ Correct (${correct.length})</div>
+        <div class="rnames">${correct.length?correct.map(a=>`<span class="rname-chip ok">${a.name}</span>`).join(''):'<span style="color:var(--muted);font-size:.85rem;">No one got it</span>'}</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-label" style="color:var(--accent)">❌ Wrong (${wrong.length})</div>
+        <div class="rnames">${wrong.length?wrong.map(a=>`<span class="rname-chip no">${a.name} <span style="opacity:.6;font-weight:400;">${a.answer||'(blank)'}</span></span>`).join(''):'<span style="color:var(--muted);font-size:.85rem;">Everyone got it! 🎉</span>'}</div>
+      </div>`;
+  }
 }
 
 function revealAnswers(){
@@ -973,15 +991,20 @@ function revealAnswers(){
         // phone locked mid-game, dropping the Firebase connection and triggering
         // onDisconnect().remove() which deleted their players entry.
         updates['players/'+pid+'/name']=ans.name;
-        const isCorrect=q.type==='translate'?fuzzyMatch(ans.answer,q.answer):normalize(ans.answer)===normalize(q.answer);
-        if(isCorrect){
-          const bonus=Math.max(0,Math.round((ans.timeLeft||0)*50)),pts=100+bonus;
-          // Use explicit accumulated value so a reconnected player keeps their prior score.
-          const prior=(existingPlayers[pid]&&existingPlayers[pid].score)||0;
-          updates['players/'+pid+'/score']=prior+pts;
-          updates['players/'+pid+'/lastPoints']=pts;
+        const prior=(existingPlayers[pid]&&existingPlayers[pid].score)||0;
+        if(q.type==='translate'){
+          const r=translateScore(ans.answer,q.answer,ans.timeLeft||0);
+          updates['players/'+pid+'/score']=prior+r.pts;
+          updates['players/'+pid+'/lastPoints']=r.pts;
         } else {
-          updates['players/'+pid+'/lastPoints']=0;
+          const isCorrect=normalize(ans.answer)===normalize(q.answer);
+          if(isCorrect){
+            const bonus=Math.max(0,Math.round((ans.timeLeft||0)*50)),pts=100+bonus;
+            updates['players/'+pid+'/score']=prior+pts;
+            updates['players/'+pid+'/lastPoints']=pts;
+          } else {
+            updates['players/'+pid+'/lastPoints']=0;
+          }
         }
       });
       roomRef.update(updates);
@@ -1177,12 +1200,19 @@ function startSoloGame(){
 }
 function showSoloResult(submittedAns,correctAns,timeLeft){
   clearInterval(studentTimerInt); stopMusic();
-  const isCorrect=currentStudentQ&&currentStudentQ.type==='translate'?fuzzyMatch(submittedAns,correctAns):normalize(submittedAns)===normalize(correctAns);
-  const pts=isCorrect?100+Math.max(0,Math.round((timeLeft||0)*50)):0;
+  let pts,tier;
+  if(currentStudentQ&&currentStudentQ.type==='translate'){
+    const r=translateScore(submittedAns,correctAns,timeLeft||0);
+    pts=r.pts; tier=r.tier;
+  } else {
+    const isCorrect=normalize(submittedAns)===normalize(correctAns);
+    pts=isCorrect?100+Math.max(0,Math.round((timeLeft||0)*50)):0;
+    tier=isCorrect?'correct':'wrong';
+  }
   myScore+=pts;
-  document.getElementById('result-icon').textContent=isCorrect?'🎉':'😔';
-  document.getElementById('result-word').innerHTML=isCorrect?'<span class="correct-answer">'+correctAns+'</span> ✅':'<span class="wrong-answer">'+(submittedAns||'(blank)')+'</span> → <span class="correct-answer">'+correctAns+'</span>';
-  document.getElementById('result-points').textContent=isCorrect?'+'+pts+' points 🎯':'No points this round';
+  document.getElementById('result-icon').textContent=tier==='correct'?'🎉':tier==='partial'?'🌟':'😔';
+  document.getElementById('result-word').innerHTML=tier==='correct'?'<span class="correct-answer">'+correctAns+'</span> ✅':tier==='partial'?'<span class="partial-answer">'+(submittedAns||'(blank)')+'</span> → <span class="correct-answer">'+correctAns+'</span>':'<span class="wrong-answer">'+(submittedAns||'(blank)')+'</span> → <span class="correct-answer">'+correctAns+'</span>';
+  document.getElementById('result-points').textContent=tier==='correct'?'+'+pts+' points 🎯':tier==='partial'?'+'+pts+' points 🌟 (partly correct)':'No points this round';
   document.getElementById('result-total').textContent='Your total: '+myScore+' pts';
   document.getElementById('result-rank').textContent='Question '+(soloQIdx+1)+' of '+soloQuestions.length;
   document.getElementById('solo-next-wrap').style.display='';
@@ -1378,12 +1408,19 @@ function showStudentResult(correctAnswer){
   clearInterval(studentTimerInt); stopMusic();
   roomRef.child('answers/'+playerId).once('value',snap=>{
     const myData=snap.val()||{},myAnswer=(myData.answer||'').trim();
-    const isCorrect=currentStudentQ&&currentStudentQ.type==='translate'?fuzzyMatch(myAnswer,correctAnswer):normalize(myAnswer)===normalize(correctAnswer);
-    const pts=isCorrect?100+Math.max(0,Math.round((myData.timeLeft||0)*50)):0;
+    let pts,tier;
+    if(currentStudentQ&&currentStudentQ.type==='translate'){
+      const r=translateScore(myAnswer,correctAnswer,myData.timeLeft||0);
+      pts=r.pts; tier=r.tier;
+    } else {
+      const isCorrect=normalize(myAnswer)===normalize(correctAnswer);
+      pts=isCorrect?100+Math.max(0,Math.round((myData.timeLeft||0)*50)):0;
+      tier=isCorrect?'correct':'wrong';
+    }
     myScore+=pts;
-    document.getElementById('result-icon').textContent=isCorrect?'🎉':'😔';
-    document.getElementById('result-word').innerHTML=isCorrect?'<span class="correct-answer">'+correctAnswer+'</span> ✅':'<span class="wrong-answer">'+(myAnswer||'(blank)')+'</span> → <span class="correct-answer">'+correctAnswer+'</span>';
-    document.getElementById('result-points').textContent=isCorrect?'+'+pts+' points 🎯':'No points this round';
+    document.getElementById('result-icon').textContent=tier==='correct'?'🎉':tier==='partial'?'🌟':'😔';
+    document.getElementById('result-word').innerHTML=tier==='correct'?'<span class="correct-answer">'+correctAnswer+'</span> ✅':tier==='partial'?'<span class="partial-answer">'+(myAnswer||'(blank)')+'</span> → <span class="correct-answer">'+correctAnswer+'</span>':'<span class="wrong-answer">'+(myAnswer||'(blank)')+'</span> → <span class="correct-answer">'+correctAnswer+'</span>';
+    document.getElementById('result-points').textContent=tier==='correct'?'+'+pts+' points 🎯':tier==='partial'?'+'+pts+' points 🌟 (partly correct)':'No points this round';
     document.getElementById('result-total').textContent='Your total: '+myScore+' pts';
     roomRef.child('players').once('value',snap2=>{
       const players=Object.values(snap2.val()||{}).filter(p=>p&&p.name);
@@ -1440,6 +1477,16 @@ function updateQForm(){ const type=document.getElementById('new-q-type').value; 
 function normalize(s){return(s||'').toLowerCase().trim().replace(/[^a-z0-9]/g,'');}
 function levenshtein(a,b){const m=a.length,n=b.length,dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);return dp[m][n];}
 function fuzzyMatch(sub,correct){const s=(sub||'').toLowerCase().replace(/[^a-z0-9 ]/g,'').trim(),c=(correct||'').toLowerCase().replace(/[^a-z0-9 ]/g,'').trim();if(s===c)return true;return levenshtein(s,c)<=Math.max(2,Math.floor(c.length/8));}
+function translateScore(sub,correct,timeLeft){
+  const s=(sub||'').toLowerCase().replace(/[^a-z0-9]/g,'').trim();
+  const c=(correct||'').toLowerCase().replace(/[^a-z0-9]/g,'').trim();
+  if(!s) return {pts:0,tier:'wrong'};
+  const dist=levenshtein(s,c),maxLen=Math.max(s.length,c.length);
+  const sim=maxLen>0?1-dist/maxLen:1;
+  if(sim>=0.88) return {pts:100+Math.max(0,Math.round((timeLeft||0)*50)),tier:'correct'};
+  if(sim>=0.55) return {pts:50,tier:'partial'};
+  return {pts:0,tier:'wrong'};
+}
 function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
 function showToast(msg,dur){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur||2200);}
 function cleanupListeners(){if(roomRef)roomRef.off();clearInterval(timerInterval);clearInterval(studentTimerInt);window.speechSynthesis&&window.speechSynthesis.cancel();}
