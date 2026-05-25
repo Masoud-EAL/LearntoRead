@@ -214,13 +214,67 @@ select.game-input{cursor:pointer;}
         <h2>I'm the Teacher</h2>
         <p>Create a room, pick questions, control the game from the projector</p>
       </div>
-      <div class="role-card" onclick="initStudent()">
+      <div class="role-card" onclick="goStudentHome()">
         <div class="icon">📱</div>
         <h2>I'm a Student</h2>
-        <p>Join with a room code or scan the QR code</p>
+        <p>Join with a room code or practise solo</p>
       </div>
     </div>
     <button class="btn btn-ghost btn-sm" onclick="showEditor()">✏️ Question Editor</button>
+  </div>
+</div>
+
+<!-- STUDENT HOME -->
+<div class="screen" id="screen-student-home">
+  <div class="logo-bar">WordLink <span>🎮</span> Game</div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:24px;">
+    <div class="home-title">How do you want to play?</div>
+    <div class="role-cards">
+      <div class="role-card" onclick="initStudent()">
+        <div class="icon">🏫</div>
+        <h2>Join a Class Game</h2>
+        <p>Enter your teacher's room code and play with the class</p>
+      </div>
+      <div class="role-card" onclick="initSolo()">
+        <div class="icon">🎮</div>
+        <h2>Practice Solo</h2>
+        <p>Play on your own and practise at your own pace</p>
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="goHome()">← Back</button>
+  </div>
+</div>
+
+<!-- SOLO SETUP -->
+<div class="screen" id="screen-solo-setup">
+  <div class="logo-bar">WordLink <span>🎮</span> Practice</div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:20px;gap:20px;">
+    <div class="card" style="width:100%;max-width:500px;">
+      <p style="font-family:'Fredoka One',cursive;font-size:1rem;color:var(--teal);margin-bottom:10px;">📚 Choose a category</p>
+      <div class="q-type-tabs">
+        <button class="q-type-tab active" onclick="selectSoloType('wp1',this)">WP1</button>
+        <button class="q-type-tab" onclick="selectSoloType('wp2',this)">WP2</button>
+        <button class="q-type-tab" onclick="selectSoloType('sentences',this)">Sentences</button>
+        <button class="q-type-tab" onclick="selectSoloType('numbers',this)">1–10</button>
+        <button class="q-type-tab" onclick="selectSoloType('days',this)">Days</button>
+        <button class="q-type-tab" onclick="selectSoloType('months',this)">Months</button>
+        <button class="q-type-tab" onclick="selectSoloType('weather',this)">Weather</button>
+        <button class="q-type-tab" onclick="selectSoloType('fruits',this)">Fruits</button>
+        <button class="q-type-tab" onclick="selectSoloType('body',this)">Body</button>
+        <button class="q-type-tab" onclick="selectSoloType('spelling',this)">All Spelling</button>
+        <button class="q-type-tab" onclick="selectSoloType('custom',this)">Custom</button>
+        <button class="q-type-tab" onclick="selectSoloType('unscramble',this)">Unscramble</button>
+        <button class="q-type-tab" onclick="selectSoloType('all',this)">All</button>
+      </div>
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="solo-count-display">Loading…</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <label style="font-size:.8rem;color:var(--muted);">Questions:</label>
+        <input type="number" class="game-input" id="solo-q-limit" value="10" min="1" max="50"
+          style="width:70px;padding:6px 10px;font-size:.9rem;margin-bottom:0;" oninput="updateSoloCountDisplay()">
+      </div>
+    </div>
+    <button class="btn btn-gold btn-lg" onclick="startSoloGame()">▶ Start Practice</button>
+    <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-student-home')">← Back</button>
   </div>
 </div>
 
@@ -388,7 +442,11 @@ select.game-input{cursor:pointer;}
   <div class="result-points" id="result-points"></div>
   <div class="result-total" id="result-total"></div>
   <div class="result-rank" id="result-rank"></div>
-  <div style="color:var(--muted);font-size:.85rem;margin-top:4px;">Waiting for next question…</div>
+  <div id="solo-next-wrap" style="display:none;text-align:center;margin-top:8px;">
+    <button class="btn btn-teal btn-lg" onclick="soloNextQuestion()">Next →</button>
+    <div style="color:var(--muted);font-size:.85rem;margin-top:8px;" id="solo-progress"></div>
+  </div>
+  <div id="multiplayer-wait-msg" style="color:var(--muted);font-size:.85rem;margin-top:4px;">Waiting for next question…</div>
 </div>
 
 <!-- EDITOR -->
@@ -515,6 +573,7 @@ let myScore=0,myLastQIdx=-1;
 let answerListener=null,gameListener=null;
 const TIMER_DURATION=30;
 let totalPlayers=0;
+let soloMode=false,soloQuestions=[],soloQIdx=0,soloSelectedType='wp1';
 
 const EMOJI={
   'ant':'🐜','bat':'🦇','bee':'🐝','bug':'🐛','cat':'🐱','cow':'🐄','crab':'🦀','dog':'🐶','duck':'🦆','elephant':'🐘','fish':'🐟','fox':'🦊','hen':'🐓','pig':'🐷','ram':'🐏','rat':'🐀',
@@ -673,7 +732,8 @@ function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
-function goHome(){ stopMusic(); cleanupListeners(); showScreen('screen-home'); playLobbyMusic(); }
+function goHome(){ stopMusic(); cleanupListeners(); soloMode=false; document.getElementById('music-btn').style.display=''; showScreen('screen-home'); playLobbyMusic(); }
+function goStudentHome(){ stopMusic(); document.getElementById('music-btn').style.display='none'; showScreen('screen-student-home'); }
 
 /* TEACHER FLOW */
 function goTeacher(){ role='teacher'; document.getElementById('music-btn').style.display=''; buildBank(); loadCustomQuestions(); createRoom(); }
@@ -913,7 +973,7 @@ function renderLeaderboard(players){
   order.forEach(i=>{ if(!top3[i]) return; const p=top3[i],el=document.createElement('div'); el.className='podium-place '+classes[i]; el.innerHTML='<div class="medal">'+medals[i]+'</div><div class="pname">'+p.name+'</div><div class="pscore">⭐'+(p.score||0)+'</div>'; podium.appendChild(el); });
   players.forEach((p,i)=>{ const row=document.createElement('div'); row.className='lb-row'; row.innerHTML='<div class="lb-rank">'+(i+1)+'</div><div class="lb-name">'+p.name+'</div><div class="lb-score">⭐ '+(p.score||0)+'</div>'; list.appendChild(row); });
 }
-function playAgain(){ showScreen('screen-teacher-lobby'); playLobbyMusic(); }
+function playAgain(){ if(soloMode){ showScreen('screen-solo-setup'); updateSoloCountDisplay(); } else { showScreen('screen-teacher-lobby'); playLobbyMusic(); } }
 
 /* STUDENT FLOW */
 function initStudent(){
@@ -993,6 +1053,68 @@ function showMidStudentLeaderboard(){
   });
 }
 
+/* SOLO PRACTICE */
+function initSolo(){
+  soloMode=true; role='student';
+  document.getElementById('music-btn').style.display='none';
+  buildBank(); loadCustomQuestions();
+  showScreen('screen-solo-setup');
+  updateSoloCountDisplay();
+}
+function selectSoloType(type,el){
+  soloSelectedType=type;
+  document.querySelectorAll('#screen-solo-setup .q-type-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  updateSoloCountDisplay();
+}
+function updateSoloCountDisplay(){
+  const display=document.getElementById('solo-count-display');
+  if(!display) return;
+  const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
+  const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body];
+  let pool=soloSelectedType==='all'?[...questionBank.wp1,...questionBank.wp2,...questionBank.sentences,...allSpelling,...questionBank.custom]:soloSelectedType==='spelling'?allSpelling:(questionBank[soloSelectedType]||[]);
+  display.textContent=pool.length+' available — '+Math.min(pool.length,limit)+' will be used';
+}
+function startSoloGame(){
+  const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
+  soloQuestions=getQuestions(soloSelectedType,limit);
+  if(!soloQuestions.length){showToast('No questions available!');return;}
+  soloQIdx=0; myScore=0;
+  showStudentQuestion(soloQuestions[0],Date.now());
+}
+function showSoloResult(submittedAns,correctAns,timeLeft){
+  clearInterval(studentTimerInt); stopMusic();
+  const isCorrect=normalize(submittedAns)===normalize(correctAns);
+  const pts=isCorrect?100+Math.max(0,Math.round((timeLeft||0)*50)):0;
+  myScore+=pts;
+  document.getElementById('result-icon').textContent=isCorrect?'🎉':'😔';
+  document.getElementById('result-word').innerHTML=isCorrect?'<span class="correct-answer">'+correctAns+'</span> ✅':'<span class="wrong-answer">'+(submittedAns||'(blank)')+'</span> → <span class="correct-answer">'+correctAns+'</span>';
+  document.getElementById('result-points').textContent=isCorrect?'+'+pts+' points 🎯':'No points this round';
+  document.getElementById('result-total').textContent='Your total: '+myScore+' pts';
+  document.getElementById('result-rank').textContent='Question '+(soloQIdx+1)+' of '+soloQuestions.length;
+  document.getElementById('solo-next-wrap').style.display='';
+  document.getElementById('solo-progress').textContent=(soloQIdx+1)+' / '+soloQuestions.length+' questions done';
+  document.getElementById('multiplayer-wait-msg').style.display='none';
+  showScreen('screen-student-result');
+  if(isCorrect) playCorrectJingle(); else playWrongJingle();
+}
+function soloNextQuestion(){
+  soloQIdx++;
+  if(soloQIdx>=soloQuestions.length){ showSoloFinal(); return; }
+  showStudentQuestion(soloQuestions[soloQIdx],Date.now());
+}
+function showSoloFinal(){
+  stopMusic();
+  document.getElementById('lb-title').textContent='🎉 Practice Complete!';
+  document.getElementById('podium').innerHTML='<div class="podium-place p1" style="min-width:160px;"><div class="medal">🏆</div><div class="pname">You</div><div class="pscore">⭐'+myScore+'</div></div>';
+  document.getElementById('lb-list').innerHTML='<div class="lb-row" style="justify-content:center;font-family:\'Fredoka One\',cursive;font-size:1.1rem;color:var(--gold);">'+soloQuestions.length+' questions · '+myScore+' pts total</div>';
+  document.getElementById('lb-controls-final').style.display='flex';
+  document.getElementById('lb-controls-mid').style.display='none';
+  document.getElementById('play-again-btn').textContent='🔄 Practice Again';
+  showScreen('screen-leaderboard');
+  playWinnerFanfare();
+}
+
 function showStudentQuestion(q,startedAt){
   stopMusic(); answered=false;
   document.getElementById('student-ans-input').value='';
@@ -1041,6 +1163,10 @@ function submitAnswer(auto){
     ans=(document.getElementById('student-ans-input').value||'').trim();
   }
   document.getElementById('student-submit-btn').disabled=true;
+  if(soloMode){
+    showSoloResult(ans,currentStudentQ.answer,elapsed);
+    return;
+  }
   document.getElementById('submitted-msg').textContent=auto?'⏱ Time up!':'✅ Submitted! Waiting…';
   roomRef.child('answers/'+playerId).set({name:playerName,answer:ans,timeLeft:elapsed,submittedAt:Date.now()});
 }
@@ -1153,6 +1279,8 @@ function showStudentResult(correctAnswer){
       const rank=players.findIndex(p=>p.name===playerName)+1;
       document.getElementById('result-rank').textContent='🏅 Rank: '+rank+' of '+players.length;
     });
+    document.getElementById('solo-next-wrap').style.display='none';
+    document.getElementById('multiplayer-wait-msg').style.display='';
     showScreen('screen-student-result');
     if(isCorrect) playCorrectJingle(); else playWrongJingle();
     roomRef.once('value',rsnap=>{
