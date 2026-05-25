@@ -270,7 +270,7 @@ select.game-input{cursor:pointer;}
           <circle id="timer-circle" cx="32" cy="32" r="28" fill="none" stroke="var(--gold)" stroke-width="5"
             stroke-dasharray="175.9" stroke-dashoffset="0" stroke-linecap="round" style="transition:stroke-dashoffset 1s linear;"/>
         </svg>
-        <div class="timer-text" id="timer-display">20</div>
+        <div class="timer-text" id="timer-display">40</div>
       </div>
     </div>
   </div>
@@ -297,12 +297,16 @@ select.game-input{cursor:pointer;}
 <!-- LEADERBOARD -->
 <div class="screen" id="screen-leaderboard">
   <div style="padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:18px;">
-    <div class="lb-title">🏆 Final Leaderboard</div>
+    <div class="lb-title" id="lb-title">🏆 Final Leaderboard</div>
     <div class="podium" id="podium"></div>
     <div class="lb-list scrollable" id="lb-list" style="max-height:320px;"></div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:4px;">
-      <button class="btn btn-teal" onclick="playAgain()">🔄 Play Again</button>
-      <button class="btn btn-ghost" onclick="goHome()">🏠 Home</button>
+    <div id="lb-controls-final" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:4px;">
+      <button class="btn btn-teal" id="play-again-btn" onclick="playAgain()">🔄 Play Again</button>
+      <button class="btn btn-ghost" id="home-btn" onclick="goHome()">🏠 Home</button>
+    </div>
+    <div id="lb-controls-mid" style="display:none;flex-direction:column;align-items:center;gap:10px;margin-top:4px;">
+      <button class="btn btn-gold btn-lg" id="mid-next-btn" onclick="continueToNextQuestion()">▶ Next Question</button>
+      <div style="color:var(--muted);font-size:.85rem;" id="lb-waiting-msg"></div>
     </div>
   </div>
 </div>
@@ -336,7 +340,7 @@ select.game-input{cursor:pointer;}
 
 <!-- STUDENT ANSWER -->
 <div class="screen" id="screen-student-answer">
-  <div class="student-timer" id="student-timer">20</div>
+  <div class="student-timer" id="student-timer">40</div>
   <div class="s-q-card">
     <div class="s-q-type" id="s-q-type">WORD</div>
     <div id="s-q-emoji" style="font-size:3.2rem;line-height:1;margin:6px 0 10px;text-align:center;min-height:1em;"></div>
@@ -463,12 +467,12 @@ function getQuestions(type,limit){
 let role=null,roomCode=null,roomRef=null;
 let playerName=null,playerId=null;
 let currentQuestions=[],currentQIdx=0;
-let timerInterval=null,timerLeft=20;
+let timerInterval=null,timerLeft=40;
 let selectedQType='wp1';
 let answered=false,revealed=false;
 let myScore=0,myLastQIdx=-1;
 let answerListener=null,gameListener=null;
-const TIMER_DURATION=20;
+const TIMER_DURATION=40;
 let totalPlayers=0;
 
 const EMOJI={
@@ -631,7 +635,7 @@ function showScreen(id){
 function goHome(){ stopMusic(); cleanupListeners(); showScreen('screen-home'); playLobbyMusic(); }
 
 /* TEACHER FLOW */
-function goTeacher(){ role='teacher'; buildBank(); loadCustomQuestions(); createRoom(); }
+function goTeacher(){ role='teacher'; document.getElementById('music-btn').style.display=''; buildBank(); loadCustomQuestions(); createRoom(); }
 function makeCode(){ const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let r=''; for(let i=0;i<4;i++) r+=c[Math.floor(Math.random()*c.length)]; return r; }
 
 function cleanupOldRooms(){
@@ -668,7 +672,7 @@ function createRoom(){
 }
 function generateQR(){
   const el=document.getElementById('qr-wrap'); el.innerHTML='';
-  new QRCode(el,{text:'https://masoud-eal.github.io/LearntoRead/game.html?join='+roomCode,width:140,height:140,colorDark:'#000000',colorLight:'#ffffff'});
+  new QRCode(el,{text:'https://masoud-eal.github.io/LearntoRead/game.html?join='+roomCode,width:260,height:260,colorDark:'#000000',colorLight:'#ffffff'});
 }
 function selectQType(type,el){ selectedQType=type; document.querySelectorAll('.q-type-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); updateQCountDisplay(); }
 function updateQCountDisplay(){
@@ -704,7 +708,7 @@ function playQuestion(){
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('q-emoji').textContent=q.type==='word'?emo(q.word):'';
   document.getElementById('q-text').textContent=q.type==='sentence'?q.display:'🔊 Listen and spell the word';
-  roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:Date.now(),revealed:false,correctAnswer:''});
+  roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:Date.now(),revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
   showScreen('screen-teacher-game');
   playGameMusic();
@@ -784,14 +788,18 @@ function revealAnswers(){
   clearInterval(timerInterval); stopMusic(); revealed=true;
   const q=currentQuestions[currentQIdx];
   roomRef.update({revealed:true,correctAnswer:q.answer});
-  roomRef.child('answers').once('value',snap=>{
-    const answers=snap.val()||{},updates={};
-    Object.entries(answers).forEach(([pid,ans])=>{
-      const isCorrect=normalize(ans.answer)===normalize(q.answer);
-      if(isCorrect){ const bonus=Math.max(0,Math.round((ans.timeLeft||0)*50)),pts=100+bonus; updates['players/'+pid+'/score']=firebase.database.ServerValue.increment(pts); updates['players/'+pid+'/lastPoints']=pts; }
-      else{ updates['players/'+pid+'/lastPoints']=0; }
+  roomRef.child('players').once('value',psnap=>{
+    const existingPlayers=psnap.val()||{};
+    roomRef.child('answers').once('value',snap=>{
+      const answers=snap.val()||{},updates={};
+      Object.entries(answers).forEach(([pid,ans])=>{
+        if(!existingPlayers[pid]) return;
+        const isCorrect=normalize(ans.answer)===normalize(q.answer);
+        if(isCorrect){ const bonus=Math.max(0,Math.round((ans.timeLeft||0)*50)),pts=100+bonus; updates['players/'+pid+'/score']=firebase.database.ServerValue.increment(pts); updates['players/'+pid+'/lastPoints']=pts; }
+        else{ updates['players/'+pid+'/lastPoints']=0; }
+      });
+      roomRef.update(updates);
     });
-    roomRef.update(updates);
   });
   listenForAnswers();
   const revealWord=q.type==='sentence'?q.blank:q.word;
@@ -808,18 +816,49 @@ function revealAnswers(){
   playCorrectJingle();
 }
 
-function nextQuestion(){ currentQIdx++; roomRef.update({revealed:false}); playQuestion(); }
+function nextQuestion(){
+  stopMusic();
+  roomRef.update({midLeaderboard:true});
+  roomRef.child('players').once('value',snap=>{
+    const players=Object.values(snap.val()||{}).filter(p=>p&&p.name);
+    players.sort((a,b)=>(b.score||0)-(a.score||0));
+    document.getElementById('lb-title').textContent='📊 Current Standings';
+    renderLeaderboard(players);
+    document.getElementById('lb-controls-final').style.display='none';
+    document.getElementById('lb-controls-mid').style.display='flex';
+    document.getElementById('mid-next-btn').style.display='';
+    document.getElementById('lb-waiting-msg').textContent='';
+    showScreen('screen-leaderboard');
+  });
+}
+function continueToNextQuestion(){
+  currentQIdx++;
+  document.getElementById('lb-controls-final').style.display='flex';
+  document.getElementById('lb-controls-mid').style.display='none';
+  roomRef.update({revealed:false,midLeaderboard:false});
+  playQuestion();
+}
 
 function showLeaderboard(){
   stopMusic(); roomRef.update({status:'finished'});
-  roomRef.child('players').once('value',snap=>{ const players=Object.values(snap.val()||{}); players.sort((a,b)=>(b.score||0)-(a.score||0)); renderLeaderboard(players); showScreen('screen-leaderboard'); playWinnerFanfare(); });
+  roomRef.child('players').once('value',snap=>{
+    const players=Object.values(snap.val()||{}).filter(p=>p&&p.name);
+    players.sort((a,b)=>(b.score||0)-(a.score||0));
+    document.getElementById('lb-title').textContent='🏆 Final Leaderboard';
+    renderLeaderboard(players);
+    document.getElementById('lb-controls-final').style.display='flex';
+    document.getElementById('lb-controls-mid').style.display='none';
+    showScreen('screen-leaderboard');
+    playWinnerFanfare();
+  });
 }
 function renderLeaderboard(players){
+  players=players.filter(p=>p&&p.name);
   const podium=document.getElementById('podium'),list=document.getElementById('lb-list');
   podium.innerHTML=''; list.innerHTML='';
   const top3=players.slice(0,3),order=top3.length>=3?[1,0,2]:top3.map((_,i)=>i);
   const medals=['🥇','🥈','🥉'],classes=['p1','p2','p3'];
-  order.forEach(i=>{ if(!top3[i]) return; const p=top3[i],el=document.createElement('div'); el.className='podium-place '+classes[i]; el.innerHTML='<div class="medal">'+medals[i]+'</div><div class="pname">'+p.name+'</div><div class="pscore">⭐'+( p.score||0)+'</div>'; podium.appendChild(el); });
+  order.forEach(i=>{ if(!top3[i]) return; const p=top3[i],el=document.createElement('div'); el.className='podium-place '+classes[i]; el.innerHTML='<div class="medal">'+medals[i]+'</div><div class="pname">'+p.name+'</div><div class="pscore">⭐'+(p.score||0)+'</div>'; podium.appendChild(el); });
   players.forEach((p,i)=>{ const row=document.createElement('div'); row.className='lb-row'; row.innerHTML='<div class="lb-rank">'+(i+1)+'</div><div class="lb-name">'+p.name+'</div><div class="lb-score">⭐ '+(p.score||0)+'</div>'; list.appendChild(row); });
 }
 function playAgain(){ showScreen('screen-teacher-lobby'); playLobbyMusic(); }
@@ -827,6 +866,7 @@ function playAgain(){ showScreen('screen-teacher-lobby'); playLobbyMusic(); }
 /* STUDENT FLOW */
 function initStudent(){
   role='student';
+  document.getElementById('music-btn').style.display='none';
   const urlCode=new URLSearchParams(window.location.search).get('join');
   if(urlCode) document.getElementById('join-code').value=urlCode.toUpperCase();
   showScreen('screen-student-join'); stopMusic();
@@ -849,7 +889,7 @@ function joinGame(){
     roomRef.child('players/'+playerId).onDisconnect().remove();
     document.getElementById('s-display-name').textContent=name;
     document.getElementById('s-room-display').textContent='Room: '+roomCode;
-    showScreen('screen-student-lobby'); playLobbyMusic();
+    showScreen('screen-student-lobby');
     listenForGameState();
   });
 }
@@ -868,9 +908,36 @@ function listenForGameState(){
       const onResult=document.getElementById('screen-student-result').classList.contains('active');
       if(onAnswer&&!onResult) showStudentResult(room.correctAnswer);
     }
-    if(room.status==='finished'){
-      roomRef.child('players').once('value',snap2=>{ const players=Object.values(snap2.val()||{}); players.sort((a,b)=>(b.score||0)-(a.score||0)); renderLeaderboard(players); showScreen('screen-leaderboard'); stopMusic(); playWinnerFanfare(); });
+    if(room.midLeaderboard&&room.status==='playing'){
+      const onResult=document.getElementById('screen-student-result').classList.contains('active');
+      if(onResult) showMidStudentLeaderboard();
     }
+    if(room.status==='finished'){
+      roomRef.child('players').once('value',snap2=>{
+        const players=Object.values(snap2.val()||{}).filter(p=>p&&p.name);
+        players.sort((a,b)=>(b.score||0)-(a.score||0));
+        document.getElementById('lb-title').textContent='🏆 Final Leaderboard';
+        renderLeaderboard(players);
+        document.getElementById('lb-controls-final').style.display='flex';
+        document.getElementById('lb-controls-mid').style.display='none';
+        showScreen('screen-leaderboard');
+        stopMusic();
+      });
+    }
+  });
+}
+
+function showMidStudentLeaderboard(){
+  roomRef.child('players').once('value',snap=>{
+    const players=Object.values(snap.val()||{}).filter(p=>p&&p.name);
+    players.sort((a,b)=>(b.score||0)-(a.score||0));
+    document.getElementById('lb-title').textContent='📊 Current Standings';
+    renderLeaderboard(players);
+    document.getElementById('lb-controls-final').style.display='none';
+    document.getElementById('lb-controls-mid').style.display='flex';
+    document.getElementById('mid-next-btn').style.display='none';
+    document.getElementById('lb-waiting-msg').textContent='Waiting for next question…';
+    showScreen('screen-leaderboard');
   });
 }
 
@@ -926,9 +993,18 @@ function showStudentResult(correctAnswer){
     document.getElementById('result-word').innerHTML=isCorrect?'<span class="correct-answer">'+correctAnswer+'</span> ✅':'<span class="wrong-answer">'+(myAnswer||'(blank)')+'</span> → <span class="correct-answer">'+correctAnswer+'</span>';
     document.getElementById('result-points').textContent=isCorrect?'+'+pts+' points 🎯':'No points this round';
     document.getElementById('result-total').textContent='Your total: '+myScore+' pts';
-    roomRef.child('players').once('value',snap2=>{ const players=Object.values(snap2.val()||{}); players.sort((a,b)=>(b.score||0)-(a.score||0)); const rank=players.findIndex(p=>p.name===playerName)+1; document.getElementById('result-rank').textContent='🏅 Rank: '+rank+' of '+players.length; });
+    roomRef.child('players').once('value',snap2=>{
+      const players=Object.values(snap2.val()||{}).filter(p=>p&&p.name);
+      players.sort((a,b)=>(b.score||0)-(a.score||0));
+      const rank=players.findIndex(p=>p.name===playerName)+1;
+      document.getElementById('result-rank').textContent='🏅 Rank: '+rank+' of '+players.length;
+    });
     showScreen('screen-student-result');
     if(isCorrect) playCorrectJingle(); else playWrongJingle();
+    roomRef.once('value',rsnap=>{
+      const r=rsnap.val();
+      if(r&&r.midLeaderboard&&r.status==='playing') showMidStudentLeaderboard();
+    });
   });
 }
 
@@ -976,7 +1052,7 @@ function cleanupListeners(){if(roomRef)roomRef.off();clearInterval(timerInterval
 window.addEventListener('load',()=>{
   buildBank();
   const urlCode=new URLSearchParams(window.location.search).get('join');
-  if(urlCode){document.getElementById('join-code').value=urlCode.toUpperCase();showScreen('screen-student-join');}
+  if(urlCode){role='student';document.getElementById('music-btn').style.display='none';document.getElementById('join-code').value=urlCode.toUpperCase();showScreen('screen-student-join');}
   else{showScreen('screen-home');playLobbyMusic();}
 });
 </script>
