@@ -947,19 +947,17 @@ function renderRevealResults(answers,q){
       const r=translateScore(ans.answer,q.answer,ans.timeLeft||0);
       (r.tier==='correct'?correct:r.tier==='partial'?partial:wrong).push({...ans,_pts:r.pts});
     });
-    bars.innerHTML=`
-      <div class="rgroup">
-        <div class="rgroup-label" style="color:var(--green)">✅ Correct (${correct.length})</div>
-        <div class="rnames">${correct.length?correct.map(a=>`<span class="rname-chip ok">${a.name}</span>`).join(''):'<span style="color:var(--muted);font-size:.85rem;">No one</span>'}</div>
-      </div>
-      <div class="rgroup">
-        <div class="rgroup-label" style="color:var(--gold)">🌟 Partly correct (${partial.length})</div>
-        <div class="rnames">${partial.length?partial.map(a=>`<span class="rname-chip partial">${a.name} <span style="opacity:.6;font-weight:400;">${a.answer||'(blank)'}</span></span>`).join(''):'<span style="color:var(--muted);font-size:.85rem;">No one</span>'}</div>
-      </div>
-      <div class="rgroup">
-        <div class="rgroup-label" style="color:var(--accent)">❌ Wrong (${wrong.length})</div>
-        <div class="rnames">${wrong.length?wrong.map(a=>`<span class="rname-chip no">${a.name} <span style="opacity:.6;font-weight:400;">${a.answer||'(blank)'}</span></span>`).join(''):'<span style="color:var(--muted);font-size:.85rem;">Everyone got points! 🎉</span>'}</div>
-      </div>`;
+    const noOne='<span style="color:var(--muted);font-size:.85rem;">No one</span>';
+    const de=(a,clr)=>'<div style="background:'+clr+'18;border:1.5px solid '+clr+'55;border-radius:12px;padding:8px 14px;">'
+      +'<span style="font-weight:800;font-size:.85rem;color:'+clr+'">'+a.name+'</span>'
+      +'<div style="font-family:\'Nunito\',sans-serif;font-size:.82rem;margin-top:4px;line-height:1.9;">'+diffHtml(a.answer||'',q.answer)+'</div></div>';
+    bars.innerHTML=
+      '<div class="rgroup"><div class="rgroup-label" style="color:var(--green)">✅ Correct ('+correct.length+')</div>'
+      +'<div class="rnames">'+(correct.length?correct.map(a=>'<span class="rname-chip ok">'+a.name+'</span>').join(''):noOne)+'</div></div>'
+      +'<div class="rgroup"><div class="rgroup-label" style="color:var(--gold)">🌟 Partly correct ('+partial.length+')</div>'
+      +'<div style="display:flex;flex-direction:column;gap:6px;width:100%;">'+(partial.length?partial.map(a=>de(a,'#f5a623')).join(''):noOne)+'</div></div>'
+      +'<div class="rgroup"><div class="rgroup-label" style="color:var(--accent)">❌ Wrong ('+wrong.length+')</div>'
+      +'<div style="display:flex;flex-direction:column;gap:6px;width:100%;">'+(wrong.length?wrong.map(a=>de(a,'#e94560')).join(''):'<span style="color:var(--muted);font-size:.85rem;">Everyone got points! 🎉</span>')+'</div></div>';
   } else {
     const correct=[],wrong=[];
     Object.values(answers).forEach(ans=>{
@@ -1211,7 +1209,11 @@ function showSoloResult(submittedAns,correctAns,timeLeft){
   }
   myScore+=pts;
   document.getElementById('result-icon').textContent=tier==='correct'?'🎉':tier==='partial'?'🌟':'😔';
-  document.getElementById('result-word').innerHTML=tier==='correct'?'<span class="correct-answer">'+correctAns+'</span> ✅':tier==='partial'?'<span class="partial-answer">'+(submittedAns||'(blank)')+'</span> → <span class="correct-answer">'+correctAns+'</span>':'<span class="wrong-answer">'+(submittedAns||'(blank)')+'</span> → <span class="correct-answer">'+correctAns+'</span>';
+  if(tier!=='correct'&&currentStudentQ&&currentStudentQ.type==='translate'){
+    document.getElementById('result-word').innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;line-height:2;text-align:center;">'+diffHtml(submittedAns||'',correctAns)+'</div>'+'<div style="font-size:.78rem;color:var(--muted);margin-top:6px;">Correct: <em style="color:var(--green)">'+correctAns+'</em></div>';
+  } else {
+    document.getElementById('result-word').innerHTML=tier==='correct'?'<span class="correct-answer">'+correctAns+'</span> ✅':'<span class="wrong-answer">'+(submittedAns||'(blank)')+'</span> → <span class="correct-answer">'+correctAns+'</span>';
+  }
   document.getElementById('result-points').textContent=tier==='correct'?'+'+pts+' points 🎯':tier==='partial'?'+'+pts+' points 🌟 (partly correct)':'No points this round';
   document.getElementById('result-total').textContent='Your total: '+myScore+' pts';
   document.getElementById('result-rank').textContent='Question '+(soloQIdx+1)+' of '+soloQuestions.length;
@@ -1419,7 +1421,11 @@ function showStudentResult(correctAnswer){
     }
     myScore+=pts;
     document.getElementById('result-icon').textContent=tier==='correct'?'🎉':tier==='partial'?'🌟':'😔';
-    document.getElementById('result-word').innerHTML=tier==='correct'?'<span class="correct-answer">'+correctAnswer+'</span> ✅':tier==='partial'?'<span class="partial-answer">'+(myAnswer||'(blank)')+'</span> → <span class="correct-answer">'+correctAnswer+'</span>':'<span class="wrong-answer">'+(myAnswer||'(blank)')+'</span> → <span class="correct-answer">'+correctAnswer+'</span>';
+    if(tier!=='correct'&&currentStudentQ&&currentStudentQ.type==='translate'){
+      document.getElementById('result-word').innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;line-height:2;text-align:center;">'+diffHtml(myAnswer||'',correctAnswer)+'</div>'+'<div style="font-size:.78rem;color:var(--muted);margin-top:6px;">Correct: <em style="color:var(--green)">'+correctAnswer+'</em></div>';
+    } else {
+      document.getElementById('result-word').innerHTML=tier==='correct'?'<span class="correct-answer">'+correctAnswer+'</span> ✅':'<span class="wrong-answer">'+(myAnswer||'(blank)')+'</span> → <span class="correct-answer">'+correctAnswer+'</span>';
+    }
     document.getElementById('result-points').textContent=tier==='correct'?'+'+pts+' points 🎯':tier==='partial'?'+'+pts+' points 🌟 (partly correct)':'No points this round';
     document.getElementById('result-total').textContent='Your total: '+myScore+' pts';
     roomRef.child('players').once('value',snap2=>{
@@ -1477,6 +1483,42 @@ function updateQForm(){ const type=document.getElementById('new-q-type').value; 
 function normalize(s){return(s||'').toLowerCase().trim().replace(/[^a-z0-9]/g,'');}
 function levenshtein(a,b){const m=a.length,n=b.length,dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);return dp[m][n];}
 function fuzzyMatch(sub,correct){const s=(sub||'').toLowerCase().replace(/[^a-z0-9 ]/g,'').trim(),c=(correct||'').toLowerCase().replace(/[^a-z0-9 ]/g,'').trim();if(s===c)return true;return levenshtein(s,c)<=Math.max(2,Math.floor(c.length/8));}
+function diffHtml(sub,correct){
+  // Split into words, strip punctuation for comparison but keep originals for display
+  const sw=(sub||'').replace(/[.,!?;:]/g,'').trim().split(/\s+/).filter(Boolean);
+  const cw=(correct||'').replace(/[.,!?;:]/g,'').trim().split(/\s+/).filter(Boolean);
+  const swL=sw.map(w=>w.toLowerCase()),cwL=cw.map(w=>w.toLowerCase());
+  if(!sw.length) return cw.map(w=>`<b style="color:var(--accent)">[${w}]</b>`).join(' ');
+  const m=sw.length,n=cw.length;
+  // Word-level Levenshtein DP (exact word match for alignment)
+  const dp=[];
+  for(let i=0;i<=m;i++){dp[i]=[];for(let j=0;j<=n;j++) dp[i][j]=i===0?j:j===0?i:0;}
+  for(let i=1;i<=m;i++) for(let j=1;j<=n;j++)
+    dp[i][j]=swL[i-1]===cwL[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  // Traceback
+  const ops=[];
+  let i=m,j=n;
+  while(i>0||j>0){
+    if(i===0){ops.unshift({t:'ins',c:cw[j-1]});j--;}
+    else if(j===0){ops.unshift({t:'del',s:sw[i-1]});i--;}
+    else if(swL[i-1]===cwL[j-1]){ops.unshift({t:'ok',s:sw[i-1]});i--;j--;}
+    else{
+      const d=dp[i-1][j-1],u=dp[i-1][j],l=dp[i][j-1];
+      if(d<=u&&d<=l){ops.unshift({t:'sub',s:sw[i-1],c:cw[j-1]});i--;j--;}
+      else if(l<=u){ops.unshift({t:'ins',c:cw[j-1]});j--;}
+      else{ops.unshift({t:'del',s:sw[i-1]});i--;}
+    }
+  }
+  return ops.map(o=>{
+    if(o.t==='ok') return `<span style="color:var(--green)">${o.s}</span>`;
+    if(o.t==='ins') return `<span style="color:var(--accent)">[${o.c}?]</span>`;
+    if(o.t==='del') return `<span style="color:var(--accent);text-decoration:line-through;opacity:.7">${o.s}</span>`;
+    // substitution — gold if close typo, red+green if very different
+    const dist=levenshtein(o.s.toLowerCase(),o.c.toLowerCase());
+    if(dist<=2) return `<span style="color:var(--gold)">${o.s}<sup style="font-size:.65em;opacity:.85"> →${o.c}</sup></span>`;
+    return `<span style="color:var(--accent);text-decoration:line-through;opacity:.7">${o.s}</span> <span style="color:var(--green)">${o.c}</span>`;
+  }).join(' ');
+}
 function translateScore(sub,correct,timeLeft){
   const s=(sub||'').toLowerCase().replace(/[^a-z0-9]/g,'').trim();
   const c=(correct||'').toLowerCase().replace(/[^a-z0-9]/g,'').trim();
