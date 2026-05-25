@@ -927,6 +927,7 @@
     <option value="km">🇰🇭 ភាសាខ្មែរ</option>
     <option value="my">🇲🇲 မြန်မာ</option>
     <option value="hi">🇮🇳 हिंदी</option>
+    <option value="ar">🇸🇦 العربية</option>
   </select>
 </div>
 
@@ -1395,11 +1396,12 @@ function emo(word) {
    TRANSLATION
 ══════════════════════════════════════════ */
 let translations = null;
-const RTL_LANGS = new Set(['fa', 'ur']);
+const RTL_LANGS = new Set(['fa', 'ur', 'ar']);
 
 // Per-language font families (Urdu gets Nastaliq; all others use the CSS default)
 const LANG_FONT = {
   'ur': "'Noto Nastaliq Urdu','Noto Sans Arabic',sans-serif",
+  'ar': "'Noto Sans Arabic',sans-serif",
   'fa': "'Noto Sans Arabic',sans-serif",
   'zh': "'Noto Sans SC',sans-serif",
   'km': "'Noto Sans Khmer',sans-serif",

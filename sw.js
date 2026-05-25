@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v6';
+const CACHE = 'learntoread-v7';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -62,6 +62,7 @@ const OPTIONAL = [
   './translations/km.json',
   './translations/my.json',
   './translations/hi.json',
+  './translations/ar.json',
 ];
 
 self.addEventListener('install', e => {
