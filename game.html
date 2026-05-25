@@ -170,6 +170,12 @@ select.game-input{cursor:pointer;}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:12px 24px;font-weight:700;font-size:.9rem;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .3s;z-index:999;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+@keyframes revealPop{0%{transform:scale(0) translateY(20px);opacity:0;}70%{transform:scale(1.12);opacity:1;}100%{transform:scale(1) translateY(0);opacity:1;}}
+.reveal-pop{animation:revealPop .55s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes podiumDrop{0%{transform:scale(0) translateY(-30px);opacity:0;}70%{transform:scale(1.08);opacity:1;}100%{transform:scale(1) translateY(0);opacity:1;}}
+.podium-place{animation:podiumDrop .6s cubic-bezier(.34,1.56,.64,1) both;}
+.lb-row.dimmed{opacity:.28;}
+.lb-row.winner-row{background:rgba(255,215,0,.13);border:1.5px solid rgba(255,215,0,.4);border-radius:10px;}
 
 /* UNSCRAMBLE TILES */
 .unscramble-section{width:100%;max-width:520px;flex-direction:column;gap:12px;}
@@ -399,11 +405,18 @@ select.game-input{cursor:pointer;}
   <div class="logo-bar">WordLink <span>🎮</span> Game</div>
   <div class="join-title">Join a Game</div>
   <div class="card join-card">
-    <div class="field-label">Room Code</div>
-    <input class="game-input code-input" id="join-code" maxlength="4" placeholder="----"
-      oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"
-      onkeydown="if(event.key==='Enter')joinGame()">
-    <div class="field-label">Your Name</div>
+    <div id="join-code-section">
+      <div class="field-label">Room Code</div>
+      <input class="game-input code-input" id="join-code" maxlength="4" placeholder="----"
+        oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"
+        onkeydown="if(event.key==='Enter')joinGame()">
+    </div>
+    <div id="join-qr-banner" style="display:none;background:rgba(15,155,142,.15);border:2px solid var(--teal);border-radius:12px;padding:14px 18px;text-align:center;margin-bottom:8px;">
+      <div style="font-size:1.7rem;">✅</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:1.2rem;color:var(--teal);">Room found!</div>
+      <div id="join-qr-code-display" style="font-size:2rem;font-family:'Fredoka One',cursive;letter-spacing:6px;color:var(--text);"></div>
+    </div>
+    <div class="field-label" id="join-name-label" style="font-size:1.1rem;margin-top:4px;">Your Name</div>
     <input class="game-input" id="join-name" maxlength="18" placeholder="Enter your name"
       onkeydown="if(event.key==='Enter')joinGame()">
     <div class="field-label" style="margin-top:2px;">Language (for Translate games)</div>
@@ -785,6 +798,19 @@ function playWrongJingle(){
   const ctx=getCtx(),now=ctx.currentTime;
   [200,175].forEach((f,i)=>tone(ctx,f,now+i*0.14,0.22,0.09,'sawtooth',0));
 }
+function playRevealTone(rank){
+  if(!musicOn) return;
+  const ctx=getCtx(),now=ctx.currentTime;
+  // rank 5→1: ascending excitement
+  const configs={
+    5:[[330,0],[392,0.1]],
+    4:[[392,0],[494,0.1],[392,0.2]],
+    3:[[494,0],[587,0.1],[740,0.22]],
+    2:[[587,0],[740,0.1],[880,0.22],[740,0.34],[880,0.44]],
+    1:[[523,0],[659,0.09],[784,0.18],[1047,0.30],[784,0.42],[1047,0.55],[1319,0.70]]
+  };
+  (configs[rank]||configs[5]).forEach(([f,t])=>tone(ctx,f,now+t,0.22,0.08,'triangle',0));
+}
 function toggleMusic(){
   musicOn=!musicOn;
   document.getElementById('music-btn').textContent=musicOn?'🎵 Music: On':'🎵 Music: Off';
@@ -1052,11 +1078,10 @@ function showLeaderboard(){
     const players=Object.values(snap.val()||{}).filter(p=>p&&p.name);
     players.sort((a,b)=>(b.score||0)-(a.score||0));
     document.getElementById('lb-title').textContent='🏆 Final Leaderboard';
-    renderLeaderboard(players);
-    document.getElementById('lb-controls-final').style.display='flex';
+    document.getElementById('lb-controls-final').style.display='none';
     document.getElementById('lb-controls-mid').style.display='none';
     showScreen('screen-leaderboard');
-    playWinnerFanfare();
+    revealLeaderboard(players);
   });
 }
 function renderLeaderboard(players){
@@ -1068,6 +1093,44 @@ function renderLeaderboard(players){
   order.forEach(i=>{ if(!top3[i]) return; const p=top3[i],el=document.createElement('div'); el.className='podium-place '+classes[i]; el.innerHTML='<div class="medal">'+medals[i]+'</div><div class="pname">'+p.name+'</div><div class="pscore">⭐'+(p.score||0)+'</div>'; podium.appendChild(el); });
   players.forEach((p,i)=>{ const row=document.createElement('div'); row.className='lb-row'; row.innerHTML='<div class="lb-rank">'+(i+1)+'</div><div class="lb-name">'+p.name+'</div><div class="lb-score">⭐ '+(p.score||0)+'</div>'; list.appendChild(row); });
 }
+function revealLeaderboard(players){
+  const podium=document.getElementById('podium'),list=document.getElementById('lb-list');
+  podium.innerHTML=''; list.innerHTML='';
+  const revealCount=Math.min(5,players.length);
+  const rest=players.slice(revealCount);
+  // Show 6th place and below immediately, dimmed
+  rest.forEach((p,i)=>{
+    const row=document.createElement('div');
+    row.className='lb-row dimmed';
+    row.innerHTML='<div class="lb-rank">'+(revealCount+1+i)+'</div><div class="lb-name">'+p.name+'</div><div class="lb-score">⭐ '+(p.score||0)+'</div>';
+    list.appendChild(row);
+  });
+  // Reveal top 5 in reverse order (5th first, 1st last)
+  const delays=[1200,2600,4000,5600,7600]; // cumulative ms for ranks 5,4,3,2,1
+  for(let ri=0;ri<revealCount;ri++){
+    const rank=revealCount-ri; // 5,4,3,2,1
+    const p=players[rank-1];
+    setTimeout(()=>{
+      playRevealTone(rank);
+      const row=document.createElement('div');
+      row.className='lb-row reveal-pop'+(rank===1?' winner-row':'');
+      row.innerHTML='<div class="lb-rank">'+rank+'</div><div class="lb-name">'+p.name+'</div><div class="lb-score">⭐ '+(p.score||0)+'</div>';
+      list.insertBefore(row,list.firstChild);
+      if(rank===1){
+        // Build podium and play winner fanfare
+        setTimeout(()=>{
+          const top3=players.slice(0,3),order=top3.length>=3?[1,0,2]:top3.map((_,i)=>i);
+          const medals=['🥇','🥈','🥉'],classes=['p1','p2','p3'];
+          order.forEach(i=>{ if(!top3[i]) return; const p=top3[i],el=document.createElement('div'); el.className='podium-place '+classes[i]; el.innerHTML='<div class="medal">'+medals[i]+'</div><div class="pname">'+p.name+'</div><div class="pscore">⭐'+(p.score||0)+'</div>'; podium.appendChild(el); });
+        },400);
+        playWinnerFanfare();
+        setTimeout(()=>{
+          document.getElementById('lb-controls-final').style.display='flex';
+        },3200);
+      }
+    },delays[ri]);
+  }
+}
 function playAgain(){ if(soloMode){ showScreen('screen-solo-setup'); updateSoloCountDisplay(); } else { showScreen('screen-teacher-lobby'); playLobbyMusic(); } }
 
 /* STUDENT FLOW */
@@ -1075,9 +1138,19 @@ function initStudent(){
   role='student';
   document.getElementById('music-btn').style.display='none';
   const urlCode=new URLSearchParams(window.location.search).get('join');
-  if(urlCode) document.getElementById('join-code').value=urlCode.toUpperCase();
   const storedLang=localStorage.getItem('translateLang')||'vi';
   document.getElementById('join-lang').value=storedLang;
+  if(urlCode){
+    const code=urlCode.toUpperCase();
+    document.getElementById('join-code').value=code;
+    document.getElementById('join-code-section').style.display='none';
+    document.getElementById('join-qr-code-display').textContent=code;
+    document.getElementById('join-qr-banner').style.display='block';
+    document.getElementById('join-name-label').style.fontSize='1.25rem';
+    document.getElementById('join-name-label').style.color='var(--teal)';
+    document.getElementById('join-name-label').textContent='👤 Enter your name to join:';
+    setTimeout(()=>document.getElementById('join-name').focus(),300);
+  }
   showScreen('screen-student-join'); stopMusic();
 }
 
@@ -1537,7 +1610,22 @@ function cleanupListeners(){if(roomRef)roomRef.off();clearInterval(timerInterval
 window.addEventListener('load',()=>{
   buildBank();
   const urlCode=new URLSearchParams(window.location.search).get('join');
-  if(urlCode){role='student';document.getElementById('music-btn').style.display='none';document.getElementById('join-code').value=urlCode.toUpperCase();showScreen('screen-student-join');}
+  if(urlCode){
+    const code=urlCode.toUpperCase();
+    role='student';
+    document.getElementById('music-btn').style.display='none';
+    document.getElementById('join-code').value=code;
+    document.getElementById('join-code-section').style.display='none';
+    document.getElementById('join-qr-code-display').textContent=code;
+    document.getElementById('join-qr-banner').style.display='block';
+    document.getElementById('join-name-label').style.fontSize='1.25rem';
+    document.getElementById('join-name-label').style.color='var(--teal)';
+    document.getElementById('join-name-label').textContent='👤 Enter your name to join:';
+    const storedLang=localStorage.getItem('translateLang')||'vi';
+    document.getElementById('join-lang').value=storedLang;
+    showScreen('screen-student-join');
+    setTimeout(()=>document.getElementById('join-name').focus(),300);
+  }
   else{showScreen('screen-home');playLobbyMusic();}
 });
 </script>
