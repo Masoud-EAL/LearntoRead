@@ -171,7 +171,20 @@ select.game-input{cursor:pointer;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
 
-/* EMOJI HINT */
+/* UNSCRAMBLE TILES */
+.unscramble-section{width:100%;max-width:520px;flex-direction:column;gap:12px;}
+.unscrm-label{font-size:.72rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.answer-area{display:flex;flex-wrap:wrap;align-content:flex-start;gap:8px;min-height:56px;padding:10px 12px;background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.18);border-radius:12px;transition:border-color .2s,border-style .2s;}
+.answer-area.complete{border-color:var(--teal);border-style:solid;}
+.word-bank-area{display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px;background:rgba(255,255,255,.04);border-radius:12px;}
+.word-tile{display:inline-flex;align-items:center;padding:8px 14px;border-radius:10px;font-family:'Fredoka One',cursive;font-size:.95rem;cursor:pointer;user-select:none;touch-action:manipulation;border:2px solid transparent;transition:transform .12s,filter .12s,background .15s,border-color .15s;line-height:1.2;}
+.word-tile:active{transform:scale(.93)!important;}
+.bank-tile{background:var(--purple);color:white;}
+.bank-tile:hover{transform:translateY(-2px);filter:brightness(1.15);}
+.ans-tile{background:var(--teal);color:white;}
+.ans-tile:hover{filter:brightness(1.1);}
+.word-tile.selected{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 4px 14px rgba(245,166,35,.45);}
+
 .q-emoji-big{font-size:2.8rem;line-height:1;min-height:1em;text-align:center;margin-bottom:4px;}
 
 /* BIG REVEAL */
@@ -242,6 +255,7 @@ select.game-input{cursor:pointer;}
           <button class="q-type-tab" onclick="selectQType('body',this)">Body</button>
           <button class="q-type-tab" onclick="selectQType('spelling',this)">All Spelling</button>
           <button class="q-type-tab" onclick="selectQType('custom',this)">Custom</button>
+          <button class="q-type-tab" onclick="selectQType('unscramble',this)">Unscramble</button>
           <button class="q-type-tab" onclick="selectQType('all',this)">All</button>
         </div>
         <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="q-count-display">Loading…</div>
@@ -347,10 +361,20 @@ select.game-input{cursor:pointer;}
     <div class="s-q-text" id="s-q-text">…</div>
     <button class="s-hear-btn" id="s-hear-btn" onclick="studentSpeak()">🔊 Hear it again</button>
   </div>
-  <div class="ans-input-wrap">
+  <div id="ans-input-section" class="ans-input-wrap">
     <input class="game-input" id="student-ans-input" placeholder="Type your answer…"
       autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
       onkeydown="if(event.key==='Enter')submitAnswer()">
+  </div>
+  <div class="unscramble-section" id="unscramble-section" style="display:none;">
+    <div>
+      <div class="unscrm-label">Your sentence</div>
+      <div class="answer-area" id="answer-area"></div>
+    </div>
+    <div>
+      <div class="unscrm-label">Tap (or drag) words to build your sentence</div>
+      <div class="word-bank-area" id="word-bank-area"></div>
+    </div>
   </div>
   <button class="submit-btn" id="student-submit-btn" onclick="submitAnswer()">✓ Submit</button>
   <div class="submitted-msg" id="submitted-msg"></div>
@@ -431,8 +455,23 @@ const SPELL_MONTHS=['January','February','March','April','May','June','July','Au
 const SPELL_WEATHER=['sunny','cloudy','rainy','windy','snowy','stormy','foggy','hot','cold','warm','cool','humid'];
 const SPELL_FRUITS=['apple','banana','orange','grape','mango','peach','plum','pear','lemon','cherry','strawberry','watermelon','pineapple','coconut','kiwi'];
 const SPELL_BODY=['head','eye','ear','nose','mouth','tooth','tongue','neck','shoulder','arm','elbow','wrist','hand','finger','thumb','chest','stomach','back','hip','leg','knee','ankle','foot','toe'];
+const UNSCRAMBLE_SENTENCES=[
+  'My name is David.','I am from Vietnam.','I live in Springvale.','I am married.',
+  'I have two children.','Today is Monday.','The weather is sunny and warm.',
+  'I have a book in my bag.','I have a pen in my bag.','I have a phone in my bag.',
+  'I have a notebook in my bag.','I like football.','I like music.','I like cooking.',
+  'My favourite colour is blue.','My favourite fruit is apple.',
+  'My favourite food is rice and chicken.','I came to Australia in 2022.',
+  'I can drive.','I can cook.','I can clean.','I can use a computer.',
+  'I can speak a little English.','I want to learn English.',
+  'I want to speak to people.','I want to find a good job.','My weekend is good.',
+  'I go to English class on Mondays.','There are four people in my family.',
+  'I want to help my children with school.','I have one son and one daughter.',
+  'I have one brother and one sister.','I speak Vietnamese and a little English.',
+  'I wake up at 7:00 every day.',
+];
 
-let questionBank={wp1:[],wp2:[],sentences:[],numbers:[],days:[],months:[],weather:[],fruits:[],body:[],custom:[]};
+let questionBank={wp1:[],wp2:[],sentences:[],numbers:[],days:[],months:[],weather:[],fruits:[],body:[],custom:[],unscramble:[]};
 function buildBank(){
   questionBank.wp1=WP1_WORDS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.wp2=WP2_WORDS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
@@ -443,6 +482,7 @@ function buildBank(){
   questionBank.weather=SPELL_WEATHER.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.fruits=SPELL_FRUITS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.body=SPELL_BODY.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
+  questionBank.unscramble=UNSCRAMBLE_SENTENCES.map(s=>({type:'unscramble',sentence:s,answer:s,words:s.trim().split(/\s+/)}));
 }
 function getQuestions(type,limit){
   const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body];
@@ -458,6 +498,7 @@ function getQuestions(type,limit){
   else if(type==='body') pool=[...questionBank.body];
   else if(type==='spelling') pool=allSpelling;
   else if(type==='custom') pool=[...questionBank.custom];
+  else if(type==='unscramble') pool=[...questionBank.unscramble];
   else pool=[...questionBank.wp1,...questionBank.wp2,...questionBank.sentences,...allSpelling,...questionBank.custom];
   shuffle(pool);
   return pool.slice(0,limit);
@@ -700,14 +741,14 @@ function playQuestion(){
   stopMusic(); revealed=false; answered=false;
   const q=currentQuestions[currentQIdx],total=currentQuestions.length;
   document.getElementById('game-prog').textContent='Question '+(currentQIdx+1)+' of '+total;
-  document.getElementById('q-badge').textContent=q.type==='sentence'?'SENTENCE':'WORD';
-  document.getElementById('q-hint').textContent=q.type==='sentence'?'Students type the missing word':'';
+  document.getElementById('q-badge').textContent=q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':'WORD';
+  document.getElementById('q-hint').textContent=q.type==='sentence'?'Students type the missing word':q.type==='unscramble'?'Students arrange word tiles':'';
   document.getElementById('ans-bars').innerHTML='';
   document.getElementById('reveal-btn').style.display='';
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('q-emoji').textContent=q.type==='word'?emo(q.word):'';
-  document.getElementById('q-text').textContent=q.type==='sentence'?q.display:'🔊 Listen and spell the word';
+  document.getElementById('q-text').textContent=q.type==='sentence'?q.display:q.type==='unscramble'?q.sentence:'🔊 Listen and spell the word';
   roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:Date.now(),revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
   showScreen('screen-teacher-game');
@@ -720,7 +761,7 @@ function playQuestion(){
 function teacherSpeak(){
   const q=currentQuestions[currentQIdx],btn=document.getElementById('hear-btn');
   btn.classList.add('playing');
-  const spokenText=q.type==='sentence'?q.sentence.replace('___',q.blank):q.word;
+  const spokenText=q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.word;
   const utt=new SpeechSynthesisUtterance(spokenText);
   utt.rate=0.7; utt.lang='en-AU';
   utt.onend=utt.onerror=()=>btn.classList.remove('playing');
@@ -813,11 +854,11 @@ function revealAnswers(){
     });
   });
   listenForAnswers();
-  const revealWord=q.type==='sentence'?q.blank:q.word;
+  const revealWord=q.type==='sentence'?q.blank:q.type==='unscramble'?q.sentence:q.word;
   const revealSentence=q.type==='sentence'?q.sentence.replace('___',q.blank):'';
-  document.getElementById('q-text').innerHTML=
-    `<div class="reveal-word">${revealWord}</div>`+
-    (revealSentence?`<div class="reveal-sentence">${revealSentence}</div>`:'');
+  document.getElementById('q-text').innerHTML=q.type==='unscramble'
+    ?`<div class="reveal-word" style="font-size:clamp(1rem,3.5vw,1.6rem);line-height:1.4">${revealWord}</div>`
+    :`<div class="reveal-word">${revealWord}</div>`+(revealSentence?`<div class="reveal-sentence">${revealSentence}</div>`:'');
   document.getElementById('q-emoji').textContent=q.type==='word'?emo(q.word):'';
   document.getElementById('q-hint').textContent='';
   document.getElementById('reveal-btn').style.display='none';
@@ -955,11 +996,18 @@ function showMidStudentLeaderboard(){
 function showStudentQuestion(q,startedAt){
   stopMusic(); answered=false;
   document.getElementById('student-ans-input').value='';
-  document.getElementById('student-submit-btn').disabled=false;
   document.getElementById('submitted-msg').textContent='';
-  document.getElementById('s-q-type').textContent=q.type==='sentence'?'SENTENCE — type the missing word':'WORD — listen and spell it';
+  const isUnscramble=q.type==='unscramble';
+  document.getElementById('ans-input-section').style.display=isUnscramble?'none':'';
+  document.getElementById('unscramble-section').style.display=isUnscramble?'flex':'none';
+  document.getElementById('student-submit-btn').disabled=isUnscramble; // enabled by checkAllPlaced
+  document.getElementById('s-q-type').textContent=isUnscramble?'UNSCRAMBLE — arrange the word tiles':q.type==='sentence'?'SENTENCE — type the missing word':'WORD — listen and spell it';
   document.getElementById('s-q-emoji').textContent=q.type==='word'?emo(q.word):'';
-  document.getElementById('s-q-text').textContent=q.type==='sentence'?q.display:'🔊 Listen carefully…';
+  document.getElementById('s-q-text').textContent=isUnscramble?'Put the words in the right order:':q.type==='sentence'?q.display:'🔊 Listen carefully…';
+  if(isUnscramble){
+    const words=Array.isArray(q.words)?q.words:Object.values(q.words||{});
+    renderUnscrambleTiles(words);
+  }
   showScreen('screen-student-answer');
   studentSpeak(q); startStudentTimer(startedAt);
 }
@@ -968,7 +1016,7 @@ let currentStudentQ=null;
 function studentSpeak(q){
   currentStudentQ=q||currentStudentQ;
   if(!currentStudentQ) return;
-  const text=currentStudentQ.type==='sentence'?currentStudentQ.sentence.replace('___',currentStudentQ.blank):currentStudentQ.word;
+  const text=currentStudentQ.type==='sentence'?currentStudentQ.sentence.replace('___',currentStudentQ.blank):currentStudentQ.type==='unscramble'?currentStudentQ.sentence:currentStudentQ.word;
   if(!text) return;
   const utt=new SpeechSynthesisUtterance(text);
   utt.rate=0.7; utt.lang='en-AU';
@@ -986,10 +1034,105 @@ function startStudentTimer(startedAt){
 function submitAnswer(auto){
   if(answered) return; answered=true; clearInterval(studentTimerInt);
   const elapsed=parseInt(document.getElementById('student-timer').textContent)||0;
-  const ans=(document.getElementById('student-ans-input').value||'').trim();
+  let ans;
+  if(currentStudentQ&&currentStudentQ.type==='unscramble'){
+    ans=Array.from(document.querySelectorAll('#answer-area .word-tile')).map(t=>t.dataset.word).join(' ');
+  } else {
+    ans=(document.getElementById('student-ans-input').value||'').trim();
+  }
   document.getElementById('student-submit-btn').disabled=true;
   document.getElementById('submitted-msg').textContent=auto?'⏱ Time up!':'✅ Submitted! Waiting…';
   roomRef.child('answers/'+playerId).set({name:playerName,answer:ans,timeLeft:elapsed,submittedAt:Date.now()});
+}
+
+/* UNSCRAMBLE TILE ENGINE */
+let selectedAnswerTile=null,draggedTile=null;
+
+function renderUnscrambleTiles(words){
+  const bank=document.getElementById('word-bank-area');
+  const answer=document.getElementById('answer-area');
+  bank.innerHTML=''; answer.innerHTML='';
+  answer.classList.remove('complete');
+  selectedAnswerTile=null;
+  shuffle([...words]).forEach(word=>{
+    const tile=makeTile(word,'bank-tile');
+    tile.onclick=()=>bankTileClick(tile);
+    setupTileDrag(tile);
+    bank.appendChild(tile);
+  });
+  setupDropZone(answer,true);
+  setupDropZone(bank,false);
+}
+
+function makeTile(word,cls){
+  const t=document.createElement('div');
+  t.className='word-tile '+cls;
+  t.textContent=word; t.dataset.word=word;
+  t.setAttribute('draggable','true');
+  return t;
+}
+
+function sendToAnswer(tile){
+  if(tile.classList.contains('ans-tile')) return;
+  tile.classList.replace('bank-tile','ans-tile');
+  tile.onclick=()=>answerTileClick(tile);
+  document.getElementById('answer-area').appendChild(tile);
+  checkAllPlaced();
+}
+
+function sendToBank(tile){
+  if(tile.classList.contains('bank-tile')) return;
+  if(selectedAnswerTile===tile){ tile.classList.remove('selected'); selectedAnswerTile=null; }
+  tile.classList.replace('ans-tile','bank-tile');
+  tile.onclick=()=>bankTileClick(tile);
+  document.getElementById('word-bank-area').appendChild(tile);
+  checkAllPlaced();
+}
+
+function bankTileClick(tile){ if(!answered) sendToAnswer(tile); }
+
+function answerTileClick(tile){
+  if(answered) return;
+  if(!selectedAnswerTile){
+    selectedAnswerTile=tile; tile.classList.add('selected');
+  } else if(selectedAnswerTile===tile){
+    tile.classList.remove('selected'); selectedAnswerTile=null;
+    sendToBank(tile);
+  } else {
+    // Swap the two tiles
+    const answer=document.getElementById('answer-area');
+    const marker=document.createComment('');
+    answer.insertBefore(marker,selectedAnswerTile);
+    answer.insertBefore(selectedAnswerTile,tile.nextSibling);
+    answer.insertBefore(tile,marker);
+    marker.remove();
+    selectedAnswerTile.classList.remove('selected'); selectedAnswerTile=null;
+  }
+}
+
+function checkAllPlaced(){
+  const done=document.getElementById('word-bank-area').children.length===0
+           &&document.getElementById('answer-area').children.length>0;
+  if(!answered) document.getElementById('student-submit-btn').disabled=!done;
+  document.getElementById('answer-area').classList.toggle('complete',done);
+}
+
+function setupTileDrag(tile){
+  tile.addEventListener('dragstart',e=>{
+    draggedTile=tile; e.dataTransfer.effectAllowed='move';
+    setTimeout(()=>tile.style.opacity='0.4',0);
+  });
+  tile.addEventListener('dragend',()=>{ tile.style.opacity=''; draggedTile=null; });
+}
+
+function setupDropZone(el,toAnswer){
+  el.addEventListener('dragover',e=>{ e.preventDefault(); e.dataTransfer.dropEffect='move'; });
+  el.addEventListener('drop',e=>{
+    e.preventDefault();
+    if(!draggedTile||answered) return;
+    if(toAnswer&&draggedTile.classList.contains('bank-tile')) sendToAnswer(draggedTile);
+    else if(!toAnswer&&draggedTile.classList.contains('ans-tile')) sendToBank(draggedTile);
+  });
 }
 
 function showStudentResult(correctAnswer){
