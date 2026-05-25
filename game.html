@@ -672,7 +672,7 @@ function createRoom(){
 }
 function generateQR(){
   const el=document.getElementById('qr-wrap'); el.innerHTML='';
-  new QRCode(el,{text:'https://masoud-eal.github.io/LearntoRead/game.html?join='+roomCode,width:520,height:520,colorDark:'#000000',colorLight:'#ffffff'});
+  new QRCode(el,{text:'https://masoud-eal.github.io/LearntoRead/game.html?join='+roomCode,width:260,height:260,colorDark:'#000000',colorLight:'#ffffff'});
 }
 function selectQType(type,el){ selectedQType=type; document.querySelectorAll('.q-type-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); updateQCountDisplay(); }
 function updateQCountDisplay(){
