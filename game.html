@@ -270,7 +270,7 @@ select.game-input{cursor:pointer;}
           <circle id="timer-circle" cx="32" cy="32" r="28" fill="none" stroke="var(--gold)" stroke-width="5"
             stroke-dasharray="175.9" stroke-dashoffset="0" stroke-linecap="round" style="transition:stroke-dashoffset 1s linear;"/>
         </svg>
-        <div class="timer-text" id="timer-display">40</div>
+        <div class="timer-text" id="timer-display">30</div>
       </div>
     </div>
   </div>
@@ -340,7 +340,7 @@ select.game-input{cursor:pointer;}
 
 <!-- STUDENT ANSWER -->
 <div class="screen" id="screen-student-answer">
-  <div class="student-timer" id="student-timer">40</div>
+  <div class="student-timer" id="student-timer">30</div>
   <div class="s-q-card">
     <div class="s-q-type" id="s-q-type">WORD</div>
     <div id="s-q-emoji" style="font-size:3.2rem;line-height:1;margin:6px 0 10px;text-align:center;min-height:1em;"></div>
@@ -467,12 +467,12 @@ function getQuestions(type,limit){
 let role=null,roomCode=null,roomRef=null;
 let playerName=null,playerId=null;
 let currentQuestions=[],currentQIdx=0;
-let timerInterval=null,timerLeft=40;
+let timerInterval=null,timerLeft=30;
 let selectedQType='wp1';
 let answered=false,revealed=false;
 let myScore=0,myLastQIdx=-1;
 let answerListener=null,gameListener=null;
-const TIMER_DURATION=40;
+const TIMER_DURATION=30;
 let totalPlayers=0;
 
 const EMOJI={
@@ -793,10 +793,21 @@ function revealAnswers(){
     roomRef.child('answers').once('value',snap=>{
       const answers=snap.val()||{},updates={};
       Object.entries(answers).forEach(([pid,ans])=>{
-        if(!existingPlayers[pid]) return;
+        if(!ans||!ans.name) return;
+        // Always restore the name — this fixes "undefined" when a student's
+        // phone locked mid-game, dropping the Firebase connection and triggering
+        // onDisconnect().remove() which deleted their players entry.
+        updates['players/'+pid+'/name']=ans.name;
         const isCorrect=normalize(ans.answer)===normalize(q.answer);
-        if(isCorrect){ const bonus=Math.max(0,Math.round((ans.timeLeft||0)*50)),pts=100+bonus; updates['players/'+pid+'/score']=firebase.database.ServerValue.increment(pts); updates['players/'+pid+'/lastPoints']=pts; }
-        else{ updates['players/'+pid+'/lastPoints']=0; }
+        if(isCorrect){
+          const bonus=Math.max(0,Math.round((ans.timeLeft||0)*50)),pts=100+bonus;
+          // Use explicit accumulated value so a reconnected player keeps their prior score.
+          const prior=(existingPlayers[pid]&&existingPlayers[pid].score)||0;
+          updates['players/'+pid+'/score']=prior+pts;
+          updates['players/'+pid+'/lastPoints']=pts;
+        } else {
+          updates['players/'+pid+'/lastPoints']=0;
+        }
       });
       roomRef.update(updates);
     });
