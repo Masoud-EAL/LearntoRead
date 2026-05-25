@@ -876,7 +876,7 @@ function playQuestion(){
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('q-emoji').textContent=q.type==='word'?emo(q.word):'';
-  document.getElementById('q-text').textContent=q.type==='sentence'?q.display:q.type==='unscramble'||q.type==='gramscramble'?q.sentence:q.type==='translate'?q.en:'🔊 Listen and spell the word';
+  document.getElementById('q-text').textContent=q.type==='sentence'?q.display:q.type==='unscramble'||q.type==='gramscramble'?q.sentence:q.type==='translate'?'🌐 Students see this in their own language':'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=noAudio?'none':'';
   roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:Date.now(),revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
@@ -898,8 +898,11 @@ function teacherSpeak(){
   window.speechSynthesis.cancel(); window.speechSynthesis.speak(utt);
 }
 
+let currentTimerDuration=TIMER_DURATION;
 function startTeacherTimer(){
-  clearInterval(timerInterval); timerLeft=TIMER_DURATION; updateTimerUI(timerLeft);
+  const q=currentQuestions[currentQIdx];
+  currentTimerDuration=q.type==='translate'?60:TIMER_DURATION;
+  clearInterval(timerInterval); timerLeft=currentTimerDuration; updateTimerUI(timerLeft);
   timerInterval=setInterval(()=>{
     timerLeft--; updateTimerUI(timerLeft); tickGameMusic(timerLeft);
     if(timerLeft<=0){ clearInterval(timerInterval); revealAnswers(); }
@@ -907,7 +910,7 @@ function startTeacherTimer(){
 }
 function updateTimerUI(t){
   document.getElementById('timer-display').textContent=t;
-  document.getElementById('timer-circle').style.strokeDashoffset=175.9*(1-t/TIMER_DURATION);
+  document.getElementById('timer-circle').style.strokeDashoffset=175.9*(1-t/currentTimerDuration);
   document.getElementById('timer-circle').style.stroke=t<=5?'var(--accent)':'var(--gold)';
 }
 
@@ -1238,7 +1241,7 @@ function showStudentQuestion(q,startedAt){
     renderUnscrambleTiles(words);
   }
   showScreen('screen-student-answer');
-  studentSpeak(q); startStudentTimer(startedAt);
+  studentSpeak(q); startStudentTimer(startedAt, q.type==='translate'?60:TIMER_DURATION);
 }
 
 let currentStudentQ=null;
@@ -1254,10 +1257,11 @@ function studentSpeak(q){
 }
 
 let studentTimerInt=null;
-function startStudentTimer(startedAt){
+function startStudentTimer(startedAt,dur){
+  dur=dur||TIMER_DURATION;
   clearInterval(studentTimerInt);
   const el=document.getElementById('student-timer');
-  function tick(){ const elapsed=(Date.now()-startedAt)/1000,left=Math.max(0,TIMER_DURATION-elapsed),leftInt=Math.ceil(left); el.textContent=leftInt; el.classList.toggle('urgent',leftInt<=5); if(left<=0){ clearInterval(studentTimerInt); if(!answered) submitAnswer(true); } }
+  function tick(){ const elapsed=(Date.now()-startedAt)/1000,left=Math.max(0,dur-elapsed),leftInt=Math.ceil(left); el.textContent=leftInt; el.classList.toggle('urgent',leftInt<=5); if(left<=0){ clearInterval(studentTimerInt); if(!answered) submitAnswer(true); } }
   tick(); studentTimerInt=setInterval(tick,500);
 }
 
