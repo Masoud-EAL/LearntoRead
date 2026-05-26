@@ -1035,10 +1035,12 @@ function revealAnswers(){
     });
   });
   listenForAnswers();
-  const revealWord=q.type==='sentence'?q.blank:q.type==='unscramble'?q.sentence:q.word;
+  const revealWord=q.type==='sentence'?q.blank:q.type==='unscramble'||q.type==='gramscramble'?q.sentence:q.type==='translate'?q.answer:q.word;
   const revealSentence=q.type==='sentence'?q.sentence.replace('___',q.blank):'';
-  document.getElementById('q-text').innerHTML=q.type==='unscramble'
+  document.getElementById('q-text').innerHTML=q.type==='unscramble'||q.type==='gramscramble'
     ?`<div class="reveal-word" style="font-size:clamp(1rem,3.5vw,1.6rem);line-height:1.4">${revealWord}</div>`
+    :q.type==='translate'
+    ?`<div class="reveal-word" style="font-size:clamp(.85rem,2.8vw,1.3rem);line-height:1.5">${revealWord}</div>`
     :`<div class="reveal-word">${revealWord}</div>`+(revealSentence?`<div class="reveal-sentence">${revealSentence}</div>`:'');
   document.getElementById('q-emoji').textContent=q.type==='word'?emo(q.word):'';
   document.getElementById('q-hint').textContent='';
@@ -1282,8 +1284,8 @@ function showSoloResult(submittedAns,correctAns,timeLeft){
   }
   myScore+=pts;
   document.getElementById('result-icon').textContent=tier==='correct'?'🎉':tier==='partial'?'🌟':'😔';
-  if(tier!=='correct'&&currentStudentQ&&currentStudentQ.type==='translate'){
-    document.getElementById('result-word').innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;line-height:2;text-align:center;">'+diffHtml(submittedAns||'',correctAns)+'</div>'+'<div style="font-size:.78rem;color:var(--muted);margin-top:6px;">Correct: <em style="color:var(--green)">'+correctAns+'</em></div>';
+  if(currentStudentQ&&currentStudentQ.type==='translate'){
+    document.getElementById('result-word').innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;line-height:2;text-align:center;">'+diffHtml(submittedAns||'',correctAns)+'</div>'+(tier!=='correct'?'<div style="font-size:.78rem;color:var(--muted);margin-top:6px;">Correct: <em style="color:var(--green)">'+correctAns+'</em></div>':'');
   } else {
     document.getElementById('result-word').innerHTML=tier==='correct'?'<span class="correct-answer">'+correctAns+'</span> ✅':'<span class="wrong-answer">'+(submittedAns||'(blank)')+'</span> → <span class="correct-answer">'+correctAns+'</span>';
   }
@@ -1494,8 +1496,8 @@ function showStudentResult(correctAnswer){
     }
     myScore+=pts;
     document.getElementById('result-icon').textContent=tier==='correct'?'🎉':tier==='partial'?'🌟':'😔';
-    if(tier!=='correct'&&currentStudentQ&&currentStudentQ.type==='translate'){
-      document.getElementById('result-word').innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;line-height:2;text-align:center;">'+diffHtml(myAnswer||'',correctAnswer)+'</div>'+'<div style="font-size:.78rem;color:var(--muted);margin-top:6px;">Correct: <em style="color:var(--green)">'+correctAnswer+'</em></div>';
+    if(currentStudentQ&&currentStudentQ.type==='translate'){
+      document.getElementById('result-word').innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;line-height:2;text-align:center;">'+diffHtml(myAnswer||'',correctAnswer)+'</div>'+(tier!=='correct'?'<div style="font-size:.78rem;color:var(--muted);margin-top:6px;">Correct: <em style="color:var(--green)">'+correctAnswer+'</em></div>':'');
     } else {
       document.getElementById('result-word').innerHTML=tier==='correct'?'<span class="correct-answer">'+correctAnswer+'</span> ✅':'<span class="wrong-answer">'+(myAnswer||'(blank)')+'</span> → <span class="correct-answer">'+correctAnswer+'</span>';
     }
