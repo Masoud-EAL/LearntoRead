@@ -904,7 +904,7 @@ function playQuestion(){
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('q-emoji').textContent=q.type==='word'?emo(q.word):'';
-  document.getElementById('q-text').textContent=q.type==='sentence'?q.display:q.type==='unscramble'||q.type==='gramscramble'?q.sentence:q.type==='translate'?'🌐 Students see this in their own language':'🔊 Listen and spell the word';
+  document.getElementById('q-text').textContent=q.type==='sentence'?q.display:q.type==='gramscramble'?'📝 Students are unscrambling a sentence':q.type==='unscramble'?q.sentence:q.type==='translate'?'🌐 Students see this in their own language':'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=noAudio?'none':'';
   roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:Date.now(),revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
@@ -1037,7 +1037,9 @@ function revealAnswers(){
   listenForAnswers();
   const revealWord=q.type==='sentence'?q.blank:q.type==='unscramble'||q.type==='gramscramble'?q.sentence:q.type==='translate'?q.answer:q.word;
   const revealSentence=q.type==='sentence'?q.sentence.replace('___',q.blank):'';
-  document.getElementById('q-text').innerHTML=q.type==='unscramble'||q.type==='gramscramble'
+  document.getElementById('q-text').innerHTML=q.type==='gramscramble'
+    ?`<div class="q-hint" style="font-size:1rem;color:var(--green)">✅ Answer revealed to students</div>`
+    :q.type==='unscramble'
     ?`<div class="reveal-word" style="font-size:clamp(1rem,3.5vw,1.6rem);line-height:1.4">${revealWord}</div>`
     :q.type==='translate'
     ?`<div class="reveal-word" style="font-size:clamp(.85rem,2.8vw,1.3rem);line-height:1.5">${revealWord}</div>`
@@ -1171,6 +1173,8 @@ function joinGame(){
     myScore=0; myLastQIdx=-1;
     roomRef.child('players/'+playerId).set({name,score:0});
     roomRef.child('players/'+playerId).onDisconnect().remove();
+    document.removeEventListener('visibilitychange',handlePlayerVisibility);
+    document.addEventListener('visibilitychange',handlePlayerVisibility);
     document.getElementById('s-display-name').textContent=name;
     document.getElementById('s-room-display').textContent='Room: '+roomCode;
     showScreen('screen-student-lobby');
@@ -1606,7 +1610,18 @@ function translateScore(sub,correct,timeLeft){
 }
 function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
 function showToast(msg,dur){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur||2200);}
-function cleanupListeners(){if(roomRef)roomRef.off();clearInterval(timerInterval);clearInterval(studentTimerInt);window.speechSynthesis&&window.speechSynthesis.cancel();}
+function handlePlayerVisibility(){
+  if(!playerId||!roomRef) return;
+  if(document.visibilityState==='hidden'){
+    roomRef.child('players/'+playerId).onDisconnect().cancel();
+  } else {
+    roomRef.child('players/'+playerId).once('value',snap=>{
+      if(!snap.exists()) roomRef.child('players/'+playerId).set({name:playerName,score:myScore||0});
+    });
+    roomRef.child('players/'+playerId).onDisconnect().remove();
+  }
+}
+function cleanupListeners(){if(roomRef)roomRef.off();clearInterval(timerInterval);clearInterval(studentTimerInt);window.speechSynthesis&&window.speechSynthesis.cancel();document.removeEventListener('visibilitychange',handlePlayerVisibility);}
 
 /* INIT */
 window.addEventListener('load',()=>{
