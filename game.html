@@ -718,6 +718,25 @@ function tone(ctx,freq,start,dur,vol,wave,pan){
 function chord(ctx,freqs,start,dur,vol,wave,pan){
   freqs.forEach(f=>tone(ctx,f,start,dur,vol/freqs.length,wave||'sine',pan||0));
 }
+function noiseBurst(ctx,start,dur,vol,filterFreq,filterQ,pan,atk){
+  atk=atk!==undefined?atk:Math.min(0.012,dur*0.15);
+  const frames=Math.ceil(ctx.sampleRate*dur);
+  const buf=ctx.createBuffer(1,frames,ctx.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<frames;i++) d[i]=Math.random()*2-1;
+  const src=ctx.createBufferSource(); src.buffer=buf;
+  const flt=ctx.createBiquadFilter(); flt.type='bandpass';
+  flt.frequency.value=filterFreq; flt.Q.value=filterQ||0.7;
+  const g=ctx.createGain(),p=ctx.createStereoPanner();
+  p.pan.value=pan||0;
+  g.gain.setValueAtTime(0.0001,start);
+  g.gain.linearRampToValueAtTime(vol*MASTER_VOL,start+atk);
+  g.gain.setValueAtTime(vol*MASTER_VOL,start+dur*0.65);
+  g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+  src.connect(flt); flt.connect(g); g.connect(p); p.connect(ctx.destination);
+  src.start(start); src.stop(start+dur+0.06);
+  oscNodes.push(src);
+}
 
 /* LOBBY — upbeat 32-beat C-pentatonic groove */
 function playLobbyMusic(){
@@ -786,6 +805,12 @@ function playWinnerFanfare(){
   const p2=cs+1.35;
   [523.3,659.3,783.9,1046.5].forEach((f,i)=>tone(ctx,f,p2+i*0.11,0.35,0.10,'triangle',i%2===0?-0.35:0.35));
   chord(ctx,[523.3,659.3,783.9,1046.5],p2+0.55,1.4,0.08,'triangle',0);
+  // Crowd cheering: three noise layers swell in when the big chord hits
+  noiseBurst(ctx,cs,3.5,0.38,480,0.5,0,0.45);
+  noiseBurst(ctx,cs+0.05,3.3,0.22,1050,0.55,0.12,0.40);
+  noiseBurst(ctx,cs+0.1,3.4,0.25,240,0.4,-0.1,0.50);
+  // Rhythmic clapping (9 claps, alternating left/right pan)
+  for(let i=0;i<9;i++) noiseBurst(ctx,cs+i*0.38,0.085,0.42,1380,1.4,i%2?0.35:-0.35);
   musicTimeout=setTimeout(()=>{ musicType=null; playLobbyMusic(); },(p2+2.1-now)*1000);
 }
 function playCorrectJingle(){
