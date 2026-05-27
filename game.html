@@ -262,7 +262,8 @@ select.game-input{cursor:pointer;}
       <div class="q-type-tabs">
         <button class="q-type-tab active" onclick="selectSoloType('wp1',this)">WP1</button>
         <button class="q-type-tab" onclick="selectSoloType('wp2',this)">WP2</button>
-        <button class="q-type-tab" onclick="selectSoloType('sentences',this)">Sentences</button>
+        <button class="q-type-tab" onclick="selectSoloType('beginner',this)">Beginner</button>
+        <button class="q-type-tab" onclick="selectSoloType('elementary',this)">Elementary</button>
         <button class="q-type-tab" onclick="selectSoloType('numbers',this)">1–10</button>
         <button class="q-type-tab" onclick="selectSoloType('days',this)">Days</button>
         <button class="q-type-tab" onclick="selectSoloType('months',this)">Months</button>
@@ -319,7 +320,8 @@ select.game-input{cursor:pointer;}
         <div class="q-type-tabs">
           <button class="q-type-tab active" onclick="selectQType('wp1',this)">WP1</button>
           <button class="q-type-tab" onclick="selectQType('wp2',this)">WP2</button>
-          <button class="q-type-tab" onclick="selectQType('sentences',this)">Sentences</button>
+          <button class="q-type-tab" onclick="selectQType('beginner',this)">Beginner</button>
+          <button class="q-type-tab" onclick="selectQType('elementary',this)">Elementary</button>
           <button class="q-type-tab" onclick="selectQType('numbers',this)">1–10</button>
           <button class="q-type-tab" onclick="selectQType('days',this)">Days</button>
           <button class="q-type-tab" onclick="selectQType('months',this)">Months</button>
@@ -531,20 +533,39 @@ const db=firebase.database();
 /* QUESTION BANK */
 const WP1_WORDS=['man','can','pan','ran','fan','tan','van','cat','bat','hat','mat','rat','sat','pat','cap','map','nap','tap','lap','gap','bag','tag','rag','wag','lag','ham','jam','ram','dam','yam','pet','net','set','bet','met','wet','pen','hen','ten','men','den','big','dig','fig','pig','wig','pin','bin','fin','tin','win','lip','dip','hip','sip','tip','zip','hop','mop','top','pop','cop','hot','pot','dot','lot','not','bug','dug','hug','mug','rug','sun','fun','run','bun','gun'];
 const WP2_WORDS=['ship','shop','fish','dish','shed','shell','chip','chat','much','rich','chop','chest','this','that','these','those','thin','think','bath','teeth','when','what','why','phone','photo','graph','elephant','see','bee','feet','eat','team','meat','read','rain','train','mail','tail','day','play','say','way','boat','coat','road','soap','toe','goes','pie','tie','blue','glue','true','clue','moon','food','soon','pool','cool','book','look','cook','foot','good','out','loud','sound','found','mouth','count','could','would','should','cow','now','snow','low','coin','join','boil','soil','boy','toy','enjoy','saw','law','paw','draw','haul','cake','make','take','lake','late','mate','gate','fine','line','mine','nine','hope','rope','ride','side','game','name','same','came','more','core','sore','stop','step','stand','stick','black','block','blow','tree','truck','trip','drop','drum','dress','drink','class','clap','clock','clean','flag','flat','flip','fly','green','grab','grow','plan','plant','please','brown','bring','bread','brush','crab','cry','crop','cross','slip','slow','sleep','spin','spot','speak','spoon','back','duck','pick','rock','ball','bell','fill','doll','catch','match','watch','pitch','bridge','edge','badge','judge','nation','station','action','motion','section','mission','session','vision','tension','picture','nature','future','culture','mixture','capture','musician','magician','technician'];
-const SENTENCE_BLANKS=[
-  {sentence:'My ___ is David.',blank:'name'},{sentence:'I am from ___.',blank:'Vietnam'},
-  {sentence:'I go to English ___ on Mondays.',blank:'class'},{sentence:'I live in ___.',blank:'Springvale'},
-  {sentence:'I have two ___.',blank:'children'},{sentence:'Today is ___.',blank:'Monday'},
-  {sentence:'I have a ___ in my bag.',blank:'book'},{sentence:'I like ___.',blank:'music'},
-  {sentence:'I can speak a little ___.',blank:'English'},{sentence:'I want to learn ___.',blank:'English'},
-  {sentence:'She shops at the fish ___ on the main street.',blank:'shop'},
-  {sentence:'I eat a meal of meat and green beans each ___.',blank:'day'},
-  {sentence:'The cook took a good ___ at the food on the stove.',blank:'look'},
-  {sentence:'We ride our bikes on the wide ___ by the lake.',blank:'path'},
-  {sentence:'I stop at the store and grab a green ___ for my class.',blank:'plant'},
-  {sentence:'The nation has a new ___ for the next generation.',blank:'station'},
-  {sentence:'I picked up a black ___ by the bridge and watched it swim.',blank:'duck'},
-  {sentence:'The children are playing, learning and ___ every day.',blank:'reading'},
+const BEGINNER_SENTENCE_BLANKS=[
+  {sentence:'My ___ is David.',blank:'name'},
+  {sentence:'I am ___ Vietnam.',blank:'from'},
+  {sentence:'I go to English ___ on Mondays.',blank:'class'},
+  {sentence:'I ___ in Springvale.',blank:'live'},
+  {sentence:'I ___ two children.',blank:'have'},
+  {sentence:'___ is Monday.',blank:'Today'},
+  {sentence:'I have a book in my ___.',blank:'bag'},
+  {sentence:'I ___ music.',blank:'like'},
+  {sentence:'I can speak a little ___.',blank:'English'},
+  {sentence:'I want to ___ English.',blank:'learn'},
+  {sentence:'I ___ married.',blank:'am'},
+  {sentence:'I ___ 30 years old.',blank:'am'},
+  {sentence:'There ___ four people in my family.',blank:'are'},
+  {sentence:'My ___ is on 15 June.',blank:'birthday'},
+  {sentence:'I ___ to Australia in 2022.',blank:'came'},
+  {sentence:'I ___ up at 7:00 every day.',blank:'wake'},
+  {sentence:'I ___ drive.',blank:'can'},
+  {sentence:'I ___ to find a good job.',blank:'want'},
+];
+const ELEMENTARY_SENTENCE_BLANKS=[
+  {sentence:'She ___ at the fish shop on the main street.',blank:'shops'},
+  {sentence:'I ___ a meal of meat and green beans each day.',blank:'eat'},
+  {sentence:'The cook ___ a good look at the food on the stove.',blank:'took'},
+  {sentence:'We ___ our bikes on the wide path by the lake.',blank:'ride'},
+  {sentence:'I ___ at the store and grab a green plant for my class.',blank:'stop'},
+  {sentence:'The nation ___ a new station for the next generation.',blank:'has'},
+  {sentence:'I ___ up a black duck by the bridge and watched it swim.',blank:'picked'},
+  {sentence:'The children ___ playing, learning and reading every day.',blank:'are'},
+  {sentence:'She ___ her lunch at the table with her friends.',blank:'eats'},
+  {sentence:'He ___ the door and walks into the room.',blank:'opens'},
+  {sentence:'They ___ a long way to reach the top of the hill.',blank:'walk'},
+  {sentence:'I ___ the train to the city on weekdays.',blank:'catch'},
 ];
 const SPELL_NUMBERS=['one','two','three','four','five','six','seven','eight','nine','ten'];
 const SPELL_DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
@@ -606,11 +627,12 @@ const LEVEL0_SENTENCES=[
 ];
 const LANG_NAMES={vi:'Tiếng Việt',fa:'فارسی',ar:'العربية',zh:'中文',hi:'हिन्दी',ur:'اردو',km:'ខ្មែរ',my:'မြန်မာ'};
 
-let questionBank={wp1:[],wp2:[],sentences:[],numbers:[],days:[],months:[],weather:[],fruits:[],body:[],custom:[],unscramble:[],gramscramble:[],translate:[]};
+let questionBank={wp1:[],wp2:[],beginner:[],elementary:[],numbers:[],days:[],months:[],weather:[],fruits:[],body:[],custom:[],unscramble:[],gramscramble:[],translate:[]};
 function buildBank(){
   questionBank.wp1=WP1_WORDS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.wp2=WP2_WORDS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
-  questionBank.sentences=SENTENCE_BLANKS.map(s=>({type:'sentence',sentence:s.sentence,blank:s.blank,display:s.sentence,answer:s.blank.toLowerCase()}));
+  questionBank.beginner=BEGINNER_SENTENCE_BLANKS.map(s=>({type:'sentence',sentence:s.sentence,blank:s.blank,display:s.sentence,answer:s.blank.toLowerCase()}));
+  questionBank.elementary=ELEMENTARY_SENTENCE_BLANKS.map(s=>({type:'sentence',sentence:s.sentence,blank:s.blank,display:s.sentence,answer:s.blank.toLowerCase()}));
   questionBank.numbers=SPELL_NUMBERS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.days=SPELL_DAYS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.months=SPELL_MONTHS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
@@ -626,7 +648,8 @@ function getQuestions(type,limit){
   let pool=[];
   if(type==='wp1') pool=[...questionBank.wp1];
   else if(type==='wp2') pool=[...questionBank.wp2];
-  else if(type==='sentences') pool=[...questionBank.sentences];
+  else if(type==='beginner') pool=[...questionBank.beginner];
+  else if(type==='elementary') pool=[...questionBank.elementary];
   else if(type==='numbers') pool=[...questionBank.numbers];
   else if(type==='days') pool=[...questionBank.days];
   else if(type==='months') pool=[...questionBank.months];
@@ -638,7 +661,7 @@ function getQuestions(type,limit){
   else if(type==='unscramble') pool=[...questionBank.unscramble];
   else if(type==='gramscramble') pool=[...questionBank.gramscramble];
   else if(type==='translate') pool=[...questionBank.translate];
-  else pool=[...questionBank.wp1,...questionBank.wp2,...questionBank.sentences,...allSpelling,...questionBank.custom];
+  else pool=[...questionBank.wp1,...questionBank.wp2,...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.custom];
   shuffle(pool);
   return pool.slice(0,limit);
 }
@@ -921,7 +944,7 @@ function selectQType(type,el){ selectedQType=type; document.querySelectorAll('.q
 function updateQCountDisplay(){
   const limit=parseInt(document.getElementById('q-limit').value)||10;
   const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body];
-  let pool=selectedQType==='all'?[...questionBank.wp1,...questionBank.wp2,...questionBank.sentences,...allSpelling,...questionBank.custom]:selectedQType==='spelling'?allSpelling:(questionBank[selectedQType]||[]);
+  let pool=selectedQType==='all'?[...questionBank.wp1,...questionBank.wp2,...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.custom]:selectedQType==='spelling'?allSpelling:(questionBank[selectedQType]||[]);
   document.getElementById('q-count-display').textContent=pool.length+' available — '+Math.min(pool.length,limit)+' will be used';
 }
 
@@ -1314,7 +1337,7 @@ function updateSoloCountDisplay(){
   if(!display) return;
   const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
   const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body];
-  let pool=soloSelectedType==='all'?[...questionBank.wp1,...questionBank.wp2,...questionBank.sentences,...allSpelling,...questionBank.custom]:soloSelectedType==='spelling'?allSpelling:(questionBank[soloSelectedType]||[]);
+  let pool=soloSelectedType==='all'?[...questionBank.wp1,...questionBank.wp2,...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.custom]:soloSelectedType==='spelling'?allSpelling:(questionBank[soloSelectedType]||[]);
   display.textContent=pool.length+' available — '+Math.min(pool.length,limit)+' will be used';
 }
 function startSoloGame(){
