@@ -1047,6 +1047,49 @@ function playWrongJingle(){
   const ctx=getCtx(),now=ctx.currentTime;
   [200,175].forEach((f,i)=>tone(ctx,f,now+i*0.14,0.22,0.09,'sawtooth',0));
 }
+
+/* GAMEPLAY SFX — tile interactions and submission */
+function playTilePickup(){
+  if(!musicOn) return;
+  const ctx=getCtx(),now=ctx.currentTime;
+  tone(ctx,900,now,0.055,0.07,'sine',0);
+}
+function playTileDrop(){
+  if(!musicOn) return;
+  const ctx=getCtx(),now=ctx.currentTime;
+  tone(ctx,180,now,0.065,0.16,'sine',0);
+  noiseBurst(ctx,now+0.005,0.03,0.12,3200,1.8,0,0.002);
+}
+function playTileReturn(){
+  if(!musicOn) return;
+  const ctx=getCtx(),now=ctx.currentTime;
+  const o=ctx.createOscillator(),g=ctx.createGain(),p=ctx.createStereoPanner();
+  o.type='sine'; o.frequency.setValueAtTime(600,now);
+  o.frequency.exponentialRampToValueAtTime(340,now+0.07);
+  const v=0.065*MASTER_VOL;
+  g.gain.setValueAtTime(v,now); g.gain.exponentialRampToValueAtTime(0.0001,now+0.09);
+  o.connect(g); g.connect(p); p.connect(ctx.destination);
+  o.start(now); o.stop(now+0.12); oscNodes.push(o);
+}
+function playTileSwap(){
+  if(!musicOn) return;
+  const ctx=getCtx(),now=ctx.currentTime;
+  tone(ctx,660,now,0.045,0.065,'sine',-0.2);
+  tone(ctx,880,now+0.055,0.045,0.065,'sine',0.2);
+}
+function playAllPlaced(){
+  if(!musicOn) return;
+  const ctx=getCtx(),now=ctx.currentTime;
+  [523.3,659.3,783.9].forEach((f,i)=>tone(ctx,f,now+i*0.065,0.13,0.08,'triangle',0));
+}
+function playSubmitSound(){
+  if(!musicOn) return;
+  const ctx=getCtx(),now=ctx.currentTime;
+  noiseBurst(ctx,now,0.10,0.16,1800,0.5,0,0.008);
+  tone(ctx,523.3,now+0.04,0.20,0.10,'triangle',0);
+  tone(ctx,1046.5,now+0.10,0.15,0.07,'triangle',0);
+}
+
 function playRevealTone(rank){
   if(!musicOn) return;
   const ctx=getCtx(),now=ctx.currentTime;
@@ -1632,6 +1675,7 @@ function startStudentTimer(startedAt,dur){
 
 function submitAnswer(auto){
   if(answered) return; answered=true; clearInterval(studentTimerInt);
+  if(!auto) playSubmitSound();
   const elapsed=parseInt(document.getElementById('student-timer').textContent)||0;
   let ans;
   if(currentStudentQ&&(currentStudentQ.type==='unscramble'||currentStudentQ.type==='gramscramble')){
@@ -1677,6 +1721,7 @@ function makeTile(word,cls){
 
 function sendToAnswer(tile){
   if(tile.classList.contains('ans-tile')) return;
+  playTileDrop();
   tile.classList.replace('bank-tile','ans-tile');
   tile.onclick=()=>answerTileClick(tile);
   document.getElementById('answer-area').appendChild(tile);
@@ -1685,6 +1730,7 @@ function sendToAnswer(tile){
 
 function sendToBank(tile){
   if(tile.classList.contains('bank-tile')) return;
+  playTileReturn();
   if(selectedAnswerTile===tile){ tile.classList.remove('selected'); selectedAnswerTile=null; }
   tile.classList.replace('ans-tile','bank-tile');
   tile.onclick=()=>bankTileClick(tile);
@@ -1697,12 +1743,13 @@ function bankTileClick(tile){ if(!answered) sendToAnswer(tile); }
 function answerTileClick(tile){
   if(answered) return;
   if(!selectedAnswerTile){
+    playTilePickup();
     selectedAnswerTile=tile; tile.classList.add('selected');
   } else if(selectedAnswerTile===tile){
     tile.classList.remove('selected'); selectedAnswerTile=null;
     sendToBank(tile);
   } else {
-    // Swap the two tiles
+    playTileSwap();
     const answer=document.getElementById('answer-area');
     const marker=document.createComment('');
     answer.insertBefore(marker,selectedAnswerTile);
@@ -1716,13 +1763,18 @@ function answerTileClick(tile){
 function checkAllPlaced(){
   const done=document.getElementById('word-bank-area').children.length===0
            &&document.getElementById('answer-area').children.length>0;
-  if(!answered) document.getElementById('student-submit-btn').disabled=!done;
+  if(!answered){
+    const btn=document.getElementById('student-submit-btn');
+    if(done&&btn.disabled) playAllPlaced();
+    btn.disabled=!done;
+  }
   document.getElementById('answer-area').classList.toggle('complete',done);
 }
 
 function setupTileDrag(tile){
   tile.addEventListener('dragstart',e=>{
     draggedTile=tile; e.dataTransfer.effectAllowed='move';
+    playTilePickup();
     setTimeout(()=>tile.style.opacity='0.4',0);
   });
   tile.addEventListener('dragend',()=>{ tile.style.opacity=''; draggedTile=null; });
