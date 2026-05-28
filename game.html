@@ -336,10 +336,17 @@ select.game-input{cursor:pointer;}
           <button class="q-type-tab" onclick="selectQType('all',this)">All</button>
         </div>
         <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="q-count-display">Loading…</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <label style="font-size:.8rem;color:var(--muted);">Questions:</label>
-          <input type="number" class="game-input" id="q-limit" value="10" min="3" max="50"
-            style="width:70px;padding:6px 10px;font-size:.9rem;margin-bottom:0;" oninput="updateQCountDisplay()">
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <label style="font-size:.8rem;color:var(--muted);">Questions:</label>
+            <input type="number" class="game-input" id="q-limit" value="10" min="3" max="50"
+              style="width:70px;padding:6px 10px;font-size:.9rem;margin-bottom:0;" oninput="updateQCountDisplay()">
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <label style="font-size:.8rem;color:var(--muted);">Seconds:</label>
+            <input type="number" class="game-input" id="t-limit" value="30" min="10" max="120"
+              style="width:70px;padding:6px 10px;font-size:.9rem;margin-bottom:0;">
+          </div>
         </div>
       </div>
     </div>
@@ -1172,6 +1179,7 @@ function updateQCountDisplay(){
 
 function startGame(){
   const limit=parseInt(document.getElementById('q-limit').value)||10;
+  teacherTimerDuration=Math.max(10,Math.min(120,parseInt(document.getElementById('t-limit').value)||30));
   currentQuestions=getQuestions(selectedQType,limit);
   if(!currentQuestions.length){ showToast('No questions available!'); return; }
   currentQIdx=0;
@@ -1219,9 +1227,10 @@ function teacherSpeak(){
 }
 
 let currentTimerDuration=TIMER_DURATION;
+let teacherTimerDuration=TIMER_DURATION;
 function startTeacherTimer(){
   const q=currentQuestions[currentQIdx];
-  currentTimerDuration=q.type==='translate'?60:TIMER_DURATION;
+  currentTimerDuration=q.type==='translate'?teacherTimerDuration*2:teacherTimerDuration;
   clearInterval(timerInterval); timerLeft=currentTimerDuration; updateTimerUI(timerLeft);
   timerInterval=setInterval(()=>{
     timerLeft--; updateTimerUI(timerLeft); tickGameMusic(timerLeft);
