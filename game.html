@@ -251,7 +251,7 @@ select.game-input{cursor:pointer;}
         <p>Play on your own and practise at your own pace</p>
       </div>
     </div>
-    <button class="btn btn-ghost btn-sm" onclick="location.href='index.html'">← WordLink</button>
+    <button class="btn btn-ghost btn-sm" onclick="goHome()">← Back</button>
   </div>
 </div>
 
@@ -296,7 +296,7 @@ select.game-input{cursor:pointer;}
       </div>
     </div>
     <button class="btn btn-gold btn-lg" onclick="startSoloGame()">▶ Start Practice</button>
-    <button class="btn btn-ghost btn-sm" onclick="location.href='index.html'">← WordLink</button>
+    <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-student-home')">← Back</button>
   </div>
 </div>
 
@@ -1129,7 +1129,7 @@ function showScreen(id){
   document.getElementById(id).classList.add('active');
 }
 function goHome(){ stopMusic(); cleanupListeners(); soloMode=false; document.getElementById('music-btn').style.display=''; showScreen('screen-home'); playLobbyMusic(); }
-function goStudentHome(){ stopMusic(); if(audioCtx){audioCtx.close();audioCtx=null;} document.getElementById('music-btn').style.display='none'; showScreen('screen-student-home'); }
+function goStudentHome(){ document.getElementById('music-btn').style.display='none'; showScreen('screen-student-home'); }
 
 /* TEACHER FLOW */
 function goTeacher(){ role='teacher'; document.getElementById('music-btn').style.display=''; buildBank(); loadCustomQuestions(); createRoom(); }
@@ -1206,7 +1206,7 @@ function playQuestion(){
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('q-emoji').innerHTML=q.type==='word'?emo(q.word):'';
-  document.getElementById('q-text').innerHTML=q.type==='sentence'?q.display:q.type==='gramscramble'?'📝 Students are unscrambling a sentence':q.type==='unscramble'?`<span style="color:var(--teal)">${q.sentence}</span>`:q.type==='translate'?'🌐 Students see this in their own language':'🔊 Listen and spell the word';
+  document.getElementById('q-text').textContent=q.type==='sentence'?q.display:q.type==='gramscramble'||q.type==='unscramble'?'🔊 Students listen and unscramble':q.type==='translate'?'🌐 Students see this in their own language':'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=noAudio?'none':'';
   roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:Date.now(),revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
