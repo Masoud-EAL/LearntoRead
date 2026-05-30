@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Bun bottom (flat base) -->
+  <ellipse cx="50" cy="74" rx="34" ry="9" fill="#b8742a"/>
+  <!-- Bun dome -->
+  <path d="M16,70 Q16,30 50,28 Q84,30 84,70Z" fill="#d4922e"/>
+  <!-- Bottom rim lighter -->
+  <ellipse cx="50" cy="70" rx="34" ry="8" fill="#e8aa48"/>
+  <!-- Top highlight -->
+  <ellipse cx="43" cy="44" rx="10" ry="7" fill="#f0c060" opacity="0.55"/>
+  <!-- Sesame seeds -->
+  <ellipse cx="50" cy="38" rx="4.5" ry="2" fill="#f5e0a0" transform="rotate(15,50,38)"/>
+  <ellipse cx="38" cy="48" rx="4.5" ry="2" fill="#f5e0a0" transform="rotate(-20,38,48)"/>
+  <ellipse cx="62" cy="48" rx="4.5" ry="2" fill="#f5e0a0" transform="rotate(10,62,48)"/>
+  <ellipse cx="44" cy="58" rx="4.5" ry="2" fill="#f5e0a0" transform="rotate(-10,44,58)"/>
+  <ellipse cx="57" cy="58" rx="4.5" ry="2" fill="#f5e0a0" transform="rotate(25,57,58)"/>
+</svg>

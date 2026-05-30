@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Stem -->
+  <rect x="46" y="6" width="8" height="14" rx="4" fill="#4a8c2a"/>
+  <!-- Fig body: wide pear shape -->
+  <path d="M50,18 C32,18 18,36 18,58 C18,78 32,92 50,92 C68,92 82,78 82,58 C82,36 68,18 50,18Z" fill="#6b2d82"/>
+  <!-- Bloom end -->
+  <circle cx="50" cy="90" r="5" fill="#8b3da8"/>
+  <!-- Interior cross-section hint (lighter oval) -->
+  <ellipse cx="50" cy="60" rx="20" ry="22" fill="#c47cde" opacity="0.35"/>
+  <!-- Seeds -->
+  <ellipse cx="50" cy="52" rx="3" ry="2" fill="#3a1a4a" opacity="0.7"/>
+  <ellipse cx="42" cy="62" rx="3" ry="2" fill="#3a1a4a" opacity="0.7"/>
+  <ellipse cx="58" cy="62" rx="3" ry="2" fill="#3a1a4a" opacity="0.7"/>
+  <ellipse cx="46" cy="72" rx="3" ry="2" fill="#3a1a4a" opacity="0.7"/>
+  <ellipse cx="54" cy="72" rx="3" ry="2" fill="#3a1a4a" opacity="0.7"/>
+  <!-- Highlight -->
+  <ellipse cx="38" cy="40" rx="7" ry="10" fill="#b060cc" opacity="0.4"/>
+</svg>

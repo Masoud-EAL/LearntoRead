@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Blackboard -->
+  <rect x="8" y="12" width="84" height="54" rx="4" fill="#2d5a2d"/>
+  <!-- Blackboard frame -->
+  <rect x="8" y="12" width="84" height="54" rx="4" fill="none" stroke="#7a5c2e" stroke-width="5"/>
+  <!-- Chalk writing: "ABC" -->
+  <!-- A -->
+  <path d="M22,52 L28,28 L34,52 M24,42 L32,42" stroke="#f0ead6" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- B -->
+  <path d="M40,28 L40,52 M40,28 Q50,28 50,34 Q50,40 40,40 M40,40 Q52,40 52,46 Q52,52 40,52" stroke="#f0ead6" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- C -->
+  <path d="M68,32 Q58,28 57,40 Q56,52 66,52" stroke="#f0ead6" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Chalk tray -->
+  <rect x="8" y="64" width="84" height="7" rx="2" fill="#7a5c2e"/>
+  <!-- Chalk piece on tray -->
+  <rect x="36" y="65" width="14" height="4" rx="2" fill="#f0ead6"/>
+  <!-- Teacher's desk legs -->
+  <rect x="18" y="78" width="6" height="16" rx="2" fill="#7a5c2e"/>
+  <rect x="76" y="78" width="6" height="16" rx="2" fill="#7a5c2e"/>
+  <!-- Teacher's desk top -->
+  <rect x="12" y="74" width="76" height="7" rx="3" fill="#a07840"/>
+</svg>
