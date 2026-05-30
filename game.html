@@ -251,7 +251,7 @@ select.game-input{cursor:pointer;}
         <p>Play on your own and practise at your own pace</p>
       </div>
     </div>
-    <button class="btn btn-ghost btn-sm" onclick="goHome()">← Back</button>
+    <button class="btn btn-ghost btn-sm" onclick="location.href='index.html'">← WordLink</button>
   </div>
 </div>
 
@@ -264,8 +264,8 @@ select.game-input{cursor:pointer;}
       <div class="q-type-tabs">
         <button class="q-type-tab active" onclick="selectSoloType('wp1',this)">WP1</button>
         <button class="q-type-tab" onclick="selectSoloType('wp2',this)">WP2</button>
-        <button class="q-type-tab" onclick="selectSoloType('beginner',this)">Beginner</button>
-        <button class="q-type-tab" onclick="selectSoloType('elementary',this)">Elementary</button>
+        <button class="q-type-tab" onclick="selectSoloType('beginner',this)">Beginner Listen and Fill Gaps</button>
+        <button class="q-type-tab" onclick="selectSoloType('elementary',this)">Elementary Listen and Fill Gaps</button>
         <button class="q-type-tab" onclick="selectSoloType('numbers',this)">1–10</button>
         <button class="q-type-tab" onclick="selectSoloType('days',this)">Days</button>
         <button class="q-type-tab" onclick="selectSoloType('months',this)">Months</button>
@@ -274,8 +274,8 @@ select.game-input{cursor:pointer;}
         <button class="q-type-tab" onclick="selectSoloType('body',this)">Body</button>
         <button class="q-type-tab" onclick="selectSoloType('spelling',this)">All Spelling</button>
         <button class="q-type-tab" onclick="selectSoloType('custom',this)">Custom</button>
-        <button class="q-type-tab" onclick="selectSoloType('unscramble',this)">Unscramble</button>
-        <button class="q-type-tab" onclick="selectSoloType('gramscramble',this)">Grammar</button>
+        <button class="q-type-tab" onclick="selectSoloType('unscramble',this)">Listen and Unscramble</button>
+        <button class="q-type-tab" onclick="selectSoloType('gramscramble',this)">Grammar Unscramble</button>
         <button class="q-type-tab" onclick="selectSoloType('translate',this)">Translate</button>
         <button class="q-type-tab" onclick="selectSoloType('all',this)">All</button>
       </div>
@@ -296,7 +296,7 @@ select.game-input{cursor:pointer;}
       </div>
     </div>
     <button class="btn btn-gold btn-lg" onclick="startSoloGame()">▶ Start Practice</button>
-    <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-student-home')">← Back</button>
+    <button class="btn btn-ghost btn-sm" onclick="location.href='index.html'">← WordLink</button>
   </div>
 </div>
 
@@ -322,8 +322,8 @@ select.game-input{cursor:pointer;}
         <div class="q-type-tabs">
           <button class="q-type-tab active" onclick="selectQType('wp1',this)">WP1</button>
           <button class="q-type-tab" onclick="selectQType('wp2',this)">WP2</button>
-          <button class="q-type-tab" onclick="selectQType('beginner',this)">Beginner</button>
-          <button class="q-type-tab" onclick="selectQType('elementary',this)">Elementary</button>
+          <button class="q-type-tab" onclick="selectQType('beginner',this)">Beginner Listen and Fill Gaps</button>
+          <button class="q-type-tab" onclick="selectQType('elementary',this)">Elementary Listen and Fill Gaps</button>
           <button class="q-type-tab" onclick="selectQType('numbers',this)">1–10</button>
           <button class="q-type-tab" onclick="selectQType('days',this)">Days</button>
           <button class="q-type-tab" onclick="selectQType('months',this)">Months</button>
@@ -332,8 +332,8 @@ select.game-input{cursor:pointer;}
           <button class="q-type-tab" onclick="selectQType('body',this)">Body</button>
           <button class="q-type-tab" onclick="selectQType('spelling',this)">All Spelling</button>
           <button class="q-type-tab" onclick="selectQType('custom',this)">Custom</button>
-          <button class="q-type-tab" onclick="selectQType('unscramble',this)">Unscramble</button>
-          <button class="q-type-tab" onclick="selectQType('gramscramble',this)">Grammar</button>
+          <button class="q-type-tab" onclick="selectQType('unscramble',this)">Listen and Unscramble</button>
+          <button class="q-type-tab" onclick="selectQType('gramscramble',this)">Grammar Unscramble</button>
           <button class="q-type-tab" onclick="selectQType('translate',this)">Translate</button>
           <button class="q-type-tab" onclick="selectQType('all',this)">All</button>
         </div>
@@ -1129,7 +1129,7 @@ function showScreen(id){
   document.getElementById(id).classList.add('active');
 }
 function goHome(){ stopMusic(); cleanupListeners(); soloMode=false; document.getElementById('music-btn').style.display=''; showScreen('screen-home'); playLobbyMusic(); }
-function goStudentHome(){ stopMusic(); document.getElementById('music-btn').style.display='none'; showScreen('screen-student-home'); }
+function goStudentHome(){ stopMusic(); if(audioCtx){audioCtx.close();audioCtx=null;} document.getElementById('music-btn').style.display='none'; showScreen('screen-student-home'); }
 
 /* TEACHER FLOW */
 function goTeacher(){ role='teacher'; document.getElementById('music-btn').style.display=''; buildBank(); loadCustomQuestions(); createRoom(); }
@@ -1206,7 +1206,7 @@ function playQuestion(){
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('q-emoji').innerHTML=q.type==='word'?emo(q.word):'';
-  document.getElementById('q-text').textContent=q.type==='sentence'?q.display:q.type==='gramscramble'?'📝 Students are unscrambling a sentence':q.type==='unscramble'?q.sentence:q.type==='translate'?'🌐 Students see this in their own language':'🔊 Listen and spell the word';
+  document.getElementById('q-text').innerHTML=q.type==='sentence'?q.display:q.type==='gramscramble'?'📝 Students are unscrambling a sentence':q.type==='unscramble'?`<span style="color:var(--teal)">${q.sentence}</span>`:q.type==='translate'?'🌐 Students see this in their own language':'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=noAudio?'none':'';
   roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:Date.now(),revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
