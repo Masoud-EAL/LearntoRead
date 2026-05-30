@@ -192,6 +192,8 @@ select.game-input{cursor:pointer;}
 .word-tile.selected{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 4px 14px rgba(245,166,35,.45);}
 
 .q-emoji-big{font-size:2.8rem;line-height:1;min-height:1em;text-align:center;margin-bottom:4px;}
+.custom-icon-emoji{height:1em;width:1em;vertical-align:middle;display:inline-block;object-fit:contain;}
+.q-emoji-big .custom-icon-emoji{height:1em;width:1em;}
 
 /* BIG REVEAL */
 .reveal-word{font-family:'Fredoka One',cursive;font-size:clamp(2.2rem,9vw,3.8rem);color:var(--green);line-height:1.1;word-break:break-word;}
@@ -690,11 +692,11 @@ let hintLevel=0;
 const EMOJI={
   'ant':'🐜','bat':'🦇','bee':'🐝','bug':'🐛','cat':'🐱','cow':'🐄','crab':'🦀','dog':'🐶','duck':'🦆','elephant':'🐘','fish':'🐟','fox':'🦊','hen':'🐓','pig':'🐷','ram':'🐏','rat':'🐀',
   'boy':'👦','dad':'👨','king':'👑','man':'👨','men':'👥','teacher':'👩‍🏫','student':'🧑‍🎓',
-  'apple':'🍎','bun':'🧁','cake':'🎂','chip':'🍟','chop':'🥩','cup':'🥤','egg':'🥚','fig':'🫒','food':'🍱','ham':'🥩','ice':'🧊','jam':'🍓','meat':'🥩','pan':'🍳','pie':'🥧','pop':'🥤','yam':'🍠',
+  'apple':'🍎','bun':'<img src="icons/bun.svg" class="custom-icon-emoji" alt="bun">','cake':'🎂','chip':'🍟','chop':'🥩','cup':'🥤','egg':'🥚','fig':'<img src="icons/fig.svg" class="custom-icon-emoji" alt="fig">','food':'🍱','ham':'🥩','ice':'🧊','jam':'🫙','meat':'🥩','pan':'🍳','pie':'🥧','pop':'🥤','yam':'🍠',
   'day':'🌤️','lake':'🏞️','moon':'🌙','rain':'🌧️','snow':'❄️','sun':'☀️','tree':'🌳',
   'bus':'🚌','ship':'🚢','train':'🚂','truck':'🚚','van':'🚐','bike':'🚲',
-  'shop':'🏪','class':'🏫',
-  'bag':'👜','bath':'🛁','bed':'🛏️','bell':'🔔','bin':'🗑️','book':'📚','box':'📦','brush':'🪥','can':'🥫','clock':'🕐','dish':'🍽️','door':'🚪','fan':'🪭','jar':'🫙','lamp':'💡','map':'🗺️','mat':'🟫','mop':'🧹','mug':'☕','net':'🥅','pen':'✏️','phone':'📱','photo':'📷','pin':'📍','pot':'🪴','rope':'🪢','rug':'🧶','shell':'🐚','soap':'🧼','spoon':'🥄','tin':'🥫','watch':'⌚','wig':'👱',
+  'shop':'🏪','class':'<img src="icons/class.svg" class="custom-icon-emoji" alt="class">',
+  'bag':'👜','bath':'🛁','bed':'🛏️','bell':'🔔','bin':'🗑️','book':'📚','box':'📦','brush':'🪥','can':'🥫','clock':'🕐','dish':'🍽️','door':'🚪','fan':'🪭','jar':'🫙','lamp':'💡','map':'🗺️','mat':'🟫','mop':'🧹','mug':'☕','net':'🥅','pen':'🖊️','phone':'📱','photo':'📷','pin':'📍','pot':'🪴','rope':'🪢','rug':'🧶','shell':'🐚','soap':'🧼','spoon':'🥄','tin':'🥫','watch':'⌚','wig':'<img src="icons/wig.svg" class="custom-icon-emoji" alt="wig">',
   'cap':'🧢','coat':'🧥','dress':'👗','hat':'🎩','tie':'👔',
   'ear':'👂','feet':'🦶','foot':'🦶','leg':'🦵','lip':'👄','mouth':'👄','teeth':'🦷','thumb':'👍','toe':'🦶',
   'cry':'😢','dig':'⛏️','drop':'💧','fly':'🪰','hop':'🦘','hug':'🤗','run':'🏃','sleep':'😴','spin':'🌀','stop':'🛑','read':'📖','write':'✍️','play':'🎮','work':'💼','look':'👀',
@@ -1203,7 +1205,7 @@ function playQuestion(){
   document.getElementById('reveal-btn').style.display='';
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
-  document.getElementById('q-emoji').textContent=q.type==='word'?emo(q.word):'';
+  document.getElementById('q-emoji').innerHTML=q.type==='word'?emo(q.word):'';
   document.getElementById('q-text').textContent=q.type==='sentence'?q.display:q.type==='gramscramble'?'📝 Students are unscrambling a sentence':q.type==='unscramble'?q.sentence:q.type==='translate'?'🌐 Students see this in their own language':'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=noAudio?'none':'';
   roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:Date.now(),revealed:false,correctAnswer:'',midLeaderboard:false});
@@ -1345,7 +1347,7 @@ function revealAnswers(){
     :q.type==='translate'
     ?`<div class="reveal-word" style="font-size:clamp(.85rem,2.8vw,1.3rem);line-height:1.5">${revealWord}</div>`
     :`<div class="reveal-word">${revealWord}</div>`+(revealSentence?`<div class="reveal-sentence">${revealSentence}</div>`:'');
-  document.getElementById('q-emoji').textContent=q.type==='word'?emo(q.word):'';
+  document.getElementById('q-emoji').innerHTML=q.type==='word'?emo(q.word):'';
   document.getElementById('q-hint').textContent='';
   document.getElementById('reveal-btn').style.display='none';
   const isLast=currentQIdx>=currentQuestions.length-1;
@@ -1643,7 +1645,7 @@ function showStudentQuestion(q,startedAt){
     isTile?(q.type==='gramscramble'?'GRAMMAR — arrange words in order':'UNSCRAMBLE — arrange the word tiles'):
     isTranslate?'TRANSLATE — type the English sentence':
     q.type==='sentence'?'SENTENCE — type the missing word':'WORD — listen and spell it';
-  document.getElementById('s-q-emoji').textContent=q.type==='word'?emo(q.word):'';
+  document.getElementById('s-q-emoji').innerHTML=q.type==='word'?emo(q.word):'';
   if(isTranslate){
     const lang=localStorage.getItem('translateLang')||'vi';
     const t=q.translations&&q.translations[lang]?q.translations[lang]:(q.en||q.answer);

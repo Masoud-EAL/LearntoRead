@@ -228,6 +228,9 @@
   .letter-block.vowel .example-pill.playing { background: var(--accent2); border-color: var(--accent2); }
   .sound-group + .sound-group .example-pill.playing { background: var(--accent4); border-color: var(--accent4); }
   .pill-emoji { font-size: 1.3em; line-height: 1; }
+  .custom-icon-emoji { height: 1em; width: 1em; vertical-align: middle; display: inline-block; object-fit: contain; }
+  .word-emoji-display .custom-icon-emoji { height: 1em; width: 1em; }
+  .chip-emoji .custom-icon-emoji { height: 1.2em; width: 1.2em; }
 
   /* ════════════════════════════════
      SHARED WORD PRONUNCIATION STYLES
@@ -1309,8 +1312,8 @@ const EMOJI = {
   'men':'👥','uncle':'👨','vet':'👨‍⚕️','teacher':'👩‍🏫','student':'🧑‍🎓',
 
   // Food & drink
-  'apple':'🍎','bun':'🧁','cake':'🎂','chip':'🍟','chop':'🥩','cup':'🥤',
-  'egg':'🥚','fig':'🫒','food':'🍱','ham':'🥩','ice':'🧊','jam':'🍓',
+  'apple':'🍎','bun':'<img src="icons/bun.svg" class="custom-icon-emoji" alt="bun">','cake':'🎂','chip':'🍟','chop':'🥩','cup':'🥤',
+  'egg':'🥚','fig':'<img src="icons/fig.svg" class="custom-icon-emoji" alt="fig">','food':'🍱','ham':'🥩','ice':'🧊','jam':'🫙',
   'meat':'🥩','pan':'🍳','pie':'🥧','pop':'🥤','yam':'🍠',
 
   // Nature & outdoors
@@ -1321,16 +1324,16 @@ const EMOJI = {
   'bus':'🚌','ship':'🚢','train':'🚂','truck':'🚚','van':'🚐','bike':'🚲',
 
   // Buildings & places
-  'city':'🏙️','den':'🏕️','shop':'🏪','zoo':'🦁','class':'🏫',
+  'city':'🏙️','den':'🏕️','shop':'🏪','zoo':'🦁','class':'<img src="icons/class.svg" class="custom-icon-emoji" alt="class">',
 
   // Household objects
   'bag':'👜','bath':'🛁','bed':'🛏️','bell':'🔔','bin':'🗑️','book':'📚',
   'box':'📦','brush':'🪥','can':'🥫','clock':'🕐','dish':'🍽️','door':'🚪',
   'fan':'🪭','jar':'🫙','kit':'🧰','lamp':'💡','map':'🗺️',
-  'mat':'🟫','mop':'🧹','mug':'☕','net':'🥅','pen':'✏️','phone':'📱',
+  'mat':'🟫','mop':'🧹','mug':'☕','net':'🥅','pen':'🖊️','phone':'📱',
   'photo':'📷','pin':'📍','pot':'🪴','rope':'🪢','rug':'🧶','shell':'🐚',
   'soap':'🧼','spoon':'🥄','tag':'🏷️','tin':'🥫','tube':'🧴',
-  'umbrella':'☂️','watch':'⌚','wig':'👱',
+  'umbrella':'☂️','watch':'⌚','wig':'<img src="icons/wig.svg" class="custom-icon-emoji" alt="wig">',
 
   // Clothing
   'cap':'🧢','coat':'🧥','dress':'👗','hat':'🎩','tie':'👔','vest':'🦺',
@@ -2343,7 +2346,7 @@ function renderWord(wp) {
 
   // Emoji in main display
   const emojiDiv = document.getElementById(wp + '-emoji');
-  if (emojiDiv) emojiDiv.textContent = emo(word);
+  if (emojiDiv) emojiDiv.innerHTML = emo(word);
 
   // Translation under emoji
   const trDiv = document.getElementById(wp + '-translation');

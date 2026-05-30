@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Wig stand (simple cylindrical neck) -->
+  <rect x="42" y="72" width="16" height="20" rx="4" fill="#c8a882"/>
+  <ellipse cx="50" cy="72" rx="8" ry="4" fill="#b8956e"/>
+  <!-- Head form -->
+  <ellipse cx="50" cy="58" rx="16" ry="18" fill="#d4b896"/>
+  <!-- Hair cap base -->
+  <ellipse cx="50" cy="42" rx="28" ry="22" fill="#8B4513"/>
+  <!-- Long flowing hair left side -->
+  <path d="M22,42 Q10,55 12,75 Q14,85 20,88 Q16,75 22,65 Q24,55 28,50Z" fill="#8B4513"/>
+  <!-- Long flowing hair right side -->
+  <path d="M78,42 Q90,55 88,75 Q86,85 80,88 Q84,75 78,65 Q76,55 72,50Z" fill="#8B4513"/>
+  <!-- Top of hair (rounded dome) -->
+  <ellipse cx="50" cy="30" rx="28" ry="18" fill="#A0522D"/>
+  <!-- Hair shine highlight -->
+  <path d="M34,22 Q42,16 52,18" stroke="#CD853F" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.8"/>
+  <path d="M30,30 Q36,24 44,26" stroke="#CD853F" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5"/>
+</svg>
