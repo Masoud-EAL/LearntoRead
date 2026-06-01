@@ -482,6 +482,7 @@ select.game-input{cursor:pointer;}
   </div>
   <button class="submit-btn" id="student-submit-btn" onclick="submitAnswer()">✓ Submit</button>
   <div class="submitted-msg" id="submitted-msg"></div>
+  <button class="btn btn-ghost btn-sm" id="solo-back-btn" style="display:none;margin-top:4px;" onclick="showScreen('screen-solo-setup')">← Back to categories</button>
 </div>
 
 <!-- STUDENT RESULT -->
@@ -1128,7 +1129,7 @@ function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
-function goHome(){ stopMusic(); cleanupListeners(); soloMode=false; document.getElementById('music-btn').style.display=''; showScreen('screen-home'); playLobbyMusic(); }
+function goHome(){ stopMusic(); cleanupListeners(); soloMode=false; document.getElementById('music-btn').style.display=''; document.getElementById('solo-back-btn').style.display='none'; showScreen('screen-home'); playLobbyMusic(); }
 function goStudentHome(){ document.getElementById('music-btn').style.display='none'; showScreen('screen-student-home'); }
 
 /* TEACHER FLOW */
@@ -1581,6 +1582,7 @@ function startSoloGame(){
   soloQuestions=getQuestions(soloSelectedType,limit);
   if(!soloQuestions.length){showToast('No questions available!');return;}
   soloQIdx=0; myScore=0;
+  document.getElementById('solo-back-btn').style.display='';
   showStudentQuestion(soloQuestions[0],Date.now());
 }
 function showSoloResult(submittedAns,correctAns,timeLeft){
