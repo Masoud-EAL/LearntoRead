@@ -1803,10 +1803,12 @@ function pointerDownTile(e,tile){
   if(answered||drag) return;
   if(e.button!=null&&e.button!==0) return;
   drag={tile,started:false,startX:e.clientX,startY:e.clientY,pointerId:e.pointerId,lastZone:null};
-  try{ tile.setPointerCapture(e.pointerId); }catch(_){}
-  tile.addEventListener('pointermove',pointerMoveTile);
-  tile.addEventListener('pointerup',pointerUpTile);
-  tile.addEventListener('pointercancel',pointerUpTile);
+  /* Listen on document, not the tile: when a drag begins the tile is re-parented
+     to <body>, which makes browsers drop pointer capture and stop sending move
+     events to the tile itself. Document-level listeners keep firing regardless. */
+  document.addEventListener('pointermove',pointerMoveTile,{passive:false});
+  document.addEventListener('pointerup',pointerUpTile);
+  document.addEventListener('pointercancel',pointerUpTile);
 }
 
 function beginDrag(e){
@@ -1851,11 +1853,9 @@ function pointerMoveTile(e){
 
 function pointerUpTile(e){
   if(!drag) return;
-  const tile=drag.tile;
-  tile.removeEventListener('pointermove',pointerMoveTile);
-  tile.removeEventListener('pointerup',pointerUpTile);
-  tile.removeEventListener('pointercancel',pointerUpTile);
-  try{ tile.releasePointerCapture(drag.pointerId); }catch(_){}
+  document.removeEventListener('pointermove',pointerMoveTile);
+  document.removeEventListener('pointerup',pointerUpTile);
+  document.removeEventListener('pointercancel',pointerUpTile);
   if(!drag.started){ const t=drag.tile; drag=null; tapTile(t); return; }
   e.preventDefault();
   commitDrag();
