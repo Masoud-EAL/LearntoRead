@@ -183,13 +183,15 @@ select.game-input{cursor:pointer;}
 .answer-area{display:flex;flex-wrap:wrap;align-content:flex-start;gap:8px;min-height:56px;padding:10px 12px;background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.18);border-radius:12px;transition:border-color .2s,border-style .2s;}
 .answer-area.complete{border-color:var(--teal);border-style:solid;}
 .word-bank-area{display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px;background:rgba(255,255,255,.04);border-radius:12px;}
-.word-tile{display:inline-flex;align-items:center;padding:8px 14px;border-radius:10px;font-family:'Fredoka One',cursive;font-size:.95rem;cursor:pointer;user-select:none;touch-action:manipulation;border:2px solid transparent;transition:transform .12s,filter .12s,background .15s,border-color .15s;line-height:1.2;}
-.word-tile:active{transform:scale(.93)!important;}
+.word-tile{display:inline-flex;align-items:center;padding:8px 14px;border-radius:10px;font-family:'Fredoka One',cursive;font-size:.95rem;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;border:2px solid transparent;transition:transform .12s,filter .12s,background .15s,border-color .15s;line-height:1.2;}
+.word-tile:active{transform:scale(.93);}
 .bank-tile{background:var(--purple);color:white;}
 .bank-tile:hover{transform:translateY(-2px);filter:brightness(1.15);}
 .ans-tile{background:var(--teal);color:white;}
 .ans-tile:hover{filter:brightness(1.1);}
 .word-tile.selected{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 4px 14px rgba(245,166,35,.45);}
+.word-tile.dragging{cursor:grabbing;opacity:.95;box-shadow:0 10px 26px rgba(0,0,0,.4);transform:scale(1.06);transition:none;border-color:var(--gold);}
+.tile-placeholder{border-radius:10px;background:rgba(245,166,35,.18);border:2px dashed var(--gold);box-sizing:border-box;}
 
 .q-emoji-big{font-size:2.8rem;line-height:1;min-height:1em;text-align:center;margin-bottom:4px;}
 .custom-icon-emoji{height:1em;width:1em;vertical-align:middle;display:inline-block;object-fit:contain;}
@@ -1705,30 +1707,30 @@ function submitAnswer(auto){
   roomRef.child('answers/'+playerId).set({name:playerName,answer:ans,timeLeft:elapsed,submittedAt:Date.now()});
 }
 
-/* UNSCRAMBLE TILE ENGINE */
-let selectedAnswerTile=null,draggedTile=null;
+/* UNSCRAMBLE TILE ENGINE
+   - Tap a tile to send it to the next free spot at the end of the sentence
+     (tap a placed tile to send it back to the word bank).
+   - Drag & drop any tile to a precise spot; the other tiles shuffle aside to
+     make room next to where it lands. Works with both mouse and touch. */
+let drag=null;
+const DRAG_THRESHOLD=6;
 
 function renderUnscrambleTiles(words){
   const bank=document.getElementById('word-bank-area');
   const answer=document.getElementById('answer-area');
   bank.innerHTML=''; answer.innerHTML='';
   answer.classList.remove('complete');
-  selectedAnswerTile=null;
+  drag=null;
   shuffle([...words]).forEach(word=>{
-    const tile=makeTile(word,'bank-tile');
-    tile.onclick=()=>bankTileClick(tile);
-    setupTileDrag(tile);
-    bank.appendChild(tile);
+    bank.appendChild(makeTile(word,'bank-tile'));
   });
-  setupDropZone(answer,true);
-  setupDropZone(bank,false);
 }
 
 function makeTile(word,cls){
   const t=document.createElement('div');
   t.className='word-tile '+cls;
   t.textContent=word; t.dataset.word=word;
-  t.setAttribute('draggable','true');
+  t.addEventListener('pointerdown',e=>pointerDownTile(e,t));
   return t;
 }
 
@@ -1736,7 +1738,6 @@ function sendToAnswer(tile){
   if(tile.classList.contains('ans-tile')) return;
   playTileDrop();
   tile.classList.replace('bank-tile','ans-tile');
-  tile.onclick=()=>answerTileClick(tile);
   document.getElementById('answer-area').appendChild(tile);
   checkAllPlaced();
 }
@@ -1744,33 +1745,16 @@ function sendToAnswer(tile){
 function sendToBank(tile){
   if(tile.classList.contains('bank-tile')) return;
   playTileReturn();
-  if(selectedAnswerTile===tile){ tile.classList.remove('selected'); selectedAnswerTile=null; }
   tile.classList.replace('ans-tile','bank-tile');
-  tile.onclick=()=>bankTileClick(tile);
   document.getElementById('word-bank-area').appendChild(tile);
   checkAllPlaced();
 }
 
-function bankTileClick(tile){ if(!answered) sendToAnswer(tile); }
-
-function answerTileClick(tile){
+/* Tap = send to the end of the sentence (or back to the bank if already placed) */
+function tapTile(tile){
   if(answered) return;
-  if(!selectedAnswerTile){
-    playTilePickup();
-    selectedAnswerTile=tile; tile.classList.add('selected');
-  } else if(selectedAnswerTile===tile){
-    tile.classList.remove('selected'); selectedAnswerTile=null;
-    sendToBank(tile);
-  } else {
-    playTileSwap();
-    const answer=document.getElementById('answer-area');
-    const marker=document.createComment('');
-    answer.insertBefore(marker,selectedAnswerTile);
-    answer.insertBefore(selectedAnswerTile,tile.nextSibling);
-    answer.insertBefore(tile,marker);
-    marker.remove();
-    selectedAnswerTile.classList.remove('selected'); selectedAnswerTile=null;
-  }
+  if(tile.classList.contains('bank-tile')) sendToAnswer(tile);
+  else sendToBank(tile);
 }
 
 function checkAllPlaced(){
@@ -1784,23 +1768,111 @@ function checkAllPlaced(){
   document.getElementById('answer-area').classList.toggle('complete',done);
 }
 
-function setupTileDrag(tile){
-  tile.addEventListener('dragstart',e=>{
-    draggedTile=tile; e.dataTransfer.effectAllowed='move';
-    playTilePickup();
-    setTimeout(()=>tile.style.opacity='0.4',0);
-  });
-  tile.addEventListener('dragend',()=>{ tile.style.opacity=''; draggedTile=null; });
+/* ---- Pointer-based drag & drop with insertion (tiles move aside) ---- */
+function pointInRect(x,y,el){
+  if(!el) return false;
+  const r=el.getBoundingClientRect();
+  return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;
 }
 
-function setupDropZone(el,toAnswer){
-  el.addEventListener('dragover',e=>{ e.preventDefault(); e.dataTransfer.dropEffect='move'; });
-  el.addEventListener('drop',e=>{
-    e.preventDefault();
-    if(!draggedTile||answered) return;
-    if(toAnswer&&draggedTile.classList.contains('bank-tile')) sendToAnswer(draggedTile);
-    else if(!toAnswer&&draggedTile.classList.contains('ans-tile')) sendToBank(draggedTile);
-  });
+/* Find the tile the pointer sits before, accounting for wrapped rows.
+   Returns null when the pointer is past the last tile (append at end). */
+function getDragAfterElement(container,x,y){
+  const els=[...container.querySelectorAll('.word-tile')]
+              .filter(t=>t!==drag.tile&&t!==drag.ph);
+  if(!els.length) return null;
+  const rows=[];
+  for(const el of els){
+    const b=el.getBoundingClientRect();
+    let row=rows.find(r=>Math.abs(r.top-b.top)<b.height*0.6);
+    if(!row){ row={top:b.top,bottom:b.bottom,items:[]}; rows.push(row); }
+    row.bottom=Math.max(row.bottom,b.bottom);
+    row.items.push({el,b});
+  }
+  rows.sort((a,b)=>a.top-b.top);
+  let target=rows.find(r=>y>=r.top-4&&y<=r.bottom+4);
+  if(!target) target=y<rows[0].top?rows[0]:rows[rows.length-1];
+  for(const it of target.items){
+    if(x<it.b.left+it.b.width/2) return it.el;
+  }
+  const ti=rows.indexOf(target);
+  return ti<rows.length-1?rows[ti+1].items[0].el:null;
+}
+
+function pointerDownTile(e,tile){
+  if(answered||drag) return;
+  if(e.button!=null&&e.button!==0) return;
+  drag={tile,started:false,startX:e.clientX,startY:e.clientY,pointerId:e.pointerId,lastZone:null};
+  try{ tile.setPointerCapture(e.pointerId); }catch(_){}
+  tile.addEventListener('pointermove',pointerMoveTile);
+  tile.addEventListener('pointerup',pointerUpTile);
+  tile.addEventListener('pointercancel',pointerUpTile);
+}
+
+function beginDrag(e){
+  drag.started=true;
+  playTilePickup();
+  const tile=drag.tile, r=tile.getBoundingClientRect();
+  drag.offX=e.clientX-r.left; drag.offY=e.clientY-r.top;
+  const ph=document.createElement('div');
+  ph.className='tile-placeholder';
+  ph.style.width=r.width+'px'; ph.style.height=r.height+'px';
+  drag.ph=ph;
+  tile.parentNode.insertBefore(ph,tile);
+  tile.classList.add('dragging');
+  tile.style.width=r.width+'px'; tile.style.height=r.height+'px';
+  tile.style.position='fixed'; tile.style.left=r.left+'px'; tile.style.top=r.top+'px';
+  tile.style.margin='0'; tile.style.zIndex='9999'; tile.style.pointerEvents='none';
+  document.body.appendChild(tile);
+}
+
+function pointerMoveTile(e){
+  if(!drag) return;
+  if(!drag.started){
+    if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)<DRAG_THRESHOLD) return;
+    beginDrag(e);
+  }
+  e.preventDefault();
+  const tile=drag.tile;
+  tile.style.left=(e.clientX-drag.offX)+'px';
+  tile.style.top=(e.clientY-drag.offY)+'px';
+  const answer=document.getElementById('answer-area');
+  const bank=document.getElementById('word-bank-area');
+  const ph=drag.ph;
+  ph.remove();
+  let zone=pointInRect(e.clientX,e.clientY,answer)?answer
+          :pointInRect(e.clientX,e.clientY,bank)?bank
+          :(drag.lastZone||answer);
+  drag.lastZone=zone;
+  const after=getDragAfterElement(zone,e.clientX,e.clientY);
+  if(after) zone.insertBefore(ph,after); else zone.appendChild(ph);
+  ph.dataset.zone=zone===answer?'answer':'bank';
+}
+
+function pointerUpTile(e){
+  if(!drag) return;
+  const tile=drag.tile;
+  tile.removeEventListener('pointermove',pointerMoveTile);
+  tile.removeEventListener('pointerup',pointerUpTile);
+  tile.removeEventListener('pointercancel',pointerUpTile);
+  try{ tile.releasePointerCapture(drag.pointerId); }catch(_){}
+  if(!drag.started){ const t=drag.tile; drag=null; tapTile(t); return; }
+  e.preventDefault();
+  commitDrag();
+}
+
+function commitDrag(){
+  const tile=drag.tile, ph=drag.ph;
+  tile.classList.remove('dragging');
+  ['position','left','top','width','height','margin','zIndex','pointerEvents','opacity']
+    .forEach(p=>tile.style[p]='');
+  const toBank=ph.dataset.zone==='bank';
+  if(toBank){ tile.classList.remove('ans-tile'); tile.classList.add('bank-tile'); playTileReturn(); }
+  else{ tile.classList.remove('bank-tile'); tile.classList.add('ans-tile'); playTileDrop(); }
+  ph.parentNode.insertBefore(tile,ph);
+  ph.remove();
+  drag=null;
+  checkAllPlaced();
 }
 
 function showStudentResult(correctAnswer){
