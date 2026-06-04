@@ -202,6 +202,7 @@ select.game-input{cursor:pointer;}
 .mc-choice .mc-pic .custom-icon-emoji{height:1em;width:1em;}
 .mc-choice .mc-label{font-size:1.15rem;word-break:break-word;text-align:center;}
 .mc-choice.mc-text .mc-label{font-size:1.5rem;}
+.mc-choice.mc-sentence .mc-label{font-size:1.05rem;line-height:1.4;font-family:'Nunito',sans-serif;font-weight:700;}
 .mc-choice.selected{border-color:var(--gold);background:rgba(245,166,35,.12);}
 .mc-choice.mc-correct{border-color:var(--green);background:rgba(0,200,83,.18);}
 .mc-choice.mc-wrong{border-color:var(--accent);background:rgba(233,69,96,.15);}
@@ -803,8 +804,39 @@ function attachMcChoices(questions,type){
   const sourceWords=[...new Set(poolFor(type).filter(mcSupported).map(mcKeyWord))];
   questions.forEach(q=>{
     if(mcSupported(q)) q.choices=buildChoices(q,sourceWords);
+    else if(q.type==='unscramble'||q.type==='gramscramble') q.choices=buildOrderChoices(q);
+    else if(q.type==='translate') q.choices=buildSentenceChoices(q);
   });
   return questions;
+}
+/* Sentence-ordering games as MC: show the scrambled words, pick the correctly
+   ordered sentence. Distractors are other word orders of the same words. */
+function buildOrderChoices(q){
+  const correct=q.answer;
+  const words=Array.isArray(q.words)&&q.words.length?q.words:correct.trim().split(/\s+/);
+  const seen=new Set([correct]),wrong=[];
+  let tries=0;
+  while(wrong.length<3&&tries<60){
+    const s=shuffle([...words]).join(' ');
+    if(!seen.has(s)){ seen.add(s); wrong.push(s); }
+    tries++;
+  }
+  // Very short sentences can't yield 3 distinct re-orderings — pad with other
+  // sentences from the same bank so there are always four options.
+  if(wrong.length<3){
+    const pool=shuffle(poolFor(q.type).map(x=>x.answer));
+    for(const a of pool){ if(wrong.length>=3) break; if(!seen.has(a)){ seen.add(a); wrong.push(a); } }
+  }
+  let prompt=shuffle([...words]).join(' ');
+  if(prompt===correct&&words.length>1) prompt=shuffle([...words]).join(' ');
+  q.promptText=prompt;
+  return shuffle([correct,...wrong]);
+}
+/* Translate as MC: show the native-language sentence, pick the English one. */
+function buildSentenceChoices(q){
+  const correct=q.answer;
+  const pool=shuffle([...new Set(poolFor('translate').map(x=>x.answer))].filter(a=>a!==correct));
+  return shuffle([correct,...pool.slice(0,3)]);
 }
 
 function buildChoices(q,sourceWords){
@@ -1794,7 +1826,10 @@ function showSoloFinal(){
 }
 
 function showStudentQuestion(q,startedAt){
-  stopMusic(); answered=false; hintLevel=0;
+  // Multiplayer students get silence to focus on the host; the solo player is
+  // looking at this screen themselves, so keep the calm game music going.
+  if(soloMode) playGameMusic(); else stopMusic();
+  answered=false; hintLevel=0;
   document.getElementById('student-ans-input').value='';
   document.getElementById('submitted-msg').textContent='';
   const isMc=Array.isArray(q.choices)&&q.choices.length>0;
@@ -1810,13 +1845,18 @@ function showStudentQuestion(q,startedAt){
   // In MC mode tapping a choice submits, so hide the Submit button.
   document.getElementById('student-submit-btn').style.display=isMc?'none':'';
   document.getElementById('student-submit-btn').disabled=isTile;
-  document.getElementById('s-hear-btn').style.display=(q.type==='gramscramble'||isTranslate)?'none':'';
+  // Sentence-ordering & translate MC are read-and-pick: hide audio so it can't
+  // simply read out the answer.
+  const hideHear=q.type==='gramscramble'||q.type==='translate'||(isMc&&q.type==='unscramble');
+  document.getElementById('s-hear-btn').style.display=hideHear?'none':'';
   document.getElementById('s-q-type').textContent=
     isMc?(
       q.type==='sentence'?'TAP THE MISSING WORD':
       q.type==='letter'?'LISTEN — TAP THE LETTER':
       q.type==='lettersound'?'TAP THE PICTURE WITH THIS SOUND':
       q.type==='oddone'?'TAP THE ONE THAT IS DIFFERENT':
+      q.type==='translate'?'TAP THE ENGLISH SENTENCE':
+      (q.type==='unscramble'||q.type==='gramscramble')?'TAP THE SENTENCE IN THE RIGHT ORDER':
       'LISTEN — TAP THE PICTURE'):
     isTile?(q.type==='gramscramble'?'GRAMMAR — arrange words in order':'UNSCRAMBLE — arrange the word tiles'):
     isTranslate?'TRANSLATE — type the English sentence':
@@ -1829,12 +1869,17 @@ function showStudentQuestion(q,startedAt){
     document.getElementById('s-q-text').textContent=t;
     document.getElementById('student-ans-input').placeholder='Type the English sentence…';
   } else if(isMc){
-    document.getElementById('s-q-text').textContent=
-      q.type==='sentence'?q.display:
-      q.type==='oddone'?'Which one is different?':
-      q.type==='letter'?'🔊 Listen, then tap the letter':
-      q.type==='lettersound'?'🔊 Listen to the sound':
-      '🔊 Listen, then tap the answer';
+    let mcPrompt;
+    if(q.type==='sentence') mcPrompt=q.display;
+    else if(q.type==='oddone') mcPrompt='Which one is different?';
+    else if(q.type==='letter') mcPrompt='🔊 Listen, then tap the letter';
+    else if(q.type==='lettersound') mcPrompt='🔊 Listen to the sound';
+    else if(q.type==='unscramble'||q.type==='gramscramble') mcPrompt=q.promptText||q.answer;
+    else if(q.type==='translate'){
+      const lang=localStorage.getItem('translateLang')||'vi';
+      mcPrompt=q.translations&&q.translations[lang]?q.translations[lang]:(q.en||q.answer);
+    } else mcPrompt='🔊 Listen, then tap the answer';
+    document.getElementById('s-q-text').textContent=mcPrompt;
   } else {
     document.getElementById('s-q-text').textContent=isTile?'Put the words in the correct order:':q.type==='sentence'?q.display:'🔊 Listen carefully…';
     document.getElementById('student-ans-input').placeholder='Type your answer…';
@@ -1859,7 +1904,8 @@ function renderMcChoices(q){
   q.choices.forEach(word=>{
     const pic=emo(word);
     const btn=document.createElement('button');
-    btn.className='mc-choice'+((usePics&&pic)?'':' mc-text');
+    const isSentence=!pic&&/\s/.test(word);
+    btn.className='mc-choice'+((usePics&&pic)?'':' mc-text')+(isSentence?' mc-sentence':'');
     btn.dataset.word=word;
     if(usePics&&pic){
       btn.innerHTML='<span class="mc-pic">'+pic+'</span><span class="mc-label">'+word+'</span>';
@@ -1895,6 +1941,8 @@ function studentSpeak(q){
   const Q=currentStudentQ;
   if(!Q) return;
   if(Q.type==='gramscramble'||Q.type==='translate') return;
+  // MC sentence-ordering is read-and-pick — don't read the answer aloud.
+  if(Q.type==='unscramble'&&Array.isArray(Q.choices)&&Q.choices.length) return;
   if(Q.type==='lettersound'){ playSoundFile(Q.soundFile); return; }
   if(Q.type==='letter'){ speakTTS(Q.letter); return; }
   if(Q.type==='oddone'){ speakTTS('Tap the one that does not belong.'); return; }
