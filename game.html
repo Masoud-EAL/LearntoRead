@@ -299,6 +299,9 @@ select.game-input{cursor:pointer;}
         <button class="q-type-tab" onclick="selectSoloType('unscramble',this)">Listen and Unscramble</button>
         <button class="q-type-tab" onclick="selectSoloType('gramscramble',this)">Grammar Unscramble</button>
         <button class="q-type-tab" onclick="selectSoloType('translate',this)">Translate</button>
+        <button class="q-type-tab" onclick="selectSoloType('letter',this)">🔤 Letter Names</button>
+        <button class="q-type-tab" onclick="selectSoloType('lettersound',this)">🔊 First Sounds</button>
+        <button class="q-type-tab" onclick="selectSoloType('oddone',this)">🧩 Odd One Out</button>
         <button class="q-type-tab" onclick="selectSoloType('all',this)">All</button>
       </div>
       <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="solo-count-display">Loading…</div>
@@ -364,6 +367,9 @@ select.game-input{cursor:pointer;}
           <button class="q-type-tab" onclick="selectQType('unscramble',this)">Listen and Unscramble</button>
           <button class="q-type-tab" onclick="selectQType('gramscramble',this)">Grammar Unscramble</button>
           <button class="q-type-tab" onclick="selectQType('translate',this)">Translate</button>
+          <button class="q-type-tab" onclick="selectQType('letter',this)">🔤 Letter Names</button>
+          <button class="q-type-tab" onclick="selectQType('lettersound',this)">🔊 First Sounds</button>
+          <button class="q-type-tab" onclick="selectQType('oddone',this)">🧩 Odd One Out</button>
           <button class="q-type-tab" onclick="selectQType('all',this)">All</button>
         </div>
         <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="q-count-display">Loading…</div>
@@ -674,8 +680,72 @@ const LEVEL0_SENTENCES=[
 ];
 const LANG_NAMES={vi:'Tiếng Việt',fa:'فارسی',ar:'العربية',zh:'中文',hi:'हिन्दी',ur:'اردو',km:'ខ្មែរ',my:'မြန်မာ'};
 
-let questionBank={wp1:[],wp2:[],beginner:[],elementary:[],numbers:[],days:[],months:[],weather:[],fruits:[],body:[],custom:[],unscramble:[],gramscramble:[],translate:[]};
+/* ── PRE-LITERACY PICTURE GAMES ──
+   These three types are always multiple choice (they carry their own .choices)
+   and need no typing — built for early readers. */
+const LETTERS='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+// Initial sound → phoneme audio file (in /audio) + words that begin with it.
+// Every word here has a picture in EMOJI; onsets are phonetically regular.
+const SOUND_BANK={
+  b:{file:'b',words:['bat','bed','bell','book','box','bus','bag','ball','bike','boat']},
+  k:{file:'k',words:['cat','cap','cow','cake','coat','coin','key','king','kite','cup']},
+  d:{file:'d',words:['dog','duck','dish','door','drum','dress']},
+  f:{file:'f',words:['fish','fox','fan','feet','flag','food']},
+  g:{file:'g',words:['game','gate','glue','grape','green']},
+  h:{file:'h',words:['hat','hen','ham','hand','hip','head']},
+  l:{file:'l',words:['lamp','leg','lip','lake','lock','lemon']},
+  m:{file:'m',words:['man','map','mat','moon','mug','mail','meat','mango','mouth']},
+  n:{file:'n',words:['net','nose','nine','neck']},
+  p:{file:'p',words:['pig','pen','pot','pan','pie','pin','peach','pear','plum','pool']},
+  r:{file:'r',words:['rat','ram','rug','rope','rock','rain','rice']},
+  s:{file:'s',words:['sun','soap','star','spoon','snow','six','seven']},
+  t:{file:'t',words:['toy','tie','train','truck','tree','ten','toe','teeth','tin']},
+  w:{file:'w',words:['wig','watch','watermelon']}
+};
+// Picture categories for "odd one out".
+const ODD_GROUPS={
+  animals:['cat','dog','pig','cow','duck','fish','bee','fox','hen','rat','bat','crab','elephant'],
+  fruit:['apple','banana','orange','grape','mango','peach','pear','lemon','cherry','watermelon','pineapple','coconut','kiwi'],
+  transport:['bus','ship','train','truck','van','bike','boat'],
+  clothes:['cap','coat','dress','hat','tie'],
+  body:['ear','foot','leg','hand','nose','eye','mouth','teeth'],
+  food:['cake','egg','pie','jam','meat','rice','bun']
+};
+function genLetterQuestions(){
+  return LETTERS.map(L=>{
+    const others=shuffle(LETTERS.filter(x=>x!==L)).slice(0,3);
+    return {type:'letter',letter:L,answer:L,choices:shuffle([L,...others])};
+  });
+}
+function genSoundQuestions(){
+  const allWords=[];
+  Object.keys(SOUND_BANK).forEach(s=>SOUND_BANK[s].words.forEach(w=>allWords.push({w,s})));
+  const out=[];
+  Object.keys(SOUND_BANK).forEach(snd=>{
+    SOUND_BANK[snd].words.forEach(word=>{
+      const distract=shuffle(allWords.filter(x=>x.s!==snd).map(x=>x.w)).slice(0,3);
+      out.push({type:'lettersound',sound:snd,soundFile:SOUND_BANK[snd].file,word:word,answer:word,choices:shuffle([word,...distract])});
+    });
+  });
+  return out;
+}
+function genOddOneOut(count){
+  const groups=Object.keys(ODD_GROUPS),out=[];
+  for(let i=0;i<count;i++){
+    const a=groups[Math.floor(Math.random()*groups.length)];
+    let b; do{ b=groups[Math.floor(Math.random()*groups.length)]; }while(b===a);
+    const same=shuffle([...ODD_GROUPS[a]]).slice(0,3);
+    const odd=shuffle([...ODD_GROUPS[b]])[0];
+    out.push({type:'oddone',answer:odd,group:a,oddGroup:b,choices:shuffle([odd,...same])});
+  }
+  return out;
+}
+
+let questionBank={wp1:[],wp2:[],beginner:[],elementary:[],numbers:[],days:[],months:[],weather:[],fruits:[],body:[],custom:[],unscramble:[],gramscramble:[],translate:[],letter:[],lettersound:[],oddone:[]};
 function buildBank(){
+  questionBank.letter=genLetterQuestions();
+  questionBank.lettersound=genSoundQuestions();
+  questionBank.oddone=genOddOneOut(40);
   questionBank.wp1=WP1_WORDS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.wp2=WP2_WORDS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.beginner=BEGINNER_SENTENCE_BLANKS.map(s=>({type:'sentence',sentence:s.sentence,blank:s.blank,display:s.sentence,answer:s.blank.toLowerCase()}));
@@ -707,6 +777,9 @@ function poolFor(type){
   if(type==='unscramble') return [...questionBank.unscramble];
   if(type==='gramscramble') return [...questionBank.gramscramble];
   if(type==='translate') return [...questionBank.translate];
+  if(type==='letter') return [...questionBank.letter];
+  if(type==='lettersound') return [...questionBank.lettersound];
+  if(type==='oddone') return [...questionBank.oddone];
   return [...questionBank.wp1,...questionBank.wp2,...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.custom];
 }
 
@@ -1289,14 +1362,14 @@ function playQuestion(){
   const q=currentQuestions[currentQIdx],total=currentQuestions.length;
   document.getElementById('game-prog').textContent='Question '+(currentQIdx+1)+' of '+total;
   const noAudio=q.type==='gramscramble'||q.type==='translate';
-  document.getElementById('q-badge').textContent=q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':'WORD';
-  document.getElementById('q-hint').textContent=q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='unscramble'||q.type==='gramscramble'?'Students arrange word tiles':q.type==='translate'?'Students type the English sentence':'';
+  document.getElementById('q-badge').textContent=q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='lettersound'?'FIRST SOUND':q.type==='oddone'?'ODD ONE OUT':'WORD';
+  document.getElementById('q-hint').textContent=q.type==='oddone'?'Students tap the picture that is different':q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='unscramble'||q.type==='gramscramble'?'Students arrange word tiles':q.type==='translate'?'Students type the English sentence':'';
   document.getElementById('ans-bars').innerHTML='';
   document.getElementById('reveal-btn').style.display='';
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
-  document.getElementById('q-emoji').innerHTML=q.type==='word'?emo(q.word):'';
-  document.getElementById('q-text').textContent=q.type==='sentence'?q.display:q.type==='gramscramble'||q.type==='unscramble'?'🔊 Students listen and unscramble':q.type==='translate'?'🌐 Students see this in their own language':'🔊 Listen and spell the word';
+  document.getElementById('q-emoji').innerHTML=q.type==='word'?emo(q.word):q.type==='letter'?q.letter:'';
+  document.getElementById('q-text').textContent=q.type==='sentence'?q.display:q.type==='gramscramble'||q.type==='unscramble'?'🔊 Students listen and unscramble':q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=noAudio?'none':'';
   roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:Date.now(),revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
@@ -1310,8 +1383,9 @@ function playQuestion(){
 function teacherSpeak(){
   const q=currentQuestions[currentQIdx],btn=document.getElementById('hear-btn');
   if(q.type==='gramscramble'||q.type==='translate') return;
+  if(q.type==='lettersound'){ playSoundFile(q.soundFile); return; }
   btn.classList.add('playing');
-  const spokenText=q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.word;
+  const spokenText=q.type==='letter'?q.letter:q.type==='oddone'?'Tap the one that does not belong.':q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.word;
   const utt=new SpeechSynthesisUtterance(spokenText);
   utt.rate=0.7; utt.lang='en-AU';
   utt.onend=utt.onerror=()=>btn.classList.remove('playing');
@@ -1738,7 +1812,12 @@ function showStudentQuestion(q,startedAt){
   document.getElementById('student-submit-btn').disabled=isTile;
   document.getElementById('s-hear-btn').style.display=(q.type==='gramscramble'||isTranslate)?'none':'';
   document.getElementById('s-q-type').textContent=
-    isMc?(q.type==='sentence'?'TAP THE MISSING WORD':'LISTEN — TAP THE PICTURE'):
+    isMc?(
+      q.type==='sentence'?'TAP THE MISSING WORD':
+      q.type==='letter'?'LISTEN — TAP THE LETTER':
+      q.type==='lettersound'?'TAP THE PICTURE WITH THIS SOUND':
+      q.type==='oddone'?'TAP THE ONE THAT IS DIFFERENT':
+      'LISTEN — TAP THE PICTURE'):
     isTile?(q.type==='gramscramble'?'GRAMMAR — arrange words in order':'UNSCRAMBLE — arrange the word tiles'):
     isTranslate?'TRANSLATE — type the English sentence':
     q.type==='sentence'?'SENTENCE — type the missing word':'WORD — listen and spell it';
@@ -1750,7 +1829,12 @@ function showStudentQuestion(q,startedAt){
     document.getElementById('s-q-text').textContent=t;
     document.getElementById('student-ans-input').placeholder='Type the English sentence…';
   } else if(isMc){
-    document.getElementById('s-q-text').textContent=q.type==='sentence'?q.display:'🔊 Listen, then tap the answer';
+    document.getElementById('s-q-text').textContent=
+      q.type==='sentence'?q.display:
+      q.type==='oddone'?'Which one is different?':
+      q.type==='letter'?'🔊 Listen, then tap the letter':
+      q.type==='lettersound'?'🔊 Listen to the sound':
+      '🔊 Listen, then tap the answer';
   } else {
     document.getElementById('s-q-text').textContent=isTile?'Put the words in the correct order:':q.type==='sentence'?q.display:'🔊 Listen carefully…';
     document.getElementById('student-ans-input').placeholder='Type your answer…';
@@ -1795,16 +1879,28 @@ function selectMc(word,btn){
   submitAnswer();
 }
 
-let currentStudentQ=null;
-function studentSpeak(q){
-  currentStudentQ=q||currentStudentQ;
-  if(!currentStudentQ) return;
-  if(currentStudentQ.type==='gramscramble'||currentStudentQ.type==='translate') return;
-  const text=currentStudentQ.type==='sentence'?currentStudentQ.sentence.replace('___',currentStudentQ.blank):currentStudentQ.type==='unscramble'?currentStudentQ.sentence:currentStudentQ.word;
-  if(!text) return;
+let sfxAudio=null;
+function playSoundFile(file){
+  try{ if(sfxAudio){sfxAudio.pause();} sfxAudio=new Audio('audio/'+file+'.wav'); sfxAudio.play().catch(()=>{}); }catch(e){}
+}
+function speakTTS(text){
   const utt=new SpeechSynthesisUtterance(text);
   utt.rate=0.7; utt.lang='en-AU';
   window.speechSynthesis.cancel(); window.speechSynthesis.speak(utt);
+}
+
+let currentStudentQ=null;
+function studentSpeak(q){
+  currentStudentQ=q||currentStudentQ;
+  const Q=currentStudentQ;
+  if(!Q) return;
+  if(Q.type==='gramscramble'||Q.type==='translate') return;
+  if(Q.type==='lettersound'){ playSoundFile(Q.soundFile); return; }
+  if(Q.type==='letter'){ speakTTS(Q.letter); return; }
+  if(Q.type==='oddone'){ speakTTS('Tap the one that does not belong.'); return; }
+  const text=Q.type==='sentence'?Q.sentence.replace('___',Q.blank):Q.type==='unscramble'?Q.sentence:Q.word;
+  if(!text) return;
+  speakTTS(text);
 }
 
 let studentTimerInt=null;
