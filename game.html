@@ -193,6 +193,26 @@ select.game-input{cursor:pointer;}
 .word-tile.dragging{cursor:grabbing;opacity:.95;box-shadow:0 10px 26px rgba(0,0,0,.4);transform:scale(1.06);transition:none;border-color:var(--gold);}
 .tile-placeholder{border-radius:10px;background:rgba(245,166,35,.18);border:2px dashed var(--gold);box-sizing:border-box;}
 
+/* MULTIPLE CHOICE (4 options) */
+.mc-section{width:100%;max-width:520px;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.mc-choice{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:120px;padding:16px 12px;background:var(--card);border:2px solid rgba(255,255,255,.12);border-radius:16px;cursor:pointer;transition:transform .12s,border-color .15s,background .15s;color:var(--text);font-family:'Fredoka One',cursive;}
+.mc-choice:hover{transform:translateY(-3px);border-color:var(--purple);}
+.mc-choice:active{transform:scale(.96);}
+.mc-choice .mc-pic{font-size:3.2rem;line-height:1;}
+.mc-choice .mc-pic .custom-icon-emoji{height:1em;width:1em;}
+.mc-choice .mc-label{font-size:1.15rem;word-break:break-word;text-align:center;}
+.mc-choice.mc-text .mc-label{font-size:1.5rem;}
+.mc-choice.selected{border-color:var(--gold);background:rgba(245,166,35,.12);}
+.mc-choice.mc-correct{border-color:var(--green);background:rgba(0,200,83,.18);}
+.mc-choice.mc-wrong{border-color:var(--accent);background:rgba(233,69,96,.15);}
+.mc-choice.locked{pointer-events:none;}
+.mc-toggle-wrap{display:flex;align-items:center;gap:10px;margin:4px 0 10px;padding:10px 14px;background:rgba(124,77,255,.12);border:1.5px solid rgba(124,77,255,.35);border-radius:12px;cursor:pointer;}
+.mc-toggle-wrap .mc-toggle-txt{font-size:.9rem;font-weight:800;color:var(--text);}
+.mc-toggle-wrap .mc-toggle-sub{font-size:.72rem;color:var(--muted);font-weight:600;}
+.mc-switch{position:relative;width:46px;height:26px;flex:0 0 auto;border-radius:50px;background:rgba(255,255,255,.18);transition:background .15s;}
+.mc-switch::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s;}
+.mc-toggle-wrap.on .mc-switch{background:var(--teal);}
+.mc-toggle-wrap.on .mc-switch::after{transform:translateX(20px);}
 .q-emoji-big{font-size:2.8rem;line-height:1;min-height:1em;text-align:center;margin-bottom:4px;}
 .custom-icon-emoji{height:1em;width:1em;vertical-align:middle;display:inline-block;object-fit:contain;}
 .q-emoji-big .custom-icon-emoji{height:1em;width:1em;}
@@ -282,6 +302,13 @@ select.game-input{cursor:pointer;}
         <button class="q-type-tab" onclick="selectSoloType('all',this)">All</button>
       </div>
       <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="solo-count-display">Loading…</div>
+      <div class="mc-toggle-wrap" id="solo-mc-toggle" onclick="toggleMcMode('solo')">
+        <div class="mc-switch"></div>
+        <div>
+          <div class="mc-toggle-txt">🖼️ Multiple Choice (4 pictures)</div>
+          <div class="mc-toggle-sub">Listen & tap — no typing. Great for early readers.</div>
+        </div>
+      </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <label style="font-size:.8rem;color:var(--muted);">Questions:</label>
         <input type="number" class="game-input" id="solo-q-limit" value="10" min="1" max="50"
@@ -340,6 +367,13 @@ select.game-input{cursor:pointer;}
           <button class="q-type-tab" onclick="selectQType('all',this)">All</button>
         </div>
         <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="q-count-display">Loading…</div>
+        <div class="mc-toggle-wrap" id="host-mc-toggle" onclick="toggleMcMode('host')">
+          <div class="mc-switch"></div>
+          <div>
+            <div class="mc-toggle-txt">🖼️ Multiple Choice (4 pictures)</div>
+            <div class="mc-toggle-sub">Players listen & tap a picture — no typing.</div>
+          </div>
+        </div>
         <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
           <div style="display:flex;align-items:center;gap:10px;">
             <label style="font-size:.8rem;color:var(--muted);">Questions:</label>
@@ -482,6 +516,7 @@ select.game-input{cursor:pointer;}
       <div class="word-bank-area" id="word-bank-area"></div>
     </div>
   </div>
+  <div class="mc-section" id="mc-section" style="display:none;"></div>
   <button class="submit-btn" id="student-submit-btn" onclick="submitAnswer()">✓ Submit</button>
   <div class="submitted-msg" id="submitted-msg"></div>
   <button class="btn btn-ghost btn-sm" id="solo-back-btn" style="display:none;margin-top:4px;" onclick="showScreen('screen-solo-setup')">← Back to categories</button>
@@ -655,27 +690,69 @@ function buildBank(){
   questionBank.gramscramble=UNSCRAMBLE_SENTENCES.map(s=>({type:'gramscramble',sentence:s,answer:s,words:s.trim().split(/\s+/)}));
   questionBank.translate=LEVEL0_SENTENCES.map(s=>({type:'translate',en:s.en,answer:s.en,translations:{fa:s.fa,vi:s.vi,zh:s.zh,ar:s.ar,hi:s.hi,ur:s.ur,km:s.km,my:s.my}}));
 }
-function getQuestions(type,limit){
+function poolFor(type){
   const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body];
-  let pool=[];
-  if(type==='wp1') pool=[...questionBank.wp1];
-  else if(type==='wp2') pool=[...questionBank.wp2];
-  else if(type==='beginner') pool=[...questionBank.beginner];
-  else if(type==='elementary') pool=[...questionBank.elementary];
-  else if(type==='numbers') pool=[...questionBank.numbers];
-  else if(type==='days') pool=[...questionBank.days];
-  else if(type==='months') pool=[...questionBank.months];
-  else if(type==='weather') pool=[...questionBank.weather];
-  else if(type==='fruits') pool=[...questionBank.fruits];
-  else if(type==='body') pool=[...questionBank.body];
-  else if(type==='spelling') pool=allSpelling;
-  else if(type==='custom') pool=[...questionBank.custom];
-  else if(type==='unscramble') pool=[...questionBank.unscramble];
-  else if(type==='gramscramble') pool=[...questionBank.gramscramble];
-  else if(type==='translate') pool=[...questionBank.translate];
-  else pool=[...questionBank.wp1,...questionBank.wp2,...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.custom];
+  if(type==='wp1') return [...questionBank.wp1];
+  if(type==='wp2') return [...questionBank.wp2];
+  if(type==='beginner') return [...questionBank.beginner];
+  if(type==='elementary') return [...questionBank.elementary];
+  if(type==='numbers') return [...questionBank.numbers];
+  if(type==='days') return [...questionBank.days];
+  if(type==='months') return [...questionBank.months];
+  if(type==='weather') return [...questionBank.weather];
+  if(type==='fruits') return [...questionBank.fruits];
+  if(type==='body') return [...questionBank.body];
+  if(type==='spelling') return allSpelling;
+  if(type==='custom') return [...questionBank.custom];
+  if(type==='unscramble') return [...questionBank.unscramble];
+  if(type==='gramscramble') return [...questionBank.gramscramble];
+  if(type==='translate') return [...questionBank.translate];
+  return [...questionBank.wp1,...questionBank.wp2,...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.custom];
+}
+
+function getQuestions(type,limit){
+  const pool=poolFor(type);
   shuffle(pool);
   return pool.slice(0,limit);
+}
+
+/* ── MULTIPLE-CHOICE (4-option) SUPPORT ──
+   A question can be converted to multiple choice when its answer is a single
+   word (word banks, themed spelling, or a sentence's missing word). Tile and
+   translate questions are left as-is. */
+function mcSupported(q){ return q && (q.type==='word'||q.type==='sentence'); }
+function mcKeyWord(q){ return q.type==='sentence'?q.blank:q.word; }
+
+/* Attach a fixed 4-option list (q.choices) to every supported question so the
+   same options show on every device and survive replays. type = the category
+   the questions came from (used as the distractor source). */
+function attachMcChoices(questions,type){
+  const sourceWords=[...new Set(poolFor(type).filter(mcSupported).map(mcKeyWord))];
+  questions.forEach(q=>{
+    if(mcSupported(q)) q.choices=buildChoices(q,sourceWords);
+  });
+  return questions;
+}
+
+function buildChoices(q,sourceWords){
+  const correct=mcKeyWord(q);
+  let others=sourceWords.filter(w=>normalize(w)!==normalize(correct));
+  // If the correct answer has a picture, prefer distractors that also have a
+  // distinct picture so the round stays visual.
+  if(emo(correct)){
+    const withPic=others.filter(w=>emo(w)&&emo(w)!==emo(correct));
+    if(withPic.length>=3) others=withPic;
+  }
+  shuffle(others);
+  const picks=others.slice(0,3);
+  // Pad from the wider word list if a small category can't supply 3 distractors.
+  if(picks.length<3){
+    const backup=[...new Set(poolFor('all').filter(mcSupported).map(mcKeyWord))]
+      .filter(w=>normalize(w)!==normalize(correct)&&!picks.some(p=>normalize(p)===normalize(w)));
+    shuffle(backup);
+    while(picks.length<3&&backup.length) picks.push(backup.shift());
+  }
+  return shuffle([correct,...picks]);
 }
 
 /* GAME STATE */
@@ -691,6 +768,7 @@ const TIMER_DURATION=30;
 let totalPlayers=0;
 let soloMode=false,soloQuestions=[],soloQIdx=0,soloSelectedType='wp1';
 let hintLevel=0;
+let mcMode=false;
 
 const EMOJI={
   'ant':'🐜','bat':'🦇','bee':'🐝','bug':'🐛','cat':'🐱','cow':'🐄','crab':'🦀','dog':'🐶','duck':'🦆','elephant':'🐘','fish':'🐟','fox':'🦊','hen':'🐓','pig':'🐷','ram':'🐏','rat':'🐀',
@@ -710,7 +788,7 @@ const EMOJI={
   'rice':'🍚','kite':'🪁','five':'5️⃣','six':'6️⃣','nine':'9️⃣','ten':'🔟',
   'one':'1️⃣','two':'2️⃣','three':'3️⃣','four':'4️⃣','seven':'7️⃣','eight':'8️⃣',
   'orange':'🍊','grape':'🍇','mango':'🥭','peach':'🍑','plum':'🍑','pear':'🍐','lemon':'🍋','cherry':'🍒','strawberry':'🍓','watermelon':'🍉','pineapple':'🍍','coconut':'🥥','kiwi':'🥝','banana':'🍌',
-  'head':'🗣️','eye':'👁️','nose':'👃','tongue':'👅','neck':'🦒','shoulder':'💪','arm':'💪','elbow':'💪','wrist':'⌚','hand':'✋','finger':'☝️','chest':'🫀','stomach':'🫃','back':'🔙','hip':'🦴','knee':'🦵','ankle':'🦶',
+  'head':'🗣️','eye':'👁️','nose':'👃','tongue':'👅','tooth':'🦷','neck':'🦒','shoulder':'💪','arm':'💪','elbow':'💪','wrist':'⌚','hand':'✋','finger':'☝️','chest':'🫀','stomach':'🫃','back':'🔙','hip':'🦴','knee':'🦵','ankle':'🦶',
   'sunny':'☀️','cloudy':'☁️','rainy':'🌧️','windy':'💨','snowy':'❄️','stormy':'⛈️','foggy':'🌫️','warm':'🌤️','humid':'💧',
   'Monday':'📅','Tuesday':'📅','Wednesday':'📅','Thursday':'📅','Friday':'📅','Saturday':'🎉','Sunday':'☀️'
 };
@@ -1174,6 +1252,14 @@ function generateQR(){
   const el=document.getElementById('qr-wrap'); el.innerHTML='';
   new QRCode(el,{text:'https://masoud-eal.github.io/LearntoRead/game.html?join='+roomCode,width:260,height:260,colorDark:'#000000',colorLight:'#ffffff'});
 }
+function toggleMcMode(which){
+  mcMode=!mcMode;
+  const w=document.getElementById(which==='host'?'host-mc-toggle':'solo-mc-toggle');
+  if(w) w.classList.toggle('on',mcMode);
+  // keep both toggles visually in sync
+  ['solo-mc-toggle','host-mc-toggle'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('on',mcMode);});
+}
+
 function selectQType(type,el){ selectedQType=type; document.querySelectorAll('.q-type-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); updateQCountDisplay(); }
 function updateQCountDisplay(){
   const limit=parseInt(document.getElementById('q-limit').value)||10;
@@ -1187,6 +1273,7 @@ function startGame(){
   teacherTimerDuration=Math.max(10,Math.min(120,parseInt(document.getElementById('t-limit').value)||30));
   currentQuestions=getQuestions(selectedQType,limit);
   if(!currentQuestions.length){ showToast('No questions available!'); return; }
+  if(mcMode) attachMcChoices(currentQuestions,selectedQType);
   currentQIdx=0;
   roomRef.child('players').once('value',snap=>{
     const players=snap.val()||{},updates={};
@@ -1203,7 +1290,7 @@ function playQuestion(){
   document.getElementById('game-prog').textContent='Question '+(currentQIdx+1)+' of '+total;
   const noAudio=q.type==='gramscramble'||q.type==='translate';
   document.getElementById('q-badge').textContent=q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':'WORD';
-  document.getElementById('q-hint').textContent=q.type==='sentence'?'Students type the missing word':q.type==='unscramble'||q.type==='gramscramble'?'Students arrange word tiles':q.type==='translate'?'Students type the English sentence':'';
+  document.getElementById('q-hint').textContent=q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='unscramble'||q.type==='gramscramble'?'Students arrange word tiles':q.type==='translate'?'Students type the English sentence':'';
   document.getElementById('ans-bars').innerHTML='';
   document.getElementById('reveal-btn').style.display='';
   document.getElementById('next-btn').style.display='none';
@@ -1583,6 +1670,7 @@ function startSoloGame(){
   const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
   soloQuestions=getQuestions(soloSelectedType,limit);
   if(!soloQuestions.length){showToast('No questions available!');return;}
+  if(mcMode) attachMcChoices(soloQuestions,soloSelectedType);
   soloQIdx=0; myScore=0;
   document.getElementById('solo-back-btn').style.display='';
   showStudentQuestion(soloQuestions[0],Date.now());
@@ -1612,7 +1700,7 @@ function showSoloResult(submittedAns,correctAns,timeLeft){
   document.getElementById('solo-progress').textContent=(soloQIdx+1)+' / '+soloQuestions.length+' questions done';
   document.getElementById('multiplayer-wait-msg').style.display='none';
   showScreen('screen-student-result');
-  if(isCorrect) playCorrectJingle(); else playWrongJingle();
+  if(tier==='correct'||tier==='partial') playCorrectJingle(); else playWrongJingle();
 }
 function soloNextQuestion(){
   soloQIdx++;
@@ -1635,36 +1723,76 @@ function showStudentQuestion(q,startedAt){
   stopMusic(); answered=false; hintLevel=0;
   document.getElementById('student-ans-input').value='';
   document.getElementById('submitted-msg').textContent='';
-  const isTile=q.type==='unscramble'||q.type==='gramscramble';
-  const isTranslate=q.type==='translate';
-  document.getElementById('ans-input-section').style.display=isTile?'none':'';
+  const isMc=Array.isArray(q.choices)&&q.choices.length>0;
+  const isTile=!isMc&&(q.type==='unscramble'||q.type==='gramscramble');
+  const isTranslate=!isMc&&q.type==='translate';
+  document.getElementById('ans-input-section').style.display=(isMc||isTile)?'none':'';
   document.getElementById('unscramble-section').style.display=isTile?'flex':'none';
+  document.getElementById('mc-section').style.display=isMc?'grid':'none';
   document.getElementById('translate-hint-wrap').style.display=isTranslate?'':'none';
   document.getElementById('hint-text').textContent='';
   document.getElementById('hint-btn').disabled=false;
   document.getElementById('hint-btn').textContent='💡 Hint';
+  // In MC mode tapping a choice submits, so hide the Submit button.
+  document.getElementById('student-submit-btn').style.display=isMc?'none':'';
   document.getElementById('student-submit-btn').disabled=isTile;
   document.getElementById('s-hear-btn').style.display=(q.type==='gramscramble'||isTranslate)?'none':'';
   document.getElementById('s-q-type').textContent=
+    isMc?(q.type==='sentence'?'TAP THE MISSING WORD':'LISTEN — TAP THE PICTURE'):
     isTile?(q.type==='gramscramble'?'GRAMMAR — arrange words in order':'UNSCRAMBLE — arrange the word tiles'):
     isTranslate?'TRANSLATE — type the English sentence':
     q.type==='sentence'?'SENTENCE — type the missing word':'WORD — listen and spell it';
-  document.getElementById('s-q-emoji').innerHTML=q.type==='word'?emo(q.word):'';
+  // For a picture round, don't show the answer's own picture as the prompt.
+  document.getElementById('s-q-emoji').innerHTML=(q.type==='word'&&!isMc)?emo(q.word):'';
   if(isTranslate){
     const lang=localStorage.getItem('translateLang')||'vi';
     const t=q.translations&&q.translations[lang]?q.translations[lang]:(q.en||q.answer);
     document.getElementById('s-q-text').textContent=t;
     document.getElementById('student-ans-input').placeholder='Type the English sentence…';
+  } else if(isMc){
+    document.getElementById('s-q-text').textContent=q.type==='sentence'?q.display:'🔊 Listen, then tap the answer';
   } else {
     document.getElementById('s-q-text').textContent=isTile?'Put the words in the correct order:':q.type==='sentence'?q.display:'🔊 Listen carefully…';
     document.getElementById('student-ans-input').placeholder='Type your answer…';
   }
+  if(isMc) renderMcChoices(q);
   if(isTile){
     const words=Array.isArray(q.words)?q.words:Object.values(q.words||{});
     renderUnscrambleTiles(words);
   }
   showScreen('screen-student-answer');
   studentSpeak(q); startStudentTimer(startedAt, q.type==='translate'?60:TIMER_DURATION);
+}
+
+/* Render the four picture/word options. If two options would show the same
+   emoji (e.g. days all map to 📅), fall back to large text for all four. */
+function renderMcChoices(q){
+  const box=document.getElementById('mc-section');
+  box.innerHTML='';
+  const emojis=q.choices.map(w=>emo(w));
+  const hasDup=emojis.some((e,i)=>e&&emojis.indexOf(e)!==i);
+  const usePics=emojis.every(e=>e)&&!hasDup;
+  q.choices.forEach(word=>{
+    const pic=emo(word);
+    const btn=document.createElement('button');
+    btn.className='mc-choice'+((usePics&&pic)?'':' mc-text');
+    btn.dataset.word=word;
+    if(usePics&&pic){
+      btn.innerHTML='<span class="mc-pic">'+pic+'</span><span class="mc-label">'+word+'</span>';
+    } else {
+      btn.innerHTML='<span class="mc-label">'+word+'</span>';
+    }
+    btn.onclick=()=>selectMc(word,btn);
+    box.appendChild(btn);
+  });
+}
+
+function selectMc(word,btn){
+  if(answered) return;
+  document.querySelectorAll('#mc-section .mc-choice').forEach(b=>b.classList.add('locked'));
+  btn.classList.add('selected');
+  document.getElementById('student-ans-input').value=word;
+  submitAnswer();
 }
 
 let currentStudentQ=null;
@@ -1907,7 +2035,7 @@ function showStudentResult(correctAnswer){
     document.getElementById('solo-next-wrap').style.display='none';
     document.getElementById('multiplayer-wait-msg').style.display='';
     showScreen('screen-student-result');
-    if(isCorrect) playCorrectJingle(); else playWrongJingle();
+    if(tier==='correct'||tier==='partial') playCorrectJingle(); else playWrongJingle();
     roomRef.once('value',rsnap=>{
       const r=rsnap.val();
       if(r&&r.midLeaderboard&&r.status==='playing') showMidStudentLeaderboard();
