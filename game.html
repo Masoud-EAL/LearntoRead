@@ -1310,10 +1310,30 @@ function toggleMusic(){
 }
 
 /* SCREENS */
+// Which background music belongs to a given screen.
+const LOBBY_SCREENS=['screen-home','screen-student-home','screen-solo-setup','screen-teacher-lobby','screen-student-lobby'];
+function startScreenMusic(id){
+  if(!musicOn) return;
+  if(LOBBY_SCREENS.includes(id)) playLobbyMusic();
+  else if(id==='screen-teacher-game') playGameMusic();
+  // other screens (questions, results, leaderboard) manage their own audio
+}
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  startScreenMusic(id);
 }
+/* Browsers start the AudioContext suspended until the user interacts, so the
+   menu loads silent. Resume it on the first gesture and start the right music. */
+let audioUnlocked=false;
+function unlockAudio(){
+  if(audioUnlocked) return;
+  audioUnlocked=true;
+  try{ getCtx(); }catch(e){}
+  const s=document.querySelector('.screen.active');
+  if(s) startScreenMusic(s.id);
+}
+['pointerdown','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,unlockAudio));
 function goHome(){ stopMusic(); cleanupListeners(); soloMode=false; document.getElementById('music-btn').style.display=''; document.getElementById('solo-back-btn').style.display='none'; showScreen('screen-home'); playLobbyMusic(); }
 function goStudentHome(){ document.getElementById('music-btn').style.display='none'; showScreen('screen-student-home'); }
 
