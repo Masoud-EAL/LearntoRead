@@ -162,6 +162,30 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .add-q-form h3{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--gold);margin-bottom:12px;}
 select.game-input{cursor:pointer;}
 
+/* BANK PICKER MODAL */
+.bank-picker-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;display:flex;align-items:center;justify-content:center;}
+.bank-picker-card{background:var(--bg);border-radius:var(--radius);padding:24px;width:min(92vw,420px);max-height:80vh;overflow-y:auto;display:flex;flex-direction:column;gap:14px;border:1px solid rgba(255,255,255,.1);}
+.bank-picker-card h3{font-family:'Fredoka One',cursive;font-size:1.2rem;color:var(--gold);}
+.bank-item{background:var(--card);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;border:2px solid transparent;transition:border-color .15s;}
+.bank-item:hover{border-color:var(--teal);}
+.bank-item .bank-name{flex:1;font-family:'Fredoka One',cursive;font-size:1rem;}
+.bank-item .bank-count{font-size:.78rem;color:var(--muted);}
+.bank-sel-btn{background:var(--teal);color:white;border:none;border-radius:50px;padding:7px 16px;font-family:'Fredoka One',cursive;font-size:.85rem;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.bank-sel-btn:hover{filter:brightness(1.1);}
+/* MC form options */
+.mc-options-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.mc-opt-row{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border-radius:8px;padding:8px 10px;}
+.mc-opt-row input[type=radio]{accent-color:var(--teal);width:16px;height:16px;flex-shrink:0;cursor:pointer;}
+.mc-opt-row .game-input{margin-bottom:0;padding:8px 12px;font-size:.9rem;}
+.mc-correct-label{font-size:.75rem;color:var(--muted);font-weight:700;letter-spacing:.5px;}
+/* New tag colors */
+.tag-mc{background:rgba(63,140,255,.2);color:#3f8cff;}
+.tag-unscrm{background:rgba(255,165,0,.2);color:orange;}
+/* Bank selector in editor */
+.editor-bank-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
+.editor-bank-row select.game-input{flex:1;min-width:0;margin-bottom:0;padding:10px 14px;font-size:.9rem;}
+.editor-bank-name{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--teal);flex:1;}
+
 /* MISC */
 .music-btn,.back-btn{position:fixed;top:12px;z-index:100;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:7px 14px;font-size:.8rem;cursor:pointer;color:var(--muted);text-decoration:none;transition:all .15s;}
 .music-btn:hover,.back-btn:hover{background:rgba(255,255,255,.12);color:var(--text);}
@@ -296,7 +320,6 @@ select.game-input{cursor:pointer;}
         <button class="q-type-tab" onclick="selectSoloType('fruits',this)">Fruits</button>
         <button class="q-type-tab" onclick="selectSoloType('body',this)">Body</button>
         <button class="q-type-tab" onclick="selectSoloType('spelling',this)">All Spelling</button>
-        <button class="q-type-tab" onclick="selectSoloType('custom',this)">Custom</button>
         <button class="q-type-tab" onclick="selectSoloType('unscramble',this)">Listen and Unscramble</button>
         <button class="q-type-tab" onclick="selectSoloType('gramscramble',this)">Grammar Unscramble</button>
         <button class="q-type-tab" onclick="selectSoloType('translate',this)">Translate</button>
@@ -304,6 +327,7 @@ select.game-input{cursor:pointer;}
         <button class="q-type-tab" onclick="selectSoloType('lettersound',this)">🔊 First Sounds</button>
         <button class="q-type-tab" onclick="selectSoloType('oddone',this)">🧩 Odd One Out</button>
         <button class="q-type-tab" onclick="selectSoloType('all',this)">All</button>
+        <button class="q-type-tab" id="solo-custom-tab" onclick="showBankPicker('solo',this)">📚 Custom</button>
       </div>
       <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="solo-count-display">Loading…</div>
       <div class="mc-toggle-wrap" id="solo-mc-toggle" onclick="toggleMcMode('solo')">
@@ -364,7 +388,6 @@ select.game-input{cursor:pointer;}
           <button class="q-type-tab" onclick="selectQType('fruits',this)">Fruits</button>
           <button class="q-type-tab" onclick="selectQType('body',this)">Body</button>
           <button class="q-type-tab" onclick="selectQType('spelling',this)">All Spelling</button>
-          <button class="q-type-tab" onclick="selectQType('custom',this)">Custom</button>
           <button class="q-type-tab" onclick="selectQType('unscramble',this)">Listen and Unscramble</button>
           <button class="q-type-tab" onclick="selectQType('gramscramble',this)">Grammar Unscramble</button>
           <button class="q-type-tab" onclick="selectQType('translate',this)">Translate</button>
@@ -372,6 +395,7 @@ select.game-input{cursor:pointer;}
           <button class="q-type-tab" onclick="selectQType('lettersound',this)">🔊 First Sounds</button>
           <button class="q-type-tab" onclick="selectQType('oddone',this)">🧩 Odd One Out</button>
           <button class="q-type-tab" onclick="selectQType('all',this)">All</button>
+          <button class="q-type-tab" id="teacher-custom-tab" onclick="showBankPicker('teacher',this)">📚 Custom</button>
         </div>
         <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="q-count-display">Loading…</div>
         <div class="mc-toggle-wrap" id="host-mc-toggle" onclick="toggleMcMode('host')">
@@ -546,32 +570,113 @@ select.game-input{cursor:pointer;}
 
 <!-- EDITOR -->
 <div class="screen" id="screen-editor">
-  <div style="padding:0 20px 20px;display:flex;flex-direction:column;gap:14px;flex:1;">
+  <div style="padding:0 20px 20px;display:flex;flex-direction:column;gap:14px;flex:1;overflow-y:auto;">
     <div class="editor-hdr">
-      <h2>✏️ Custom Questions</h2>
+      <h2>✏️ Custom Question Banks</h2>
       <button class="btn btn-ghost btn-sm" onclick="goHome()">← Back</button>
     </div>
-    <div class="card scrollable" id="custom-q-list" style="max-height:280px;min-height:60px;display:flex;flex-direction:column;gap:8px;">
-      <div style="color:var(--muted);font-size:.85rem;">No custom questions yet.</div>
+
+    <!-- Bank selector -->
+    <div class="card" style="padding:16px;">
+      <p style="font-family:'Fredoka One',cursive;font-size:.85rem;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">Question Bank</p>
+      <div class="editor-bank-row">
+        <select class="game-input" id="editor-bank-select" onchange="onEditorBankChange(this.value)">
+          <option value="">— select a bank —</option>
+        </select>
+        <button class="btn btn-teal btn-sm" onclick="showCreateBankForm()">＋ New Bank</button>
+      </div>
+      <div id="create-bank-form" style="display:none;margin-top:10px;display:none;flex-direction:column;gap:8px;">
+        <input class="game-input" id="new-bank-name" placeholder="Bank name e.g. My Phonics Quiz" style="margin-bottom:0;">
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-gold btn-sm" onclick="createBank()">Save Bank</button>
+          <button class="btn btn-ghost btn-sm" onclick="hideCreateBankForm()">Cancel</button>
+        </div>
+      </div>
+      <div id="active-bank-info" style="display:none;margin-top:10px;display:none;flex-direction:column;gap:6px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span class="editor-bank-name" id="active-bank-name-label"></span>
+          <button class="btn btn-ghost btn-sm" style="font-size:.75rem;padding:4px 12px;" onclick="deleteBankConfirm()">🗑 Delete Bank</button>
+        </div>
+      </div>
     </div>
-    <div class="add-q-form">
+
+    <!-- Question list for active bank -->
+    <div class="card scrollable" id="custom-q-list" style="max-height:260px;min-height:60px;display:flex;flex-direction:column;gap:8px;">
+      <div style="color:var(--muted);font-size:.85rem;">Select or create a bank above to get started.</div>
+    </div>
+
+    <!-- Add question form -->
+    <div class="add-q-form" id="add-q-form-wrap" style="display:none;">
       <h3>➕ Add a question</h3>
       <select class="game-input" id="new-q-type" onchange="updateQForm()">
-        <option value="word">📝 Spell a word (students hear it, type the spelling)</option>
-        <option value="sentence">📖 Fill the blank (students type the missing word)</option>
+        <option value="word">🔊 Listening — Spell a Word</option>
+        <option value="sentence">📖 Fill the Blank</option>
+        <option value="mc">🔵 Multiple Choice (4 options)</option>
+        <option value="unscramble">🔀 Sentence Unscramble</option>
       </select>
+
+      <!-- word form -->
       <div id="word-q-form">
         <div class="field-label">Word</div>
         <input class="game-input" id="new-q-word" placeholder="e.g. elephant">
       </div>
+
+      <!-- sentence fill-blank form -->
       <div id="sentence-q-form" style="display:none;">
         <div class="field-label">Full sentence</div>
         <input class="game-input" id="new-q-sentence" placeholder="e.g. I go to school every day.">
-        <div class="field-label">Missing word</div>
+        <div class="field-label">Missing word (must appear in sentence)</div>
         <input class="game-input" id="new-q-blank" placeholder="e.g. school">
       </div>
+
+      <!-- multiple choice form -->
+      <div id="mc-q-form" style="display:none;">
+        <div class="field-label">Question prompt</div>
+        <input class="game-input" id="new-q-question" placeholder="e.g. Which animal has a trunk?">
+        <div class="field-label" style="margin-top:4px;">Options — tick the correct one</div>
+        <div class="mc-options-grid">
+          <div class="mc-opt-row">
+            <input type="radio" name="mc-correct" value="0" id="mc-r0">
+            <input class="game-input" id="new-q-opt-0" placeholder="Option A">
+          </div>
+          <div class="mc-opt-row">
+            <input type="radio" name="mc-correct" value="1" id="mc-r1">
+            <input class="game-input" id="new-q-opt-1" placeholder="Option B">
+          </div>
+          <div class="mc-opt-row">
+            <input type="radio" name="mc-correct" value="2" id="mc-r2">
+            <input class="game-input" id="new-q-opt-2" placeholder="Option C">
+          </div>
+          <div class="mc-opt-row">
+            <input type="radio" name="mc-correct" value="3" id="mc-r3">
+            <input class="game-input" id="new-q-opt-3" placeholder="Option D">
+          </div>
+        </div>
+        <p style="font-size:.75rem;color:var(--muted);margin-top:4px;">Tick the radio button next to the correct option.</p>
+      </div>
+
+      <!-- unscramble form -->
+      <div id="unscramble-q-form" style="display:none;">
+        <div class="field-label">Sentence (students hear it and arrange the words)</div>
+        <input class="game-input" id="new-q-unscramble" placeholder="e.g. She goes to school every morning.">
+      </div>
+
       <div class="err-msg" id="editor-error"></div>
-      <button class="btn btn-gold" onclick="addCustomQuestion()">➕ Add</button>
+      <button class="btn btn-gold" onclick="addCustomQuestion()">➕ Add Question</button>
+    </div>
+  </div>
+</div>
+
+<!-- BANK PICKER MODAL -->
+<div class="bank-picker-overlay" id="bank-picker-modal" style="display:none;" onclick="if(event.target===this)closeBankPicker()">
+  <div class="bank-picker-card">
+    <h3>📚 Choose a Question Bank</h3>
+    <div id="bank-picker-list" style="display:flex;flex-direction:column;gap:10px;">
+      <div style="color:var(--muted);font-size:.88rem;">Loading…</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.08);padding-top:12px;">
+      <button class="btn btn-ghost btn-sm" onclick="openEditorFromPicker()">✏️ Manage Banks</button>
+      <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="closeBankPicker()">✕ Cancel</button>
     </div>
   </div>
 </div>
@@ -743,6 +848,12 @@ function genOddOneOut(count){
 }
 
 let questionBank={wp1:[],wp2:[],beginner:[],elementary:[],numbers:[],days:[],months:[],weather:[],fruits:[],body:[],custom:[],unscramble:[],gramscramble:[],translate:[],letter:[],lettersound:[],oddone:[]};
+let customBanks={};        // { bankId: { name, questions:[] } }
+let activeBankId=null;     // bank open in editor
+let selectedBankId=null;   // bank loaded for the game
+let selectedBankName='';
+let bankPickerMode=null;   // 'teacher' | 'solo'
+let bankPickerTabEl=null;  // the tab button that opened the picker
 function buildBank(){
   questionBank.letter=genLetterQuestions();
   questionBank.lettersound=genSoundQuestions();
@@ -1338,7 +1449,7 @@ function goHome(){ stopMusic(); cleanupListeners(); soloMode=false; document.get
 function goStudentHome(){ document.getElementById('music-btn').style.display='none'; showScreen('screen-student-home'); }
 
 /* TEACHER FLOW */
-function goTeacher(){ role='teacher'; document.getElementById('music-btn').style.display=''; buildBank(); loadCustomQuestions(); createRoom(); }
+function goTeacher(){ role='teacher'; document.getElementById('music-btn').style.display=''; buildBank(); loadCustomBanks(); createRoom(); }
 function makeCode(){ const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let r=''; for(let i=0;i<4;i++) r+=c[Math.floor(Math.random()*c.length)]; return r; }
 
 function cleanupOldRooms(){
@@ -1385,12 +1496,15 @@ function toggleMcMode(which){
   ['solo-mc-toggle','host-mc-toggle'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('on',mcMode);});
 }
 
-function selectQType(type,el){ selectedQType=type; document.querySelectorAll('.q-type-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); updateQCountDisplay(); }
+function selectQType(type,el){ selectedQType=type; document.querySelectorAll('#screen-teacher-lobby .q-type-tab').forEach(t=>t.classList.remove('active')); if(el) el.classList.add('active'); updateQCountDisplay(); }
 function updateQCountDisplay(){
   const limit=parseInt(document.getElementById('q-limit').value)||10;
   const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body];
   let pool=selectedQType==='all'?[...questionBank.wp1,...questionBank.wp2,...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.custom]:selectedQType==='spelling'?allSpelling:(questionBank[selectedQType]||[]);
-  document.getElementById('q-count-display').textContent=pool.length+' available — '+Math.min(pool.length,limit)+' will be used';
+  const disp=document.getElementById('q-count-display');
+  if(!disp) return;
+  if(selectedQType==='custom') disp.textContent=(selectedBankName?'"'+selectedBankName+'" — ':'')+pool.length+' questions available — '+Math.min(pool.length,limit)+' will be used';
+  else disp.textContent=pool.length+' available — '+Math.min(pool.length,limit)+' will be used';
 }
 
 function startGame(){
@@ -1413,15 +1527,15 @@ function playQuestion(){
   stopMusic(); revealed=false; answered=false;
   const q=currentQuestions[currentQIdx],total=currentQuestions.length;
   document.getElementById('game-prog').textContent='Question '+(currentQIdx+1)+' of '+total;
-  const noAudio=q.type==='gramscramble'||q.type==='translate';
-  document.getElementById('q-badge').textContent=q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='lettersound'?'FIRST SOUND':q.type==='oddone'?'ODD ONE OUT':'WORD';
-  document.getElementById('q-hint').textContent=q.type==='oddone'?'Students tap the picture that is different':q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='unscramble'||q.type==='gramscramble'?'Students arrange word tiles':q.type==='translate'?'Students type the English sentence':'';
+  const noAudio=q.type==='gramscramble'||q.type==='translate'||q.type==='mc';
+  document.getElementById('q-badge').textContent=q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='lettersound'?'FIRST SOUND':q.type==='oddone'?'ODD ONE OUT':q.type==='mc'?'MULTIPLE CHOICE':'WORD';
+  document.getElementById('q-hint').textContent=q.type==='oddone'?'Students tap the picture that is different':q.type==='mc'?'Students tap the correct answer':(q.choices&&q.type!=='mc')?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='unscramble'||q.type==='gramscramble'?'Students arrange word tiles':q.type==='translate'?'Students type the English sentence':'';
   document.getElementById('ans-bars').innerHTML='';
   document.getElementById('reveal-btn').style.display='';
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('q-emoji').innerHTML=q.type==='word'?emo(q.word):q.type==='letter'?q.letter:'';
-  document.getElementById('q-text').textContent=q.type==='sentence'?q.display:q.type==='gramscramble'||q.type==='unscramble'?'🔊 Students listen and unscramble':q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':'🔊 Listen and spell the word';
+  document.getElementById('q-text').textContent=q.type==='mc'?q.question:q.type==='sentence'?q.display:q.type==='gramscramble'||q.type==='unscramble'?'🔊 Students listen and unscramble':q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=noAudio?'none':'';
   roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:Date.now(),revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
@@ -1434,7 +1548,7 @@ function playQuestion(){
 
 function teacherSpeak(){
   const q=currentQuestions[currentQIdx],btn=document.getElementById('hear-btn');
-  if(q.type==='gramscramble'||q.type==='translate') return;
+  if(q.type==='gramscramble'||q.type==='translate'||q.type==='mc') return;
   if(q.type==='lettersound'){ playSoundFile(q.soundFile); return; }
   btn.classList.add('playing');
   const spokenText=q.type==='letter'?q.letter:q.type==='oddone'?'Tap the one that does not belong.':q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.word;
@@ -1554,7 +1668,7 @@ function revealAnswers(){
     });
   });
   listenForAnswers();
-  const revealWord=q.type==='sentence'?q.blank:q.type==='unscramble'||q.type==='gramscramble'?q.sentence:q.type==='translate'?q.answer:q.word;
+  const revealWord=q.type==='sentence'?q.blank:q.type==='unscramble'||q.type==='gramscramble'?q.sentence:q.type==='translate'||q.type==='mc'?q.answer:q.word;
   const revealSentence=q.type==='sentence'?q.sentence.replace('___',q.blank):'';
   document.getElementById('q-text').innerHTML=q.type==='gramscramble'
     ?`<div class="q-hint" style="font-size:1rem;color:var(--green)">✅ Answer revealed to students</div>`
@@ -1765,7 +1879,7 @@ function showHint(){
 function initSolo(){
   soloMode=true; role='student';
   document.getElementById('music-btn').style.display='none';
-  buildBank(); loadCustomQuestions();
+  buildBank(); loadCustomBanks();
   showScreen('screen-solo-setup');
   updateSoloCountDisplay();
 }
@@ -1787,7 +1901,8 @@ function updateSoloCountDisplay(){
   const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
   const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body];
   let pool=soloSelectedType==='all'?[...questionBank.wp1,...questionBank.wp2,...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.custom]:soloSelectedType==='spelling'?allSpelling:(questionBank[soloSelectedType]||[]);
-  display.textContent=pool.length+' available — '+Math.min(pool.length,limit)+' will be used';
+  if(soloSelectedType==='custom') display.textContent=(selectedBankName?'"'+selectedBankName+'" — ':'')+pool.length+' questions available — '+Math.min(pool.length,limit)+' will be used';
+  else display.textContent=pool.length+' available — '+Math.min(pool.length,limit)+' will be used';
 }
 function startSoloGame(){
   if(soloSelectedType==='translate'){
@@ -1865,11 +1980,11 @@ function showStudentQuestion(q,startedAt){
   // In MC mode tapping a choice submits, so hide the Submit button.
   document.getElementById('student-submit-btn').style.display=isMc?'none':'';
   document.getElementById('student-submit-btn').disabled=isTile;
-  // Sentence-ordering & translate MC are read-and-pick: hide audio so it can't
-  // simply read out the answer.
-  const hideHear=q.type==='gramscramble'||q.type==='translate'||(isMc&&q.type==='unscramble');
+  // Sentence-ordering, translate, and custom MC are read-and-pick: hide audio.
+  const hideHear=q.type==='gramscramble'||q.type==='translate'||q.type==='mc'||(isMc&&q.type==='unscramble');
   document.getElementById('s-hear-btn').style.display=hideHear?'none':'';
   document.getElementById('s-q-type').textContent=
+    q.type==='mc'?'MULTIPLE CHOICE — tap the correct answer':
     isMc?(
       q.type==='sentence'?'TAP THE MISSING WORD':
       q.type==='letter'?'LISTEN — TAP THE LETTER':
@@ -1890,7 +2005,8 @@ function showStudentQuestion(q,startedAt){
     document.getElementById('student-ans-input').placeholder='Type the English sentence…';
   } else if(isMc){
     let mcPrompt;
-    if(q.type==='sentence') mcPrompt=q.display;
+    if(q.type==='mc') mcPrompt=q.question;
+    else if(q.type==='sentence') mcPrompt=q.display;
     else if(q.type==='oddone') mcPrompt='Which one is different?';
     else if(q.type==='letter') mcPrompt='🔊 Listen, then tap the letter';
     else if(q.type==='lettersound') mcPrompt='🔊 Listen to the sound';
@@ -2207,39 +2323,250 @@ function showStudentResult(correctAnswer){
   });
 }
 
-/* CUSTOM QUESTIONS */
-function showEditor(){ buildBank(); loadCustomQuestions(); showScreen('screen-editor'); renderCustomQList(); }
-function loadCustomQuestions(){
-  db.ref('customQuestions').once('value',snap=>{ questionBank.custom=Object.values(snap.val()||{}); updateQCountDisplay(); renderCustomQList(); });
+/* CUSTOM QUESTION BANKS */
+
+function loadCustomBanks(){
+  db.ref('customBanks').once('value',snap=>{
+    const raw=snap.val()||{};
+    // Migrate old flat customQuestions into a default bank if needed
+    if(!Object.keys(raw).length){
+      db.ref('customQuestions').once('value',oldSnap=>{
+        const oldQs=Object.values(oldSnap.val()||{});
+        if(oldQs.length){
+          const bankRef=db.ref('customBanks').push();
+          const bankId=bankRef.key;
+          const qMap={};
+          oldQs.forEach(q=>{ const qRef=db.ref('customBanks/'+bankId+'/questions').push(); q.id=qRef.key; qMap[qRef.key]=q; });
+          bankRef.set({name:'My Questions',questions:qMap},()=>{ loadCustomBanks(); });
+        } else {
+          customBanks={}; updateQCountDisplay(); updateSoloCountDisplay();
+        }
+      });
+      return;
+    }
+    customBanks={};
+    Object.entries(raw).forEach(([bid,bdata])=>{
+      customBanks[bid]={name:bdata.name||'Unnamed Bank',questions:Object.values(bdata.questions||{})};
+    });
+    updateQCountDisplay(); updateSoloCountDisplay();
+  });
 }
+
+function showEditor(){
+  buildBank(); loadCustomBanks();
+  showScreen('screen-editor');
+  setTimeout(renderEditorBankSelector,300);
+}
+
+function renderEditorBankSelector(){
+  const sel=document.getElementById('editor-bank-select');
+  if(!sel) return;
+  sel.innerHTML='<option value="">— select a bank —</option>';
+  Object.entries(customBanks).forEach(([bid,b])=>{
+    const opt=document.createElement('option');
+    opt.value=bid; opt.textContent=b.name+' ('+b.questions.length+' Qs)';
+    if(bid===activeBankId) opt.selected=true;
+    sel.appendChild(opt);
+  });
+  const newOpt=document.createElement('option');
+  newOpt.value='__new__'; newOpt.textContent='＋ Create new bank…';
+  sel.appendChild(newOpt);
+  if(activeBankId&&customBanks[activeBankId]){
+    document.getElementById('active-bank-info').style.display='flex';
+    document.getElementById('active-bank-name-label').textContent=customBanks[activeBankId].name;
+    document.getElementById('add-q-form-wrap').style.display='';
+    renderCustomQList();
+  } else {
+    document.getElementById('active-bank-info').style.display='none';
+    document.getElementById('add-q-form-wrap').style.display='none';
+    document.getElementById('custom-q-list').innerHTML='<div style="color:var(--muted);font-size:.85rem;">Select or create a bank above to get started.</div>';
+  }
+}
+
+function onEditorBankChange(val){
+  if(val==='__new__'){
+    showCreateBankForm();
+    document.getElementById('editor-bank-select').value='';
+    return;
+  }
+  if(!val){ activeBankId=null; renderEditorBankSelector(); return; }
+  activeBankId=val;
+  renderEditorBankSelector();
+}
+
+function showCreateBankForm(){
+  document.getElementById('create-bank-form').style.display='flex';
+  document.getElementById('new-bank-name').focus();
+}
+function hideCreateBankForm(){
+  document.getElementById('create-bank-form').style.display='none';
+  document.getElementById('new-bank-name').value='';
+}
+
+function createBank(){
+  const name=document.getElementById('new-bank-name').value.trim();
+  if(!name){ showToast('Enter a bank name.'); return; }
+  const bankRef=db.ref('customBanks').push();
+  bankRef.set({name,questions:{}},()=>{
+    customBanks[bankRef.key]={name,questions:[]};
+    activeBankId=bankRef.key;
+    hideCreateBankForm();
+    renderEditorBankSelector();
+    showToast('Bank "'+name+'" created!');
+  });
+}
+
+function deleteBankConfirm(){
+  if(!activeBankId) return;
+  const bname=customBanks[activeBankId]?.name||'this bank';
+  if(!confirm('Delete bank "'+bname+'" and all its questions?')) return;
+  db.ref('customBanks/'+activeBankId).remove(()=>{
+    delete customBanks[activeBankId];
+    if(selectedBankId===activeBankId){ selectedBankId=null; selectedBankName=''; questionBank.custom=[]; }
+    activeBankId=null;
+    renderEditorBankSelector();
+    showToast('Bank deleted.');
+  });
+}
+
 function addCustomQuestion(){
-  const type=document.getElementById('new-q-type').value,err=document.getElementById('editor-error');
+  if(!activeBankId){ showToast('Select a bank first.'); return; }
+  const type=document.getElementById('new-q-type').value;
+  const err=document.getElementById('editor-error');
   err.textContent=''; let q;
   if(type==='word'){
     const word=document.getElementById('new-q-word').value.trim().toLowerCase();
     if(!word){err.textContent='Enter a word.';return;}
     q={type:'word',word,answer:word};
-  } else {
+  } else if(type==='sentence'){
     const sentence=document.getElementById('new-q-sentence').value.trim();
     const blank=document.getElementById('new-q-blank').value.trim();
     if(!sentence||!blank){err.textContent='Fill in both fields.';return;}
     if(!sentence.toLowerCase().includes(blank.toLowerCase())){err.textContent='The missing word must appear in the sentence.';return;}
     const display=sentence.replace(new RegExp(blank.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i'),'___');
     q={type:'sentence',sentence,blank,display,answer:blank.toLowerCase()};
+  } else if(type==='mc'){
+    const question=document.getElementById('new-q-question').value.trim();
+    const opts=[0,1,2,3].map(i=>document.getElementById('new-q-opt-'+i).value.trim());
+    const correctEl=document.querySelector('input[name="mc-correct"]:checked');
+    if(!question){err.textContent='Enter a question prompt.';return;}
+    if(opts.some(o=>!o)){err.textContent='Fill in all 4 options.';return;}
+    if(!correctEl){err.textContent='Tick the correct option.';return;}
+    const correctIdx=parseInt(correctEl.value);
+    q={type:'mc',question,choices:opts,answer:opts[correctIdx].toLowerCase()};
+  } else if(type==='unscramble'){
+    const sentence=document.getElementById('new-q-unscramble').value.trim();
+    if(!sentence){err.textContent='Enter a sentence.';return;}
+    if(sentence.trim().split(/\s+/).length<2){err.textContent='Sentence must have at least 2 words.';return;}
+    q={type:'unscramble',sentence,answer:sentence,words:sentence.trim().split(/\s+/)};
   }
-  const ref=db.ref('customQuestions').push(); q.id=ref.key;
-  ref.set(q,()=>{ questionBank.custom.push(q); renderCustomQList(); updateQCountDisplay(); document.getElementById('new-q-word').value=''; document.getElementById('new-q-sentence').value=''; document.getElementById('new-q-blank').value=''; showToast('Question added!'); });
+  const ref=db.ref('customBanks/'+activeBankId+'/questions').push();
+  q.id=ref.key;
+  ref.set(q,()=>{
+    customBanks[activeBankId].questions.push(q);
+    if(selectedBankId===activeBankId) questionBank.custom=[...customBanks[activeBankId].questions];
+    renderCustomQList();
+    updateQCountDisplay(); updateSoloCountDisplay();
+    // clear form
+    document.getElementById('new-q-word').value='';
+    document.getElementById('new-q-sentence').value=''; document.getElementById('new-q-blank').value='';
+    document.getElementById('new-q-question').value='';
+    [0,1,2,3].forEach(i=>document.getElementById('new-q-opt-'+i).value='');
+    const cr=document.querySelector('input[name="mc-correct"]:checked'); if(cr) cr.checked=false;
+    document.getElementById('new-q-unscramble').value='';
+    showToast('Question added!');
+  });
 }
+
 function deleteCustomQuestion(id){
-  db.ref('customQuestions/'+id).remove(()=>{ questionBank.custom=questionBank.custom.filter(q=>q.id!==id); renderCustomQList(); updateQCountDisplay(); showToast('Deleted.'); });
+  if(!activeBankId) return;
+  db.ref('customBanks/'+activeBankId+'/questions/'+id).remove(()=>{
+    customBanks[activeBankId].questions=customBanks[activeBankId].questions.filter(q=>q.id!==id);
+    if(selectedBankId===activeBankId) questionBank.custom=[...customBanks[activeBankId].questions];
+    renderCustomQList(); updateQCountDisplay(); updateSoloCountDisplay();
+    showToast('Deleted.');
+  });
 }
+
 function renderCustomQList(){
   const list=document.getElementById('custom-q-list'); if(!list) return;
-  if(!questionBank.custom.length){list.innerHTML='<div style="color:var(--muted);font-size:.85rem;">No custom questions yet.</div>';return;}
+  if(!activeBankId||!customBanks[activeBankId]){
+    list.innerHTML='<div style="color:var(--muted);font-size:.85rem;">Select a bank above.</div>'; return;
+  }
+  const qs=customBanks[activeBankId].questions;
+  if(!qs.length){list.innerHTML='<div style="color:var(--muted);font-size:.85rem;">No questions yet — add one below.</div>';return;}
   list.innerHTML='';
-  questionBank.custom.forEach(q=>{ const row=document.createElement('div'); row.className='cq-item'; const tag=q.type==='sentence'?'<span class="cq-tag tag-sent">SENTENCE</span>':'<span class="cq-tag tag-word">WORD</span>'; const text=q.type==='sentence'?q.display:'Spell: "'+q.word+'"'; row.innerHTML=tag+'<div class="cq-text">'+text+'</div><button class="del-btn" onclick="deleteCustomQuestion(\''+q.id+'\')">🗑</button>'; list.appendChild(row); });
+  qs.forEach(q=>{
+    const row=document.createElement('div'); row.className='cq-item';
+    let tag,text;
+    if(q.type==='sentence'){ tag='<span class="cq-tag tag-sent">SENTENCE</span>'; text=q.display; }
+    else if(q.type==='mc'){ tag='<span class="cq-tag tag-mc">MC</span>'; text=q.question+' (✓ '+q.answer+')'; }
+    else if(q.type==='unscramble'){ tag='<span class="cq-tag tag-unscrm">UNSCRAMBLE</span>'; text=q.sentence; }
+    else { tag='<span class="cq-tag tag-word">WORD</span>'; text='Spell: "'+q.word+'"'; }
+    row.innerHTML=tag+'<div class="cq-text">'+text+'</div><button class="del-btn" onclick="deleteCustomQuestion(\''+q.id+'\')">🗑</button>';
+    list.appendChild(row);
+  });
 }
-function updateQForm(){ const type=document.getElementById('new-q-type').value; document.getElementById('word-q-form').style.display=type==='word'?'':'none'; document.getElementById('sentence-q-form').style.display=type==='sentence'?'':'none'; }
+
+function updateQForm(){
+  const type=document.getElementById('new-q-type').value;
+  document.getElementById('word-q-form').style.display=type==='word'?'':'none';
+  document.getElementById('sentence-q-form').style.display=type==='sentence'?'':'none';
+  document.getElementById('mc-q-form').style.display=type==='mc'?'':'none';
+  document.getElementById('unscramble-q-form').style.display=type==='unscramble'?'':'none';
+}
+
+/* BANK PICKER */
+function showBankPicker(mode,tabEl){
+  bankPickerMode=mode; bankPickerTabEl=tabEl;
+  const modal=document.getElementById('bank-picker-modal');
+  modal.style.display='flex';
+  renderBankPickerList();
+}
+
+function renderBankPickerList(){
+  const list=document.getElementById('bank-picker-list');
+  const banks=Object.entries(customBanks);
+  if(!banks.length){
+    list.innerHTML='<div style="color:var(--muted);font-size:.9rem;text-align:center;padding:12px 0;">No question banks yet.<br>Use the editor to create your first bank.</div>';
+    return;
+  }
+  list.innerHTML='';
+  banks.forEach(([bid,b])=>{
+    const item=document.createElement('div'); item.className='bank-item';
+    item.innerHTML='<div class="bank-name">'+b.name+'</div><div class="bank-count">'+b.questions.length+' questions</div>'
+      +'<button class="bank-sel-btn" onclick="selectBankAndClose(\''+bid+'\')">Select →</button>';
+    list.appendChild(item);
+  });
+}
+
+function closeBankPicker(){
+  document.getElementById('bank-picker-modal').style.display='none';
+  bankPickerMode=null; bankPickerTabEl=null;
+}
+
+function selectBankAndClose(bankId){
+  selectedBankId=bankId;
+  selectedBankName=customBanks[bankId]?.name||'';
+  questionBank.custom=[...(customBanks[bankId]?.questions||[])];
+  document.getElementById('bank-picker-modal').style.display='none';
+  if(bankPickerMode==='teacher'){
+    selectQType('custom', bankPickerTabEl);
+  } else {
+    soloSelectedType='custom';
+    document.querySelectorAll('#screen-solo-setup .q-type-tab').forEach(t=>t.classList.remove('active'));
+    if(bankPickerTabEl) bankPickerTabEl.classList.add('active');
+    const lw=document.getElementById('solo-lang-wrap'); if(lw) lw.style.display='none';
+    updateSoloCountDisplay();
+  }
+  bankPickerMode=null; bankPickerTabEl=null;
+  showToast('Bank "'+selectedBankName+'" selected');
+}
+
+function openEditorFromPicker(){
+  closeBankPicker();
+  showEditor();
+}
 
 /* UTILS */
 function normalize(s){return(s||'').toLowerCase().trim().replace(/[^a-z0-9]/g,'');}
