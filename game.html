@@ -609,9 +609,9 @@ select.game-input{cursor:pointer;}
     <div class="add-q-form" id="add-q-form-wrap" style="display:none;">
       <h3>➕ Add a question</h3>
       <select class="game-input" id="new-q-type" onchange="updateQForm()">
+        <option value="mc">🔵 Multiple Choice (4 options)</option>
         <option value="word">🔊 Listening — Spell a Word</option>
         <option value="sentence">📖 Fill the Blank</option>
-        <option value="mc">🔵 Multiple Choice (4 options)</option>
         <option value="unscramble">🔀 Sentence Unscramble</option>
       </select>
 
@@ -619,6 +619,11 @@ select.game-input{cursor:pointer;}
       <div id="word-q-form">
         <div class="field-label">Word</div>
         <input class="game-input" id="new-q-word" placeholder="e.g. elephant">
+        <div class="field-label">Emoji / Icon <span style="font-weight:400;color:var(--muted);">(optional — replaces the auto emoji)</span></div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input class="game-input" id="new-q-icon-word" placeholder="e.g. 🐘" style="flex:1;font-size:1.5rem;letter-spacing:4px;" oninput="document.getElementById('icon-preview-word').textContent=this.value.trim().slice(0,4)">
+          <div id="icon-preview-word" style="font-size:2.5rem;min-width:2.5rem;text-align:center;"></div>
+        </div>
       </div>
 
       <!-- sentence fill-blank form -->
@@ -631,7 +636,12 @@ select.game-input{cursor:pointer;}
 
       <!-- multiple choice form -->
       <div id="mc-q-form" style="display:none;">
-        <div class="field-label">Question prompt</div>
+        <div class="field-label">Emoji / Icon <span style="font-weight:400;color:var(--muted);">(optional — use instead of or alongside text)</span></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <input class="game-input" id="new-q-icon-mc" placeholder="e.g. 👨" style="flex:1;font-size:1.5rem;letter-spacing:4px;" oninput="document.getElementById('icon-preview-mc').textContent=this.value.trim().slice(0,4)">
+          <div id="icon-preview-mc" style="font-size:2.5rem;min-width:2.5rem;text-align:center;"></div>
+        </div>
+        <div class="field-label">Question prompt <span style="font-weight:400;color:var(--muted);">(optional if icon is set)</span></div>
         <input class="game-input" id="new-q-question" placeholder="e.g. Which animal has a trunk?">
         <div class="field-label" style="margin-top:4px;">Options — tick the correct one</div>
         <div class="mc-options-grid">
@@ -1534,8 +1544,8 @@ function playQuestion(){
   document.getElementById('reveal-btn').style.display='';
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
-  document.getElementById('q-emoji').innerHTML=q.type==='word'?emo(q.word):q.type==='letter'?q.letter:'';
-  document.getElementById('q-text').textContent=q.type==='mc'?q.question:q.type==='sentence'?q.display:q.type==='gramscramble'||q.type==='unscramble'?'🔊 Students listen and unscramble':q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':'🔊 Listen and spell the word';
+  document.getElementById('q-emoji').innerHTML=q.icon||(q.type==='word'?emo(q.word):q.type==='letter'?q.letter:'');
+  document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='sentence'?q.display:q.type==='gramscramble'||q.type==='unscramble'?'🔊 Students listen and unscramble':q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=noAudio?'none':'';
   roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:Date.now(),revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
@@ -1677,7 +1687,7 @@ function revealAnswers(){
     :q.type==='translate'
     ?`<div class="reveal-word" style="font-size:clamp(.85rem,2.8vw,1.3rem);line-height:1.5">${revealWord}</div>`
     :`<div class="reveal-word">${revealWord}</div>`+(revealSentence?`<div class="reveal-sentence">${revealSentence}</div>`:'');
-  document.getElementById('q-emoji').innerHTML=q.type==='word'?emo(q.word):'';
+  document.getElementById('q-emoji').innerHTML=q.icon||(q.type==='word'?emo(q.word):'');
   document.getElementById('q-hint').textContent='';
   document.getElementById('reveal-btn').style.display='none';
   const isLast=currentQIdx>=currentQuestions.length-1;
@@ -1997,7 +2007,7 @@ function showStudentQuestion(q,startedAt){
     isTranslate?'TRANSLATE — type the English sentence':
     q.type==='sentence'?'SENTENCE — type the missing word':'WORD — listen and spell it';
   // For a picture round, don't show the answer's own picture as the prompt.
-  document.getElementById('s-q-emoji').innerHTML=(q.type==='word'&&!isMc)?emo(q.word):'';
+  document.getElementById('s-q-emoji').innerHTML=q.icon||(q.type==='word'&&!isMc?emo(q.word):'');
   if(isTranslate){
     const lang=localStorage.getItem('translateLang')||'vi';
     const t=q.translations&&q.translations[lang]?q.translations[lang]:(q.en||q.answer);
@@ -2005,7 +2015,7 @@ function showStudentQuestion(q,startedAt){
     document.getElementById('student-ans-input').placeholder='Type the English sentence…';
   } else if(isMc){
     let mcPrompt;
-    if(q.type==='mc') mcPrompt=q.question;
+    if(q.type==='mc') mcPrompt=q.question||(q.icon?'👆 Tap the correct answer':'');
     else if(q.type==='sentence') mcPrompt=q.display;
     else if(q.type==='oddone') mcPrompt='Which one is different?';
     else if(q.type==='letter') mcPrompt='🔊 Listen, then tap the letter';
@@ -2375,6 +2385,7 @@ function renderEditorBankSelector(){
     document.getElementById('active-bank-info').style.display='flex';
     document.getElementById('active-bank-name-label').textContent=customBanks[activeBankId].name;
     document.getElementById('add-q-form-wrap').style.display='';
+    updateQForm();
     renderCustomQList();
   } else {
     document.getElementById('active-bank-info').style.display='none';
@@ -2438,6 +2449,8 @@ function addCustomQuestion(){
     const word=document.getElementById('new-q-word').value.trim().toLowerCase();
     if(!word){err.textContent='Enter a word.';return;}
     q={type:'word',word,answer:word};
+    const icon=document.getElementById('new-q-icon-word').value.trim();
+    if(icon) q.icon=icon;
   } else if(type==='sentence'){
     const sentence=document.getElementById('new-q-sentence').value.trim();
     const blank=document.getElementById('new-q-blank').value.trim();
@@ -2446,14 +2459,16 @@ function addCustomQuestion(){
     const display=sentence.replace(new RegExp(blank.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i'),'___');
     q={type:'sentence',sentence,blank,display,answer:blank.toLowerCase()};
   } else if(type==='mc'){
+    const icon=document.getElementById('new-q-icon-mc').value.trim();
     const question=document.getElementById('new-q-question').value.trim();
     const opts=[0,1,2,3].map(i=>document.getElementById('new-q-opt-'+i).value.trim());
     const correctEl=document.querySelector('input[name="mc-correct"]:checked');
-    if(!question){err.textContent='Enter a question prompt.';return;}
+    if(!icon&&!question){err.textContent='Enter a question prompt or an icon (or both).';return;}
     if(opts.some(o=>!o)){err.textContent='Fill in all 4 options.';return;}
     if(!correctEl){err.textContent='Tick the correct option.';return;}
     const correctIdx=parseInt(correctEl.value);
     q={type:'mc',question,choices:opts,answer:opts[correctIdx].toLowerCase()};
+    if(icon) q.icon=icon;
   } else if(type==='unscramble'){
     const sentence=document.getElementById('new-q-unscramble').value.trim();
     if(!sentence){err.textContent='Enter a sentence.';return;}
@@ -2469,7 +2484,9 @@ function addCustomQuestion(){
     updateQCountDisplay(); updateSoloCountDisplay();
     // clear form
     document.getElementById('new-q-word').value='';
+    document.getElementById('new-q-icon-word').value=''; document.getElementById('icon-preview-word').textContent='';
     document.getElementById('new-q-sentence').value=''; document.getElementById('new-q-blank').value='';
+    document.getElementById('new-q-icon-mc').value=''; document.getElementById('icon-preview-mc').textContent='';
     document.getElementById('new-q-question').value='';
     [0,1,2,3].forEach(i=>document.getElementById('new-q-opt-'+i).value='');
     const cr=document.querySelector('input[name="mc-correct"]:checked'); if(cr) cr.checked=false;
@@ -2499,21 +2516,24 @@ function renderCustomQList(){
   qs.forEach(q=>{
     const row=document.createElement('div'); row.className='cq-item';
     let tag,text;
+    const iconHtml=q.icon?'<span style="font-size:1.3rem;margin-right:4px;">'+q.icon+'</span>':'';
     if(q.type==='sentence'){ tag='<span class="cq-tag tag-sent">SENTENCE</span>'; text=q.display; }
-    else if(q.type==='mc'){ tag='<span class="cq-tag tag-mc">MC</span>'; text=q.question+' (✓ '+q.answer+')'; }
+    else if(q.type==='mc'){ tag='<span class="cq-tag tag-mc">MC</span>'; text=iconHtml+(q.question||'(icon only)')+' (✓ '+q.answer+')'; }
     else if(q.type==='unscramble'){ tag='<span class="cq-tag tag-unscrm">UNSCRAMBLE</span>'; text=q.sentence; }
-    else { tag='<span class="cq-tag tag-word">WORD</span>'; text='Spell: "'+q.word+'"'; }
+    else { tag='<span class="cq-tag tag-word">WORD</span>'; text=iconHtml+'Spell: "'+q.word+'"'; }
     row.innerHTML=tag+'<div class="cq-text">'+text+'</div><button class="del-btn" onclick="deleteCustomQuestion(\''+q.id+'\')">🗑</button>';
     list.appendChild(row);
   });
 }
 
 function updateQForm(){
-  const type=document.getElementById('new-q-type').value;
-  document.getElementById('word-q-form').style.display=type==='word'?'':'none';
-  document.getElementById('sentence-q-form').style.display=type==='sentence'?'':'none';
-  document.getElementById('mc-q-form').style.display=type==='mc'?'':'none';
-  document.getElementById('unscramble-q-form').style.display=type==='unscramble'?'':'none';
+  const type=document.getElementById('new-q-type')?document.getElementById('new-q-type').value:'mc';
+  const show=id=>{ const el=document.getElementById(id); if(el) el.style.display=''; };
+  const hide=id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; };
+  type==='word'?show('word-q-form'):hide('word-q-form');
+  type==='sentence'?show('sentence-q-form'):hide('sentence-q-form');
+  type==='mc'?show('mc-q-form'):hide('mc-q-form');
+  type==='unscramble'?show('unscramble-q-form'):hide('unscramble-q-form');
 }
 
 /* BANK PICKER */
