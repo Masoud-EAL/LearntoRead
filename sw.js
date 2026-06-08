@@ -66,6 +66,7 @@ const OPTIONAL = [
   './translations/my.json',
   './translations/hi.json',
   './translations/ar.json',
+  './translations/th.json',
 ];
 
 self.addEventListener('install', e => {
