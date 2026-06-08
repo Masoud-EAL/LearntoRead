@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Torso outline, mid-section highlighted -->
+  <path d="M22,18 Q22,14 50,12 Q78,14 78,18 L78,82 Q78,88 50,88 Q22,88 22,82Z" fill="#f5c5a3"/>
+  <!-- Stomach / abdomen highlight band -->
+  <path d="M22,44 L78,44 L78,72 Q78,80 50,82 Q22,80 22,72Z" fill="#f0b48e"/>
+  <!-- Belly button -->
+  <ellipse cx="50" cy="50" rx="4" ry="3" fill="#e09070" opacity="0.8"/>
+  <!-- Upper torso (chest) shading to separate -->
+  <path d="M22,18 Q22,14 50,12 Q78,14 78,18 L78,44 L22,44Z" fill="#f5c5a3" opacity="0.7"/>
+  <!-- Stomach label arc (subtle curve showing the stomach region) -->
+  <path d="M30,48 Q50,58 70,48" stroke="#e09070" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5"/>
+  <!-- Waist lines -->
+  <path d="M22,44 Q50,40 78,44" stroke="#e09070" stroke-width="2" fill="none" opacity="0.4"/>
+</svg>

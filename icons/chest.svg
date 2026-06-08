@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Torso / chest shape -->
+  <path d="M20,30 Q18,20 30,16 Q50,12 70,16 Q82,20 80,30 L78,72 Q78,80 50,82 Q22,80 22,72Z" fill="#f5c5a3"/>
+  <!-- Chest shading -->
+  <path d="M20,30 Q18,20 30,16 Q50,12 70,16 Q82,20 80,30 L80,40 Q50,36 20,40Z" fill="#f0b48e" opacity="0.5"/>
+  <!-- Collar bones -->
+  <path d="M30,26 Q50,24 70,26" stroke="#e09070" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Centre sternum line -->
+  <line x1="50" y1="28" x2="50" y2="70" stroke="#e09070" stroke-width="2" opacity="0.35"/>
+  <!-- Rib hints -->
+  <path d="M35,42 Q50,40 65,42" stroke="#e09070" stroke-width="1.5" fill="none" opacity="0.4"/>
+  <path d="M33,52 Q50,50 67,52" stroke="#e09070" stroke-width="1.5" fill="none" opacity="0.4"/>
+  <path d="M32,62 Q50,60 68,62" stroke="#e09070" stroke-width="1.5" fill="none" opacity="0.4"/>
+</svg>

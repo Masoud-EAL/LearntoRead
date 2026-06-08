@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Torso lower section -->
+  <rect x="32" y="18" width="36" height="28" rx="6" fill="#f5c5a3"/>
+  <!-- Pelvis / hip bone shape -->
+  <path d="M18,46 Q14,38 22,32 Q30,26 32,34 L32,46Z" fill="#e8a882"/>
+  <path d="M82,46 Q86,38 78,32 Q70,26 68,34 L68,46Z" fill="#e8a882"/>
+  <!-- Hip curve connecting both sides -->
+  <path d="M18,46 Q50,58 82,46 L82,54 Q50,66 18,54Z" fill="#f0b48e"/>
+  <!-- Waist indent -->
+  <ellipse cx="50" cy="18" rx="18" ry="5" fill="#f0b48e"/>
+  <!-- Belly button -->
+  <ellipse cx="50" cy="36" rx="3" ry="2" fill="#e09070" opacity="0.7"/>
+  <!-- Upper legs start -->
+  <rect x="26" y="54" width="20" height="18" rx="8" fill="#f5c5a3"/>
+  <rect x="54" y="54" width="20" height="18" rx="8" fill="#f5c5a3"/>
+</svg>
