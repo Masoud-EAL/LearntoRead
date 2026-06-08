@@ -2338,7 +2338,7 @@ function showStudentResult(correctAnswer){
 function loadCustomBanks(){
   db.ref('customBanks').once('value',snap=>{
     const raw=snap.val()||{};
-    // Migrate old flat customQuestions into a default bank if needed
+    // Migrate old flat customQuestions into a default bank if needed, then delete old data
     if(!Object.keys(raw).length){
       db.ref('customQuestions').once('value',oldSnap=>{
         const oldQs=Object.values(oldSnap.val()||{});
@@ -2347,13 +2347,19 @@ function loadCustomBanks(){
           const bankId=bankRef.key;
           const qMap={};
           oldQs.forEach(q=>{ const qRef=db.ref('customBanks/'+bankId+'/questions').push(); q.id=qRef.key; qMap[qRef.key]=q; });
-          bankRef.set({name:'My Questions',questions:qMap},()=>{ loadCustomBanks(); });
+          bankRef.set({name:'My Questions',questions:qMap},()=>{
+            db.ref('customQuestions').remove();
+            loadCustomBanks();
+          });
         } else {
+          db.ref('customQuestions').remove();
           customBanks={}; updateQCountDisplay(); updateSoloCountDisplay();
         }
       });
       return;
     }
+    // Always clean up old customQuestions node if it somehow still exists
+    db.ref('customQuestions').once('value',oldSnap=>{ if(oldSnap.exists()) db.ref('customQuestions').remove(); });
     customBanks={};
     Object.entries(raw).forEach(([bid,bdata])=>{
       customBanks[bid]={name:bdata.name||'Unnamed Bank',questions:Object.values(bdata.questions||{})};
