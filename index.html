@@ -1416,6 +1416,7 @@ const LANG_FONT = {
 
 function onLangChange() {
   const lang = document.getElementById('langSelect').value;
+  localStorage.setItem('wl_lang', lang);
   if (!lang) {
     translations = null;
     updateAllTranslations();
@@ -2036,7 +2037,10 @@ function pickVoice(gender) {
 }
 function onVoiceSelectChange() {
   const sel = document.getElementById('voiceSelect');
-  if (sel) selectedVoiceGender = sel.value;
+  if (sel) {
+    selectedVoiceGender = sel.value;
+    localStorage.setItem('wl_voice', sel.value);
+  }
 }
 function applyVoice(utt) {
   const v = pickVoice(selectedVoiceGender);
@@ -2065,6 +2069,7 @@ function showSection(name, btn) {
   btn.classList.add('active');
   document.querySelectorAll('.section-page').forEach(p => p.classList.remove('active'));
   document.getElementById('sec-' + name).classList.add('active');
+  localStorage.setItem('wl_section', name);
 }
 
 /* ══════════════════════════════════════════
@@ -2441,11 +2446,13 @@ function setSpeed(rate, el) {
   speechRate = rate;
   document.querySelectorAll('.speed-opt:not(.sent-speed)').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
+  localStorage.setItem('wl_wordSpeed', rate);
 }
 function setSentSpeed(rate, el) {
   sentenceRate = rate;
   document.querySelectorAll('.sent-speed').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
+  localStorage.setItem('wl_sentSpeed', rate);
 }
 
 /* ══════════════════════════════════════════
@@ -3476,6 +3483,79 @@ buildWp2Selector();
 buildSentences();
 selectFamily('wp1', 0);
 selectFamily('wp2', 0);
+
+/* ══════════════════════════════════════════
+   RESTORE SAVED SETTINGS
+══════════════════════════════════════════ */
+(function restoreSettings() {
+  // Voice preference
+  const voice = localStorage.getItem('wl_voice');
+  if (voice) {
+    selectedVoiceGender = voice;
+    const sel = document.getElementById('voiceSelect');
+    if (sel) sel.value = voice;
+  }
+
+  // Word speed
+  const wordSpeed = parseFloat(localStorage.getItem('wl_wordSpeed'));
+  if (wordSpeed) {
+    speechRate = wordSpeed;
+    document.querySelectorAll('.speed-opt:not(.sent-speed)').forEach(btn => {
+      const m = btn.getAttribute('onclick').match(/[\d.]+/);
+      if (m) btn.classList.toggle('active', parseFloat(m[0]) === wordSpeed);
+    });
+  }
+
+  // Sentence speed
+  const sentSpeed = parseFloat(localStorage.getItem('wl_sentSpeed'));
+  if (sentSpeed) {
+    sentenceRate = sentSpeed;
+    document.querySelectorAll('.sent-speed').forEach(btn => {
+      const m = btn.getAttribute('onclick').match(/[\d.]+/);
+      if (m) btn.classList.toggle('active', parseFloat(m[0]) === sentSpeed);
+    });
+  }
+
+  // Translation language
+  const lang = localStorage.getItem('wl_lang');
+  if (lang) {
+    const sel = document.getElementById('langSelect');
+    if (sel) { sel.value = lang; onLangChange(); }
+  }
+
+  // Last visited section
+  const section = localStorage.getItem('wl_section');
+  if (section) {
+    const btn = document.querySelector('.nav-tab.sec-' + section);
+    if (btn) showSection(section, btn);
+  }
+})();
+
+/* ══════════════════════════════════════════
+   KEYBOARD SHORTCUTS (Word Pronunciation sections)
+   ← / → : navigate words   Space / Enter : hear word
+══════════════════════════════════════════ */
+document.addEventListener('keydown', function(e) {
+  const tag = document.activeElement && document.activeElement.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  if (document.querySelector('.practice-overlay.active')) return;
+
+  const activePage = document.querySelector('.section-page.active');
+  if (!activePage) return;
+  const wp = activePage.id === 'sec-wp1' ? 'wp1' : activePage.id === 'sec-wp2' ? 'wp2' : null;
+  if (!wp) return;
+
+  if (e.key === 'ArrowRight') {
+    e.preventDefault();
+    navigate(wp, 1);
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    navigate(wp, -1);
+  } else if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    speakCurrent(wp);
+  }
+});
 </script>
 <script>
 if ('serviceWorker' in navigator) {
