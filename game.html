@@ -160,7 +160,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .del-btn:hover{background:var(--accent);color:white;}
 .add-q-form{background:var(--card);border-radius:var(--radius);padding:18px;border:1px solid rgba(255,255,255,.07);}
 .add-q-form h3{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--gold);margin-bottom:12px;}
-select.game-input{cursor:pointer;}
+select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 
 /* BANK PICKER MODAL */
 .bank-picker-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;display:flex;align-items:center;justify-content:center;}
@@ -333,7 +333,7 @@ select.game-input{cursor:pointer;}
       <div class="mc-toggle-wrap" id="solo-mc-toggle" onclick="toggleMcMode('solo')">
         <div class="mc-switch"></div>
         <div>
-          <div class="mc-toggle-txt">🖼️ Multiple Choice (4 pictures)</div>
+          <div class="mc-toggle-txt">🔵 Multiple Choice (4 options)</div>
           <div class="mc-toggle-sub">Listen & tap — no typing. Great for early readers.</div>
         </div>
       </div>
@@ -402,8 +402,8 @@ select.game-input{cursor:pointer;}
         <div class="mc-toggle-wrap" id="host-mc-toggle" onclick="toggleMcMode('host')">
           <div class="mc-switch"></div>
           <div>
-            <div class="mc-toggle-txt">🖼️ Multiple Choice (4 pictures)</div>
-            <div class="mc-toggle-sub">Players listen & tap a picture — no typing.</div>
+            <div class="mc-toggle-txt">🔵 Multiple Choice (4 options)</div>
+            <div class="mc-toggle-sub">Players tap their answer — no typing.</div>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
