@@ -231,6 +231,15 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .mc-choice.mc-correct{border-color:var(--green);background:rgba(0,200,83,.18);}
 .mc-choice.mc-wrong{border-color:var(--accent);background:rgba(233,69,96,.15);}
 .mc-choice.locked{pointer-events:none;}
+/* TEACHER-SCREEN OPTIONS (read-only mirror of the student choices) */
+.t-options{width:100%;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.t-opt{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:8px 10px;background:var(--card);border:2px solid rgba(255,255,255,.12);border-radius:12px;color:var(--text);font-family:'Fredoka One',cursive;text-align:center;}
+.t-opt .t-opt-pic{font-size:1.9rem;line-height:1;}
+.t-opt .t-opt-pic .custom-icon-emoji{height:1em;width:1em;}
+.t-opt .t-opt-label{font-size:1rem;word-break:break-word;}
+.t-opt.t-opt-sentence{font-family:'Nunito',sans-serif;font-weight:700;font-size:.92rem;line-height:1.35;}
+.t-opt.t-correct{border-color:var(--green);background:rgba(0,200,83,.18);}
+.t-opt.t-correct .t-opt-label::after{content:' ✓';color:var(--green);}
 .mc-toggle-wrap{display:flex;align-items:center;gap:10px;margin:4px 0 10px;padding:10px 14px;background:rgba(124,77,255,.12);border:1.5px solid rgba(124,77,255,.35);border-radius:12px;cursor:pointer;}
 .mc-toggle-wrap .mc-toggle-txt{font-size:.9rem;font-weight:800;color:var(--text);}
 .mc-toggle-wrap .mc-toggle-sub{font-size:.72rem;color:var(--muted);font-weight:600;}
@@ -450,6 +459,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       <div class="q-hint" id="q-hint"></div>
       <button class="hear-btn" id="hear-btn" onclick="teacherSpeak()">🔊 Play again</button>
     </div>
+    <div class="t-options" id="teacher-options" style="display:none;"></div>
     <div class="card" style="flex:1;overflow:hidden;">
       <p style="font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--muted);margin-bottom:10px;">📝 Student answers</p>
       <div class="ans-bars scrollable" id="ans-bars" style="max-height:220px;"></div>
@@ -1539,16 +1549,18 @@ function playQuestion(){
   stopMusic(); revealed=false; answered=false;
   const q=currentQuestions[currentQIdx],total=currentQuestions.length;
   document.getElementById('game-prog').textContent='Question '+(currentQIdx+1)+' of '+total;
-  const noAudio=q.type==='gramscramble'||q.type==='translate'||q.type==='mc';
+  const isMcQ=Array.isArray(q.choices)&&q.choices.length>0;
+  const noAudio=q.type==='gramscramble'||q.type==='translate'||q.type==='mc'||(q.type==='unscramble'&&isMcQ);
   document.getElementById('q-badge').textContent=q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='lettersound'?'FIRST SOUND':q.type==='oddone'?'ODD ONE OUT':q.type==='mc'?'MULTIPLE CHOICE':'WORD';
-  document.getElementById('q-hint').textContent=q.type==='oddone'?'Students tap the picture that is different':q.type==='mc'?'Students tap the correct answer':(q.choices&&q.type!=='mc')?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='unscramble'||q.type==='gramscramble'?'Students arrange word tiles':q.type==='translate'?'Students type the English sentence':'';
+  document.getElementById('q-hint').textContent=q.type==='oddone'?'Students tap the picture that is different':q.type==='mc'?'Students tap the correct answer':(q.type==='unscramble'||q.type==='gramscramble')?(isMcQ?'Students tap the sentence in the right order':'Students arrange word tiles'):q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='translate'?'Students type the English sentence':'';
   document.getElementById('ans-bars').innerHTML='';
   document.getElementById('reveal-btn').style.display='';
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('q-emoji').innerHTML=q.icon||(q.type==='word'?emo(q.word):q.type==='letter'?q.letter:'');
-  document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='sentence'?q.display:q.type==='gramscramble'||q.type==='unscramble'?'🔊 Students listen and unscramble':q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':'🔊 Listen and spell the word';
+  document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?'👆 Students tap the sentence in the right order':q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=noAudio?'none':'';
+  renderTeacherOptions(q,false);
   roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:Date.now(),revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
   showScreen('screen-teacher-game');
@@ -1561,6 +1573,8 @@ function playQuestion(){
 function teacherSpeak(){
   const q=currentQuestions[currentQIdx],btn=document.getElementById('hear-btn');
   if(q.type==='gramscramble'||q.type==='translate'||q.type==='mc') return;
+  // Unscramble shown as multiple choice is read-and-pick — don't read it aloud.
+  if(q.type==='unscramble'&&Array.isArray(q.choices)&&q.choices.length) return;
   if(q.type==='lettersound'){ playSoundFile(q.soundFile); return; }
   btn.classList.add('playing');
   const spokenText=q.type==='letter'?q.letter:q.type==='oddone'?'Tap the one that does not belong.':q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.word;
@@ -1585,6 +1599,35 @@ function updateTimerUI(t){
   document.getElementById('timer-display').textContent=t;
   document.getElementById('timer-circle').style.strokeDashoffset=175.9*(1-t/currentTimerDuration);
   document.getElementById('timer-circle').style.stroke=t<=5?'var(--accent)':'var(--gold)';
+}
+
+/* Mirror the student multiple-choice options on the teacher/host screen so the
+   teacher can talk through each option. The correct answer is only highlighted
+   once answers are revealed (showCorrect=true). */
+function renderTeacherOptions(q,showCorrect){
+  const box=document.getElementById('teacher-options');
+  if(!box) return;
+  const choices=Array.isArray(q.choices)?q.choices:null;
+  if(!choices||!choices.length){ box.style.display='none'; box.innerHTML=''; return; }
+  box.innerHTML='';
+  const emojis=choices.map(w=>emo(w));
+  const hasDup=emojis.some((e,i)=>e&&emojis.indexOf(e)!==i);
+  const usePics=emojis.every(e=>e)&&!hasDup;
+  const isSentence=choices.some(w=>!emo(w)&&/\s/.test(w));
+  box.style.gridTemplateColumns=isSentence?'1fr':'repeat(2,1fr)';
+  choices.forEach(word=>{
+    const pic=emo(word);
+    const cell=document.createElement('div');
+    cell.className='t-opt'+(isSentence?' t-opt-sentence':'')
+      +(showCorrect&&normalize(word)===normalize(q.answer)?' t-correct':'');
+    if(usePics&&pic){
+      cell.innerHTML='<span class="t-opt-pic">'+pic+'</span><span class="t-opt-label">'+word+'</span>';
+    } else {
+      cell.innerHTML='<span class="t-opt-label">'+word+'</span>';
+    }
+    box.appendChild(cell);
+  });
+  box.style.display='grid';
 }
 
 function listenForAnswers(){
@@ -1680,7 +1723,8 @@ function revealAnswers(){
     });
   });
   listenForAnswers();
-  const revealWord=q.type==='sentence'?q.blank:q.type==='unscramble'||q.type==='gramscramble'?q.sentence:q.type==='translate'||q.type==='mc'?q.answer:q.word;
+  renderTeacherOptions(q,true);
+  const revealWord=q.type==='sentence'?q.blank:q.type==='unscramble'||q.type==='gramscramble'?q.sentence:q.type==='translate'||q.type==='mc'?q.answer:(q.word||q.answer);
   const revealSentence=q.type==='sentence'?q.sentence.replace('___',q.blank):'';
   document.getElementById('q-text').innerHTML=q.type==='gramscramble'
     ?`<div class="q-hint" style="font-size:1rem;color:var(--green)">✅ Answer revealed to students</div>`
@@ -2114,7 +2158,9 @@ function submitAnswer(auto){
   if(!auto) playSubmitSound();
   const elapsed=parseInt(document.getElementById('student-timer').textContent)||0;
   let ans;
-  if(currentStudentQ&&(currentStudentQ.type==='unscramble'||currentStudentQ.type==='gramscramble')){
+  const tileMode=currentStudentQ&&(currentStudentQ.type==='unscramble'||currentStudentQ.type==='gramscramble')
+    &&!(Array.isArray(currentStudentQ.choices)&&currentStudentQ.choices.length);
+  if(tileMode){
     ans=Array.from(document.querySelectorAll('#answer-area .word-tile')).map(t=>t.dataset.word).join(' ');
   } else {
     ans=(document.getElementById('student-ans-input').value||'').trim();
