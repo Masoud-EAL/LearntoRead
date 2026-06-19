@@ -830,14 +830,22 @@ const SOUND_BANK={
   t:{file:'t',words:['toy','tie','train','truck','tree','ten','toe','teeth','tin']},
   w:{file:'w',words:['wig','watch','watermelon']}
 };
-// Picture categories for "odd one out".
+// Picture categories for "odd one out". Every word here must have a distinct
+// emoji in the EMOJI map so each round shows four clear pictures.
 const ODD_GROUPS={
   animals:['cat','dog','pig','cow','duck','fish','bee','fox','hen','rat','bat','crab','elephant'],
   fruit:['apple','banana','orange','grape','mango','peach','pear','lemon','cherry','watermelon','pineapple','coconut','kiwi'],
   transport:['bus','ship','train','truck','van','bike','boat'],
   clothes:['cap','coat','dress','hat','tie'],
-  body:['ear','foot','leg','hand','nose','eye','mouth','teeth'],
-  food:['cake','egg','pie','jam','meat','rice','bun']
+  body:['ear','foot','leg','hand','nose','eye','mouth','teeth','arm','thumb'],
+  food:['cake','egg','pie','jam','meat','rice','bun'],
+  weather:['sunny','rainy','snowy','windy','cloudy','stormy','foggy'],
+  colors:['red','blue','green','brown','black'],
+  numbers:['one','two','three','four','five','six','seven','eight','nine','ten'],
+  nature:['sun','moon','star','tree','lake','rock'],
+  toys:['ball','toy','kite','drum','game'],
+  household:['bed','lamp','clock','door','box','bell','mug','spoon','phone','watch'],
+  actions:['run','hop','cry','hug','sleep','read']
 };
 function genLetterQuestions(){
   return LETTERS.map(L=>{
@@ -858,12 +866,35 @@ function genSoundQuestions(){
   return out;
 }
 function genOddOneOut(count){
-  const groups=Object.keys(ODD_GROUPS),out=[];
-  for(let i=0;i<count;i++){
-    const a=groups[Math.floor(Math.random()*groups.length)];
-    let b; do{ b=groups[Math.floor(Math.random()*groups.length)]; }while(b===a);
-    const same=shuffle([...ODD_GROUPS[a]]).slice(0,3);
-    const odd=shuffle([...ODD_GROUPS[b]])[0];
+  const groups=Object.keys(ODD_GROUPS);
+  const out=[],seen=new Set();
+  // Pick n same-category items that each show a distinct picture.
+  const pickDistinct=(words,n)=>{
+    const res=[],used=new Set();
+    for(const w of shuffle([...words])){
+      const e=emo(w); if(!e||used.has(e)) continue;
+      used.add(e); res.push(w); if(res.length>=n) break;
+    }
+    return res;
+  };
+  // Round-robin the majority category (reshuffling each pass) so a single game
+  // spans many categories instead of repeating body/transport/clothes, and skip
+  // duplicate rounds so near-identical questions don't recur.
+  let order=shuffle([...groups]),gi=0,guard=0;
+  while(out.length<count&&guard<count*40){
+    guard++;
+    if(gi>=order.length){ order=shuffle([...groups]); gi=0; }
+    const a=order[gi++];
+    const same=pickDistinct(ODD_GROUPS[a],3);
+    if(same.length<3) continue;
+    const sameEmo=new Set(same.map(w=>emo(w)));
+    const b=shuffle(groups.filter(g=>g!==a))[0];
+    // The odd item must show a picture that isn't already on screen.
+    const odd=shuffle([...ODD_GROUPS[b]]).find(w=>{const e=emo(w);return e&&!sameEmo.has(e);});
+    if(!odd) continue;
+    const sig=a+'|'+[...same].sort().join(',')+'|'+odd;
+    if(seen.has(sig)) continue;
+    seen.add(sig);
     out.push({type:'oddone',answer:odd,group:a,oddGroup:b,choices:shuffle([odd,...same])});
   }
   return out;
@@ -918,6 +949,8 @@ function poolFor(type){
 }
 
 function getQuestions(type,limit){
+  // Build a fresh, category-balanced set each game so categories don't cluster.
+  if(type==='oddone') return genOddOneOut(limit);
   const pool=poolFor(type);
   shuffle(pool);
   return pool.slice(0,limit);
@@ -1498,12 +1531,19 @@ function createRoom(){
   roomRef.child('players').on('value',snap=>{
     const players=snap.val()||{};
     const chips=document.getElementById('player-chips');
-    const count=Object.keys(players).length;
-    totalPlayers=count;
-    document.getElementById('player-count').textContent=count;
+    // Collapse duplicate/ghost entries that share a name so the roster and the
+    // auto-reveal threshold reflect the real number of students.
+    const seenNames=new Set(),uniqueNames=[];
+    Object.values(players).forEach(p=>{
+      const nm=(p&&p.name||'').trim(); if(!nm) return;
+      const key=nm.toLowerCase();
+      if(seenNames.has(key)) return; seenNames.add(key); uniqueNames.push(nm);
+    });
+    totalPlayers=uniqueNames.length;
+    document.getElementById('player-count').textContent=totalPlayers;
     chips.innerHTML='';
-    Object.values(players).forEach(p=>{ const c=document.createElement('div'); c.className='player-chip'; c.textContent=p.name; chips.appendChild(c); });
-    document.getElementById('start-btn').disabled=count<1;
+    uniqueNames.forEach(nm=>{ const c=document.createElement('div'); c.className='player-chip'; c.textContent=nm; chips.appendChild(c); });
+    document.getElementById('start-btn').disabled=totalPlayers<1;
   });
 }
 function generateQR(){
@@ -1635,9 +1675,11 @@ function listenForAnswers(){
   const q=currentQuestions[currentQIdx];
   answerListener=roomRef.child('answers').on('value',snap=>{
     const answers=snap.val()||{};
-    const count=Object.keys(answers).length;
+    // Count distinct names so a reconnected student answering once still
+    // satisfies the threshold (which is also a unique-name count).
+    const answeredNames=new Set(Object.values(answers).map(a=>(a&&a.name||'').trim().toLowerCase()).filter(Boolean));
     // Auto-reveal the moment every active player has answered
-    if(!revealed&&totalPlayers>0&&count>=totalPlayers){ revealAnswers(); return; }
+    if(!revealed&&totalPlayers>0&&answeredNames.size>=totalPlayers){ revealAnswers(); return; }
     const bars=document.getElementById('ans-bars');
     if(!revealed){
       bars.innerHTML='';
@@ -1863,10 +1905,21 @@ function joinGame(){
     if(!snap.exists()){err.textContent='Room not found.';return;}
     if(snap.val().status==='finished'){err.textContent='This game has already finished.';return;}
     roomCode=code; roomRef=db.ref('rooms/'+code);
-    playerName=name; playerId=db.ref().push().key;
+    playerName=name;
+    // Reuse a stable id for this room so a student who reloads or reconnects
+    // overwrites their own entry instead of creating a duplicate "ghost" — which
+    // used to inflate the roster and stall the auto-reveal.
+    const pidKey='wl_pid_'+code;
+    playerId=localStorage.getItem(pidKey)||db.ref().push().key;
+    localStorage.setItem(pidKey,playerId);
     myScore=0; myLastQIdx=-1;
-    roomRef.child('players/'+playerId).set({name,score:0});
-    roomRef.child('players/'+playerId).onDisconnect().remove();
+    const meRef=roomRef.child('players/'+playerId);
+    meRef.once('value',s=>{
+      const prev=s.val();
+      myScore=(prev&&prev.score)||0;
+      meRef.set({name,score:myScore});
+    });
+    meRef.onDisconnect().remove();
     document.removeEventListener('visibilitychange',handlePlayerVisibility);
     document.addEventListener('visibilitychange',handlePlayerVisibility);
     document.getElementById('s-display-name').textContent=name;
