@@ -892,7 +892,7 @@ function buildBank(){
   questionBank.body=SPELL_BODY.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.unscramble=UNSCRAMBLE_SENTENCES.map(s=>({type:'unscramble',sentence:s,answer:s,words:s.trim().split(/\s+/)}));
   questionBank.gramscramble=UNSCRAMBLE_SENTENCES.map(s=>({type:'gramscramble',sentence:s,answer:s,words:s.trim().split(/\s+/)}));
-  questionBank.translate=LEVEL0_SENTENCES.map(s=>({type:'translate',en:s.en,answer:s.en,translations:{fa:s.fa,vi:s.vi,zh:s.zh,ar:s.ar,hi:s.hi,ur:s.ur,km:s.km,my:s.my}}));
+  questionBank.translate=LEVEL0_SENTENCES.map(s=>({type:'translate',en:s.en,answer:s.en,translations:{fa:s.fa,vi:s.vi,zh:s.zh,ar:s.ar,hi:s.hi,ur:s.ur,km:s.km,my:s.my,th:s.th}}));
 }
 function poolFor(type){
   const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body];
