@@ -2022,7 +2022,8 @@ function showStudentQuestion(q,startedAt){
     else if(q.type==='oddone') mcPrompt='Which one is different?';
     else if(q.type==='letter') mcPrompt='🔊 Listen, then tap the letter';
     else if(q.type==='lettersound') mcPrompt='🔊 Listen to the sound';
-    else if(q.type==='unscramble'||q.type==='gramscramble') mcPrompt=q.promptText||q.answer;
+    else if(q.type==='gramscramble') mcPrompt='Which sentence is correct?';
+    else if(q.type==='unscramble') mcPrompt=q.promptText||q.answer;
     else if(q.type==='translate'){
       const lang=localStorage.getItem('translateLang')||'vi';
       mcPrompt=q.translations&&q.translations[lang]?q.translations[lang]:(q.en||q.answer);
