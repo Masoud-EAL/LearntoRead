@@ -1073,6 +1073,12 @@ function emo(w){ return EMOJI[w]||EMOJI[(w||'').toLowerCase()]||''; }
    Winner: fanfare then back to lobby. */
 let audioCtx=null,musicOn=true,musicType=null;
 let oscNodes=[],musicTimeout=null;
+// True only once a looping track has actually scheduled sound on a running
+// context. musicType records the *desired* track immediately, but until the
+// AudioContext is unlocked by a gesture nothing plays — so we must not treat a
+// merely-requested track as already playing, or the first tap that unlocks
+// audio would be ignored.
+let musicStarted=false,pendingAudioStart=null;
 const MASTER_VOL=0.38;
 
 function getCtx(){
@@ -1080,29 +1086,36 @@ function getCtx(){
   if(audioCtx.state==='suspended') audioCtx.resume();
   return audioCtx;
 }
-/* resume() is async. While a context is suspended its currentTime is frozen,
-   so notes scheduled at currentTime+0.05 land in the past the instant the clock
-   jumps forward on resume — the first loop is dropped and music only "starts"
-   one full silent loop later. Defer scheduling until the context is actually
-   running so it sits on a live, advancing clock. */
+/* resume() is async, and a context can only leave the suspended state after a
+   user gesture. While suspended its currentTime is frozen, so notes scheduled
+   at currentTime+0.05 land in the past the instant the clock jumps forward on
+   resume — the first loop is dropped and music only "starts" one full silent
+   loop later (or never). Defer scheduling until the context is actually running
+   so it sits on a live, advancing clock. Returns nothing; the callback may fire
+   synchronously (already running) or later (on the first gesture). */
+function cancelPendingAudioStart(){
+  if(pendingAudioStart){ pendingAudioStart(); pendingAudioStart=null; }
+}
 function whenAudioRunning(cb){
+  cancelPendingAudioStart();
   const ctx=getCtx();
   if(ctx.state==='running'){ cb(ctx); return; }
   let done=false;
-  const go=()=>{
-    if(done||ctx.state!=='running') return;
-    done=true; ctx.removeEventListener('statechange',go); cb(ctx);
-  };
+  const cleanup=()=>{ done=true; ctx.removeEventListener('statechange',go); if(pendingAudioStart===cleanup)pendingAudioStart=null; };
+  const go=()=>{ if(done||ctx.state!=='running') return; cleanup(); cb(ctx); };
   ctx.addEventListener('statechange',go);
   try{ ctx.resume().then(go).catch(()=>{}); }catch(e){}
-  // Belt-and-braces: statechange isn't guaranteed to fire on every browser.
-  setTimeout(go,300);
+  // Belt-and-braces: statechange isn't guaranteed on every browser.
+  setTimeout(go,400);
+  // Let stopMusic()/a newer request abandon this pending start.
+  pendingAudioStart=cleanup;
 }
 function stopMusic(){
+  cancelPendingAudioStart();
   if(musicTimeout){clearTimeout(musicTimeout);musicTimeout=null;}
   oscNodes.forEach(n=>{try{n.stop();}catch(e){}});
   oscNodes=[];
-  musicType=null;
+  musicType=null; musicStarted=false;
 }
 function tone(ctx,freq,start,dur,vol,wave,pan){
   wave=wave||'sine'; pan=pan||0; vol=vol*MASTER_VOL;
@@ -1142,10 +1155,11 @@ function noiseBurst(ctx,start,dur,vol,filterFreq,filterQ,pan,atk){
 
 /* LOBBY — upbeat 32-beat C-pentatonic groove */
 function playLobbyMusic(){
-  if(!musicOn||musicType==='lobby') return;
+  if(!musicOn||(musicType==='lobby'&&musicStarted)) return;
   stopMusic(); musicType='lobby';
   whenAudioRunning(ctx=>{
   if(musicType!=='lobby'||!musicOn) return;
+  musicStarted=true;
   const bpm=118,b=60/bpm,now=ctx.currentTime+0.05;
   const C3=130.8,F3=174.6,G3=196,A3=220;
   const C4=261.6,E4=329.6,G4=392,A4=440;
@@ -1168,10 +1182,11 @@ function playLobbyMusic(){
 
 /* GAME QUESTION — calm sparse loop, no stress */
 function playGameMusic(){
-  if(!musicOn||musicType==='game') return;
+  if(!musicOn||(musicType==='game'&&musicStarted)) return;
   stopMusic(); musicType='game';
   whenAudioRunning(ctx=>{
   if(musicType!=='game'||!musicOn) return;
+  musicStarted=true;
   const bpm=100,b=60/bpm,now=ctx.currentTime+0.05;
   const C3=130.8,F3=174.6,G3=196;
   const C4=261.6,E4=329.6,G4=392;
