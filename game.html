@@ -1080,6 +1080,24 @@ function getCtx(){
   if(audioCtx.state==='suspended') audioCtx.resume();
   return audioCtx;
 }
+/* resume() is async. While a context is suspended its currentTime is frozen,
+   so notes scheduled at currentTime+0.05 land in the past the instant the clock
+   jumps forward on resume — the first loop is dropped and music only "starts"
+   one full silent loop later. Defer scheduling until the context is actually
+   running so it sits on a live, advancing clock. */
+function whenAudioRunning(cb){
+  const ctx=getCtx();
+  if(ctx.state==='running'){ cb(ctx); return; }
+  let done=false;
+  const go=()=>{
+    if(done||ctx.state!=='running') return;
+    done=true; ctx.removeEventListener('statechange',go); cb(ctx);
+  };
+  ctx.addEventListener('statechange',go);
+  try{ ctx.resume().then(go).catch(()=>{}); }catch(e){}
+  // Belt-and-braces: statechange isn't guaranteed to fire on every browser.
+  setTimeout(go,300);
+}
 function stopMusic(){
   if(musicTimeout){clearTimeout(musicTimeout);musicTimeout=null;}
   oscNodes.forEach(n=>{try{n.stop();}catch(e){}});
@@ -1126,7 +1144,8 @@ function noiseBurst(ctx,start,dur,vol,filterFreq,filterQ,pan,atk){
 function playLobbyMusic(){
   if(!musicOn||musicType==='lobby') return;
   stopMusic(); musicType='lobby';
-  const ctx=getCtx();
+  whenAudioRunning(ctx=>{
+  if(musicType!=='lobby'||!musicOn) return;
   const bpm=118,b=60/bpm,now=ctx.currentTime+0.05;
   const C3=130.8,F3=174.6,G3=196,A3=220;
   const C4=261.6,E4=329.6,G4=392,A4=440;
@@ -1144,13 +1163,15 @@ function playLobbyMusic(){
     musicTimeout=setTimeout(()=>scheduleLoop(ctx.currentTime),(32*b-0.15)*1000);
   }
   scheduleLoop(now);
+  });
 }
 
 /* GAME QUESTION — calm sparse loop, no stress */
 function playGameMusic(){
   if(!musicOn||musicType==='game') return;
   stopMusic(); musicType='game';
-  const ctx=getCtx();
+  whenAudioRunning(ctx=>{
+  if(musicType!=='game'||!musicOn) return;
   const bpm=100,b=60/bpm,now=ctx.currentTime+0.05;
   const C3=130.8,F3=174.6,G3=196;
   const C4=261.6,E4=329.6,G4=392;
@@ -1164,6 +1185,7 @@ function playGameMusic(){
     musicTimeout=setTimeout(()=>scheduleLoop(ctx.currentTime),(16*b-0.12)*1000);
   }
   scheduleLoop(now);
+  });
 }
 
 /* Soft heartbeat pulse — called each second when timeLeft <= 5 */
