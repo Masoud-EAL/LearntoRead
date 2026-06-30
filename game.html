@@ -125,9 +125,9 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .student-timer.urgent{color:var(--accent);animation:urgentPulse .5s infinite;}
 @keyframes urgentPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
 .s-q-card{width:100%;max-width:500px;background:var(--card);border-radius:var(--radius);padding:22px;text-align:center;border:1px solid rgba(255,255,255,.07);}
-.s-q-type{font-size:.75rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--purple);margin-bottom:8px;}
+.s-q-type{font-size:.85rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--purple);margin-bottom:8px;}
 .s-q-text{font-family:'Fredoka One',cursive;font-size:1.5rem;line-height:1.3;margin-bottom:14px;}
-.s-hear-btn{background:rgba(124,77,255,.2);border:1.5px solid var(--purple);color:var(--purple);border-radius:50px;padding:9px 20px;font-family:'Fredoka One',cursive;font-size:.95rem;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.s-hear-btn{background:rgba(124,77,255,.2);border:1.5px solid var(--purple);color:var(--purple);border-radius:50px;padding:11px 22px;font-family:'Fredoka One',cursive;font-size:1.08rem;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
 .s-hear-btn:hover{background:var(--purple);color:white;}
 .ans-input-wrap{width:100%;max-width:420px;}
 .ans-input-wrap .game-input{font-size:1.4rem;text-align:center;letter-spacing:2px;margin-bottom:0;}
@@ -203,11 +203,11 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 
 /* UNSCRAMBLE TILES */
 .unscramble-section{width:100%;max-width:520px;flex-direction:column;gap:12px;}
-.unscrm-label{font-size:.72rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
-.answer-area{display:flex;flex-wrap:wrap;align-content:flex-start;gap:8px;min-height:56px;padding:10px 12px;background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.18);border-radius:12px;transition:border-color .2s,border-style .2s;}
+.unscrm-label{font-size:.82rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.answer-area{display:flex;flex-wrap:wrap;align-content:flex-start;gap:10px;min-height:64px;padding:12px;background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.18);border-radius:12px;transition:border-color .2s,border-style .2s;}
 .answer-area.complete{border-color:var(--teal);border-style:solid;}
-.word-bank-area{display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px;background:rgba(255,255,255,.04);border-radius:12px;}
-.word-tile{display:inline-flex;align-items:center;padding:8px 14px;border-radius:10px;font-family:'Fredoka One',cursive;font-size:.95rem;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;border:2px solid transparent;transition:transform .12s,filter .12s,background .15s,border-color .15s;line-height:1.2;}
+.word-bank-area{display:flex;flex-wrap:wrap;gap:10px;padding:12px;background:rgba(255,255,255,.04);border-radius:12px;}
+.word-tile{display:inline-flex;align-items:center;padding:11px 18px;border-radius:11px;font-family:'Fredoka One',cursive;font-size:1.25rem;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;border:2px solid transparent;transition:transform .12s,filter .12s,background .15s,border-color .15s;line-height:1.2;}
 .word-tile:active{transform:scale(.93);}
 .bank-tile{background:var(--purple);color:white;}
 .bank-tile:hover{transform:translateY(-2px);filter:brightness(1.15);}
@@ -224,9 +224,9 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .mc-choice:active{transform:scale(.96);}
 .mc-choice .mc-pic{font-size:3.2rem;line-height:1;}
 .mc-choice .mc-pic .custom-icon-emoji{height:1em;width:1em;}
-.mc-choice .mc-label{font-size:1.15rem;word-break:break-word;text-align:center;}
-.mc-choice.mc-text .mc-label{font-size:1.5rem;}
-.mc-choice.mc-sentence .mc-label{font-size:1.05rem;line-height:1.4;font-family:'Nunito',sans-serif;font-weight:700;}
+.mc-choice .mc-label{font-size:1.3rem;word-break:break-word;text-align:center;}
+.mc-choice.mc-text .mc-label{font-size:1.65rem;}
+.mc-choice.mc-sentence .mc-label{font-size:1.2rem;line-height:1.4;font-family:'Nunito',sans-serif;font-weight:700;}
 .mc-choice.selected{border-color:var(--gold);background:rgba(245,166,35,.12);}
 .mc-choice.mc-correct{border-color:var(--green);background:rgba(0,200,83,.18);}
 .mc-choice.mc-wrong{border-color:var(--accent);background:rgba(233,69,96,.15);}
@@ -237,7 +237,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .t-opt .t-opt-pic{font-size:1.9rem;line-height:1;}
 .t-opt .t-opt-pic .custom-icon-emoji{height:1em;width:1em;}
 .t-opt .t-opt-label{font-size:1rem;word-break:break-word;}
-.t-opt.t-opt-sentence{font-family:'Nunito',sans-serif;font-weight:700;font-size:.92rem;line-height:1.35;}
+.t-opt.t-opt-sentence{font-family:'Nunito',sans-serif;font-weight:700;font-size:1.05rem;line-height:1.35;}
 .t-opt.t-correct{border-color:var(--green);background:rgba(0,200,83,.18);}
 .t-opt.t-correct .t-opt-label::after{content:' ✓';color:var(--green);}
 .mc-toggle-wrap{display:flex;align-items:center;gap:10px;margin:4px 0 10px;padding:10px 14px;background:rgba(124,77,255,.12);border:1.5px solid rgba(124,77,255,.35);border-radius:12px;cursor:pointer;}
