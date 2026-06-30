@@ -1627,15 +1627,15 @@ function playQuestion(){
   const q=currentQuestions[currentQIdx],total=currentQuestions.length;
   document.getElementById('game-prog').textContent='Question '+(currentQIdx+1)+' of '+total;
   const isMcQ=Array.isArray(q.choices)&&q.choices.length>0;
-  const noAudio=q.type==='gramscramble'||q.type==='translate'||q.type==='mc'||(q.type==='unscramble'&&isMcQ);
+  const noAudio=q.type==='gramscramble'||q.type==='translate'||q.type==='mc';
   document.getElementById('q-badge').textContent=q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='lettersound'?'FIRST SOUND':q.type==='oddone'?'ODD ONE OUT':q.type==='mc'?'MULTIPLE CHOICE':'WORD';
-  document.getElementById('q-hint').textContent=q.type==='oddone'?'Students tap the picture that is different':q.type==='mc'?'Students tap the correct answer':(q.type==='unscramble'||q.type==='gramscramble')?(isMcQ?'Students tap the sentence in the right order':'Students arrange word tiles'):q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='translate'?'Students type the English sentence':'';
+  document.getElementById('q-hint').textContent=q.type==='oddone'?'Students tap the picture that is different':q.type==='mc'?'Students tap the correct answer':(q.type==='unscramble'||q.type==='gramscramble')?(isMcQ?(q.type==='unscramble'?'Students listen and tap the sentence in the right order':'Students tap the sentence in the right order'):'Students arrange word tiles'):q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='translate'?'Students type the English sentence':'';
   document.getElementById('ans-bars').innerHTML='';
   document.getElementById('reveal-btn').style.display='';
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('q-emoji').innerHTML=q.icon||(q.type==='word'?emo(q.word):q.type==='letter'?q.letter:'');
-  document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?'👆 Students tap the sentence in the right order':q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':'🔊 Listen and spell the word';
+  document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=noAudio?'none':'';
   renderTeacherOptions(q,false);
   roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:Date.now(),revealed:false,correctAnswer:'',midLeaderboard:false});
@@ -1650,8 +1650,6 @@ function playQuestion(){
 function teacherSpeak(){
   const q=currentQuestions[currentQIdx],btn=document.getElementById('hear-btn');
   if(q.type==='gramscramble'||q.type==='translate'||q.type==='mc') return;
-  // Unscramble shown as multiple choice is read-and-pick — don't read it aloud.
-  if(q.type==='unscramble'&&Array.isArray(q.choices)&&q.choices.length) return;
   if(q.type==='lettersound'){ playSoundFile(q.soundFile); return; }
   btn.classList.add('playing');
   const spokenText=q.type==='letter'?q.letter:q.type==='oddone'?'Tap the one that does not belong.':q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.word;
@@ -2126,8 +2124,9 @@ function showStudentQuestion(q,startedAt){
   // In MC mode tapping a choice submits, so hide the Submit button.
   document.getElementById('student-submit-btn').style.display=isMc?'none':'';
   document.getElementById('student-submit-btn').disabled=isTile;
-  // Sentence-ordering, translate, and custom MC are read-and-pick: hide audio.
-  const hideHear=q.type==='gramscramble'||q.type==='translate'||q.type==='mc'||(isMc&&q.type==='unscramble');
+  // Grammar-ordering, translate, and custom MC are read-and-pick: hide audio.
+  // Listen-and-Unscramble stays a listening task even in MC mode, so keep audio.
+  const hideHear=q.type==='gramscramble'||q.type==='translate'||q.type==='mc';
   document.getElementById('s-hear-btn').style.display=hideHear?'none':'';
   document.getElementById('s-q-type').textContent=
     q.type==='mc'?'MULTIPLE CHOICE — tap the correct answer':
@@ -2137,7 +2136,8 @@ function showStudentQuestion(q,startedAt){
       q.type==='lettersound'?'TAP THE PICTURE WITH THIS SOUND':
       q.type==='oddone'?'TAP THE ONE THAT IS DIFFERENT':
       q.type==='translate'?'TAP THE ENGLISH SENTENCE':
-      (q.type==='unscramble'||q.type==='gramscramble')?'TAP THE SENTENCE IN THE RIGHT ORDER':
+      q.type==='unscramble'?'LISTEN — TAP THE SENTENCE IN THE RIGHT ORDER':
+      q.type==='gramscramble'?'TAP THE SENTENCE IN THE RIGHT ORDER':
       'LISTEN — TAP THE PICTURE'):
     isTile?(q.type==='gramscramble'?'GRAMMAR — arrange words in order':'UNSCRAMBLE — arrange the word tiles'):
     isTranslate?'TRANSLATE — type the English sentence':
@@ -2157,7 +2157,7 @@ function showStudentQuestion(q,startedAt){
     else if(q.type==='letter') mcPrompt='🔊 Listen, then tap the letter';
     else if(q.type==='lettersound') mcPrompt='🔊 Listen to the sound';
     else if(q.type==='gramscramble') mcPrompt='Which sentence is correct?';
-    else if(q.type==='unscramble') mcPrompt=q.promptText||q.answer;
+    else if(q.type==='unscramble') mcPrompt='🔊 Listen, then tap the sentence in the right order';
     else if(q.type==='translate'){
       const lang=localStorage.getItem('translateLang')||'vi';
       mcPrompt=q.translations&&q.translations[lang]?q.translations[lang]:(q.en||q.answer);
@@ -2224,8 +2224,6 @@ function studentSpeak(q){
   const Q=currentStudentQ;
   if(!Q) return;
   if(Q.type==='gramscramble'||Q.type==='translate') return;
-  // MC sentence-ordering is read-and-pick — don't read the answer aloud.
-  if(Q.type==='unscramble'&&Array.isArray(Q.choices)&&Q.choices.length) return;
   if(Q.type==='lettersound'){ playSoundFile(Q.soundFile); return; }
   if(Q.type==='letter'){ speakTTS(Q.letter); return; }
   if(Q.type==='oddone'){ speakTTS('Tap the one that does not belong.'); return; }
