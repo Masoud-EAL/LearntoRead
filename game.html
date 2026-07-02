@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WordLink Game</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="fonts/fonts.css" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="vendor/qrcode.min.js"></script>
 <style>
 :root{--bg:#0d0d1a;--card:#16213e;--accent:#e94560;--gold:#f5a623;--teal:#0f9b8e;--purple:#7c4dff;--green:#00c853;--text:#f0f0ff;--muted:#8888aa;--radius:16px;}
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -710,6 +711,23 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 const firebaseConfig={apiKey:"AIzaSyARGfXd7nArpjS87r_TOiujIy8pjHpBBoA",authDomain:"wordlink-game-d1f97.firebaseapp.com",databaseURL:"https://wordlink-game-d1f97-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"wordlink-game-d1f97",storageBucket:"wordlink-game-d1f97.firebasestorage.app",messagingSenderId:"126959375644",appId:"1:126959375644:web:f2a39eb6057426382b96d9"};
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
+
+/* AUTH — every visitor (teacher or student) signs in anonymously so Firebase
+   rules can tell who created what (teacher's own question banks, room
+   ownership for deletion) without any login screen. */
+let authUid=null;
+const authReady=new Promise(resolve=>{
+  firebase.auth().onAuthStateChanged(user=>{ if(user){ authUid=user.uid; resolve(user.uid); } });
+});
+firebase.auth().signInAnonymously().catch(err=>console.error('Anonymous auth failed:',err));
+
+/* SERVER TIME — .info/serverTimeOffset is kept in sync by the SDK, so
+   serverNow() gives an accurate "now" even when a device's clock is wrong. */
+let serverTimeOffset=0;
+db.ref('.info/serverTimeOffset').on('value',snap=>{ serverTimeOffset=snap.val()||0; });
+function serverNow(){ return Date.now()+serverTimeOffset; }
+
+function banksRef(){ return db.ref('customBanks/'+authUid); }
 
 /* QUESTION BANK */
 const WP1_WORDS=['man','can','pan','ran','fan','tan','van','cat','bat','hat','mat','rat','sat','pat','cap','map','nap','tap','lap','gap','bag','tag','rag','wag','lag','ham','jam','ram','dam','yam','pet','net','set','bet','met','wet','pen','hen','ten','men','den','big','dig','fig','pig','wig','pin','bin','fin','tin','win','lip','dip','hip','sip','tip','zip','hop','mop','top','pop','cop','hot','pot','dot','lot','not','bug','dug','hug','mug','rug','sun','fun','run','bun','gun'];
@@ -1541,18 +1559,22 @@ function goHome(){ stopMusic(); cleanupListeners(); soloMode=false; document.get
 function goStudentHome(){ document.getElementById('music-btn').style.display='none'; showScreen('screen-student-home'); }
 
 /* TEACHER FLOW */
-function goTeacher(){ role='teacher'; document.getElementById('music-btn').style.display=''; buildBank(); loadCustomBanks(); createRoom(); }
+function goTeacher(){ role='teacher'; document.getElementById('music-btn').style.display=''; buildBank(); authReady.then(()=>{ loadCustomBanks(); createRoom(); }); }
 function makeCode(){ const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let r=''; for(let i=0;i<4;i++) r+=c[Math.floor(Math.random()*c.length)]; return r; }
 
+// Anyone can garbage-collect a room, but only if it's genuinely stale — the
+// security rules re-check the age against the server clock (`now`), so a
+// forged/skewed createdAt on the client can't be used to delete someone
+// else's live room early.
 function cleanupOldRooms(){
-  const AGE_24H = Date.now() - 24 * 60 * 60 * 1000;
-  const AGE_2H  = Date.now() -  2 * 60 * 60 * 1000;
+  const AGE_24H = serverNow() - 24 * 60 * 60 * 1000;
+  const AGE_2H  = serverNow() -  2 * 60 * 60 * 1000;
   db.ref('rooms').once('value', snap => {
     const rooms = snap.val() || {};
     Object.entries(rooms).forEach(([code, room]) => {
       const created = room.createdAt || 0;
       if (created < AGE_24H || (room.status === 'finished' && created < AGE_2H)) {
-        db.ref('rooms/' + code).remove();
+        db.ref('rooms/' + code).remove().catch(()=>{});
       }
     });
   });
@@ -1561,7 +1583,7 @@ function cleanupOldRooms(){
 function createRoom(){
   cleanupOldRooms();
   roomCode=makeCode(); roomRef=db.ref('rooms/'+roomCode);
-  roomRef.set({status:'lobby',createdAt:Date.now(),questionIdx:-1,revealed:false});
+  roomRef.set({status:'lobby',createdAt:firebase.database.ServerValue.TIMESTAMP,questionIdx:-1,revealed:false,hostUid:authUid});
   document.getElementById('room-code-display').textContent=roomCode;
   generateQR(); updateQCountDisplay();
   showScreen('screen-teacher-lobby'); playLobbyMusic();
@@ -1638,7 +1660,7 @@ function playQuestion(){
   document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=noAudio?'none':'';
   renderTeacherOptions(q,false);
-  roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:Date.now(),revealed:false,correctAnswer:'',midLeaderboard:false});
+  roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:firebase.database.ServerValue.TIMESTAMP,revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
   showScreen('screen-teacher-game');
   playGameMusic();
@@ -1936,7 +1958,7 @@ function joinGame(){
   if(code.length!==4){err.textContent='Enter a 4-letter room code.';return;}
   if(!name){err.textContent='Enter your name.';return;}
   err.textContent='';
-  db.ref('rooms/'+code).once('value',snap=>{
+  authReady.then(()=>db.ref('rooms/'+code).once('value',snap=>{
     if(!snap.exists()){err.textContent='Room not found.';return;}
     if(snap.val().status==='finished'){err.textContent='This game has already finished.';return;}
     roomCode=code; roomRef=db.ref('rooms/'+code);
@@ -1961,7 +1983,7 @@ function joinGame(){
     document.getElementById('s-room-display').textContent='Room: '+roomCode;
     showScreen('screen-student-lobby');
     listenForGameState();
-  });
+  }));
 }
 
 function listenForGameState(){
@@ -2023,7 +2045,7 @@ function showHint(){
 function initSolo(){
   soloMode=true; role='student';
   document.getElementById('music-btn').style.display='none';
-  buildBank(); loadCustomBanks();
+  buildBank(); authReady.then(()=>loadCustomBanks());
   showScreen('screen-solo-setup');
   updateSoloCountDisplay();
 }
@@ -2058,7 +2080,7 @@ function startSoloGame(){
   if(mcMode) attachMcChoices(soloQuestions,soloSelectedType);
   soloQIdx=0; myScore=0;
   document.getElementById('solo-back-btn').style.display='';
-  showStudentQuestion(soloQuestions[0],Date.now());
+  showStudentQuestion(soloQuestions[0],serverNow());
 }
 function showSoloResult(submittedAns,correctAns,timeLeft){
   clearInterval(studentTimerInt); stopMusic();
@@ -2090,7 +2112,7 @@ function showSoloResult(submittedAns,correctAns,timeLeft){
 function soloNextQuestion(){
   soloQIdx++;
   if(soloQIdx>=soloQuestions.length){ showSoloFinal(); return; }
-  showStudentQuestion(soloQuestions[soloQIdx],Date.now());
+  showStudentQuestion(soloQuestions[soloQIdx],serverNow());
 }
 function showSoloFinal(){
   stopMusic();
@@ -2104,6 +2126,12 @@ function showSoloFinal(){
   playWinnerFanfare();
 }
 
+const GAME_RTL_LANGS=new Set(['fa','ur','ar']);
+function setQTextLang(lang){
+  const el=document.getElementById('s-q-text');
+  if(lang){ el.setAttribute('lang',lang); el.setAttribute('dir',GAME_RTL_LANGS.has(lang)?'rtl':'ltr'); }
+  else { el.removeAttribute('lang'); el.removeAttribute('dir'); }
+}
 function showStudentQuestion(q,startedAt){
   // Multiplayer students get silence to focus on the host; the solo player is
   // looking at this screen themselves, so keep the calm game music going.
@@ -2148,9 +2176,10 @@ function showStudentQuestion(q,startedAt){
     const lang=localStorage.getItem('translateLang')||'vi';
     const t=q.translations&&q.translations[lang]?q.translations[lang]:(q.en||q.answer);
     document.getElementById('s-q-text').textContent=t;
+    setQTextLang(lang);
     document.getElementById('student-ans-input').placeholder='Type the English sentence…';
   } else if(isMc){
-    let mcPrompt;
+    let mcPrompt,mcLang=null;
     if(q.type==='mc') mcPrompt=q.question||(q.icon?'👆 Tap the correct answer':'');
     else if(q.type==='sentence') mcPrompt=q.display;
     else if(q.type==='oddone') mcPrompt='Which one is different?';
@@ -2159,12 +2188,14 @@ function showStudentQuestion(q,startedAt){
     else if(q.type==='gramscramble') mcPrompt='Which sentence is correct?';
     else if(q.type==='unscramble') mcPrompt='🔊 Listen, then tap the sentence in the right order';
     else if(q.type==='translate'){
-      const lang=localStorage.getItem('translateLang')||'vi';
-      mcPrompt=q.translations&&q.translations[lang]?q.translations[lang]:(q.en||q.answer);
+      mcLang=localStorage.getItem('translateLang')||'vi';
+      mcPrompt=q.translations&&q.translations[mcLang]?q.translations[mcLang]:(q.en||q.answer);
     } else mcPrompt='🔊 Listen, then tap the answer';
     document.getElementById('s-q-text').textContent=mcPrompt;
+    setQTextLang(mcLang);
   } else {
     document.getElementById('s-q-text').textContent=isTile?'Put the words in the correct order:':q.type==='sentence'?q.display:'🔊 Listen carefully…';
+    setQTextLang(null);
     document.getElementById('student-ans-input').placeholder='Type your answer…';
   }
   if(isMc) renderMcChoices(q);
@@ -2237,7 +2268,7 @@ function startStudentTimer(startedAt,dur){
   dur=dur||TIMER_DURATION;
   clearInterval(studentTimerInt);
   const el=document.getElementById('student-timer');
-  function tick(){ const elapsed=(Date.now()-startedAt)/1000,left=Math.max(0,dur-elapsed),leftInt=Math.ceil(left); el.textContent=leftInt; el.classList.toggle('urgent',leftInt<=5); if(left<=0){ clearInterval(studentTimerInt); if(!answered) submitAnswer(true); } }
+  function tick(){ const elapsed=(serverNow()-startedAt)/1000,left=Math.max(0,dur-elapsed),leftInt=Math.ceil(left); el.textContent=leftInt; el.classList.toggle('urgent',leftInt<=5); if(left<=0){ clearInterval(studentTimerInt); if(!answered) submitAnswer(true); } }
   tick(); studentTimerInt=setInterval(tick,500);
 }
 
@@ -2259,7 +2290,7 @@ function submitAnswer(auto){
     return;
   }
   document.getElementById('submitted-msg').textContent=auto?'⏱ Time up!':'✅ Submitted! Waiting…';
-  roomRef.child('answers/'+playerId).set({name:playerName,answer:ans,timeLeft:elapsed,submittedAt:Date.now()});
+  roomRef.child('answers/'+playerId).set({name:playerName,answer:ans,timeLeft:elapsed,submittedAt:firebase.database.ServerValue.TIMESTAMP});
 }
 
 /* UNSCRAMBLE TILE ENGINE
@@ -2472,25 +2503,27 @@ function showStudentResult(correctAnswer){
 
 /* CUSTOM QUESTION BANKS */
 
-function loadCustomBanks(){
-  db.ref('customBanks').once('value',snap=>{
+function loadCustomBanks(cb){
+  banksRef().once('value',snap=>{
     const raw=snap.val()||{};
-    // Migrate old flat customQuestions into a default bank if needed, then delete old data
+    // One-time migration: the very first teacher to open the editor after this
+    // upgrade claims the old shared/global bank into their own private namespace.
     if(!Object.keys(raw).length){
       db.ref('customQuestions').once('value',oldSnap=>{
         const oldQs=Object.values(oldSnap.val()||{});
         if(oldQs.length){
-          const bankRef=db.ref('customBanks').push();
+          const bankRef=banksRef().push();
           const bankId=bankRef.key;
           const qMap={};
-          oldQs.forEach(q=>{ const qRef=db.ref('customBanks/'+bankId+'/questions').push(); q.id=qRef.key; qMap[qRef.key]=q; });
+          oldQs.forEach(q=>{ const qRef=banksRef().child(bankId+'/questions').push(); q.id=qRef.key; qMap[qRef.key]=q; });
           bankRef.set({name:'My Questions',questions:qMap},()=>{
             db.ref('customQuestions').remove();
-            loadCustomBanks();
+            loadCustomBanks(cb);
           });
         } else {
-          db.ref('customQuestions').remove();
+          if(oldSnap.exists()) db.ref('customQuestions').remove();
           customBanks={}; updateQCountDisplay(); updateSoloCountDisplay();
+          if(cb) cb();
         }
       });
       return;
@@ -2502,13 +2535,14 @@ function loadCustomBanks(){
       customBanks[bid]={name:bdata.name||'Unnamed Bank',questions:Object.values(bdata.questions||{})};
     });
     updateQCountDisplay(); updateSoloCountDisplay();
+    if(cb) cb();
   });
 }
 
 function showEditor(){
-  buildBank(); loadCustomBanks();
+  buildBank();
   showScreen('screen-editor');
-  setTimeout(renderEditorBankSelector,300);
+  authReady.then(()=>loadCustomBanks(renderEditorBankSelector));
 }
 
 function renderEditorBankSelector(){
@@ -2560,7 +2594,7 @@ function hideCreateBankForm(){
 function createBank(){
   const name=document.getElementById('new-bank-name').value.trim();
   if(!name){ showToast('Enter a bank name.'); return; }
-  const bankRef=db.ref('customBanks').push();
+  const bankRef=banksRef().push();
   bankRef.set({name,questions:{}},()=>{
     customBanks[bankRef.key]={name,questions:[]};
     activeBankId=bankRef.key;
@@ -2574,7 +2608,7 @@ function deleteBankConfirm(){
   if(!activeBankId) return;
   const bname=customBanks[activeBankId]?.name||'this bank';
   if(!confirm('Delete bank "'+bname+'" and all its questions?')) return;
-  db.ref('customBanks/'+activeBankId).remove(()=>{
+  banksRef().child(activeBankId).remove(()=>{
     delete customBanks[activeBankId];
     if(selectedBankId===activeBankId){ selectedBankId=null; selectedBankName=''; questionBank.custom=[]; }
     activeBankId=null;
@@ -2618,7 +2652,7 @@ function addCustomQuestion(){
     if(sentence.trim().split(/\s+/).length<2){err.textContent='Sentence must have at least 2 words.';return;}
     q={type:'unscramble',sentence,answer:sentence,words:sentence.trim().split(/\s+/)};
   }
-  const ref=db.ref('customBanks/'+activeBankId+'/questions').push();
+  const ref=banksRef().child(activeBankId+'/questions').push();
   q.id=ref.key;
   ref.set(q,()=>{
     customBanks[activeBankId].questions.push(q);
@@ -2640,7 +2674,7 @@ function addCustomQuestion(){
 
 function deleteCustomQuestion(id){
   if(!activeBankId) return;
-  db.ref('customBanks/'+activeBankId+'/questions/'+id).remove(()=>{
+  banksRef().child(activeBankId+'/questions/'+id).remove(()=>{
     customBanks[activeBankId].questions=customBanks[activeBankId].questions.filter(q=>q.id!==id);
     if(selectedBankId===activeBankId) questionBank.custom=[...customBanks[activeBankId].questions];
     renderCustomQList(); updateQCountDisplay(); updateSoloCountDisplay();
@@ -2664,7 +2698,7 @@ function renderCustomQList(){
     else if(q.type==='mc'){ tag='<span class="cq-tag tag-mc">MC</span>'; text=iconHtml+(q.question||'(icon only)')+' (✓ '+q.answer+')'; }
     else if(q.type==='unscramble'){ tag='<span class="cq-tag tag-unscrm">UNSCRAMBLE</span>'; text=q.sentence; }
     else { tag='<span class="cq-tag tag-word">WORD</span>'; text=iconHtml+'Spell: "'+q.word+'"'; }
-    row.innerHTML=tag+'<div class="cq-text">'+text+'</div><button class="del-btn" onclick="deleteCustomQuestion(\''+q.id+'\')">🗑</button>';
+    row.innerHTML=tag+'<div class="cq-text">'+text+'</div><button class="del-btn" onclick="deleteCustomQuestion(\''+q.id+'\')" aria-label="Delete question">🗑</button>';
     list.appendChild(row);
   });
 }

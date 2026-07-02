@@ -1,0 +1,19 @@
+/* Self-hosted, pre-subset webfonts. See fonts/README.md. */
+@font-face{font-family:'Fredoka One';font-style:normal;font-weight:400;font-display:swap;src:url('fredoka-one-400.woff2') format('woff2');}
+@font-face{font-family:'Nunito';font-style:normal;font-weight:400;font-display:swap;src:url('nunito-400.woff2') format('woff2');}
+@font-face{font-family:'Nunito';font-style:normal;font-weight:600;font-display:swap;src:url('nunito-600.woff2') format('woff2');}
+@font-face{font-family:'Nunito';font-style:normal;font-weight:700;font-display:swap;src:url('nunito-700.woff2') format('woff2');}
+@font-face{font-family:'Nunito';font-style:normal;font-weight:800;font-display:swap;src:url('nunito-800.woff2') format('woff2');}
+@font-face{font-family:'Nunito';font-style:normal;font-weight:900;font-display:swap;src:url('nunito-900.woff2') format('woff2');}
+@font-face{font-family:'Noto Sans Arabic';font-style:normal;font-weight:400;font-display:swap;src:url('noto-sans-arabic-400.woff2') format('woff2');}
+@font-face{font-family:'Noto Sans Arabic';font-style:normal;font-weight:700;font-display:swap;src:url('noto-sans-arabic-700.woff2') format('woff2');}
+@font-face{font-family:'Noto Nastaliq Urdu';font-style:normal;font-weight:400;font-display:swap;src:url('noto-nastaliq-urdu-400.woff2') format('woff2');}
+@font-face{font-family:'Noto Nastaliq Urdu';font-style:normal;font-weight:700;font-display:swap;src:url('noto-nastaliq-urdu-700.woff2') format('woff2');}
+@font-face{font-family:'Noto Sans SC';font-style:normal;font-weight:400;font-display:swap;src:url('noto-sans-sc-400.woff2') format('woff2');}
+@font-face{font-family:'Noto Sans SC';font-style:normal;font-weight:700;font-display:swap;src:url('noto-sans-sc-700.woff2') format('woff2');}
+@font-face{font-family:'Noto Sans Khmer';font-style:normal;font-weight:400;font-display:swap;src:url('noto-sans-khmer-400.woff2') format('woff2');}
+@font-face{font-family:'Noto Sans Khmer';font-style:normal;font-weight:700;font-display:swap;src:url('noto-sans-khmer-700.woff2') format('woff2');}
+@font-face{font-family:'Noto Sans Myanmar';font-style:normal;font-weight:400;font-display:swap;src:url('noto-sans-myanmar-400.woff2') format('woff2');}
+@font-face{font-family:'Noto Sans Myanmar';font-style:normal;font-weight:700;font-display:swap;src:url('noto-sans-myanmar-700.woff2') format('woff2');}
+@font-face{font-family:'Noto Sans Devanagari';font-style:normal;font-weight:400;font-display:swap;src:url('noto-sans-devanagari-400.woff2') format('woff2');}
+@font-face{font-family:'Noto Sans Devanagari';font-style:normal;font-weight:700;font-display:swap;src:url('noto-sans-devanagari-700.woff2') format('woff2');}

@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v9';
+const CACHE = 'learntoread-v10';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -8,10 +8,30 @@ const CORE = [
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
+  './fonts/fonts.css',
+  './vendor/qrcode.min.js',
 ];
 
 // Optional files — cached individually; one failure won't block install
 const OPTIONAL = [
+  './fonts/fredoka-one-400.woff2',
+  './fonts/nunito-400.woff2',
+  './fonts/nunito-600.woff2',
+  './fonts/nunito-700.woff2',
+  './fonts/nunito-800.woff2',
+  './fonts/nunito-900.woff2',
+  './fonts/noto-sans-arabic-400.woff2',
+  './fonts/noto-sans-arabic-700.woff2',
+  './fonts/noto-nastaliq-urdu-400.woff2',
+  './fonts/noto-nastaliq-urdu-700.woff2',
+  './fonts/noto-sans-sc-400.woff2',
+  './fonts/noto-sans-sc-700.woff2',
+  './fonts/noto-sans-khmer-400.woff2',
+  './fonts/noto-sans-khmer-700.woff2',
+  './fonts/noto-sans-myanmar-400.woff2',
+  './fonts/noto-sans-myanmar-700.woff2',
+  './fonts/noto-sans-devanagari-400.woff2',
+  './fonts/noto-sans-devanagari-700.woff2',
   './audio/b.wav',
   './audio/d.wav',
   './audio/f.wav',

@@ -1,0 +1,40 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "customBanks": {
+      "$teacherId": {
+        ".read": "auth != null && auth.uid === $teacherId",
+        ".write": "auth != null && auth.uid === $teacherId"
+      }
+    },
+
+    "customQuestions": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "rooms": {
+      "$code": {
+        ".read": "auth != null",
+
+        "hostUid": {
+          ".validate": "!data.exists() && newData.val() === auth.uid"
+        },
+        "createdAt": {
+          ".validate": "newData.val() === now"
+        },
+
+        "players": {
+          "$playerId": { ".write": "auth != null" }
+        },
+        "answers": {
+          "$playerId": { ".write": "auth != null" }
+        },
+
+        ".write": "auth != null && (!data.exists() || data.child('hostUid').val() === auth.uid || (!newData.exists() && (now - data.child('createdAt').val() > 86400000 || (data.child('status').val() === 'finished' && now - data.child('createdAt').val() > 7200000))))"
+      }
+    }
+  }
+}

@@ -13,10 +13,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
 <link rel="icon" href="icon-192.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <link rel="icon" href="icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Khmer:wght@400;700&family=Noto+Sans+Myanmar:wght@400;700&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
+<link href="fonts/fonts.css" rel="stylesheet">
 <style>
   :root {
     --bg: #fdf6ec;
@@ -1069,7 +1066,7 @@
 ══════════════════════════════════════════ -->
 <div class="practice-overlay" id="spellingOverlay">
   <div class="practice-header spell-header-gradient">
-    <button class="practice-back" onclick="closeSpelling()" title="Back">←</button>
+    <button class="practice-back" onclick="closeSpelling()" title="Back" aria-label="Back">←</button>
     <div class="practice-header-text">
       <h2 id="spellingTitle">✏️ Spelling Practice</h2>
       <p id="spellingSubtitle">Listen · Write · Check</p>
@@ -1126,7 +1123,7 @@
 <div class="practice-overlay" id="practiceOverlay">
 
   <div class="practice-header">
-    <button class="practice-back" onclick="closePractice()" title="Back">←</button>
+    <button class="practice-back" onclick="closePractice()" title="Back" aria-label="Back">←</button>
     <div class="practice-header-text">
       <h2 id="practiceTitle">🎙️ Practice Reading</h2>
       <p id="practiceSubtitle">Listen · Record · Compare</p>
@@ -1168,7 +1165,7 @@
         <span class="phase-banner phase-record">🎙️ Record your voice</span>
         <div class="record-controls">
           <div class="record-btn-wrap">
-            <button class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙️</button>
+            <button class="record-btn" id="recordBtn" onclick="toggleRecording()" aria-label="Record your voice">🎙️</button>
             <div class="record-countdown" id="recordCountdown">3</div>
           </div>
           <div class="record-hint" id="recordHint">Tap the mic — recording stops after 3 seconds</div>
@@ -1222,7 +1219,7 @@
 <div class="practice-overlay" id="testOverlay">
 
   <div class="practice-header" style="background:linear-gradient(135deg,#5cb85c,#3a7a3a)">
-    <button class="practice-back" onclick="closeTest()" title="Back">←</button>
+    <button class="practice-back" onclick="closeTest()" title="Back" aria-label="Back">←</button>
     <div class="practice-header-text">
       <h2 id="testTitle">🧪 Test Yourself</h2>
       <p id="testSubtitle">10 random words</p>
@@ -1247,7 +1244,7 @@
         <span class="phase-banner phase-record">🎙️ Record your voice</span>
         <div class="record-controls">
           <div class="record-btn-wrap">
-            <button class="record-btn" id="testRecordBtn" onclick="testToggleRecording()">🎙️</button>
+            <button class="record-btn" id="testRecordBtn" onclick="testToggleRecording()" aria-label="Record your voice">🎙️</button>
             <div class="record-countdown" id="testCountdown">3</div>
           </div>
           <div class="record-hint" id="testRecordHint">Tap the mic — recording stops after 3 seconds</div>
@@ -1436,6 +1433,11 @@ function ts(sentence) {
   return (translations && translations.sentences && translations.sentences[sentence]) || '';
 }
 
+function setTranslationLangAttrs(el, lang, dir) {
+  if (lang) { el.setAttribute('lang', lang); el.setAttribute('dir', dir); }
+  else { el.removeAttribute('lang'); el.removeAttribute('dir'); }
+}
+
 function updateAllTranslations() {
   const lang = document.getElementById('langSelect').value;
   const dir = RTL_LANGS.has(lang) ? 'rtl' : 'ltr';
@@ -1444,12 +1446,14 @@ function updateAllTranslations() {
   document.querySelectorAll('[data-trword]').forEach(el => {
     el.textContent = tw(el.dataset.trword);
     el.style.direction = dir;
+    setTranslationLangAttrs(el, lang, dir);
     if (font) el.style.fontFamily = font;
   });
   document.querySelectorAll('[data-trkey]').forEach(el => {
     el.textContent = ts(el.dataset.trkey);
     el.style.direction = dir;
     el.style.textAlign = sentAlign;
+    setTranslationLangAttrs(el, lang, dir);
     if (font) el.style.fontFamily = font;
   });
 }
@@ -2360,7 +2364,9 @@ function renderWord(wp) {
     trDiv.textContent = tw(word);
     trDiv.dataset.trword = word;
     const lang = document.getElementById('langSelect').value;
-    trDiv.style.direction = RTL_LANGS.has(lang) ? 'rtl' : 'ltr';
+    const dir = RTL_LANGS.has(lang) ? 'rtl' : 'ltr';
+    trDiv.style.direction = dir;
+    setTranslationLangAttrs(trDiv, lang, dir);
     const font = LANG_FONT[lang];
     if (font) trDiv.style.fontFamily = font;
   }
@@ -2988,7 +2994,7 @@ function testShowResults() {
       '<span class="ri-mark">' + (r.correct ? '✅' : '❌') + '</span>' +
       '<span class="ri-word">' + r.word + '</span>' +
       (em ? '<span>' + em + '</span>' : '') +
-      '<button class="ri-play" onclick="testPlayResult(' + i + ')" title="Hear correct pronunciation">🔊</button>';
+      '<button class="ri-play" onclick="testPlayResult(' + i + ')" title="Hear correct pronunciation" aria-label="Hear correct pronunciation">🔊</button>';
     list.appendChild(div);
   });
 
@@ -3236,12 +3242,22 @@ function buildSentences() {
         trEl.className = 'sentence-translation';
         trEl.dataset.trkey = sent;
         trEl.textContent = ts(sent);
+        (function() {
+          var lang = document.getElementById('langSelect').value;
+          var dir = RTL_LANGS.has(lang) ? 'rtl' : 'ltr';
+          trEl.style.direction = dir;
+          trEl.style.textAlign = dir === 'rtl' ? 'right' : 'left';
+          setTranslationLangAttrs(trEl, lang, dir);
+          var font = LANG_FONT[lang];
+          if (font) trEl.style.fontFamily = font;
+        })();
         text.appendChild(trEl);
 
         var playBtn = document.createElement('button');
         playBtn.className = 'sentence-play-btn';
         playBtn.innerHTML = '🔊';
         playBtn.title = 'Hear this sentence';
+        playBtn.setAttribute('aria-label', 'Hear this sentence');
         playBtn.onclick = (function(s, b) {
           return function() { speakSentence(s, b); };
         })(sent, playBtn);
