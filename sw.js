@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v10';
+const CACHE = 'learntoread-v11';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -20,18 +20,6 @@ const OPTIONAL = [
   './fonts/nunito-700.woff2',
   './fonts/nunito-800.woff2',
   './fonts/nunito-900.woff2',
-  './fonts/noto-sans-arabic-400.woff2',
-  './fonts/noto-sans-arabic-700.woff2',
-  './fonts/noto-nastaliq-urdu-400.woff2',
-  './fonts/noto-nastaliq-urdu-700.woff2',
-  './fonts/noto-sans-sc-400.woff2',
-  './fonts/noto-sans-sc-700.woff2',
-  './fonts/noto-sans-khmer-400.woff2',
-  './fonts/noto-sans-khmer-700.woff2',
-  './fonts/noto-sans-myanmar-400.woff2',
-  './fonts/noto-sans-myanmar-700.woff2',
-  './fonts/noto-sans-devanagari-400.woff2',
-  './fonts/noto-sans-devanagari-700.woff2',
   './audio/b.wav',
   './audio/d.wav',
   './audio/f.wav',
