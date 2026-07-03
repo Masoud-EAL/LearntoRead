@@ -2095,6 +2095,7 @@ function showSection(name, btn) {
   document.querySelectorAll('.section-page').forEach(p => p.classList.remove('active'));
   document.getElementById('sec-' + name).classList.add('active');
   localStorage.setItem('wl_section', name);
+  if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: 'section-' + name, event: true });
 }
 
 /* ══════════════════════════════════════════
