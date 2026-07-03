@@ -269,7 +269,9 @@ const LINES = { top: 12, mid: 40, base: 72, desc: 94 };
    descending f, u-shaped y, left-hooked g/j/y tails, right tick on q.
    Letters are written in ONE continuous motion where handwriting does:
    retrace segments (down then back up the same line) mirror the real
-   pen movement. Only crossbars, dots and k's kick are separate strokes.
+   pen movement. Only crossbars, dots, k's kick, and p's bowl (a near-
+   full-length retrace of the descender, so it's a separate lifted
+   stroke instead) are separate strokes.
    Exit flick pattern: stem ends at y=67, then A(x+5,67,5,180,315). */
 const LETTERS = {
   a: [ [['A',48,56,13,45,380],['L',60.2,51.6,61,45],['L',61,45,61,67],['A',66,67,5,180,315]] ],
@@ -287,7 +289,7 @@ const LETTERS = {
   m: [ [['L',32,42,32,72],['L',32,72,32,54],['A',41,54,9,180,0],['L',50,54,50,72],['L',50,72,50,54],['A',59,54,9,180,0],['L',68,54,68,67],['A',73,67,5,180,315]] ],
   n: [ [['L',38,42,38,72],['L',38,72,38,56],['A',50,56,12,180,0],['L',62,56,62,67],['A',67,67,5,180,315]] ],
   o: [ [['A',48,56,15,55,415]] ],
-  p: [ [['L',36,42,36,94],['L',36,94,36,46],['C',36,46,66,44,66,72,37,70]] ],
+  p: [ [['L',36,42,36,94]], [['C',36,46,66,44,66,72,37,70]] ],
   q: [ [['A',46,56,13,45,380],['L',58.2,51.6,59,45],['L',59,45,59,88],['A',64,88,5,180,315]] ],
   r: [ [['L',38,42,38,72],['L',38,72,38,54],['A',50,54,12,180,60]] ],
   s: [ [['C',59,46,55,39,39,40,37,48],['C',37,48,36,56,58,56,59,64],['C',59,64,60,72,42,74,35,66]] ],
@@ -302,15 +304,17 @@ const LETTERS = {
 
 /* Capitals: full height (topline y=12 to baseline y=72), no exit
    flicks (capitals don't join). Stroke counts kept to a minimum:
-   B/D/P/R retrace the stem and continue in one motion; A, E, F, K,
-   M, N combine connected lines into single strokes. Arcs use the
-   optional 7th value as a vertical radius (round capitals are
-   taller than wide). */
+   A, E, F, K, M, N combine connected lines into single strokes.
+   B/D/P/R are two lifted strokes (stem, then curve/leg restarting
+   at the top) rather than retracing the full stem, since that
+   retrace would double back over the entire letter height. Arcs
+   use the optional 7th value as a vertical radius (round capitals
+   are taller than wide). */
 const CAPITALS = {
   A: [ [['P',32,72,48,12,64,72]], [['L',38,52,58,52]] ],
-  B: [ [['L',36,12,36,72],['L',36,72,36,12],['C',36,12,62,10,62,40,36,41],['C',36,41,66,40,66,73,36,72]] ],
+  B: [ [['L',36,12,36,72]], [['C',36,12,62,10,62,40,36,41],['C',36,41,66,40,66,73,36,72]] ],
   C: [ [['A',49,42,17,50,310,28]] ],
-  D: [ [['L',36,12,36,72],['L',36,72,36,12],['C',36,12,68,16,68,68,36,72]] ],
+  D: [ [['L',36,12,36,72]], [['C',36,12,68,16,68,68,36,72]] ],
   E: [ [['L',60,12,36,12],['L',36,12,36,72],['L',36,72,60,72]], [['L',36,42,56,42]] ],
   F: [ [['L',60,12,36,12],['L',36,12,36,72]], [['L',36,42,56,42]] ],
   G: [ [['A',49,42,17,50,330,28],['L',63.7,56,48,56]] ],
@@ -322,9 +326,9 @@ const CAPITALS = {
   M: [ [['L',34,12,34,72]], [['P',34,12,48,52,62,12],['L',62,12,62,72]] ],
   N: [ [['L',36,12,36,72]], [['P',36,12,62,72],['L',62,72,62,12]] ],
   O: [ [['A',48,42,17,55,415,29]] ],
-  P: [ [['L',36,12,36,72],['L',36,72,36,12],['C',36,12,64,10,64,44,36,44]] ],
+  P: [ [['L',36,12,36,72]], [['C',36,12,64,10,64,44,36,44]] ],
   Q: [ [['A',48,42,17,55,415,29]], [['L',52,56,64,72]] ],
-  R: [ [['L',36,12,36,72],['L',36,72,36,12],['C',36,12,64,10,64,44,36,44],['L',36,44,62,72]] ],
+  R: [ [['L',36,12,36,72]], [['C',36,12,64,10,64,44,36,44],['L',36,44,62,72]] ],
   S: [ [['C',61,22,56,10,36,12,35,26],['C',35,26,33,40,61,44,61,58],['C',61,58,61,70,40,73,34,61]] ],
   T: [ [['L',48,12,48,72]], [['L',30,12,66,12]] ],
   U: [ [['L',36,12,36,54],['A',48,54,12,180,360,18],['L',60,54,60,12]] ],
