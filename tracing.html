@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>WordLink — Letter Tracing</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --letterfont: 'Andika', 'Nunito', sans-serif;
+    --bg: #fdf6ec;
+    --accent1: #f4845f;   /* coral  – current stroke / ink   */
+    --accent2: #4a90d9;   /* blue                            */
+    --accent3: #5cb85c;
+    --accent4: #f0b429;   /* gold – stars                    */
+    --teal: #2baa8a;      /* completed strokes               */
+    --dark: #2d2a26;
+    --mid: #7a6f65;
+    --light: #e8ddd2;
+    --shadow: 0 4px 20px rgba(0,0,0,0.10);
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { overscroll-behavior: none; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(244,132,95,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(74,144,217,0.08) 0%, transparent 50%);
+    display: flex; flex-direction: column; align-items: center;
+    padding-bottom: 24px;
+  }
+
+header { text-align: center; padding: 18px 16px 4px; }
+header h1 {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  color: var(--accent1); letter-spacing: 1px; line-height: 1;
+}
+header h1 span { color: var(--accent2); }
+header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 700; }
+
+/* ── word association pill ── */
+.word-pill {
+  font-family: var(--letterfont);
+  margin: 10px auto 2px;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: white; border: 2.5px solid var(--light);
+  border-radius: 40px; padding: 8px 20px;
+  font-size: 1.15rem; font-weight: 800; color: var(--dark);
+  box-shadow: var(--shadow); cursor: pointer;
+  transition: transform .15s;
+}
+.word-pill:active { transform: scale(0.96); }
+.word-pill .emoji { font-size: 1.5rem; }
+.word-pill .speaker { color: var(--accent2); font-size: 1.1rem; }
+
+/* ── canvas card ── */
+.trace-card {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 10px; margin-top: 12px;
+  position: relative;
+  touch-action: none;
+}
+#traceCanvas { display: block; border-radius: 12px; touch-action: none; }
+
+.hint-bubble {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  bottom: 14px;
+  background: var(--dark); color: white;
+  font-size: 0.85rem; font-weight: 700;
+  padding: 7px 16px; border-radius: 30px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s;
+  white-space: nowrap;
+}
+.hint-bubble.show { opacity: 0.92; }
+
+/* ── stroke pips ── */
+.stroke-pips { display: flex; gap: 8px; justify-content: center; margin-top: 10px; min-height: 16px; }
+.pip {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--light); transition: background .2s, transform .2s;
+}
+.pip.current { background: var(--accent1); transform: scale(1.25); }
+.pip.done { background: var(--teal); }
+
+/* ── controls ── */
+.controls { display: flex; gap: 10px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+.ctl-btn {
+  font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+  padding: 10px 18px; border-radius: 36px; border: 2.5px solid var(--light);
+  background: white; color: var(--mid); cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  transition: transform .15s;
+}
+.ctl-btn:active { transform: scale(0.95); }
+.ctl-btn.primary { background: var(--accent2); border-color: var(--accent2); color: white; box-shadow: 0 4px 14px rgba(74,144,217,0.4); }
+
+/* ── case toggle ── */
+.case-toggle {
+  display: flex; gap: 0; margin-top: 16px;
+  background: white; border: 2.5px solid var(--light);
+  border-radius: 40px; padding: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+.case-btn {
+  font-family: var(--letterfont); font-weight: 700; font-size: 1.05rem;
+  padding: 8px 22px; border-radius: 30px; border: none;
+  background: transparent; color: var(--mid); cursor: pointer;
+  transition: all .15s;
+}
+.case-btn.active { background: var(--accent2); color: white; box-shadow: 0 3px 10px rgba(74,144,217,0.35); }
+
+/* ── letter navigation ── */
+.letter-nav { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+.nav-arrow {
+  font-family: 'Fredoka One', cursive; font-size: 1.3rem;
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 2.5px solid var(--light); background: white; color: var(--accent2);
+  cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+.nav-arrow:disabled { opacity: 0.3; }
+.current-letter-label {
+  font-family: var(--letterfont); font-weight: 700; font-size: 1.4rem; color: var(--dark);
+  min-width: 70px; text-align: center;
+}
+
+.letter-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: 7px; margin-top: 14px; padding: 0 14px; width: 100%; max-width: 480px;
+}
+.letter-chip {
+  position: relative;
+  font-family: var(--letterfont); font-weight: 700; font-size: 1.15rem;
+  aspect-ratio: 1; border-radius: 12px;
+  border: 2.5px solid var(--light); background: white; color: var(--mid);
+  cursor: pointer; transition: all .15s;
+}
+.letter-chip.active { background: var(--accent1); border-color: var(--accent1); color: white; box-shadow: 0 4px 12px rgba(244,132,95,0.4); }
+.letter-chip .star {
+  position: absolute; top: -7px; right: -6px; font-size: 0.8rem;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+}
+
+/* ── back link ── */
+.back-link {
+  margin-top: 14px;
+  font-family: var(--letterfont); font-weight: 700; font-size: 0.95rem;
+  color: var(--mid); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+
+/* ── celebration overlay ── */
+.celebrate {
+  position: fixed; inset: 0; z-index: 50;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(45,42,38,0.45);
+}
+.celebrate.show { display: flex; }
+.celebrate-card {
+  background: white; border-radius: 22px; padding: 30px 36px;
+  text-align: center; box-shadow: 0 12px 50px rgba(0,0,0,0.3);
+  animation: pop .4s cubic-bezier(.2,1.6,.4,1);
+  margin: 0 20px;
+}
+@keyframes pop { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.celebrate-card .big-letter {
+  font-family: var(--letterfont); font-weight: 700; font-size: 4rem; color: var(--teal); line-height: 1;
+}
+.celebrate-card .word { font-family: var(--letterfont); font-size: 1.5rem; font-weight: 800; margin-top: 8px; }
+.celebrate-card .word .emoji { font-size: 2rem; }
+.celebrate-card .stars { font-size: 1.6rem; margin-top: 6px; letter-spacing: 4px; }
+.celebrate-card .btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+.celebrate-card button {
+  font-family: 'Fredoka One', cursive; font-size: 1rem;
+  padding: 12px 22px; border-radius: 40px; border: none;
+  background: var(--accent1); color: white; cursor: pointer;
+  box-shadow: 0 5px 16px rgba(244,132,95,0.45);
+}
+.celebrate-card button.secondary {
+  background: white; color: var(--mid);
+  border: 2.5px solid var(--light); box-shadow: none;
+}
+#confettiCanvas { position: fixed; inset: 0; z-index: 49; pointer-events: none; display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .celebrate-card { animation: none; }
+}
+</style>
+
+</head>
+<body>
+
+<header>
+  <h1>Word<span>Link</span> ✏️</h1>
+  <p>Letter Tracing — watch, then trace with your finger</p>
+</header>
+
+<button class="word-pill" id="wordPill" aria-label="Hear the letter and word">
+  <span id="pillText">a</span>
+  <span class="emoji" id="pillEmoji">🍎</span>
+  <span class="speaker">🔊</span>
+</button>
+
+<div class="trace-card">
+  <canvas id="traceCanvas" aria-label="Letter tracing area"></canvas>
+  <div class="hint-bubble" id="hintBubble">Start at the orange dot</div>
+</div>
+
+<div class="stroke-pips" id="strokePips" aria-hidden="true"></div>
+
+<div class="controls">
+  <button class="ctl-btn primary" id="watchBtn" aria-label="Watch how to write the letter">👀 Watch</button>
+  <button class="ctl-btn" id="hearBtn" aria-label="Hear the letter name">🔊 Hear</button>
+</div>
+
+<div class="case-toggle" role="group" aria-label="Letter case">
+  <button class="case-btn active" id="caseLower">abc</button>
+  <button class="case-btn" id="caseUpper">ABC</button>
+</div>
+
+<div class="letter-nav">
+  <button class="nav-arrow" id="prevBtn" aria-label="Previous letter">‹</button>
+  <div class="current-letter-label" id="letterLabel">a</div>
+  <button class="nav-arrow" id="nextBtn" aria-label="Next letter">›</button>
+</div>
+
+<div class="letter-grid" id="letterGrid"></div>
+
+<a class="back-link" href="index.html">← Back to WordLink</a>
+
+<div class="celebrate" id="celebrate">
+  <div class="celebrate-card">
+    <div class="big-letter" id="celebLetter">a</div>
+    <div class="word"><span id="celebWord">apple</span> <span class="emoji" id="celebEmoji">🍎</span></div>
+    <div class="stars">⭐⭐⭐</div>
+    <div class="btn-row">
+      <button id="celebAgain" class="secondary">⟲ Trace again</button>
+      <button id="celebNext">Next letter ›</button>
+    </div>
+  </div>
+</div>
+<canvas id="confettiCanvas"></canvas>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════════════
+   COORDINATE SPACE: 100 wide × 110 tall
+   Handwriting guide lines: top=12, mid=40, base=72, desc=94
+   Stroke segments:
+     ['L', x1,y1,x2,y2]                    straight line
+     ['P', x1,y1, x2,y2, ...]              polyline
+     ['A', cx,cy,r, deg0,deg1]             arc  (deg1<deg0 ⇒ clockwise)
+     ['C', x0,y0, c1x,c1y, c2x,c2y, x1,y1] cubic bézier
+     ['DOT', x,y]                          tap target (i / j dots)
+   Angle convention: pt(θ) = [cx + r·cosθ, cy − r·sinθ]
+   (increasing θ moves counter-clockwise on screen)
+══════════════════════════════════════════════════════════ */
+
+const LINES = { top: 12, mid: 40, base: 72, desc: 94 };
+
+/* School-handwriting letterforms: exit flicks on baseline strokes,
+   descending f, u-shaped y, left-hooked g/j/y tails, right tick on q.
+   Letters are written in ONE continuous motion where handwriting does:
+   retrace segments (down then back up the same line) mirror the real
+   pen movement. Only crossbars, dots and k's kick are separate strokes.
+   Exit flick pattern: stem ends at y=67, then A(x+5,67,5,180,315). */
+const LETTERS = {
+  a: [ [['A',48,56,13,45,380],['L',60.2,51.6,61,45],['L',61,45,61,67],['A',66,67,5,180,315]] ],
+  b: [ [['L',36,12,36,72],['L',36,72,36,46],['C',36,46,66,44,66,72,37,70]] ],
+  c: [ [['A',48,56,15,50,310]] ],
+  d: [ [['A',47,56,13,45,380],['L',59.2,51.6,60,45],['L',60,45,60,12],['L',60,12,60,67],['A',65,67,5,180,315]] ],
+  e: [ [['L',33,56,61,56],['A',47,56,14,0,300]] ],
+  f: [ [['C',58,16,46,9,38,16,38,26],['L',38,26,38,80],['A',30,80,8,0,-80]], [['L',28,40,52,40]] ],
+  g: [ [['A',46,56,13,45,380],['L',58.2,51.6,59,45],['L',59,45,59,84],['A',47,84,12,0,-100]] ],
+  h: [ [['L',36,12,36,72],['L',36,72,36,56],['A',50,56,14,180,0],['L',64,56,64,67],['A',69,67,5,180,315]] ],
+  i: [ [['L',50,42,50,67],['A',55,67,5,180,315]], [['DOT',50,28]] ],
+  j: [ [['L',54,42,54,84],['A',44,84,10,0,-100]], [['DOT',54,28]] ],
+  k: [ [['L',36,12,36,72]], [['P',57,42,38,56,53,67],['A',58,67,5,180,315]] ],
+  l: [ [['L',50,12,50,67],['A',55,67,5,180,315]] ],
+  m: [ [['L',32,42,32,72],['L',32,72,32,54],['A',41,54,9,180,0],['L',50,54,50,72],['L',50,72,50,54],['A',59,54,9,180,0],['L',68,54,68,67],['A',73,67,5,180,315]] ],
+  n: [ [['L',38,42,38,72],['L',38,72,38,56],['A',50,56,12,180,0],['L',62,56,62,67],['A',67,67,5,180,315]] ],
+  o: [ [['A',48,56,15,55,415]] ],
+  p: [ [['L',36,42,36,94],['L',36,94,36,46],['C',36,46,66,44,66,72,37,70]] ],
+  q: [ [['A',46,56,13,45,380],['L',58.2,51.6,59,45],['L',59,45,59,88],['A',64,88,5,180,315]] ],
+  r: [ [['L',38,42,38,72],['L',38,72,38,54],['A',50,54,12,180,60]] ],
+  s: [ [['C',59,46,55,39,39,40,37,48],['C',37,48,36,56,58,56,59,64],['C',59,64,60,72,42,74,35,66]] ],
+  t: [ [['L',46,18,46,64],['A',54,64,8,180,270]], [['L',34,40,58,40]] ],
+  u: [ [['L',36,42,36,58],['A',48,58,12,180,360],['L',60,58,60,42],['L',60,42,60,67],['A',65,67,5,180,315]] ],
+  v: [ [['P',36,42,48,72,60,42]] ],
+  w: [ [['P',32,42,41,72,50,48,59,72,68,42]] ],
+  x: [ [['L',38,42,60,72]], [['L',60,42,38,72]] ],
+  y: [ [['L',38,42,38,58],['A',48,58,10,180,360],['L',58,58,58,42],['L',58,42,58,84],['A',46,84,12,0,-100]] ],
+  z: [ [['P',36,42,60,42,36,72,60,72]] ]
+};
+
+/* Capitals: full height (topline y=12 to baseline y=72), no exit
+   flicks (capitals don't join). Stroke counts kept to a minimum:
+   B/D/P/R retrace the stem and continue in one motion; A, E, F, K,
+   M, N combine connected lines into single strokes. Arcs use the
+   optional 7th value as a vertical radius (round capitals are
+   taller than wide). */
+const CAPITALS = {
+  A: [ [['P',32,72,48,12,64,72]], [['L',38,52,58,52]] ],
+  B: [ [['L',36,12,36,72],['L',36,72,36,12],['C',36,12,62,10,62,40,36,41],['C',36,41,66,40,66,73,36,72]] ],
+  C: [ [['A',49,42,17,50,310,28]] ],
+  D: [ [['L',36,12,36,72],['L',36,72,36,12],['C',36,12,68,16,68,68,36,72]] ],
+  E: [ [['L',60,12,36,12],['L',36,12,36,72],['L',36,72,60,72]], [['L',36,42,56,42]] ],
+  F: [ [['L',60,12,36,12],['L',36,12,36,72]], [['L',36,42,56,42]] ],
+  G: [ [['A',49,42,17,50,330,28],['L',63.7,56,48,56]] ],
+  H: [ [['L',36,12,36,72]], [['L',62,12,62,72]], [['L',36,42,62,42]] ],
+  I: [ [['L',48,12,48,72]] ],
+  J: [ [['L',56,12,56,58],['A',46,58,10,0,-100,14]] ],
+  K: [ [['L',36,12,36,72]], [['P',60,12,36,44,62,72]] ],
+  L: [ [['L',36,12,36,72],['L',36,72,60,72]] ],
+  M: [ [['L',34,12,34,72]], [['P',34,12,48,52,62,12],['L',62,12,62,72]] ],
+  N: [ [['L',36,12,36,72]], [['P',36,12,62,72],['L',62,72,62,12]] ],
+  O: [ [['A',48,42,17,55,415,29]] ],
+  P: [ [['L',36,12,36,72],['L',36,72,36,12],['C',36,12,64,10,64,44,36,44]] ],
+  Q: [ [['A',48,42,17,55,415,29]], [['L',52,56,64,72]] ],
+  R: [ [['L',36,12,36,72],['L',36,72,36,12],['C',36,12,64,10,64,44,36,44],['L',36,44,62,72]] ],
+  S: [ [['C',61,22,56,10,36,12,35,26],['C',35,26,33,40,61,44,61,58],['C',61,58,61,70,40,73,34,61]] ],
+  T: [ [['L',48,12,48,72]], [['L',30,12,66,12]] ],
+  U: [ [['L',36,12,36,54],['A',48,54,12,180,360,18],['L',60,54,60,12]] ],
+  V: [ [['P',34,12,48,72,62,12]] ],
+  W: [ [['P',30,12,39,72,48,26,57,72,66,12]] ],
+  X: [ [['L',34,12,62,72]], [['L',62,12,34,72]] ],
+  Y: [ [['L',34,12,48,42]], [['L',62,12,48,42],['L',48,42,48,72]] ],
+  Z: [ [['P',34,12,62,12,34,72,62,72]] ]
+};
+
+const WORDS = {
+  a:['apple','🍎'], b:['ball','⚽'], c:['cat','🐱'], d:['dog','🐶'], e:['egg','🥚'],
+  f:['fish','🐟'], g:['goat','🐐'], h:['hat','🎩'], i:['insect','🐜'], j:['juice','🧃'],
+  k:['key','🔑'], l:['lemon','🍋'], m:['moon','🌙'], n:['nose','👃'], o:['orange','🍊'],
+  p:['pen','🖊️'], q:['queen','👑'], r:['rain','🌧️'], s:['sun','☀️'], t:['tree','🌳'],
+  u:['umbrella','☂️'], v:['van','🚐'], w:['water','💧'], x:['box','📦'], y:['yo-yo','🪀'],
+  z:['zip','🤐']
+};
+
+const ALPHABET = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+/* ── sample segments into evenly-spaced point arrays ── */
+const D2R = Math.PI / 180;
+
+function rawPoints(segs) {
+  const pts = [];
+  for (const s of segs) {
+    if (s[0] === 'L') {
+      const [, x1, y1, x2, y2] = s;
+      const n = Math.max(2, Math.ceil(Math.hypot(x2 - x1, y2 - y1)));
+      for (let i = 0; i <= n; i++) pts.push([x1 + (x2 - x1) * i / n, y1 + (y2 - y1) * i / n]);
+    } else if (s[0] === 'P') {
+      for (let j = 1; j + 3 < s.length + 1 && j + 3 <= s.length; j += 2) {
+        const x1 = s[j], y1 = s[j + 1], x2 = s[j + 2], y2 = s[j + 3];
+        if (x2 === undefined) break;
+        const n = Math.max(2, Math.ceil(Math.hypot(x2 - x1, y2 - y1)));
+        for (let i = 0; i <= n; i++) pts.push([x1 + (x2 - x1) * i / n, y1 + (y2 - y1) * i / n]);
+      }
+    } else if (s[0] === 'A') {
+      const [, cx, cy, r, a0, a1] = s;
+      const ry = s.length > 6 ? s[6] : r;   /* optional vertical radius */
+      const sweep = a1 - a0, steps = Math.max(8, Math.ceil(Math.abs(sweep) / 5));
+      for (let i = 0; i <= steps; i++) {
+        const th = (a0 + sweep * i / steps) * D2R;
+        pts.push([cx + r * Math.cos(th), cy - ry * Math.sin(th)]);
+      }
+    } else if (s[0] === 'C') {
+      const [, x0, y0, c1x, c1y, c2x, c2y, x1, y1] = s;
+      for (let i = 0; i <= 28; i++) {
+        const t = i / 28, mt = 1 - t;
+        pts.push([
+          mt*mt*mt*x0 + 3*mt*mt*t*c1x + 3*mt*t*t*c2x + t*t*t*x1,
+          mt*mt*mt*y0 + 3*mt*mt*t*c1y + 3*mt*t*t*c2y + t*t*t*y1
+        ]);
+      }
+    }
+  }
+  return pts;
+}
+
+function resample(pts, spacing = 1.8) {
+  if (pts.length < 2) return pts;
+  const out = [pts[0]];
+  let acc = 0;
+  for (let i = 1; i < pts.length; i++) {
+    const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+    acc += d;
+    if (acc >= spacing) { out.push(pts[i]); acc = 0; }
+  }
+  out.push(pts[pts.length - 1]);
+  return out;
+}
+
+function buildStrokes(letter) {
+  return activeSet()[dispChar(letter)] ? activeSet()[dispChar(letter)].map(segs => {
+    if (segs[0][0] === 'DOT') {
+      return { isDot: true, x: segs[0][1], y: segs[0][2], pts: [[segs[0][1], segs[0][2]]] };
+    }
+    const pts = resample(rawPoints(segs));
+    return { isDot: false, pts, start: pts[0], end: pts[pts.length - 1] };
+  }) : [];
+}
+
+/* ══════════════ STATE ══════════════ */
+let currentCase = 'lower';   /* 'lower' | 'upper' */
+let currentLetter = 'a';
+const activeSet = () => currentCase === 'upper' ? CAPITALS : LETTERS;
+const dispChar  = l  => currentCase === 'upper' ? l.toUpperCase() : l;
+const capWord   = w  => currentCase === 'upper' ? w[0].toUpperCase() + w.slice(1) : w;
+const spokenName = () => currentCase === 'upper' ? `capital ${currentLetter}` : currentLetter;
+let strokes = [];
+let strokeIdx = 0;
+let matchIdx = 0;          // furthest guide point reached in current stroke
+let ink = [];              // user's raw drawing points (unit coords)
+let drawing = false;
+let demoAnim = null;
+let pulse = 0;
+/* Safe storage: localStorage throws in sandboxed iframes (e.g. chat
+   previews) and some private-browsing modes. Fall back to in-memory
+   so the app always runs; stars persist wherever storage is real. */
+const store = (() => {
+  try {
+    localStorage.setItem('__wl_t', '1'); localStorage.removeItem('__wl_t');
+    return { get: k => localStorage.getItem(k), set: (k, v) => localStorage.setItem(k, v) };
+  } catch (e) {
+    const mem = {};
+    return { get: k => (k in mem ? mem[k] : null), set: (k, v) => { mem[k] = v; } };
+  }
+})();
+let done = JSON.parse(store.get('wl_trace_done') || '{}');
+
+const TOL = 10, START_TOL = 14, LOOKAHEAD = 12;
+
+/* ══════════════ CANVAS SETUP ══════════════ */
+const canvas = document.getElementById('traceCanvas');
+const ctx = canvas.getContext('2d');
+let scale = 1, W = 0, H = 0;
+
+function fitCanvas() {
+  const size = Math.min(window.innerWidth - 44, 400);
+  W = size; H = size * 1.1;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  scale = W / 100;
+}
+window.addEventListener('resize', () => { fitCanvas(); });
+
+const sx = p => p[0] * scale;
+const sy = p => p[1] * scale;
+
+/* ══════════════ DRAWING ══════════════ */
+function drawGuideLines() {
+  ctx.save();
+  ctx.strokeStyle = '#e8ddd2'; ctx.lineWidth = 1.5;
+  for (const key of ['top', 'base', 'desc']) {
+    ctx.beginPath();
+    ctx.setLineDash(key === 'desc' ? [4, 6] : []);
+    ctx.moveTo(0, LINES[key] * scale); ctx.lineTo(W, LINES[key] * scale);
+    ctx.stroke();
+  }
+  ctx.setLineDash([6, 6]); ctx.strokeStyle = '#d9ecff';
+  ctx.beginPath(); ctx.moveTo(0, LINES.mid * scale); ctx.lineTo(W, LINES.mid * scale); ctx.stroke();
+  ctx.restore();
+}
+
+function drawStrokePath(st, color, width, dash) {
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = width;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  if (dash) ctx.setLineDash(dash);
+  if (st.isDot) {
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(st.x * scale, st.y * scale, width * 0.75, 0, Math.PI * 2); ctx.fill();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(sx(st.pts[0]), sy(st.pts[0]));
+    for (let i = 1; i < st.pts.length; i++) ctx.lineTo(sx(st.pts[i]), sy(st.pts[i]));
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawArrow(st) {
+  if (st.isDot || st.pts.length < 8) return;
+  const a = st.pts[4], b = st.pts[7];
+  const ang = Math.atan2(sy(b) - sy(a), sx(b) - sx(a));
+  ctx.save();
+  ctx.translate(sx(b), sy(b)); ctx.rotate(ang);
+  ctx.fillStyle = '#f4845f';
+  ctx.beginPath();
+  ctx.moveTo(8, 0); ctx.lineTo(-4, -6); ctx.lineTo(-4, 6); ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawStartDot(st) {
+  const p = st.isDot ? [st.x, st.y] : st.pts[0];
+  const r = (7 + Math.sin(pulse) * 1.8) * (scale / 4);
+  ctx.save();
+  ctx.fillStyle = 'rgba(244,132,95,0.25)';
+  ctx.beginPath(); ctx.arc(sx(p), sy(p), r * 1.7, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#f4845f';
+  ctx.beginPath(); ctx.arc(sx(p), sy(p), r, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = 'white';
+  ctx.font = `bold ${Math.round(r * 1.1)}px Nunito`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(String(strokeIdx + 1), sx(p), sy(p) + 0.5);
+  ctx.restore();
+}
+
+function drawInk() {
+  if (ink.length < 2) return;
+  ctx.save();
+  ctx.strokeStyle = '#f4845f'; ctx.lineWidth = 9 * (scale / 4);
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(sx(ink[0]), sy(ink[0]));
+  for (let i = 1; i < ink.length; i++) ctx.lineTo(sx(ink[i]), sy(ink[i]));
+  ctx.stroke();
+  ctx.restore();
+}
+
+let demoPos = null; // [x,y] during demo animation
+
+function render() {
+  ctx.clearRect(0, 0, W, H);
+  drawGuideLines();
+  const wGuide = 11 * (scale / 4), wDone = 9 * (scale / 4);
+  strokes.forEach((st, i) => {
+    if (i > strokeIdx) drawStrokePath(st, '#eee4d8', wGuide);
+  });
+  strokes.forEach((st, i) => {
+    if (i < strokeIdx) drawStrokePath(st, '#2baa8a', wDone);
+  });
+  if (strokeIdx < strokes.length) {
+    const cur = strokes[strokeIdx];
+    drawStrokePath(cur, '#f8c9b8', wGuide);
+    if (!cur.isDot) drawStrokePath(cur, '#f4845f', 2.5, [7, 7]);
+    drawArrow(cur);
+    if (!drawing) drawStartDot(cur);
+  }
+  drawInk();
+  if (demoPos) {
+    ctx.save();
+    ctx.fillStyle = '#4a90d9';
+    ctx.beginPath(); ctx.arc(sx(demoPos), sy(demoPos), 8 * (scale / 4), 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+}
+
+function loop() {
+  pulse += 0.09;
+  render();
+  requestAnimationFrame(loop);
+}
+
+/* ══════════════ POINTER / VALIDATION ══════════════ */
+function canvasPoint(e) {
+  const r = canvas.getBoundingClientRect();
+  return [(e.clientX - r.left) / scale, (e.clientY - r.top) / scale];
+}
+const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+
+function showHint(msg) {
+  const el = document.getElementById('hintBubble');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+canvas.addEventListener('pointerdown', e => {
+  if (strokeIdx >= strokes.length) return;
+  stopDemo();
+  const p = canvasPoint(e);
+  const cur = strokes[strokeIdx];
+
+  if (cur.isDot) {
+    if (dist(p, [cur.x, cur.y]) < START_TOL) { strokeComplete(); }
+    else showHint('Tap the orange dot');
+    return;
+  }
+  if (dist(p, cur.pts[0]) > START_TOL) {
+    showHint('Start at the orange dot');
+    return;
+  }
+  drawing = true;
+  canvas.setPointerCapture(e.pointerId);
+  ink = [p];
+  matchIdx = 0;
+  advanceMatch(p);
+});
+
+canvas.addEventListener('pointermove', e => {
+  if (!drawing) return;
+  const p = canvasPoint(e);
+  ink.push(p);
+  advanceMatch(p);
+});
+
+function advanceMatch(p) {
+  const pts = strokes[strokeIdx].pts;
+  const end = Math.min(pts.length, matchIdx + LOOKAHEAD);
+  for (let i = matchIdx; i < end; i++) {
+    if (dist(p, pts[i]) < TOL) matchIdx = i + 1;
+  }
+}
+
+function endStrokeAttempt() {
+  if (!drawing) return;
+  drawing = false;
+  const cur = strokes[strokeIdx];
+  const coverage = matchIdx / cur.pts.length;
+  if (coverage >= 0.82) {
+    strokeComplete();
+  } else {
+    ink = [];
+    matchIdx = 0;
+    playWrong();
+    showHint(coverage > 0.3 ? 'Almost! Follow the whole path' : 'Follow the dotted path');
+  }
+}
+canvas.addEventListener('pointerup', endStrokeAttempt);
+canvas.addEventListener('pointercancel', endStrokeAttempt);
+
+/* ── Scroll-blocking, belt and braces ──
+   touch-action:none covers modern browsers, but iOS Safari can still
+   rubber-band or pull-to-refresh. Non-passive touch listeners let us
+   cancel the touch before the browser ever treats it as a scroll.
+   (Pointer events still fire normally — only scrolling is blocked.) */
+['touchstart', 'touchmove'].forEach(ev =>
+  canvas.addEventListener(ev, e => e.preventDefault(), { passive: false })
+);
+/* If a finger wanders off the canvas mid-stroke, pointer capture keeps
+   our drawing alive — this stops the page moving underneath it. */
+document.addEventListener('touchmove', e => {
+  if (drawing) e.preventDefault();
+}, { passive: false });
+
+function strokeComplete() {
+  ink = [];
+  matchIdx = 0;
+  strokeIdx++;
+  updatePips();
+  if (strokeIdx >= strokes.length) {
+    letterComplete();
+  } else {
+    playTick();
+  }
+}
+
+/* ══════════════ LETTER FLOW ══════════════ */
+function loadLetter(letter) {
+  stopDemo();
+  currentLetter = letter;
+  strokes = buildStrokes(letter);
+  strokeIdx = 0; matchIdx = 0; ink = []; drawing = false;
+  const [word, emoji] = WORDS[letter];
+  document.getElementById('pillText').textContent = dispChar(letter) + '  •  ' + capWord(word);
+  document.getElementById('pillEmoji').textContent = emoji;
+  document.getElementById('letterLabel').textContent = dispChar(letter);
+  updatePips();
+  updateGrid();
+  const i = ALPHABET.indexOf(letter);
+  document.getElementById('prevBtn').disabled = i === 0;
+  document.getElementById('nextBtn').disabled = i === ALPHABET.length - 1;
+  playDemo();   /* autoplay the stroke demonstration for every letter */
+}
+
+function updatePips() {
+  const wrap = document.getElementById('strokePips');
+  wrap.innerHTML = '';
+  strokes.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'pip' + (i < strokeIdx ? ' done' : i === strokeIdx ? ' current' : '');
+    wrap.appendChild(d);
+  });
+}
+
+function letterComplete() {
+  done[dispChar(currentLetter)] = true;
+  store.set('wl_trace_done', JSON.stringify(done));
+  updateGrid();
+  playFanfare();
+  launchConfetti();
+  const [word, emoji] = WORDS[currentLetter];
+  document.getElementById('celebLetter').textContent = dispChar(currentLetter);
+  document.getElementById('celebWord').textContent = capWord(word);
+  document.getElementById('celebEmoji').textContent = emoji;
+  document.getElementById('celebrate').classList.add('show');
+  const phrase = `${spokenName()}, as in ${word}.`;
+  setTimeout(() => speak(phrase), 500);
+}
+
+document.getElementById('celebAgain').addEventListener('click', () => {
+  document.getElementById('celebrate').classList.remove('show');
+  stopConfetti();
+  loadLetter(currentLetter);   /* fresh start on the same letter */
+});
+document.getElementById('celebNext').addEventListener('click', () => {
+  document.getElementById('celebrate').classList.remove('show');
+  stopConfetti();
+  const i = ALPHABET.indexOf(currentLetter);
+  loadLetter(ALPHABET[Math.min(i + 1, ALPHABET.length - 1)]);
+});
+
+/* ══════════════ DEMO ANIMATION ══════════════ */
+function stopDemo() {
+  if (demoAnim) { cancelAnimationFrame(demoAnim); demoAnim = null; }
+  demoPos = null;
+}
+
+function playDemo() {
+  stopDemo();
+  ink = []; matchIdx = 0;
+  const startAt = strokeIdx < strokes.length ? strokeIdx : 0;
+  if (strokeIdx >= strokes.length) { strokeIdx = 0; updatePips(); }
+  let si = startAt, pi = 0;
+  const step = () => {
+    const st = strokes[si];
+    if (st.isDot) {
+      demoPos = [st.x, st.y];
+      pi += 6;
+      if (pi > 30) { si++; pi = 0; }
+    } else {
+      demoPos = st.pts[Math.min(pi, st.pts.length - 1)];
+      pi += 2;
+      if (pi >= st.pts.length + 10) { si++; pi = 0; }
+    }
+    if (si >= strokes.length) { stopDemo(); return; }
+    demoAnim = requestAnimationFrame(step);
+  };
+  speak(spokenName());
+  demoAnim = requestAnimationFrame(step);
+}
+document.getElementById('watchBtn').addEventListener('click', playDemo);
+
+/* ══════════════ SPEECH ══════════════ */
+function speak(text) {
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-AU'; u.rate = 0.8;
+    speechSynthesis.speak(u);
+  } catch (e) { /* TTS unavailable */ }
+}
+document.getElementById('hearBtn').addEventListener('click', () => speak(spokenName()));
+document.getElementById('wordPill').addEventListener('click', () => {
+  const [word] = WORDS[currentLetter];
+  speak(`${spokenName()}, as in ${word}.`);
+});
+
+/* ══════════════ AUDIO FX (procedural, WordLink-game style) ══════════════ */
+let actx = null;
+function getCtx() {
+  if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+  if (actx && actx.state === 'suspended') actx.resume();
+  return actx;
+}
+function tone(freq, start, dur, vol, wave = 'sine') {
+  const c = getCtx(); if (!c) return;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = wave; o.frequency.value = freq;
+  g.gain.setValueAtTime(0, c.currentTime + start);
+  g.gain.linearRampToValueAtTime(vol, c.currentTime + start + 0.015);
+  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + start + dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(c.currentTime + start); o.stop(c.currentTime + start + dur + 0.05);
+}
+function playTick()   { tone(660, 0, 0.12, 0.25); tone(880, 0.08, 0.15, 0.2); }
+function playWrong()  { tone(300, 0, 0.18, 0.18, 'triangle'); tone(240, 0.12, 0.22, 0.15, 'triangle'); }
+function playFanfare(){ [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.13, 0.35, 0.22)); }
+document.body.addEventListener('pointerdown', getCtx, { once: true });
+
+/* ══════════════ CONFETTI ══════════════ */
+const cCanvas = document.getElementById('confettiCanvas');
+const cCtx = cCanvas.getContext('2d');
+let confetti = [], confettiRAF = null;
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function launchConfetti() {
+  if (reducedMotion) return;
+  cCanvas.width = window.innerWidth; cCanvas.height = window.innerHeight;
+  cCanvas.style.display = 'block';
+  const colors = ['#f4845f', '#4a90d9', '#2baa8a', '#f0b429', '#9b6fd4'];
+  confetti = Array.from({ length: 90 }, () => ({
+    x: Math.random() * cCanvas.width,
+    y: -20 - Math.random() * cCanvas.height * 0.4,
+    r: 4 + Math.random() * 5,
+    c: colors[Math.floor(Math.random() * colors.length)],
+    vy: 2 + Math.random() * 3,
+    vx: -1.5 + Math.random() * 3,
+    rot: Math.random() * Math.PI, vr: -0.1 + Math.random() * 0.2
+  }));
+  const tick = () => {
+    cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height);
+    confetti.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+      cCtx.save(); cCtx.translate(p.x, p.y); cCtx.rotate(p.rot);
+      cCtx.fillStyle = p.c;
+      cCtx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r);
+      cCtx.restore();
+    });
+    confetti = confetti.filter(p => p.y < cCanvas.height + 30);
+    if (confetti.length) confettiRAF = requestAnimationFrame(tick);
+    else stopConfetti();
+  };
+  confettiRAF = requestAnimationFrame(tick);
+}
+function stopConfetti() {
+  if (confettiRAF) cancelAnimationFrame(confettiRAF);
+  confettiRAF = null;
+  cCanvas.style.display = 'none';
+}
+
+/* ══════════════ NAV / GRID ══════════════ */
+document.getElementById('prevBtn').addEventListener('click', () => {
+  const i = ALPHABET.indexOf(currentLetter);
+  if (i > 0) loadLetter(ALPHABET[i - 1]);
+});
+document.getElementById('nextBtn').addEventListener('click', () => {
+  const i = ALPHABET.indexOf(currentLetter);
+  if (i < ALPHABET.length - 1) loadLetter(ALPHABET[i + 1]);
+});
+
+function updateGrid() {
+  const grid = document.getElementById('letterGrid');
+  grid.innerHTML = '';
+  ALPHABET.forEach(l => {
+    const b = document.createElement('button');
+    b.className = 'letter-chip' + (l === currentLetter ? ' active' : '');
+    b.textContent = dispChar(l);
+    b.setAttribute('aria-label', 'Practise letter ' + dispChar(l));
+    if (done[dispChar(l)]) {
+      const s = document.createElement('span');
+      s.className = 'star'; s.textContent = '⭐';
+      b.appendChild(s);
+    }
+    b.addEventListener('click', () => loadLetter(l));
+    grid.appendChild(b);
+  });
+}
+
+/* ══════════════ CASE TOGGLE ══════════════ */
+function setCase(c) {
+  if (currentCase === c) return;
+  currentCase = c;
+  document.getElementById('caseLower').classList.toggle('active', c === 'lower');
+  document.getElementById('caseUpper').classList.toggle('active', c === 'upper');
+  loadLetter(currentLetter);
+}
+document.getElementById('caseLower').addEventListener('click', () => setCase('lower'));
+document.getElementById('caseUpper').addEventListener('click', () => setCase('upper'));
+
+/* ══════════════ INIT ══════════════ */
+fitCanvas();
+loadLetter('a');
+loop();
+</script>
+
+</body>
+</html>

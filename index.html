@@ -712,6 +712,18 @@
   .test-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(30,100,30,0.4), 0 10px 22px rgba(92,184,92,0.35); }
   .test-btn:active { transform: translateY(2px); }
 
+  /* ── Trace button (alphabet section) ── */
+  .trace-btn {
+    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
+    padding: 11px 28px; border-radius: 36px; border: none;
+    background: linear-gradient(135deg, #f4845f, #d9603a);
+    color: white; cursor: pointer; text-decoration: none;
+    box-shadow: 0 4px 0 rgba(150,60,20,0.4), 0 6px 18px rgba(244,132,95,0.35);
+    transition: all 0.18s; display: inline-flex; align-items: center; gap: 9px;
+  }
+  .trace-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(150,60,20,0.4), 0 10px 22px rgba(244,132,95,0.4); }
+  .trace-btn:active { transform: translateY(2px); }
+
   /* ── Judge buttons ── */
   .test-judge-row {
     display: flex; gap: 14px; justify-content: center; margin-top: 16px; flex-wrap: wrap;
@@ -941,6 +953,9 @@
   <p class="sec-intro">Tap any letter to hear its name — the way you say the alphabet.<br>
     <strong style="color:var(--accent2)">Blue = vowel</strong> &nbsp;·&nbsp; <strong style="color:var(--teal)">Green = consonant</strong>
   </p>
+  <div class="section-test-bar">
+    <a class="trace-btn" href="tracing.html">✏️ Trace Letters</a>
+  </div>
   <div class="alpha-grid" id="nameGrid"></div>
 </div>
 
