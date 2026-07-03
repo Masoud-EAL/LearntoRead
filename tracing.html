@@ -670,9 +670,6 @@ function loadLetter(letter) {
   document.getElementById('letterLabel').textContent = dispChar(letter);
   updatePips();
   updateGrid();
-  const i = ALPHABET.indexOf(letter);
-  document.getElementById('prevBtn').disabled = i === 0;
-  document.getElementById('nextBtn').disabled = i === ALPHABET.length - 1;
   playDemo();   /* autoplay the stroke demonstration for every letter */
 }
 
@@ -709,8 +706,7 @@ document.getElementById('celebAgain').addEventListener('click', () => {
 document.getElementById('celebNext').addEventListener('click', () => {
   document.getElementById('celebrate').classList.remove('show');
   stopConfetti();
-  const i = ALPHABET.indexOf(currentLetter);
-  loadLetter(ALPHABET[Math.min(i + 1, ALPHABET.length - 1)]);
+  stepLetter(1);
 });
 
 /* ══════════════ DEMO ANIMATION ══════════════ */
@@ -823,14 +819,21 @@ function stopConfetti() {
 }
 
 /* ══════════════ NAV / GRID ══════════════ */
-document.getElementById('prevBtn').addEventListener('click', () => {
+/* The alphabet loops: lowercase a→z flows into capital A, and capital
+   Z flows back into lowercase a (and the same in reverse). */
+function stepLetter(dir) {
   const i = ALPHABET.indexOf(currentLetter);
-  if (i > 0) loadLetter(ALPHABET[i - 1]);
-});
-document.getElementById('nextBtn').addEventListener('click', () => {
-  const i = ALPHABET.indexOf(currentLetter);
-  if (i < ALPHABET.length - 1) loadLetter(ALPHABET[i + 1]);
-});
+  const ni = i + dir;
+  if (ni >= 0 && ni < ALPHABET.length) {
+    loadLetter(ALPHABET[ni]);
+  } else {
+    const nextCase = currentCase === 'lower' ? 'upper' : 'lower';
+    const wrapLetter = dir > 0 ? ALPHABET[0] : ALPHABET[ALPHABET.length - 1];
+    setCaseAndLetter(nextCase, wrapLetter);
+  }
+}
+document.getElementById('prevBtn').addEventListener('click', () => stepLetter(-1));
+document.getElementById('nextBtn').addEventListener('click', () => stepLetter(1));
 
 function updateGrid() {
   const grid = document.getElementById('letterGrid');
@@ -851,12 +854,15 @@ function updateGrid() {
 }
 
 /* ══════════════ CASE TOGGLE ══════════════ */
-function setCase(c) {
-  if (currentCase === c) return;
+function setCaseAndLetter(c, letter) {
   currentCase = c;
   document.getElementById('caseLower').classList.toggle('active', c === 'lower');
   document.getElementById('caseUpper').classList.toggle('active', c === 'upper');
-  loadLetter(currentLetter);
+  loadLetter(letter);
+}
+function setCase(c) {
+  if (currentCase === c) return;
+  setCaseAndLetter(c, currentLetter);
 }
 document.getElementById('caseLower').addEventListener('click', () => setCase('lower'));
 document.getElementById('caseUpper').addEventListener('click', () => setCase('upper'));
