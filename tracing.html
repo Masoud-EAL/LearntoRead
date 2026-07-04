@@ -442,7 +442,7 @@ const store = (() => {
 })();
 let done = JSON.parse(store.get('wl_trace_done') || '{}');
 
-const TOL = 10, START_TOL = 14, LOOKAHEAD = 12;
+const TOL = 8.5, START_TOL = 14, LOOKAHEAD = 12;
 
 /* ══════════════ CANVAS SETUP ══════════════ */
 const canvas = document.getElementById('traceCanvas');
@@ -626,7 +626,7 @@ function endStrokeAttempt() {
   drawing = false;
   const cur = strokes[strokeIdx];
   const coverage = matchIdx / cur.pts.length;
-  if (coverage >= 0.82) {
+  if (coverage >= 0.88) {
     strokeComplete();
   } else {
     ink = [];
