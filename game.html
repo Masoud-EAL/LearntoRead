@@ -1100,8 +1100,8 @@ function buildChoices(q,sourceWords){
   let others=sourceWords.filter(w=>normalize(w)!==normalize(correct));
   // If the correct answer has a picture, prefer distractors that also have a
   // distinct picture so the round stays visual.
-  if(emo(correct)){
-    const withPic=others.filter(w=>emo(w)&&emo(w)!==emo(correct));
+  if(mcEmoji(q,correct)){
+    const withPic=others.filter(w=>mcEmoji(q,w)&&mcEmoji(q,w)!==mcEmoji(q,correct));
     if(withPic.length>=3) others=withPic;
   }
   shuffle(others);
@@ -1154,6 +1154,15 @@ const EMOJI={
   'Monday':'📅','Tuesday':'📅','Wednesday':'📅','Thursday':'📅','Friday':'📅','Saturday':'🎉','Sunday':'☀️'
 };
 function emo(w){ return EMOJI[w]||EMOJI[(w||'').toLowerCase()]||''; }
+/* Words whose EMOJI entry depicts an unrelated noun (e.g. a tin "can") that
+   would mislead a sentence fill-in-the-blank using a different sense of the
+   same spelling (e.g. the modal verb "can", as in "I can drive"). Sentence
+   questions look up pictures through this instead of emo() directly. */
+const SENTENCE_PIC_EXCLUDE=new Set(['can']);
+function mcEmoji(q,word){
+  if(q&&q.type==='sentence'&&SENTENCE_PIC_EXCLUDE.has((word||'').toLowerCase())) return '';
+  return emo(word);
+}
 
 /* MUSIC ENGINE
    MASTER_VOL keeps all music significantly quieter than TTS/voice.
@@ -1779,13 +1788,13 @@ function renderTeacherOptions(q,showCorrect){
   const choices=Array.isArray(q.choices)?q.choices:null;
   if(!choices||!choices.length){ box.style.display='none'; box.innerHTML=''; return; }
   box.innerHTML='';
-  const emojis=choices.map(w=>emo(w));
+  const emojis=choices.map(w=>mcEmoji(q,w));
   const hasDup=emojis.some((e,i)=>e&&emojis.indexOf(e)!==i);
   const usePics=emojis.every(e=>e)&&!hasDup;
-  const isSentence=choices.some(w=>!emo(w)&&/\s/.test(w));
+  const isSentence=choices.some(w=>!mcEmoji(q,w)&&/\s/.test(w));
   box.style.gridTemplateColumns=isSentence?'1fr':'repeat(2,1fr)';
   choices.forEach(word=>{
-    const pic=emo(word);
+    const pic=mcEmoji(q,word);
     const cell=document.createElement('div');
     cell.className='t-opt'+(isSentence?' t-opt-sentence':'')
       +(showCorrect&&normalize(word)===normalize(q.answer)?' t-correct':'');
@@ -2284,11 +2293,11 @@ function showStudentQuestion(q,startedAt){
 function renderMcChoices(q){
   const box=document.getElementById('mc-section');
   box.innerHTML='';
-  const emojis=q.choices.map(w=>emo(w));
+  const emojis=q.choices.map(w=>mcEmoji(q,w));
   const hasDup=emojis.some((e,i)=>e&&emojis.indexOf(e)!==i);
   const usePics=emojis.every(e=>e)&&!hasDup;
   q.choices.forEach(word=>{
-    const pic=emo(word);
+    const pic=mcEmoji(q,word);
     const btn=document.createElement('button');
     const isSentence=!pic&&/\s/.test(word);
     btn.className='mc-choice'+((usePics&&pic)?'':' mc-text')+(isSentence?' mc-sentence':'');
