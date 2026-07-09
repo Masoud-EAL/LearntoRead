@@ -385,6 +385,9 @@
     .alpha-grid { grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); }
     .alpha-letter { font-size:2rem; }
     .letter-block-letter { font-size:2.4rem; }
+    .level-tab { font-size:0.85rem; padding:8px 16px; }
+    .level-tab-suffix { display: none; }
+    .level-tab:nth-child(3) { flex-basis: 100%; }
   }
 
   /* ════════════════════════════════
@@ -602,7 +605,7 @@
 
   /* ── Read Sentences section ── */
   .sentence-level-tabs {
-    display: flex; gap: 10px; justify-content: center; margin: 18px 16px 0;
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 18px 16px 0;
   }
   .level-tab {
     font-family: 'Fredoka One', cursive; font-size: 1rem;
@@ -1083,8 +1086,8 @@
     </div>
   </div>
   <div class="sentence-level-tabs">
-    <button class="level-tab active" onclick="showLevel(0,this)">Level 0 — Beginner</button>
-    <button class="level-tab"        onclick="showLevel(1,this)">Level 1 — Elementary</button>
+    <button class="level-tab active" onclick="showLevel(0,this)">Level 0 <span class="level-tab-suffix">— Beginner</span></button>
+    <button class="level-tab"        onclick="showLevel(1,this)">Level 1 <span class="level-tab-suffix">— Elementary</span></button>
     <button class="level-tab"        onclick="showLevel(2,this)">🗣️ Speaking Practice</button>
   </div>
   <div class="sentence-level-page active" id="sent-level-0">
