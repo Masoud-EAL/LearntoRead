@@ -2953,6 +2953,7 @@ function cvShowQuestion() {
   document.getElementById('cvPatternHint').textContent   = item.pattern;
   document.getElementById('cvQuestionPlayBtn').classList.remove('speaking');
   document.getElementById('phaseCvQuestion').style.display = '';
+  setTimeout(cvPlayQuestion, 400);
 }
 
 function cvPlayQuestion() {
@@ -3133,8 +3134,7 @@ function cvAdvance() {
     document.getElementById('cvStepCounter').textContent  = 'All done! 🎉';
     return;
   }
-  cvSetProgress();
-  cvShowRecord();
+  cvShowQuestion();
 }
 
 /* ══════════════════════════════════════════
