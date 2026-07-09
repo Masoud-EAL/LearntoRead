@@ -650,6 +650,26 @@
   .sentence-play-btn:hover { transform: scale(1.1); }
   .sentence-play-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
 
+  .convo-pattern-hint {
+    font-size: 0.85rem; font-weight: 600; color: var(--mid);
+    font-style: italic; margin-top: 3px;
+  }
+
+  /* Speaking Practice overlay — model answer reveal */
+  .convo-model-answer {
+    background: linear-gradient(135deg, #f4effe, #e9defc);
+    border: 2px solid #d8c4f5; border-radius: 16px;
+    padding: 14px 18px; margin: 14px 0; text-align: center;
+  }
+  .convo-model-label {
+    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    color: #6a3ec7; margin-bottom: 6px;
+  }
+  .convo-model-text {
+    font-size: 1.1rem; font-weight: 700; color: var(--dark);
+    line-height: 1.5; margin-bottom: 10px;
+  }
+
   .sentence-level-intro {
     padding: 14px 18px 0; font-size: 0.9rem; color: var(--mid);
     font-weight: 600; line-height: 1.6; text-align: center;
@@ -1065,6 +1085,7 @@
   <div class="sentence-level-tabs">
     <button class="level-tab active" onclick="showLevel(0,this)">Level 0 — Beginner</button>
     <button class="level-tab"        onclick="showLevel(1,this)">Level 1 — Elementary</button>
+    <button class="level-tab"        onclick="showLevel(2,this)">🗣️ Speaking Practice</button>
   </div>
   <div class="sentence-level-page active" id="sent-level-0">
     <p class="sentence-level-intro">Simple everyday sentences. Listen, then practise saying them aloud.</p>
@@ -1079,6 +1100,10 @@
       <button class="test-btn" onclick="openTest('sent1')">🧪 Test Yourself — 10 random sentences</button>
     </div>
     <div id="sent-level-1-groups"></div>
+  </div>
+  <div class="sentence-level-page" id="sent-level-2">
+    <p class="sentence-level-intro">Listen to a question, record yourself answering, then compare your answer with David's.</p>
+    <div id="sent-level-2-groups"></div>
   </div>
 </div>
 
@@ -1233,6 +1258,106 @@
 
   </div><!-- /practice-body -->
 </div><!-- /practiceOverlay -->
+
+<!-- ══════════════════════════════════════════
+     SPEAKING PRACTICE (CONVERSATION) OVERLAY
+══════════════════════════════════════════ -->
+<div class="practice-overlay" id="conversationOverlay">
+
+  <div class="practice-header" style="background:linear-gradient(135deg,#8a5cf0,#5a2ec7)">
+    <button class="practice-back" onclick="closeConversation()" title="Back" aria-label="Back">←</button>
+    <div class="practice-header-text">
+      <h2 id="cvTitle">🗣️ Speaking Practice</h2>
+      <p id="cvSubtitle">Listen · Record · Compare</p>
+    </div>
+  </div>
+
+  <div class="practice-body">
+
+    <div class="practice-step-info">
+      <div class="step-counter" id="cvStepCounter">Question 1 of 1</div>
+      <div class="practice-progress"><div class="practice-progress-fill" id="cvProgressFill" style="width:0%;background:linear-gradient(90deg,#8a5cf0,#5a2ec7)"></div></div>
+    </div>
+
+    <!-- PHASE 0: Question (listen) -->
+    <div id="phaseCvQuestion">
+      <div class="practice-card">
+        <div class="practice-word test-sentence-mode" id="cvQuestionText"></div>
+        <div class="convo-pattern-hint" id="cvPatternHint"></div>
+        <div class="practice-word-label">Listen to the question first</div>
+        <span class="phase-banner phase-listen">👂 Listen</span><br>
+        <div class="example-listen-row">
+          <div class="example-label">Hear the question.<br>Then tap the button below to record your own answer.</div>
+          <button class="listen-play-btn" id="cvQuestionPlayBtn" onclick="cvPlayQuestion()">
+            <span>🔊</span> <span id="cvQuestionPlayLbl">Hear the question</span>
+          </button>
+          <button class="start-practice-btn" onclick="cvShowRecord()">
+            🎙️ Record My Answer →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 1: Record -->
+    <div id="phaseCvRecord" style="display:none">
+      <div class="practice-card">
+        <div class="practice-word test-sentence-mode" id="cvRecordQuestionText"></div>
+        <div class="practice-word-label">Your turn — answer this question</div>
+        <span class="phase-banner phase-record">🎙️ Record your voice</span>
+        <div class="record-controls">
+          <div class="record-btn-wrap">
+            <button class="record-btn" id="cvRecordBtn" onclick="cvToggleRecording()" aria-label="Record your voice">🎙️</button>
+            <div class="record-countdown" id="cvRecordCountdown">10</div>
+          </div>
+          <div class="record-hint" id="cvRecordHint">Tap the mic — recording stops after 10 seconds</div>
+        </div>
+        <div class="mic-warning" id="cvMicWarning" style="margin-top:16px"></div>
+      </div>
+    </div>
+
+    <!-- PHASE 2: Reveal & compare -->
+    <div id="phaseCvReveal" style="display:none">
+      <div class="practice-card">
+        <div class="practice-word test-sentence-mode" id="cvRevealQuestionText"></div>
+        <div class="practice-word-label">Compare your answer with David's</div>
+        <span class="phase-banner phase-compare">🔍 Compare</span>
+        <div class="compare-controls">
+          <div class="playback-row">
+            <button class="playback-btn my-voice" onclick="cvPlayMyRecording()">
+              🎧 My answer
+            </button>
+          </div>
+          <div class="convo-model-answer">
+            <div class="convo-model-label">💬 David's answer:</div>
+            <div class="convo-model-text" id="cvModelText"></div>
+            <button class="playback-btn correct-voice" onclick="cvPlayModelAnswer()">🔊 Hear David's answer</button>
+          </div>
+          <div class="convo-model-answer" id="cvModel2Wrap" style="display:none">
+            <div class="convo-model-label">or</div>
+            <div class="convo-model-text" id="cvModel2Text"></div>
+            <button class="playback-btn correct-voice" onclick="cvPlayModelAnswer2()">🔊 Hear this version</button>
+          </div>
+          <button class="rerecord-link" onclick="cvShowRecord()">↩ Record again</button>
+          <button class="practice-next-btn" id="cvNextBtn" onclick="cvAdvance()">
+            Next question →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINISH -->
+    <div class="practice-finish" id="cvFinish" style="display:none">
+      <div class="finish-icon">🏅</div>
+      <h2>Speaking practice complete!</h2>
+      <p>Great work! You practised all the questions in this topic.<br>Head back and try another topic.</p>
+      <br>
+      <button class="practice-next-btn" onclick="closeConversation()" style="margin-top:10px">
+        ← Back to lessons
+      </button>
+    </div>
+
+  </div><!-- /practice-body -->
+</div><!-- /conversationOverlay -->
 
 <!-- ══════════════════════════════════════════
      TEST YOURSELF OVERLAY
@@ -2760,6 +2885,256 @@ function advancePractice() {
 }
 
 /* ══════════════════════════════════════════
+   SPEAKING PRACTICE (CONVERSATION) MODE
+══════════════════════════════════════════ */
+
+var cvItems    = [];
+var cvIdx      = 0;
+var cvAudio    = null;
+var cvStream   = null;
+var cvRecorder = null;
+var cvChunks   = [];
+var cvTimer    = null;
+
+/* ── Open / Close ── */
+function openConversation(items, label) {
+  if (!items || items.length < 1) { alert('Need at least 1 question to practise.'); return; }
+  cvItems = items.slice();
+  cvIdx   = 0;
+  cvAudio = null;
+  document.getElementById('cvSubtitle').textContent = label || '';
+  cvCleanup();
+  cvShowQuestion();
+  document.getElementById('conversationOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeConversation() {
+  cvCleanup();
+  document.getElementById('conversationOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+  window.speechSynthesis && window.speechSynthesis.cancel();
+}
+
+function cvCleanup() {
+  if (cvTimer) { clearInterval(cvTimer); cvTimer = null; }
+  if (cvRecorder && cvRecorder.state !== 'inactive') {
+    try { cvRecorder.stop(); } catch(e) {}
+  }
+  cvRecorder = null;
+  if (cvStream) { cvStream.getTracks().forEach(function(t){ t.stop(); }); cvStream = null; }
+  cvChunks = [];
+}
+
+function cvHideAllPhases() {
+  ['phaseCvQuestion','phaseCvRecord','phaseCvReveal','cvFinish'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.style.display = 'none'; el.classList.remove('show'); }
+  });
+}
+
+function cvSetProgress() {
+  var total = cvItems.length;
+  document.getElementById('cvStepCounter').textContent = 'Question ' + (cvIdx + 1) + ' of ' + total;
+  var pct = total > 1 ? (cvIdx / (total - 1)) * 100 : 100;
+  document.getElementById('cvProgressFill').style.width = pct + '%';
+}
+
+/* ── PHASE 0: Question ── */
+function cvShowQuestion() {
+  cvHideAllPhases();
+  cvSetProgress();
+  cvAudio = null;
+  var item = cvItems[cvIdx];
+  document.getElementById('cvQuestionText').textContent = item.q;
+  document.getElementById('cvPatternHint').textContent   = item.pattern;
+  document.getElementById('cvQuestionPlayBtn').classList.remove('speaking');
+  document.getElementById('phaseCvQuestion').style.display = '';
+}
+
+function cvPlayQuestion() {
+  var item = cvItems[cvIdx];
+  var btn  = document.getElementById('cvQuestionPlayBtn');
+  var lbl  = document.getElementById('cvQuestionPlayLbl');
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(item.q);
+  utt.rate = 0.85; utt.pitch = 1.05; utt.lang = 'en-AU';
+  applyVoice(utt);
+  btn.classList.add('speaking');
+  lbl.textContent = 'Listening...';
+  utt.onend = utt.onerror = function() {
+    btn.classList.remove('speaking');
+    lbl.textContent = 'Hear the question';
+  };
+  window.speechSynthesis.speak(utt);
+}
+
+/* ── PHASE 1: Record ── */
+function cvShowRecord() {
+  cvHideAllPhases();
+  cvSetProgress();
+  cvCleanup();
+  cvAudio = null;
+  var item = cvItems[cvIdx];
+  document.getElementById('cvRecordQuestionText').textContent = item.q;
+  document.getElementById('cvRecordBtn').classList.remove('recording');
+  document.getElementById('cvRecordBtn').innerHTML = '🎙️';
+  document.getElementById('cvRecordHint').textContent = 'Tap the mic — recording stops after 10 seconds';
+  document.getElementById('cvRecordCountdown').classList.remove('show');
+  var w = document.getElementById('cvMicWarning');
+  w.innerHTML = ''; w.classList.remove('show');
+  document.getElementById('phaseCvRecord').style.display = '';
+}
+
+function cvToggleRecording() {
+  if (cvRecorder && cvRecorder.state === 'recording') {
+    cvStopRec();
+  } else {
+    cvStartRec();
+  }
+}
+
+function cvStartRec() {
+  var warn = document.getElementById('cvMicWarning');
+  warn.innerHTML = ''; warn.classList.remove('show');
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    warn.innerHTML = '⚠️ Your browser does not support microphone access. Use Chrome or Edge on a desktop.';
+    warn.classList.add('show');
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+    .then(function(stream) {
+      cvStream = stream;
+      cvChunks = [];
+
+      var mimeType = '';
+      if (window.MediaRecorder) {
+        ['audio/webm;codecs=opus','audio/webm','audio/ogg'].forEach(function(t) {
+          if (!mimeType && MediaRecorder.isTypeSupported(t)) mimeType = t;
+        });
+      }
+
+      try {
+        cvRecorder = mimeType ? new MediaRecorder(stream, {mimeType: mimeType}) : new MediaRecorder(stream);
+      } catch(e) {
+        cvRecorder = new MediaRecorder(stream);
+      }
+
+      cvRecorder.ondataavailable = function(e) {
+        if (e.data && e.data.size > 0) cvChunks.push(e.data);
+      };
+
+      cvRecorder.onstop = function() {
+        cvStream.getTracks().forEach(function(t){ t.stop(); });
+        cvStream = null;
+        if (cvChunks.length === 0) { cvShowRecord(); return; }
+        var blob = new Blob(cvChunks, { type: cvRecorder.mimeType || 'audio/webm' });
+        cvAudio = new Audio(URL.createObjectURL(blob));
+        cvShowReveal();
+      };
+
+      cvRecorder.start(100);
+
+      document.getElementById('cvRecordBtn').classList.add('recording');
+      document.getElementById('cvRecordBtn').innerHTML = '⏹';
+      document.getElementById('cvRecordHint').textContent = '● Recording...';
+
+      var secs = 10;
+      var cd = document.getElementById('cvRecordCountdown');
+      cd.textContent = secs; cd.classList.add('show');
+      cvTimer = setInterval(function() {
+        secs--;
+        if (secs <= 0) { cvStopRec(); }
+        else { cd.textContent = secs; }
+      }, 1000);
+    })
+    .catch(function(err) {
+      var n = err && err.name ? err.name : 'Error';
+      var msg = '⚠️ Microphone error: <strong>' + n + '</strong><br>';
+      if (n === 'NotAllowedError' || n === 'PermissionDeniedError') {
+        msg += 'Click the 🔒 icon in the address bar, set Microphone to <strong>Allow</strong>, then <strong>reload the page</strong> and try again.';
+      } else if (n === 'NotFoundError') {
+        msg += 'No microphone found on this device.';
+      } else if (n === 'NotReadableError') {
+        msg += 'Microphone is in use by another app (Zoom, Teams, etc.). Close it and try again.';
+      } else {
+        msg += 'Please check your browser and system microphone settings.';
+      }
+      warn.innerHTML = msg; warn.classList.add('show');
+    });
+}
+
+function cvStopRec() {
+  if (cvTimer) { clearInterval(cvTimer); cvTimer = null; }
+  document.getElementById('cvRecordCountdown').classList.remove('show');
+  if (cvRecorder && cvRecorder.state === 'recording') {
+    try { cvRecorder.stop(); } catch(e) {}
+  }
+  document.getElementById('cvRecordBtn').classList.remove('recording');
+  document.getElementById('cvRecordBtn').innerHTML = '🎙️';
+}
+
+/* ── PHASE 2: Reveal & compare ── */
+function cvShowReveal() {
+  cvHideAllPhases();
+  var item = cvItems[cvIdx];
+  document.getElementById('cvRevealQuestionText').textContent = item.q;
+  document.getElementById('cvModelText').textContent = getModelAnswer(item);
+  var m2Wrap = document.getElementById('cvModel2Wrap');
+  if (item.model2) {
+    document.getElementById('cvModel2Text').textContent = item.model2;
+    m2Wrap.style.display = '';
+  } else {
+    m2Wrap.style.display = 'none';
+  }
+  var isLast = cvIdx >= cvItems.length - 1;
+  document.getElementById('cvNextBtn').textContent = isLast ? '✓ Finish' : 'Next question →';
+  document.getElementById('phaseCvReveal').style.display = '';
+}
+
+function cvPlayMyRecording() {
+  if (!cvAudio) return;
+  cvAudio.currentTime = 0; cvAudio.play();
+}
+
+function cvPlayModelAnswer() {
+  var item = cvItems[cvIdx];
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(getModelAnswer(item));
+  utt.rate = 0.85; utt.pitch = 1.0; utt.lang = 'en-AU';
+  applyVoice(utt);
+  window.speechSynthesis.speak(utt);
+}
+
+function cvPlayModelAnswer2() {
+  var item = cvItems[cvIdx];
+  if (!item.model2 || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(item.model2);
+  utt.rate = 0.85; utt.pitch = 1.0; utt.lang = 'en-AU';
+  applyVoice(utt);
+  window.speechSynthesis.speak(utt);
+}
+
+function cvAdvance() {
+  cvIdx++;
+  if (cvIdx >= cvItems.length) {
+    cvHideAllPhases();
+    var fin = document.getElementById('cvFinish');
+    fin.style.display = ''; fin.classList.add('show');
+    document.getElementById('cvProgressFill').style.width = '100%';
+    document.getElementById('cvStepCounter').textContent  = 'All done! 🎉';
+    return;
+  }
+  cvSetProgress();
+  cvShowRecord();
+}
+
+/* ══════════════════════════════════════════
    TEST YOURSELF MODE
 ══════════════════════════════════════════ */
 
@@ -3275,6 +3650,176 @@ const sentenceData = {
 };
 
 /* ══════════════════════════════════════════
+   SPEAKING PRACTICE — DATA
+   Persona: David Johnson — matches the Read Sentences 0 content.
+══════════════════════════════════════════ */
+
+const conversationData = [
+  {
+    topic: '👋 Greetings',
+    items: [
+      { q: 'Hello! How are you?', pattern: "Hi, I'm good, thank you. How are you?", model: "Hi, I'm good, thank you. How are you?" },
+      { q: 'How are you today?', pattern: "I'm fine, thanks.", model: "I'm fine, thanks." },
+      { q: 'Nice to meet you.', pattern: 'Nice to meet you too.', model: 'Nice to meet you too.' },
+    ]
+  },
+  {
+    topic: '👤 My name',
+    items: [
+      { q: 'What is your name?', pattern: 'My name is ______.', model: 'My name is David.' },
+      { q: 'How do you spell your name?', pattern: "It's ______.", model: "It's D, A, V, I, D." },
+      { q: 'What is your last name?', pattern: 'My last name is ______.', model: 'My last name is Johnson.' },
+      { q: 'What is your full name?', pattern: 'My full name is ______.', model: 'My full name is David Johnson.' },
+    ]
+  },
+  {
+    topic: '🌏 About me',
+    items: [
+      { q: 'How old are you?', pattern: 'I am ______ years old.', model: 'I am 30 years old.' },
+      { q: 'When is your birthday?', pattern: 'My birthday is on ______.', model: 'My birthday is on the 15th of June.' },
+      { q: 'When were you born?', pattern: 'I was born on ______. (date, month, year)', model: 'I was born on the 15th of June, 1995.' },
+      { q: 'Where are you from?', pattern: 'I am from ______.', model: 'I am from Vietnam.' },
+      { q: 'What city are you from?', pattern: 'I am from ______.', model: 'I am from Ho Chi Minh City.' },
+      { q: 'What language do you speak?', pattern: 'I speak ______ and a little English.', model: 'I speak Vietnamese and a little English.' },
+      { q: 'When did you come to Australia?', pattern: 'I came to Australia in ______.', model: 'I came to Australia in 2022.' },
+      { q: 'Do you like Australia?', pattern: "Yes, I do. / No, I don't.", model: 'Yes, I do. I like Australia.' },
+    ]
+  },
+  {
+    topic: '🏫 My class',
+    items: [
+      { q: "What's your teacher's name?", pattern: "My teacher's name is ______.", model: "My teacher's name is Sarah." },
+      { q: 'When do you go to English class?', pattern: 'I go to English class on ______.', model: 'I go to English class on Mondays, Wednesdays, and Thursdays.' },
+      { q: 'How many days a week do you go to English class?', pattern: 'I go to English class ______ days a week.', model: 'I go to English class three days a week.' },
+      { q: 'What time does your class start?', pattern: 'My class starts at ______.', model: "My class starts at 9 o'clock in the morning." },
+      { q: 'What time does your class finish?', pattern: 'My class finishes at ______.', model: 'My class finishes at 2:30 in the afternoon.' },
+      { q: 'How do you go to class?', pattern: 'I take the ______ to class. / I go on foot. / I drive.', model: 'I take the bus to class.' },
+      { q: 'Do you like your class?', pattern: "Yes, I do. / No, I don't.", model: 'Yes, I do. I like my class.' },
+      { q: 'Why do you want to learn English?', pattern: 'Because I want to ______.', model: 'Because I want to speak to people and find a good job.' },
+    ]
+  },
+  {
+    topic: '🏠 Where I live',
+    items: [
+      { q: 'Where do you live?', pattern: 'I live in ______.', model: 'I live in Springvale.' },
+      { q: 'Do you live in a house or a flat?', pattern: 'I live in a ______.', model: 'I live in a house.' },
+      { q: 'How many bedrooms does your house have?', pattern: 'My house has ______ bedrooms. / I live in a ______-bedroom house.', model: 'I live in a three-bedroom house.' },
+    ]
+  },
+  {
+    topic: '📱 My details',
+    items: [
+      { q: 'What is your phone number?', pattern: 'My phone number is ______.', model: 'My phone number is 0 4 0 0, 1 2 3, 4 5 6.' },
+      { q: 'What is your address?', pattern: 'My address is ______. (number, street, suburb, state, postcode)', model: 'My address is 25 King Street, Springvale, Victoria, 3171.' },
+      { q: 'What is your email address?', pattern: 'My email address is ______.', model: 'My email address is david123, at gmail, dot com.' },
+    ]
+  },
+  {
+    topic: '👨‍👩‍👧‍👦 My family',
+    items: [
+      { q: 'Are you married?', pattern: "Yes, I am. / No, I'm not.", model: 'Yes, I am. I am married.', model2: "No, I'm not." },
+      { q: 'Do you have children?', pattern: "Yes, I do. / No, I don't.", model: 'Yes, I do.', model2: "No, I don't." },
+      { q: 'How many children do you have?', pattern: 'I have ______ children. I have ______ son(s) and ______ daughter(s).', model: 'I have two children. I have one son and one daughter.' },
+      { q: 'How many people are there in your family?', pattern: 'There are ______ people in my family.', model: 'There are four people in my family.' },
+      { q: 'How many brothers and sisters do you have?', pattern: 'I have ______ brother(s) and ______ sister(s).', model: 'I have one brother and one sister.' },
+    ]
+  },
+  {
+    topic: '👩 My wife',
+    items: [
+      { q: "What is your wife's name?", pattern: "My wife's name is ______. / My husband's name is ______.", model: "My wife's name is Linh." },
+      { q: 'How old is your wife?', pattern: 'She is ______ years old. / He is ______ years old.', model: 'She is 28 years old.' },
+      { q: 'Where is she from?', pattern: 'She is from ______.', model: 'She is from Vietnam too.' },
+      { q: 'What does she like?', pattern: 'She likes ______ and ______.', model: 'She likes cooking and music.' },
+      { q: 'Can she drive?', pattern: "Yes, she can. / No, she can't.", model: 'Yes, she can. She can drive.', model2: "No, she can't." },
+    ]
+  },
+  {
+    topic: '📅 Today',
+    items: [
+      { q: 'What day is today?', pattern: 'Today is ______.', model: 'Today is Monday.', dynamic: 'day' },
+      { q: 'What day is tomorrow?', pattern: 'Tomorrow is ______.', model: 'Tomorrow is Tuesday.', dynamic: 'dayTomorrow' },
+      { q: 'What is the date today?', pattern: 'The date is ______. (date, month, year)', model: 'The date is the 8th of July, 2026.', dynamic: 'date' },
+      { q: 'How is the weather today?', pattern: 'The weather is ______. (sunny / cloudy / rainy / windy / hot / warm / cold / cool)', model: 'The weather is sunny and warm.', model2: 'The weather is cold and rainy.' },
+      { q: 'What time is it?', pattern: "It's ______ o'clock.", model: "It's ten o'clock." },
+    ]
+  },
+  {
+    topic: '⏰ My day',
+    items: [
+      { q: 'What time do you wake up?', pattern: 'I wake up at ______.', model: "I wake up at 7 o'clock." },
+      { q: 'What do you do in the morning?', pattern: 'First, I ______. Then I ______. After that, I ______.', model: 'First, I wake up. Then I brush my teeth and have a shower. After that, I get dressed and eat breakfast.' },
+      { q: 'What time do you eat breakfast?', pattern: 'I eat breakfast at ______.', model: 'I eat breakfast at 7:30.' },
+      { q: 'What time do you have lunch?', pattern: 'I have lunch at ______.', model: 'I have lunch at 12:30.' },
+      { q: 'What time do you cook dinner?', pattern: 'I cook dinner at ______.', model: "I cook dinner at 6 o'clock." },
+      { q: 'What do you do every day?', pattern: 'I usually ______ every day.', model: 'I usually go to English class, cook dinner, and watch TV with my family.' },
+      { q: 'What time do you go to bed?', pattern: 'I go to bed at ______.', model: "I go to bed at 10 o'clock." },
+    ]
+  },
+  {
+    topic: '🌅 My weekend',
+    items: [
+      { q: 'How was your weekend?', pattern: 'It was good, thank you. How about yours?', model: 'It was good, thank you. How about yours?' },
+      { q: 'What did you do on the weekend?', pattern: 'I ______ on the weekend.', model: 'I cleaned the house, went to the market, and played football with my son.' },
+      { q: 'What did you do on Saturday?', pattern: 'On Saturday, I ______.', model: 'On Saturday, I stayed at home, washed my clothes, and cooked lunch for my family.' },
+      { q: 'What did you do on Sunday?', pattern: 'On Sunday, I ______.', model: 'On Sunday, I visited my friend and watched a movie.' },
+      { q: 'What do you do on weekends?', pattern: 'I ______ on weekends.', model: 'I go to the park with my children and talk to my family in Vietnam on weekends.' },
+    ]
+  },
+  {
+    topic: '❤️ What I like',
+    items: [
+      { q: 'What do you like?', pattern: 'I like ______, ______ and ______.', model: 'I like football, music, and cooking.' },
+      { q: 'What is your favourite colour?', pattern: 'My favourite colour is ______.', model: 'My favourite colour is blue.' },
+      { q: 'What is your favourite fruit?', pattern: 'My favourite fruit is ______.', model: 'My favourite fruit is apple.' },
+      { q: 'What is your favourite food?', pattern: 'My favourite food is ______.', model: 'My favourite food is rice and chicken.' },
+      { q: 'Do you like coffee or tea?', pattern: 'I like ______.', model: 'I like tea.' },
+    ]
+  },
+  {
+    topic: '🎒 My bag',
+    items: [
+      { q: 'What do you have in your bag?', pattern: 'I have ______, ______, ______ and ______ in my bag.', model: 'I have a book, a pen, a phone, and a notebook in my bag.' },
+      { q: 'What colour is your bag?', pattern: "It's ______.", model: "It's black." },
+      { q: 'What are you wearing today?', pattern: "I'm wearing ______ today.", model: "I'm wearing a white t-shirt, blue jeans, and black shoes today." },
+      { q: 'How much is the milk?', pattern: "It's ______ dollars.", model: "It's three dollars." },
+    ]
+  },
+  {
+    topic: '✅ What I can do',
+    items: [
+      { q: 'What can you do?', pattern: 'I can ______ and ______.', model: 'I can drive, cook, clean, and use a computer.' },
+      { q: 'Can you drive?', pattern: "Yes, I can. / No, I can't.", model: 'Yes, I can. I can drive.', model2: "No, I can't." },
+      { q: 'Can you speak English?', pattern: 'Yes, I can speak a little English.', model: 'Yes, I can speak a little English.' },
+      { q: 'Do you work?', pattern: "Yes, I do. / No, I don't. I'm a student.", model: "No, I don't. I'm a student. I want to find a good job." },
+    ]
+  },
+];
+
+const CONVO_DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const CONVO_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function convoOrdinal(n) {
+  if (n % 10 === 1 && n % 100 !== 11) return n + 'st';
+  if (n % 10 === 2 && n % 100 !== 12) return n + 'nd';
+  if (n % 10 === 3 && n % 100 !== 13) return n + 'rd';
+  return n + 'th';
+}
+
+function getModelAnswer(item) {
+  var now = new Date();
+  if (item.dynamic === 'day') return 'Today is ' + CONVO_DAYS[now.getDay()] + '.';
+  if (item.dynamic === 'dayTomorrow') {
+    var t = new Date(now); t.setDate(t.getDate() + 1);
+    return 'Tomorrow is ' + CONVO_DAYS[t.getDay()] + '.';
+  }
+  if (item.dynamic === 'date') {
+    return 'The date is the ' + convoOrdinal(now.getDate()) + ' of ' + CONVO_MONTHS[now.getMonth()] + ', ' + now.getFullYear() + '.';
+  }
+  return item.model;
+}
+
+/* ══════════════════════════════════════════
    READ SENTENCES — BUILD
 ══════════════════════════════════════════ */
 
@@ -3360,6 +3905,73 @@ function buildSentences() {
 
       container.appendChild(card);
     });
+  });
+}
+
+function buildConversation() {
+  var container = document.getElementById('sent-level-2-groups');
+  container.innerHTML = '';
+  conversationData.forEach(function(group) {
+    var card = document.createElement('div');
+    card.className = 'sentence-group';
+
+    var header = document.createElement('div');
+    header.className = 'sentence-group-header';
+    header.textContent = group.topic;
+    card.appendChild(header);
+
+    group.items.forEach(function(item) {
+      var row = document.createElement('div');
+      row.className = 'sentence-row';
+
+      var text = document.createElement('div');
+      text.className = 'sentence-text';
+      text.appendChild(document.createTextNode(item.q));
+      var patternEl = document.createElement('div');
+      patternEl.className = 'convo-pattern-hint';
+      patternEl.textContent = item.pattern;
+      text.appendChild(patternEl);
+      var trEl = document.createElement('div');
+      trEl.className = 'sentence-translation';
+      trEl.dataset.trkey = item.q;
+      trEl.textContent = ts(item.q);
+      (function() {
+        var lang = document.getElementById('langSelect').value;
+        var dir = RTL_LANGS.has(lang) ? 'rtl' : 'ltr';
+        trEl.style.direction = dir;
+        trEl.style.textAlign = dir === 'rtl' ? 'right' : 'left';
+        setTranslationLangAttrs(trEl, lang, dir);
+        var font = LANG_FONT[lang];
+        if (font) trEl.style.fontFamily = font;
+      })();
+      text.appendChild(trEl);
+
+      var playBtn = document.createElement('button');
+      playBtn.className = 'sentence-play-btn';
+      playBtn.innerHTML = '🔊';
+      playBtn.title = 'Hear this question';
+      playBtn.setAttribute('aria-label', 'Hear this question');
+      playBtn.onclick = (function(q, b) {
+        return function() { speakSentence(q, b); };
+      })(item.q, playBtn);
+
+      row.appendChild(text);
+      row.appendChild(playBtn);
+      card.appendChild(row);
+    });
+
+    var practiceBar = document.createElement('div');
+    practiceBar.className = 'sentence-practice-bar';
+    var pb = document.createElement('button');
+    pb.className = 'set-practice-btn';
+    pb.innerHTML = '🎙️ Practice speaking this topic';
+    pb.onclick = (function(items, topic) {
+      return function() { openConversation(items, topic); };
+    })(group.items.slice(), group.topic);
+    practiceBar.appendChild(pb);
+    card.appendChild(practiceBar);
+
+    container.appendChild(card);
   });
 }
 
@@ -3567,6 +4179,7 @@ buildSoundsSection();
 buildWp1Selector();
 buildWp2Selector();
 buildSentences();
+buildConversation();
 selectFamily('wp1', 0);
 selectFamily('wp2', 0);
 
