@@ -386,8 +386,6 @@
     .alpha-letter { font-size:2rem; }
     .letter-block-letter { font-size:2.4rem; }
     .level-tab { font-size:0.85rem; padding:8px 16px; }
-    .level-tab-suffix { display: none; }
-    .level-tab:nth-child(3) { flex-basis: 100%; }
   }
 
   /* ════════════════════════════════
@@ -602,6 +600,7 @@
 
 
   .nav-tab.sec-sentences.active { background: var(--accent4); color: white; border-color: var(--accent4); box-shadow: 0 4px 14px rgba(244,132,95,0.4); }
+  .nav-tab.sec-speaking.active  { background: #8a5cf0; color: white; border-color: #8a5cf0; box-shadow: 0 4px 14px rgba(138,92,240,0.4); }
 
   /* ── Read Sentences section ── */
   .sentence-level-tabs {
@@ -951,6 +950,7 @@
   <button class="nav-tab sec-words1"          onclick="showSection('wp1',this)">📖 Word Pronunciation 1</button>
   <button class="nav-tab sec-words2"          onclick="showSection('wp2',this)">📗 Word Pronunciation 2</button>
   <button class="nav-tab sec-sentences"        onclick="showSection('sentences',this)">📝 Read Sentences</button>
+  <button class="nav-tab sec-speaking"         onclick="showSection('speaking',this)">🗣️ Speaking Practice</button>
 </div>
 
 <div class="voice-selector-bar" id="voiceSelectorBar">
@@ -1086,9 +1086,8 @@
     </div>
   </div>
   <div class="sentence-level-tabs">
-    <button class="level-tab active" onclick="showLevel(0,this)">Level 0 <span class="level-tab-suffix">— Beginner</span></button>
-    <button class="level-tab"        onclick="showLevel(1,this)">Level 1 <span class="level-tab-suffix">— Elementary</span></button>
-    <button class="level-tab"        onclick="showLevel(2,this)">🗣️ Speaking Practice</button>
+    <button class="level-tab active" onclick="showLevel(0,this)">Level 0 — Beginner</button>
+    <button class="level-tab"        onclick="showLevel(1,this)">Level 1 — Elementary</button>
   </div>
   <div class="sentence-level-page active" id="sent-level-0">
     <p class="sentence-level-intro">Simple everyday sentences. Listen, then practise saying them aloud.</p>
@@ -1104,10 +1103,12 @@
     </div>
     <div id="sent-level-1-groups"></div>
   </div>
-  <div class="sentence-level-page" id="sent-level-2">
-    <p class="sentence-level-intro">Listen to a question, record yourself answering, then compare your answer with David's.</p>
-    <div id="sent-level-2-groups"></div>
-  </div>
+</div>
+
+<!-- SECTION 6 — SPEAKING PRACTICE -->
+<div class="section-page" id="sec-speaking">
+  <p class="sentence-level-intro">Listen to a question, record yourself answering, then compare your answer with David's.</p>
+  <div id="speaking-groups"></div>
 </div>
 
 <!-- ══════════════════════════════════════════
@@ -3912,7 +3913,7 @@ function buildSentences() {
 }
 
 function buildConversation() {
-  var container = document.getElementById('sent-level-2-groups');
+  var container = document.getElementById('speaking-groups');
   container.innerHTML = '';
   conversationData.forEach(function(group) {
     var card = document.createElement('div');
