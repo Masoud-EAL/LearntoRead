@@ -1732,7 +1732,11 @@ function playQuestion(){
   document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=noAudio?'none':'';
   renderTeacherOptions(q,false);
-  roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:firebase.database.ServerValue.TIMESTAMP,revealed:false,correctAnswer:'',midLeaderboard:false});
+  // Resolve this question's time budget once (translate questions get double)
+  // and broadcast it so every student counts down for exactly the amount of
+  // time the teacher set — not a hardcoded default.
+  currentTimerDuration=q.type==='translate'?teacherTimerDuration*2:teacherTimerDuration;
+  roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:firebase.database.ServerValue.TIMESTAMP,questionDuration:currentTimerDuration,revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
   showScreen('screen-teacher-game');
   playGameMusic();
@@ -1756,8 +1760,8 @@ function teacherSpeak(){
 let currentTimerDuration=TIMER_DURATION;
 let teacherTimerDuration=TIMER_DURATION;
 function startTeacherTimer(){
-  const q=currentQuestions[currentQIdx];
-  currentTimerDuration=q.type==='translate'?teacherTimerDuration*2:teacherTimerDuration;
+  // currentTimerDuration is resolved (and broadcast to students) in playQuestion
+  // so the host and every student share one time budget.
   clearInterval(timerInterval); timerLeft=currentTimerDuration; updateTimerUI(timerLeft);
   timerInterval=setInterval(()=>{
     timerLeft--; updateTimerUI(timerLeft); tickGameMusic(timerLeft);
@@ -2065,7 +2069,7 @@ function listenForGameState(){
     if(!room) return;
     if(room.status==='playing'&&room.currentQuestion){
       const q=room.currentQuestion;
-      if(q.idx!==undefined&&q.idx!==myLastQIdx){ myLastQIdx=q.idx; answered=false; showStudentQuestion(q,room.questionStarted); }
+      if(q.idx!==undefined&&q.idx!==myLastQIdx){ myLastQIdx=q.idx; answered=false; showStudentQuestion(q,room.questionStarted,room.questionDuration); }
     }
     if(room.revealed&&room.correctAnswer){
       const onAnswer=document.getElementById('screen-student-answer').classList.contains('active');
@@ -2204,7 +2208,7 @@ function setQTextLang(lang){
   if(lang){ el.setAttribute('lang',lang); el.setAttribute('dir',GAME_RTL_LANGS.has(lang)?'rtl':'ltr'); }
   else { el.removeAttribute('lang'); el.removeAttribute('dir'); }
 }
-function showStudentQuestion(q,startedAt){
+function showStudentQuestion(q,startedAt,dur){
   // Multiplayer students get silence to focus on the host; the solo player is
   // looking at this screen themselves, so keep the calm game music going.
   if(soloMode) playGameMusic(); else stopMusic();
@@ -2276,7 +2280,10 @@ function showStudentQuestion(q,startedAt){
     renderUnscrambleTiles(words);
   }
   showScreen('screen-student-answer');
-  studentSpeak(q); startStudentTimer(startedAt, q.type==='translate'?60:TIMER_DURATION);
+  // Use the teacher-set budget broadcast with the question; fall back to the
+  // local default (solo play, or an older host that didn't send one).
+  const timerDur=dur||(q.type==='translate'?60:TIMER_DURATION);
+  studentSpeak(q); startStudentTimer(startedAt, timerDur);
 }
 
 /* Render the four picture/word options. If two options would show the same
@@ -2336,12 +2343,34 @@ function studentSpeak(q){
 }
 
 let studentTimerInt=null;
+function monoNow(){ return (typeof performance!=='undefined'&&performance.now)?performance.now():Date.now(); }
 function startStudentTimer(startedAt,dur){
   dur=dur||TIMER_DURATION;
   clearInterval(studentTimerInt);
   const el=document.getElementById('student-timer');
-  function tick(){ const elapsed=(serverNow()-startedAt)/1000,left=Math.max(0,dur-elapsed),leftInt=Math.ceil(left); el.textContent=leftInt; el.classList.toggle('urgent',leftInt<=5); if(left<=0){ clearInterval(studentTimerInt); if(!answered) submitAnswer(true); } }
-  tick(); studentTimerInt=setInterval(tick,500);
+  // The question's deadline lives in the SERVER clock: startedAt is a server
+  // timestamp shared by every player, dur is the teacher-set budget. We convert
+  // it to a remaining-milliseconds budget ONCE, using the current server-time
+  // estimate, then count that budget down against a monotonic local clock.
+  //
+  // Why: serverNow() = Date.now()+serverTimeOffset, and Firebase re-measures
+  // serverTimeOffset periodically. The old code recomputed the remaining time
+  // from serverNow() on every tick, so whenever the offset was re-measured the
+  // countdown jumped — making the timer "end faster" for whichever students had
+  // just had their offset corrected. Anchoring to performance.now() makes every
+  // device count down at exactly real time, immune to later offset re-measures
+  // or device-clock corrections, so all players get the same amount of time.
+  let remainingMs=(startedAt+dur*1000)-serverNow();
+  // Guard against a not-yet-synced or skewed offset: a student can neither be
+  // handed more than the teacher-set duration nor start already expired.
+  remainingMs=Math.max(0,Math.min(remainingMs,dur*1000));
+  const anchor=monoNow();
+  function tick(){
+    const left=Math.max(0,(remainingMs-(monoNow()-anchor))/1000),leftInt=Math.ceil(left);
+    el.textContent=leftInt; el.classList.toggle('urgent',leftInt<=5);
+    if(left<=0){ clearInterval(studentTimerInt); if(!answered) submitAnswer(true); }
+  }
+  tick(); studentTimerInt=setInterval(tick,250);
 }
 
 function submitAnswer(auto){
