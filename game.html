@@ -2957,7 +2957,9 @@ function cleanupListeners(){if(roomRef)roomRef.off();clearInterval(timerInterval
 /* INIT */
 window.addEventListener('load',()=>{
   buildBank(); loadCheerAudio();
-  const urlCode=new URLSearchParams(window.location.search).get('join');
+  const params=new URLSearchParams(window.location.search);
+  const urlCode=params.get('join');
+  const mode=params.get('mode');
   if(urlCode){
     const code=urlCode.toUpperCase();
     role='student';
@@ -2974,6 +2976,8 @@ window.addEventListener('load',()=>{
     showScreen('screen-student-join');
     setTimeout(()=>document.getElementById('join-name').focus(),300);
   }
+  else if(mode==='teacher'){goTeacher();}
+  else if(mode==='solo'){initSolo();}
   else{showScreen('screen-home');playLobbyMusic();}
 });
 </script>
