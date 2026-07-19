@@ -474,15 +474,17 @@
     letter-spacing: 1.5px; color: var(--mid); margin-bottom: 20px;
   }
 
-  /* Phase banners */
+  /* Phase labels — a "where you are" step indicator, NOT a tappable control.
+     Kept visually flat (no bordered pill / fill / shadow) so pre-literate users
+     don't mistake it for one of the action buttons below it. */
   .phase-banner {
     font-family: 'Fredoka One', cursive; font-size: 0.92rem;
-    padding: 7px 18px; border-radius: 24px; display: inline-block;
-    margin-bottom: 18px; letter-spacing: 0.5px;
+    display: inline-block; margin-bottom: 18px; letter-spacing: 0.5px;
+    background: none; border: none; padding: 0;
   }
-  .phase-listen  { background: #e8f5ff; color: var(--accent2); border: 2px solid #b4d8f8; }
-  .phase-record  { background: #fff0f8; color: #d0208a; border: 2px solid #f8b4dc; }
-  .phase-compare { background: #f0fff4; color: var(--accent3); border: 2px solid #a8e6b8; }
+  .phase-listen  { color: var(--accent2); }
+  .phase-record  { color: #d0208a; }
+  .phase-compare { color: var(--accent3); }
 
   /* Example word (word 1 — listen only) */
   .example-listen-row {
@@ -549,8 +551,9 @@
   .playback-btn.my-voice {
     background: linear-gradient(135deg, #fff0f8, #f8d6ee);
     color: #d0208a; border: 2.5px solid #f0a8d8;
+    box-shadow: 0 3px 0 rgba(208,32,138,0.22), 0 5px 14px rgba(240,168,216,0.35);
   }
-  .playback-btn.my-voice:hover { background: linear-gradient(135deg, #f8c8e8, #f0a0d0); }
+  .playback-btn.my-voice:hover { background: linear-gradient(135deg, #f8c8e8, #f0a0d0); transform: translateY(-2px); }
   .playback-btn.correct-voice {
     background: linear-gradient(135deg, var(--accent2), #2d6cbf);
     color: white; box-shadow: 0 3px 0 rgba(30,80,180,0.35), 0 5px 14px rgba(74,144,217,0.3);
