@@ -374,7 +374,9 @@
 
   .cat-divider { max-width:780px; margin:26px auto 0; padding:0 16px; display:flex; align-items:center; gap:14px; }
   .cat-divider hr { flex:1; min-width:0; border:none; border-top:2px solid var(--light); }
-  .cat-pill { font-family:'Fredoka One',cursive; font-size:0.88rem; color:white; background:var(--purple); border-radius:20px; padding:5px 16px; text-align:center; max-width:100%; }
+  /* Category divider label — a section heading between word groups, NOT a button.
+     Kept flat (no filled pill) so it isn't mistaken for a tappable family button. */
+  .cat-pill { font-family:'Fredoka One',cursive; font-size:0.8rem; color:var(--purple); background:none; padding:0 6px; text-align:center; max-width:100%; text-transform:uppercase; letter-spacing:1.5px; }
 
   footer { text-align:center; padding:18px; font-size:0.85rem; color:var(--mid); font-weight:600; border-top:2px solid var(--light); margin-top:12px; }
   footer strong { color:var(--accent1); }
@@ -1000,7 +1002,7 @@
 <body>
 <a href="game.html" class="teacher-game-btn" title="Teacher: open Kahoot-style game">🎮 Games</a>
 
-<button class="menu-dots-btn" onclick="openMenu()" title="Menu" aria-label="Open menu">⋮</button>
+<button class="menu-dots-btn" onclick="openMenu()" title="Menu" aria-label="Open menu">☰</button>
 
 <!-- ══════════════════════════════════════════
      NAVIGATION MENU OVERLAY
