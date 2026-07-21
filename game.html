@@ -325,6 +325,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button class="q-type-tab" onclick="selectSoloType('wp2',this)">WP2</button>
         <button class="q-type-tab" onclick="selectSoloType('beginner',this)">Beginner Listen and Fill Gaps</button>
         <button class="q-type-tab" onclick="selectSoloType('elementary',this)">Elementary Listen and Fill Gaps</button>
+        <button class="q-type-tab" onclick="selectSoloType('questionwords',this)">Question Words</button>
         <button class="q-type-tab" onclick="selectSoloType('numbers',this)">1–10</button>
         <button class="q-type-tab" onclick="selectSoloType('numbers1120',this)">Numbers 11–20</button>
         <button class="q-type-tab" onclick="selectSoloType('numbers2199',this)">Numbers 21–99</button>
@@ -396,6 +397,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
           <button class="q-type-tab" onclick="selectQType('wp2',this)">WP2</button>
           <button class="q-type-tab" onclick="selectQType('beginner',this)">Beginner Listen and Fill Gaps</button>
           <button class="q-type-tab" onclick="selectQType('elementary',this)">Elementary Listen and Fill Gaps</button>
+          <button class="q-type-tab" onclick="selectQType('questionwords',this)">Question Words</button>
           <button class="q-type-tab" onclick="selectQType('numbers',this)">1–10</button>
           <button class="q-type-tab" onclick="selectQType('numbers1120',this)">Numbers 11–20</button>
           <button class="q-type-tab" onclick="selectQType('numbers2199',this)">Numbers 21–99</button>
@@ -784,6 +786,74 @@ const ELEMENTARY_SENTENCE_BLANKS=[
   {sentence:'They ___ a long way to reach the top of the hill.',blank:'walk'},
   {sentence:'I ___ the train to the city on weekdays.',blank:'catch'},
 ];
+/* QUESTION WORDS — from the Speaking Practice questions (index.html). The first
+   word of each question (the question word / auxiliary — What, How, Do, Are …)
+   becomes the blank. In multiple choice the learner reads the question and taps
+   the missing word; when typing they hear the question and type it. There is no
+   listen button (noListen) — the audio plays once when the question appears, and
+   in multiple choice there is no audio at all (it is a reading task). */
+const QUESTION_WORDS_WH=['What','Where','When','How','Why','Who','Which'];
+const QUESTION_WORDS_AUX=['Do','Does','Are','Is','Can','Was','Were','Have'];
+const QUESTION_WORD_QUESTIONS=[
+  'How are you today?',
+  'What is your name?',
+  'How do you spell your name?',
+  'What is your last name?',
+  'What is your full name?',
+  'How old are you?',
+  'When is your birthday?',
+  'When were you born?',
+  'Where are you from?',
+  'What city are you from?',
+  'What language do you speak?',
+  'When did you come to Australia?',
+  'Do you like Australia?',
+  "What is your teacher's name?",
+  'When do you go to English class?',
+  'What time does your class start?',
+  'What time does your class finish?',
+  'How do you go to class?',
+  'Do you like your class?',
+  'Why do you want to learn English?',
+  'Where do you live?',
+  'Do you live in a house or a flat?',
+  'How many bedrooms does your house have?',
+  'What is your phone number?',
+  'What is your address?',
+  'What is your email address?',
+  'Are you married?',
+  'Do you have children?',
+  'How many children do you have?',
+  'How many people are there in your family?',
+  'How many brothers and sisters do you have?',
+  'How old is your wife?',
+  'Where is she from?',
+  'What does she like?',
+  'Can she drive?',
+  'What day is today?',
+  'What is the date today?',
+  'How is the weather today?',
+  'What time is it?',
+  'What time do you wake up?',
+  'What do you do in the morning?',
+  'What time do you have lunch?',
+  'What time do you go to bed?',
+  'How was your weekend?',
+  'What did you do on the weekend?',
+  'What do you do on weekends?',
+  'What do you like?',
+  'What is your favourite colour?',
+  'What is your favourite food?',
+  'Do you like coffee or tea?',
+  'What do you have in your bag?',
+  'What colour is your bag?',
+  'What are you wearing today?',
+  'How much is the milk?',
+  'What can you do?',
+  'Can you drive?',
+  'Can you speak English?',
+  'Do you work?',
+];
 const SPELL_NUMBERS=['one','two','three','four','five','six','seven','eight','nine','ten'];
 // Spell the number word for a given value. Tens+ones join with a hyphen
 // ("twenty-one") — the standard written form. Answer checking strips the
@@ -1009,7 +1079,7 @@ function genOddOneOut(count){
   return out;
 }
 
-let questionBank={wp1:[],wp2:[],beginner:[],elementary:[],numbers:[],numbers1120:[],numbers2199:[],days:[],months:[],weather:[],fruits:[],body:[],custom:[],unscramble:[],gramscramble:[],translate:[],letter:[],lettersound:[],oddone:[]};
+let questionBank={wp1:[],wp2:[],beginner:[],elementary:[],questionwords:[],numbers:[],numbers1120:[],numbers2199:[],days:[],months:[],weather:[],fruits:[],body:[],custom:[],unscramble:[],gramscramble:[],translate:[],letter:[],lettersound:[],oddone:[]};
 let customBanks={};        // { bankId: { name, questions:[] } }
 let activeBankId=null;     // bank open in editor
 let selectedBankId=null;   // bank loaded for the game
@@ -1024,6 +1094,12 @@ function buildBank(){
   questionBank.wp2=WP2_WORDS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.beginner=BEGINNER_SENTENCE_BLANKS.map(s=>({type:'sentence',sentence:s.sentence,blank:s.blank,display:s.sentence,answer:s.blank.toLowerCase()}));
   questionBank.elementary=ELEMENTARY_SENTENCE_BLANKS.map(s=>({type:'sentence',sentence:s.sentence,blank:s.blank,display:s.sentence,answer:s.blank.toLowerCase()}));
+  questionBank.questionwords=QUESTION_WORD_QUESTIONS.map(function(qtext){
+    const blank=qtext.split(/\s+/)[0];                 // first word = the question word
+    const sentence=qtext.replace(/^\S+/,'___');         // blank it out for display
+    const alts=(QUESTION_WORDS_WH.indexOf(blank)>=0?QUESTION_WORDS_WH:QUESTION_WORDS_AUX).filter(w=>w!==blank);
+    return {type:'sentence',qword:true,noListen:true,sentence:sentence,blank:blank,display:sentence,answer:blank.toLowerCase(),alts:alts};
+  });
   questionBank.numbers=SPELL_NUMBERS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.numbers1120=SPELL_NUMBERS_11_20.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.numbers2199=SPELL_NUMBERS_21_99.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
@@ -1042,6 +1118,7 @@ function poolFor(type){
   if(type==='wp2') return [...questionBank.wp2];
   if(type==='beginner') return [...questionBank.beginner];
   if(type==='elementary') return [...questionBank.elementary];
+  if(type==='questionwords') return [...questionBank.questionwords];
   if(type==='numbers') return [...questionBank.numbers];
   if(type==='numbers1120') return [...questionBank.numbers1120];
   if(type==='numbers2199') return [...questionBank.numbers2199];
@@ -1120,6 +1197,20 @@ function buildSentenceChoices(q){
 
 function buildChoices(q,sourceWords){
   const correct=mcKeyWord(q);
+  // Curated alternatives (question-word banks) take priority so the distractors
+  // are always sensible same-category options — other question words, not random
+  // words from the bank.
+  if(Array.isArray(q.alts)&&q.alts.length){
+    const alts=q.alts.filter(w=>normalize(w)!==normalize(correct));
+    shuffle(alts);
+    const picks=alts.slice(0,3);
+    if(picks.length<3){
+      const backup=sourceWords.filter(w=>normalize(w)!==normalize(correct)&&!picks.some(p=>normalize(p)===normalize(w)));
+      shuffle(backup);
+      while(picks.length<3&&backup.length) picks.push(backup.shift());
+    }
+    return shuffle([correct,...picks]);
+  }
   let others=sourceWords.filter(w=>normalize(w)!==normalize(correct));
   // If the correct answer has a picture, prefer distractors that also have a
   // distinct picture so the round stays visual.
@@ -1745,7 +1836,7 @@ function playQuestion(){
   document.getElementById('game-prog').textContent='Question '+(currentQIdx+1)+' of '+total;
   const isMcQ=Array.isArray(q.choices)&&q.choices.length>0;
   const noAudio=q.type==='gramscramble'||q.type==='translate'||q.type==='mc';
-  document.getElementById('q-badge').textContent=q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='lettersound'?'FIRST SOUND':q.type==='oddone'?'ODD ONE OUT':q.type==='mc'?'MULTIPLE CHOICE':'WORD';
+  document.getElementById('q-badge').textContent=q.qword?'QUESTION WORD':q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='lettersound'?'FIRST SOUND':q.type==='oddone'?'ODD ONE OUT':q.type==='mc'?'MULTIPLE CHOICE':'WORD';
   document.getElementById('q-hint').textContent=q.type==='oddone'?'Students tap the picture that is different':q.type==='mc'?'Students tap the correct answer':(q.type==='unscramble'||q.type==='gramscramble')?(isMcQ?(q.type==='unscramble'?'Students listen and tap the sentence in the right order':'Students tap the sentence in the right order'):'Students arrange word tiles'):q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='translate'?'Students type the English sentence':'';
   document.getElementById('ans-bars').innerHTML='';
   document.getElementById('reveal-btn').style.display='';
@@ -1753,7 +1844,7 @@ function playQuestion(){
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('q-emoji').innerHTML=q.icon||(q.type==='word'?emo(q.word):q.type==='letter'?q.letter:'');
   document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':'🔊 Listen and spell the word';
-  document.getElementById('hear-btn').style.display=noAudio?'none':'';
+  document.getElementById('hear-btn').style.display=(noAudio||q.noListen)?'none':'';
   renderTeacherOptions(q,false);
   // Resolve this question's time budget once (translate questions get double)
   // and broadcast it so every student counts down for exactly the amount of
@@ -1771,6 +1862,8 @@ function playQuestion(){
 function teacherSpeak(){
   const q=currentQuestions[currentQIdx],btn=document.getElementById('hear-btn');
   if(q.type==='gramscramble'||q.type==='translate'||q.type==='mc') return;
+  // Question-word banks in multiple choice are read-and-pick: no audio.
+  if(q.qword&&Array.isArray(q.choices)&&q.choices.length) return;
   if(q.type==='lettersound'){ playSoundFile(q.soundFile); return; }
   btn.classList.add('playing');
   const spokenText=q.type==='letter'?q.letter:q.type==='oddone'?'Tap the one that does not belong.':q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.word;
@@ -2253,9 +2346,13 @@ function showStudentQuestion(q,startedAt,dur){
   document.getElementById('student-submit-btn').disabled=isTile;
   // Grammar-ordering, translate, and custom MC are read-and-pick: hide audio.
   // Listen-and-Unscramble stays a listening task even in MC mode, so keep audio.
-  const hideHear=q.type==='gramscramble'||q.type==='translate'||q.type==='mc';
+  // Question-word banks carry noListen: no replay button in either mode. In MC
+  // the learner reads the question and picks; when typing the question is spoken
+  // once as it appears (see studentSpeak).
+  const hideHear=q.type==='gramscramble'||q.type==='translate'||q.type==='mc'||q.noListen;
   document.getElementById('s-hear-btn').style.display=hideHear?'none':'';
   document.getElementById('s-q-type').textContent=
+    q.qword?(isMc?'TAP THE QUESTION WORD':'LISTEN — TYPE THE QUESTION WORD'):
     q.type==='mc'?'MULTIPLE CHOICE — tap the correct answer':
     isMc?(
       q.type==='sentence'?'TAP THE MISSING WORD':
@@ -2357,6 +2454,9 @@ function studentSpeak(q){
   const Q=currentStudentQ;
   if(!Q) return;
   if(Q.type==='gramscramble'||Q.type==='translate') return;
+  // Question-word banks in multiple choice are a reading task — no audio would
+  // give the answer away. When typing, fall through so the full question is read.
+  if(Q.qword&&Array.isArray(Q.choices)&&Q.choices.length) return;
   if(Q.type==='lettersound'){ playSoundFile(Q.soundFile); return; }
   if(Q.type==='letter'){ speakTTS(Q.letter); return; }
   if(Q.type==='oddone'){ speakTTS('Tap the one that does not belong.'); return; }
