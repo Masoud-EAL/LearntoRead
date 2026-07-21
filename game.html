@@ -791,68 +791,72 @@ const ELEMENTARY_SENTENCE_BLANKS=[
    becomes the blank. In multiple choice the learner reads the question and taps
    the missing word; when typing they hear the question and type it. There is no
    listen button (noListen) — the audio plays once when the question appears, and
-   in multiple choice there is no audio at all (it is a reading task). */
-const QUESTION_WORDS_WH=['What','Where','When','How','Why','Who','Which'];
-const QUESTION_WORDS_AUX=['Do','Does','Are','Is','Can','Was','Were','Have'];
+   in multiple choice there is no audio at all (it is a reading task).
+
+   Each question carries its own `alts` — three distractor first-words chosen so
+   that each is grammatically WRONG for that specific sentence. Every question has
+   exactly one correct answer, so the multiple-choice options never contain a
+   second word that would also fit (e.g. no "When" alongside "How" for
+   "How do you go to class?"). */
 const QUESTION_WORD_QUESTIONS=[
-  'How are you today?',
-  'What is your name?',
-  'How do you spell your name?',
-  'What is your last name?',
-  'What is your full name?',
-  'How old are you?',
-  'When is your birthday?',
-  'When were you born?',
-  'Where are you from?',
-  'What city are you from?',
-  'What language do you speak?',
-  'When did you come to Australia?',
-  'Do you like Australia?',
-  "What is your teacher's name?",
-  'When do you go to English class?',
-  'What time does your class start?',
-  'What time does your class finish?',
-  'How do you go to class?',
-  'Do you like your class?',
-  'Why do you want to learn English?',
-  'Where do you live?',
-  'Do you live in a house or a flat?',
-  'How many bedrooms does your house have?',
-  'What is your phone number?',
-  'What is your address?',
-  'What is your email address?',
-  'Are you married?',
-  'Do you have children?',
-  'How many children do you have?',
-  'How many people are there in your family?',
-  'How many brothers and sisters do you have?',
-  'How old is your wife?',
-  'Where is she from?',
-  'What does she like?',
-  'Can she drive?',
-  'What day is today?',
-  'What is the date today?',
-  'How is the weather today?',
-  'What time is it?',
-  'What time do you wake up?',
-  'What do you do in the morning?',
-  'What time do you have lunch?',
-  'What time do you go to bed?',
-  'How was your weekend?',
-  'What did you do on the weekend?',
-  'What do you do on weekends?',
-  'What do you like?',
-  'What is your favourite colour?',
-  'What is your favourite food?',
-  'Do you like coffee or tea?',
-  'What do you have in your bag?',
-  'What colour is your bag?',
-  'What are you wearing today?',
-  'How much is the milk?',
-  'What can you do?',
-  'Can you drive?',
-  'Can you speak English?',
-  'Do you work?',
+  {q:'How are you today?',alts:['When','Why','Who']},
+  {q:'What is your name?',alts:['Who','Why','When']},
+  {q:'How do you spell your name?',alts:['What','When','Which']},
+  {q:'What is your last name?',alts:['Who','Why','When']},
+  {q:'What is your full name?',alts:['Who','Why','When']},
+  {q:'How old are you?',alts:['What','When','Where']},
+  {q:'When is your birthday?',alts:['Why','Who','How']},
+  {q:'When were you born?',alts:['What','Who','Which']},
+  {q:'Where are you from?',alts:['What','When','Who']},
+  {q:'What city are you from?',alts:['Where','When','Why']},
+  {q:'What language do you speak?',alts:['Where','When','Why']},
+  {q:'When did you come to Australia?',alts:['What','Who','Which']},
+  {q:'Do you like Australia?',alts:['Does','Is','Are']},
+  {q:"What is your teacher's name?",alts:['Who','Why','When']},
+  {q:'When do you go to English class?',alts:['What','Who','Which']},
+  {q:'What time does your class start?',alts:['When','How','Where']},
+  {q:'What time does your class finish?',alts:['When','How','Where']},
+  {q:'How do you go to class?',alts:['What','Who','Which']},
+  {q:'Do you like your class?',alts:['Does','Is','Are']},
+  {q:'Why do you want to learn English?',alts:['What','Who','Which']},
+  {q:'Where do you live?',alts:['What','When','Which']},
+  {q:'Do you live in a house or a flat?',alts:['Does','Is','Are']},
+  {q:'How many bedrooms does your house have?',alts:['What','Where','Which']},
+  {q:'What is your phone number?',alts:['Who','Why','When']},
+  {q:'What is your address?',alts:['Who','Why','When']},
+  {q:'What is your email address?',alts:['Who','Why','When']},
+  {q:'Are you married?',alts:['Do','Does','Is']},
+  {q:'Do you have children?',alts:['Does','Is','Are']},
+  {q:'How many children do you have?',alts:['What','Where','Which']},
+  {q:'How many people are there in your family?',alts:['What','Where','Which']},
+  {q:'How many brothers and sisters do you have?',alts:['What','Where','Which']},
+  {q:'How old is your wife?',alts:['What','When','Where']},
+  {q:'Where is she from?',alts:['When','Who','Why']},
+  {q:'What does she like?',alts:['Where','When','How']},
+  {q:'Can she drive?',alts:['Do','Is','Are']},
+  {q:'What day is today?',alts:['When','Where','How']},
+  {q:'What is the date today?',alts:['When','Where','Why']},
+  {q:'How is the weather today?',alts:['When','Where','Why']},
+  {q:'What time is it?',alts:['When','Where','How']},
+  {q:'What time do you wake up?',alts:['When','Where','Why']},
+  {q:'What do you do in the morning?',alts:['When','Where','Why']},
+  {q:'What time do you have lunch?',alts:['When','Where','Why']},
+  {q:'What time do you go to bed?',alts:['When','Where','Why']},
+  {q:'How was your weekend?',alts:['When','Why','Who']},
+  {q:'What did you do on the weekend?',alts:['When','Where','Why']},
+  {q:'What do you do on weekends?',alts:['When','Where','Why']},
+  {q:'What do you like?',alts:['Where','When','Why']},
+  {q:'What is your favourite colour?',alts:['Who','When','Why']},
+  {q:'What is your favourite food?',alts:['Who','When','Why']},
+  {q:'Do you like coffee or tea?',alts:['Does','Is','Are']},
+  {q:'What do you have in your bag?',alts:['Where','When','Why']},
+  {q:'What colour is your bag?',alts:['Where','When','Why']},
+  {q:'What are you wearing today?',alts:['Where','When','Why']},
+  {q:'How much is the milk?',alts:['What','When','Where']},
+  {q:'What can you do?',alts:['Where','When','Why']},
+  {q:'Can you drive?',alts:['Are','Is','Does']},
+  {q:'Can you speak English?',alts:['Are','Is','Does']},
+  {q:'Do you work?',alts:['Does','Is','Are']},
 ];
 const SPELL_NUMBERS=['one','two','three','four','five','six','seven','eight','nine','ten'];
 // Spell the number word for a given value. Tens+ones join with a hyphen
@@ -1094,11 +1098,10 @@ function buildBank(){
   questionBank.wp2=WP2_WORDS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.beginner=BEGINNER_SENTENCE_BLANKS.map(s=>({type:'sentence',sentence:s.sentence,blank:s.blank,display:s.sentence,answer:s.blank.toLowerCase()}));
   questionBank.elementary=ELEMENTARY_SENTENCE_BLANKS.map(s=>({type:'sentence',sentence:s.sentence,blank:s.blank,display:s.sentence,answer:s.blank.toLowerCase()}));
-  questionBank.questionwords=QUESTION_WORD_QUESTIONS.map(function(qtext){
-    const blank=qtext.split(/\s+/)[0];                 // first word = the question word
-    const sentence=qtext.replace(/^\S+/,'___');         // blank it out for display
-    const alts=(QUESTION_WORDS_WH.indexOf(blank)>=0?QUESTION_WORDS_WH:QUESTION_WORDS_AUX).filter(w=>w!==blank);
-    return {type:'sentence',qword:true,noListen:true,sentence:sentence,blank:blank,display:sentence,answer:blank.toLowerCase(),alts:alts};
+  questionBank.questionwords=QUESTION_WORD_QUESTIONS.map(function(item){
+    const blank=item.q.split(/\s+/)[0];                 // first word = the question word
+    const sentence=item.q.replace(/^\S+/,'___');         // blank it out for display
+    return {type:'sentence',qword:true,noListen:true,sentence:sentence,blank:blank,display:sentence,answer:blank.toLowerCase(),alts:item.alts.slice()};
   });
   questionBank.numbers=SPELL_NUMBERS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.numbers1120=SPELL_NUMBERS_11_20.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
