@@ -1378,11 +1378,11 @@
         <div class="practice-word-label">Listen to the question first</div>
         <span class="phase-banner phase-listen">👂 Listen</span><br>
         <div class="example-listen-row">
-          <div class="example-label">Hear the question.<br>Then tap the button below to record your own answer.</div>
+          <div class="example-label">Listen to the question.<br>Recording starts by itself.</div>
           <button class="listen-play-btn" id="cvQuestionPlayBtn" onclick="cvPlayQuestion()">
             <span>🔊</span> <span id="cvQuestionPlayLbl">Hear the question</span>
           </button>
-          <button class="start-practice-btn" onclick="cvShowRecord()">
+          <button class="start-practice-btn" onclick="cvShowRecord(true)">
             🎙️ Record My Answer →
           </button>
         </div>
@@ -3063,14 +3063,16 @@ function cvShowQuestion() {
   document.getElementById('cvPatternHint').textContent   = item.pattern;
   document.getElementById('cvQuestionPlayBtn').classList.remove('speaking');
   document.getElementById('phaseCvQuestion').style.display = '';
-  setTimeout(cvPlayQuestion, 400);
+  // Auto-play the question, then move straight into recording so the
+  // student doesn't have to tap anything after listening.
+  setTimeout(function() { cvPlayQuestion(true); }, 400);
 }
 
-function cvPlayQuestion() {
+function cvPlayQuestion(autoRecord) {
   var item = cvItems[cvIdx];
   var btn  = document.getElementById('cvQuestionPlayBtn');
   var lbl  = document.getElementById('cvQuestionPlayLbl');
-  if (!window.speechSynthesis) return;
+  if (!window.speechSynthesis) { if (autoRecord) cvShowRecord(true); return; }
   window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(item.q);
   utt.rate = 0.85; utt.pitch = 1.05; utt.lang = 'en-AU';
@@ -3080,12 +3082,14 @@ function cvPlayQuestion() {
   utt.onend = utt.onerror = function() {
     btn.classList.remove('speaking');
     lbl.textContent = 'Hear the question';
+    // Once the question has been heard, start recording automatically.
+    if (autoRecord) cvShowRecord(true);
   };
   window.speechSynthesis.speak(utt);
 }
 
 /* ── PHASE 1: Record ── */
-function cvShowRecord() {
+function cvShowRecord(autoStart) {
   cvHideAllPhases();
   cvSetProgress();
   cvCleanup();
@@ -3094,11 +3098,16 @@ function cvShowRecord() {
   document.getElementById('cvRecordQuestionText').textContent = item.q;
   document.getElementById('cvRecordBtn').classList.remove('recording');
   document.getElementById('cvRecordBtn').innerHTML = '🎙️';
-  document.getElementById('cvRecordHint').textContent = 'Tap the mic — recording stops after 10 seconds';
+  document.getElementById('cvRecordHint').textContent = autoStart
+    ? 'Starting… recording stops after 10 seconds'
+    : 'Tap the mic — recording stops after 10 seconds';
   document.getElementById('cvRecordCountdown').classList.remove('show');
   var w = document.getElementById('cvMicWarning');
   w.innerHTML = ''; w.classList.remove('show');
   document.getElementById('phaseCvRecord').style.display = '';
+  // When we arrive here straight after the question, begin recording
+  // automatically. The short delay lets the record screen paint first.
+  if (autoStart) setTimeout(cvStartRec, 350);
 }
 
 function cvToggleRecording() {
