@@ -4030,6 +4030,21 @@ function buildSentences() {
   });
 }
 
+function makeConvoTranslation(key) {
+  var trEl = document.createElement('div');
+  trEl.className = 'sentence-translation';
+  trEl.dataset.trkey = key;
+  trEl.textContent = ts(key);
+  var lang = document.getElementById('langSelect').value;
+  var dir = RTL_LANGS.has(lang) ? 'rtl' : 'ltr';
+  trEl.style.direction = dir;
+  trEl.style.textAlign = dir === 'rtl' ? 'right' : 'left';
+  setTranslationLangAttrs(trEl, lang, dir);
+  var font = LANG_FONT[lang];
+  if (font) trEl.style.fontFamily = font;
+  return trEl;
+}
+
 function buildConversation() {
   var container = document.getElementById('speaking-groups');
   container.innerHTML = '';
@@ -4049,24 +4064,14 @@ function buildConversation() {
       var text = document.createElement('div');
       text.className = 'sentence-text';
       text.appendChild(document.createTextNode(item.q));
+      // Translation directly after the question.
+      text.appendChild(makeConvoTranslation(item.q));
       var patternEl = document.createElement('div');
       patternEl.className = 'convo-pattern-hint';
       patternEl.textContent = item.pattern;
       text.appendChild(patternEl);
-      var trEl = document.createElement('div');
-      trEl.className = 'sentence-translation';
-      trEl.dataset.trkey = item.q;
-      trEl.textContent = ts(item.q);
-      (function() {
-        var lang = document.getElementById('langSelect').value;
-        var dir = RTL_LANGS.has(lang) ? 'rtl' : 'ltr';
-        trEl.style.direction = dir;
-        trEl.style.textAlign = dir === 'rtl' ? 'right' : 'left';
-        setTranslationLangAttrs(trEl, lang, dir);
-        var font = LANG_FONT[lang];
-        if (font) trEl.style.fontFamily = font;
-      })();
-      text.appendChild(trEl);
+      // Translation directly after the answer (pattern).
+      text.appendChild(makeConvoTranslation(item.pattern));
 
       var playBtn = document.createElement('button');
       playBtn.className = 'sentence-play-btn';
