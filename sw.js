@@ -1,10 +1,12 @@
-const CACHE = 'learntoread-v16';
+const CACHE = 'learntoread-v17';
 
 // Core files — must all succeed or install fails
 const CORE = [
   './',
   './index.html',
   './game.html',
+  './tracing.html',
+  './i18n.js',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
@@ -14,6 +16,17 @@ const CORE = [
 
 // Optional files — cached individually; one failure won't block install
 const OPTIONAL = [
+  // Custom pictograms for words emoji can't express. Without these the
+  // word activities show broken images once offline.
+  './icons/back.svg',
+  './icons/bun.svg',
+  './icons/chest.svg',
+  './icons/class.svg',
+  './icons/fig.svg',
+  './icons/hip.svg',
+  './icons/neck.svg',
+  './icons/stomach.svg',
+  './icons/wig.svg',
   './fonts/fredoka-one-400.woff2',
   './fonts/nunito-400.woff2',
   './fonts/nunito-600.woff2',

@@ -4353,10 +4353,19 @@ selectFamily('wp2', 0);
     if (sel) { sel.value = lang; onLangChange(); }
   }
 
-  // Last visited section
+  // Last visited section.
+  // Two tabs carry a class that doesn't match their section id — wp1/wp2
+  // are styled .sec-words1/.sec-words2 — so look the class up rather than
+  // deriving it, or those two silently fail to restore and the learner
+  // lands back on Alphabet.
+  const SECTION_TAB_CLASS = {
+    alphabet: 'sec-alphabet', sounds: 'sec-sounds',
+    wp1: 'sec-words1', wp2: 'sec-words2',
+    sentences: 'sec-sentences', speaking: 'sec-speaking',
+  };
   const section = localStorage.getItem('wl_section');
-  if (section) {
-    const btn = document.querySelector('.nav-tab.sec-' + section);
+  if (section && SECTION_TAB_CLASS[section]) {
+    const btn = document.querySelector('.nav-tab.' + SECTION_TAB_CLASS[section]);
     if (btn) showSection(section, btn);
   }
 })();

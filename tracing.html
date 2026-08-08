@@ -7,6 +7,11 @@
 <script data-goatcounter="https://masoud-eal.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<!-- Noto scripts for first-language glosses. Loaded from Google Fonts rather
+     than self-hosted: pre-subset local copies broke shaping for some scripts
+     (e.g. Farsi ی). Glosses simply render in a fallback face when offline. -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Khmer:wght@400;700&family=Noto+Sans+Myanmar:wght@400;700&family=Noto+Sans+Devanagari:wght@400;700&family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
+<script src="i18n.js"></script>
 <style>
   :root {
     --letterfont: 'Andika', 'Nunito', sans-serif;
@@ -45,6 +50,47 @@ header h1 {
 header h1 span { color: var(--accent2); }
 header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 700; }
 
+/* ── mode tabs (letters / sounds / words / my name / numbers) ── */
+.mode-tabs {
+  display: flex; flex-wrap: wrap; gap: 7px; justify-content: center;
+  margin-top: 12px; padding: 0 14px; max-width: 520px;
+}
+.mode-tab {
+  font-family: 'Fredoka One', cursive; font-size: 0.85rem;
+  padding: 8px 15px; border-radius: 30px;
+  border: 2.5px solid var(--light); background: white; color: var(--mid);
+  cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: all .15s;
+}
+.mode-tab.active {
+  background: var(--teal); border-color: var(--teal); color: white;
+  box-shadow: 0 4px 12px rgba(43,170,138,0.35);
+}
+
+/* ── language picker for the first-language gloss ── */
+.lang-row { margin-top: 10px; display: flex; align-items: center; gap: 8px; }
+.lang-row select {
+  font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700;
+  padding: 6px 12px; border-radius: 30px;
+  border: 2.5px solid var(--light); background: white; color: var(--mid);
+  cursor: pointer;
+}
+
+/* ── whole-unit strip: shows the full word while one glyph is traced ──
+   This is where spaces between words are visible, since the canvas only
+   ever shows a single letter. */
+.unit-strip {
+  font-family: var(--letterfont); font-weight: 700;
+  font-size: 2rem; letter-spacing: 3px;
+  margin-top: 12px; min-height: 42px;
+  display: flex; align-items: center; justify-content: center; gap: 2px;
+  color: var(--light);
+}
+.unit-strip .g { transition: color .2s, transform .2s; }
+.unit-strip .g.done { color: var(--teal); }
+.unit-strip .g.current { color: var(--accent1); transform: scale(1.18); }
+.unit-strip .g.space { width: 18px; }
+
 /* ── word association pill ── */
 .word-pill {
   font-family: var(--letterfont);
@@ -59,6 +105,22 @@ header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 
 .word-pill:active { transform: scale(0.96); }
 .word-pill .emoji { font-size: 1.5rem; }
 .word-pill .speaker { color: var(--accent2); font-size: 1.1rem; }
+
+/* first-language gloss under the word pill */
+.gloss {
+  margin: 6px auto 0; padding: 0 16px;
+  font-size: 1rem; font-weight: 700; color: var(--mid);
+  text-align: center; max-width: 420px;
+}
+
+/* ── "my name" entry ── */
+.name-setup { margin-top: 12px; display: flex; gap: 8px; padding: 0 14px; flex-wrap: wrap; justify-content: center; }
+.name-setup input {
+  font-family: var(--letterfont); font-weight: 700; font-size: 1.1rem;
+  padding: 10px 16px; border-radius: 30px; width: 190px;
+  border: 2.5px solid var(--light); background: white; color: var(--dark);
+}
+.name-setup input:focus { outline: none; border-color: var(--accent2); }
 
 /* ── canvas card ── */
 .trace-card {
@@ -200,14 +262,30 @@ header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 
 
 <header>
   <h1>Word<span>Link</span> ✏️</h1>
-  <p>Letter Tracing — watch, then trace with your finger</p>
+  <p id="headerSub">Letter Tracing — watch, then trace with your finger</p>
 </header>
+
+<div class="mode-tabs" id="modeTabs" role="group" aria-label="What to trace"></div>
+
+<div class="lang-row">
+  <label for="langSelect" style="font-size:.85rem;font-weight:700;color:var(--mid);">🌐</label>
+  <select id="langSelect" aria-label="Your language"></select>
+</div>
+
+<div class="name-setup" id="nameSetup" style="display:none;">
+  <input id="nameInput" type="text" autocomplete="given-name" spellcheck="false"
+         maxlength="24" placeholder="Your name" aria-label="Type your name">
+  <button class="ctl-btn primary" id="nameSaveBtn">✔ Save</button>
+</div>
 
 <button class="word-pill" id="wordPill" aria-label="Hear the letter and word">
   <span id="pillText">a</span>
   <span class="emoji" id="pillEmoji">🍎</span>
   <span class="speaker">🔊</span>
 </button>
+<div class="gloss" id="glossLine" style="display:none;"></div>
+
+<div class="unit-strip" id="unitStrip" aria-hidden="true"></div>
 
 <div class="trace-card">
   <canvas id="traceCanvas" aria-label="Letter tracing area"></canvas>
@@ -221,15 +299,15 @@ header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 
   <button class="ctl-btn" id="hearBtn" aria-label="Hear the letter name">🔊 Hear</button>
 </div>
 
-<div class="case-toggle" role="group" aria-label="Letter case">
+<div class="case-toggle" id="caseToggle" role="group" aria-label="Letter case">
   <button class="case-btn active" id="caseLower">abc</button>
   <button class="case-btn" id="caseUpper">ABC</button>
 </div>
 
 <div class="letter-nav">
-  <button class="nav-arrow" id="prevBtn" aria-label="Previous letter">‹</button>
+  <button class="nav-arrow" id="prevBtn" aria-label="Previous">‹</button>
   <div class="current-letter-label" id="letterLabel">a</div>
-  <button class="nav-arrow" id="nextBtn" aria-label="Next letter">›</button>
+  <button class="nav-arrow" id="nextBtn" aria-label="Next">›</button>
 </div>
 
 <div class="letter-grid" id="letterGrid"></div>
@@ -240,10 +318,11 @@ header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 
   <div class="celebrate-card">
     <div class="big-letter" id="celebLetter">a</div>
     <div class="word"><span id="celebWord">apple</span> <span class="emoji" id="celebEmoji">🍎</span></div>
+    <div class="gloss" id="celebGloss" style="display:none;"></div>
     <div class="stars">⭐⭐⭐</div>
     <div class="btn-row">
       <button id="celebAgain" class="secondary">⟲ Trace again</button>
-      <button id="celebNext">Next letter ›</button>
+      <button id="celebNext">Next ›</button>
     </div>
   </div>
 </div>
@@ -251,6 +330,20 @@ header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 
 
 <script>
 'use strict';
+
+/* Glosses are an enhancement, not a dependency: if i18n.js is missing or
+   blocked, tracing must still work in English rather than throwing on the
+   first call. This no-op stand-in keeps the call sites free of guards. */
+if (!window.WL_I18N) {
+  window.WL_I18N = {
+    setLang: function () {}, lang: function () { return ''; }, saved: function () { return ''; },
+    tw: function () { return ''; }, ts: function () { return ''; },
+    dir: function () { return 'ltr'; }, font: function () { return ''; },
+    applyTo: function (el) { if (el) el.style.display = 'none'; },
+    populateSelect: function (sel) { if (sel) sel.parentNode.style.display = 'none'; },
+    names: {}, onChange: function () {}
+  };
+}
 
 /* ══════════════════════════════════════════════════════════
    COORDINATE SPACE: 100 wide × 110 tall
@@ -341,6 +434,24 @@ const CAPITALS = {
   Z: [ [['P',34,12,62,12,34,72,62,72]] ]
 };
 
+/* Digits: full height (topline y=12 to baseline y=72), same conventions as
+   the capitals. Segments inside one stroke must share endpoints — the guide
+   path is sampled as a single continuous line, so a gap between segments
+   would ask the learner to jump their finger. */
+const DIGITS = {
+  '0': [ [['A',48,42,13,90,450,30]] ],
+  '1': [ [['P',38,22,48,12],['L',48,12,48,72]] ],
+  '2': [ [['A',46,26,12,170,-45,14],['C',54.5,35.9,52,50,44,62,34,72],['L',34,72,62,72]] ],
+  '3': [ [['A',46,26,11,170,-90,14],['A',46,56,13,90,-160,16]] ],
+  '4': [ [['L',54,12,32,52],['L',32,52,62,52]], [['L',54,12,54,72]] ],
+  '5': [ [['L',36,12,36,40],['C',36,40,64,36,63,74,34,68]], [['L',36,12,60,12]] ],
+  '6': [ [['C',57,16,46,7,33,26,33,57],['A',46,57,13,180,-180,15]] ],
+  '7': [ [['L',34,12,62,12],['L',62,12,42,72]] ],
+  '8': [ [['C',48,12,34,14,34,32,48,40],['C',48,40,64,48,64,70,48,72],
+          ['C',48,72,32,70,32,48,48,40],['C',48,40,62,32,62,14,48,12]] ],
+  '9': [ [['A',47,27,13,0,360,15],['L',60,27,60,72]] ]
+};
+
 const WORDS = {
   a:['apple','🍎'], b:['ball','⚽'], c:['cat','🐱'], d:['dog','🐶'], e:['egg','🥚'],
   f:['fish','🐟'], g:['goat','🐐'], h:['hat','🎩'], i:['insect','🐜'], j:['juice','🧃'],
@@ -351,6 +462,41 @@ const WORDS = {
 };
 
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+/* ══════════════ WHAT ELSE CAN BE COPIED ══════════════
+   VU23491 asks for letters, letter combinations and extremely familiar
+   words to be copied. Each entry below is one "unit": a sequence of
+   glyphs traced one at a time, with a picture word for meaning. */
+
+const COMBOS = [
+  { text: 'sh', word: 'ship',  emoji: '🚢' },
+  { text: 'ch', word: 'chair', emoji: '🪑' },
+  { text: 'th', word: 'three', emoji: '3️⃣' },
+  { text: 'ee', word: 'tree',  emoji: '🌳' },
+  { text: 'oo', word: 'book',  emoji: '📖' },
+  { text: 'ng', word: 'ring',  emoji: '💍' }
+];
+
+/* Short, concrete, high-frequency nouns — all three letters or fewer so a
+   first word stays inside a single session. */
+const TRACE_WORDS = [
+  { text: 'cat', emoji: '🐱' }, { text: 'dog', emoji: '🐶' },
+  { text: 'sun', emoji: '☀️' }, { text: 'bus', emoji: '🚌' },
+  { text: 'cup', emoji: '🥤' }, { text: 'pen', emoji: '🖊️' },
+  { text: 'bed', emoji: '🛏️' }, { text: 'hat', emoji: '🎩' },
+  { text: 'egg', emoji: '🥚' }, { text: 'box', emoji: '📦' }
+];
+
+const DIGIT_WORDS = ['zero','one','two','three','four','five','six','seven','eight','nine'];
+const DIGIT_EMOJI = ['0️⃣','1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣'];
+
+const MODES = [
+  { id: 'letters', label: '🔤 Letters',  sub: 'Letter Tracing — watch, then trace with your finger' },
+  { id: 'combos',  label: '🔊 sh ch th', sub: 'Letter combinations — trace each letter in turn' },
+  { id: 'words',   label: '📖 Words',    sub: 'Words — trace each letter, left to right' },
+  { id: 'name',    label: '🙋 My name',  sub: 'Your name — trace each letter in turn' },
+  { id: 'digits',  label: '🔢 Numbers',  sub: 'Numbers — watch, then trace with your finger' }
+];
 
 /* ── sample segments into evenly-spaced point arrays ── */
 const D2R = Math.PI / 180;
@@ -404,23 +550,51 @@ function resample(pts, spacing = 1.8) {
   return out;
 }
 
-function buildStrokes(letter) {
-  return activeSet()[dispChar(letter)] ? activeSet()[dispChar(letter)].map(segs => {
+/* A glyph carries its own case: 'A' is always a capital, whatever the
+   abc/ABC toggle says. That matters for names like "Ali", where the first
+   letter is a capital and the rest are not. */
+function setForGlyph(ch) {
+  if (/[0-9]/.test(ch)) return DIGITS;
+  if (/[A-Z]/.test(ch)) return CAPITALS;
+  return LETTERS;
+}
+
+function buildStrokes(ch) {
+  const segsList = setForGlyph(ch)[ch];
+  if (!segsList) return [];
+  return segsList.map(segs => {
     if (segs[0][0] === 'DOT') {
       return { isDot: true, x: segs[0][1], y: segs[0][2], pts: [[segs[0][1], segs[0][2]]] };
     }
     const pts = resample(rawPoints(segs));
     return { isDot: false, pts, start: pts[0], end: pts[pts.length - 1] };
-  }) : [];
+  });
 }
 
+/* Every glyph we might ask for must actually have stroke data, or a learner
+   hits a blank canvas. Traceable() lets the word lists be filtered once, up
+   front, instead of failing at trace time. */
+const traceable = ch => !!setForGlyph(ch)[ch];
+
 /* ══════════════ STATE ══════════════ */
-let currentCase = 'lower';   /* 'lower' | 'upper' */
+let currentMode = 'letters';
+let currentCase = 'lower';   /* 'lower' | 'upper' — letters mode only */
 let currentLetter = 'a';
-const activeSet = () => currentCase === 'upper' ? CAPITALS : LETTERS;
+let units = [];              /* the current mode's list of units */
+let unitIdx = 0;
+let glyphIdx = 0;            /* which glyph of the current unit is being traced */
 const dispChar  = l  => currentCase === 'upper' ? l.toUpperCase() : l;
 const capWord   = w  => currentCase === 'upper' ? w[0].toUpperCase() + w.slice(1) : w;
-const spokenName = () => currentCase === 'upper' ? `capital ${currentLetter}` : currentLetter;
+const unit      = () => units[unitIdx] || { glyphs: [], text: '', word: '', emoji: '' };
+const curGlyph  = () => unit().glyphs[glyphIdx] || '';
+const isLetters = () => currentMode === 'letters';
+/* Spoken form of one glyph: TTS says "capital A" for capitals, and reads a
+   bare digit correctly, but needs the letter alone for lowercase. */
+function spokenGlyph(ch) {
+  if (/[0-9]/.test(ch)) return ch;
+  return /[A-Z]/.test(ch) ? `capital ${ch}` : ch;
+}
+const spokenName = () => spokenGlyph(curGlyph());
 let strokes = [];
 let strokeIdx = 0;
 let matchIdx = 0;          // furthest guide point reached in current stroke
@@ -440,7 +614,26 @@ const store = (() => {
     return { get: k => (k in mem ? mem[k] : null), set: (k, v) => { mem[k] = v; } };
   }
 })();
-let done = JSON.parse(store.get('wl_trace_done') || '{}');
+/* Stars are namespaced per mode. Letters keeps the original key so nobody
+   loses the alphabet they already worked through. */
+const doneKey = m => m === 'letters' ? 'wl_trace_done' : 'wl_trace_done_' + m;
+const doneMap = {};
+function loadDone(m) {
+  if (!doneMap[m]) {
+    try { doneMap[m] = JSON.parse(store.get(doneKey(m)) || '{}'); }
+    catch (e) { doneMap[m] = {}; }
+  }
+  return doneMap[m];
+}
+function markDone(m, key) {
+  const d = loadDone(m);
+  d[key] = true;
+  store.set(doneKey(m), JSON.stringify(d));
+}
+/* The learner's own name — "own name and address" is named directly in
+   VU23491's knowledge list, so it gets first-class storage. */
+const NAME_KEY = 'wl_trace_name';
+const savedName = () => (store.get(NAME_KEY) || '').trim();
 
 const TOL = 8.5, START_TOL = 14, LOOKAHEAD = 12;
 
@@ -658,25 +851,125 @@ function strokeComplete() {
   strokeIdx++;
   updatePips();
   if (strokeIdx >= strokes.length) {
-    letterComplete();
+    glyphComplete();
   } else {
     playTick();
   }
 }
 
-/* ══════════════ LETTER FLOW ══════════════ */
-function loadLetter(letter) {
+/* Finishing a glyph inside a word advances to the next one with a tick.
+   The fanfare and confetti are saved for the end of the whole unit, so a
+   three-letter word celebrates once, not three times. */
+function glyphComplete() {
+  glyphIdx++;
+  if (glyphIdx >= unit().glyphs.length) {
+    letterComplete();
+  } else {
+    playTick();
+    updateStrip();
+    loadGlyph();
+  }
+}
+
+/* ══════════════ UNITS ══════════════
+   A unit is one thing to copy: a letter, a combination, a word, a name or
+   a digit. Multi-glyph units are traced one glyph at a time at full canvas
+   size, so the stroke tolerance never has to shrink to fit a word on
+   screen — the whole word stays visible in the strip above instead. */
+/* `key` identifies the unit for navigation (stable across the abc/ABC
+   toggle); `star` is what the completion star is filed under, so tracing
+   'a' and 'A' still count separately as they always have. */
+function makeUnit(text, word, emoji, key, star) {
+  const glyphs = text.split('').filter(ch => ch !== ' ' && traceable(ch));
+  return {
+    key: key || text,
+    star: star || key || text,
+    text: text,
+    glyphs: glyphs,
+    word: word || text,
+    emoji: emoji || ''
+  };
+}
+
+function buildUnits(mode) {
+  if (mode === 'letters') {
+    return ALPHABET.map(l => {
+      const [word, emoji] = WORDS[l];
+      return makeUnit(dispChar(l), capWord(word), emoji, l, dispChar(l));
+    });
+  }
+  if (mode === 'combos') return COMBOS.map(c => makeUnit(c.text, c.word, c.emoji));
+  if (mode === 'words')  return TRACE_WORDS.map(w => makeUnit(w.text, w.text, w.emoji));
+  if (mode === 'digits') return '0123456789'.split('').map((d, i) =>
+    makeUnit(d, DIGIT_WORDS[i], DIGIT_EMOJI[i]));
+  if (mode === 'name') {
+    const n = savedName();
+    /* Names can hold characters we have no letterform for (hyphens,
+       accented vowels, non-Latin script). Trace what we can and keep the
+       full name visible in the strip, rather than refusing the name. */
+    return n ? [makeUnit(n, n, '🙋', 'name')] : [];
+  }
+  return [];
+}
+
+/* ══════════════ UNIT / GLYPH FLOW ══════════════ */
+function loadUnit(i) {
   stopDemo();
-  currentLetter = letter;
-  strokes = buildStrokes(letter);
-  strokeIdx = 0; matchIdx = 0; ink = []; drawing = false;
-  const [word, emoji] = WORDS[letter];
-  document.getElementById('pillText').textContent = dispChar(letter) + '  •  ' + capWord(word);
-  document.getElementById('pillEmoji').textContent = emoji;
-  document.getElementById('letterLabel').textContent = dispChar(letter);
-  updatePips();
+  unitIdx = Math.max(0, Math.min(i, units.length - 1));
+  glyphIdx = 0;
+  if (isLetters()) currentLetter = unit().key;
+  loadGlyph(true);
   updateGrid();
-  playDemo();   /* autoplay the stroke demonstration for every letter */
+}
+
+function loadGlyph(announce) {
+  stopDemo();
+  strokes = buildStrokes(curGlyph());
+  strokeIdx = 0; matchIdx = 0; ink = []; drawing = false;
+  updateHeader();
+  updatePips();
+  updateStrip();
+  if (announce !== false) playDemo();
+}
+
+function updateHeader() {
+  const u = unit();
+  const multi = u.glyphs.length > 1;
+  /* Single-glyph units read "a • apple"; multi-glyph ones lead with the
+     whole word, since that is the thing being copied. */
+  document.getElementById('pillText').textContent =
+    multi ? u.text : (u.text + '  •  ' + u.word);
+  document.getElementById('pillEmoji').textContent = u.emoji;
+  document.getElementById('letterLabel').textContent =
+    multi ? (glyphIdx + 1) + ' / ' + u.glyphs.length : u.text;
+  WL_I18N.applyTo(document.getElementById('glossLine'), WL_I18N.tw(u.word));
+}
+
+/* The strip is the only place the whole unit — and the spaces inside it —
+   is visible, because the canvas only ever shows one glyph. */
+function updateStrip() {
+  const wrap = document.getElementById('unitStrip');
+  const u = unit();
+  wrap.innerHTML = '';
+  if (u.glyphs.length < 2) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'flex';
+  let seen = 0;
+  u.text.split('').forEach(ch => {
+    const s = document.createElement('span');
+    if (ch === ' ') { s.className = 'g space'; s.textContent = ' '; wrap.appendChild(s); return; }
+    if (!traceable(ch)) { s.className = 'g'; s.textContent = ch; wrap.appendChild(s); return; }
+    s.className = 'g' + (seen < glyphIdx ? ' done' : seen === glyphIdx ? ' current' : '');
+    s.textContent = ch;
+    seen++;
+    wrap.appendChild(s);
+  });
+}
+
+/* Kept so the letter grid and case toggle can still address a letter
+   directly; everything else goes through loadUnit. */
+function loadLetter(letter) {
+  const i = units.findIndex(u => u.key === letter);
+  loadUnit(i < 0 ? 0 : i);
 }
 
 function updatePips() {
@@ -690,24 +983,26 @@ function updatePips() {
 }
 
 function letterComplete() {
-  done[dispChar(currentLetter)] = true;
-  store.set('wl_trace_done', JSON.stringify(done));
+  const u = unit();
+  markDone(currentMode, u.star);
+  updateStrip();
   updateGrid();
   playFanfare();
   launchConfetti();
-  const [word, emoji] = WORDS[currentLetter];
-  document.getElementById('celebLetter').textContent = dispChar(currentLetter);
-  document.getElementById('celebWord').textContent = capWord(word);
-  document.getElementById('celebEmoji').textContent = emoji;
+  document.getElementById('celebLetter').textContent = u.text;
+  document.getElementById('celebWord').textContent = u.word;
+  document.getElementById('celebEmoji').textContent = u.emoji;
+  WL_I18N.applyTo(document.getElementById('celebGloss'), WL_I18N.tw(u.word));
   document.getElementById('celebrate').classList.add('show');
-  const phrase = `${spokenName()}, as in ${word}.`;
+  /* A word says itself; a single letter is read as "a, as in apple". */
+  const phrase = u.glyphs.length > 1 ? u.word : `${spokenGlyph(u.text)}, as in ${u.word}.`;
   setTimeout(() => speak(phrase), 500);
 }
 
 document.getElementById('celebAgain').addEventListener('click', () => {
   document.getElementById('celebrate').classList.remove('show');
   stopConfetti();
-  loadLetter(currentLetter);   /* fresh start on the same letter */
+  loadUnit(unitIdx);   /* fresh start on the same unit */
 });
 document.getElementById('celebNext').addEventListener('click', () => {
   document.getElementById('celebrate').classList.remove('show');
@@ -757,8 +1052,9 @@ function speak(text) {
 }
 document.getElementById('hearBtn').addEventListener('click', () => speak(spokenName()));
 document.getElementById('wordPill').addEventListener('click', () => {
-  const [word] = WORDS[currentLetter];
-  speak(`${spokenName()}, as in ${word}.`);
+  const u = unit();
+  if (!u.glyphs.length) return;
+  speak(u.glyphs.length > 1 ? u.word : `${spokenGlyph(u.text)}, as in ${u.word}.`);
 });
 
 /* ══════════════ AUDIO FX (procedural, WordLink-game style) ══════════════ */
@@ -825,17 +1121,18 @@ function stopConfetti() {
 }
 
 /* ══════════════ NAV / GRID ══════════════ */
-/* The alphabet loops: lowercase a→z flows into capital A, and capital
-   Z flows back into lowercase a (and the same in reverse). */
+/* In letters mode the alphabet loops: lowercase a→z flows into capital A,
+   and capital Z flows back into lowercase a (and the same in reverse).
+   Other modes are short lists, so they simply wrap around. */
 function stepLetter(dir) {
-  const i = ALPHABET.indexOf(currentLetter);
-  const ni = i + dir;
-  if (ni >= 0 && ni < ALPHABET.length) {
-    loadLetter(ALPHABET[ni]);
-  } else {
+  const ni = unitIdx + dir;
+  if (ni >= 0 && ni < units.length) { loadUnit(ni); return; }
+  if (isLetters()) {
     const nextCase = currentCase === 'lower' ? 'upper' : 'lower';
     const wrapLetter = dir > 0 ? ALPHABET[0] : ALPHABET[ALPHABET.length - 1];
     setCaseAndLetter(nextCase, wrapLetter);
+  } else if (units.length) {
+    loadUnit(ni < 0 ? units.length - 1 : 0);
   }
 }
 document.getElementById('prevBtn').addEventListener('click', () => stepLetter(-1));
@@ -843,27 +1140,89 @@ document.getElementById('nextBtn').addEventListener('click', () => stepLetter(1)
 
 function updateGrid() {
   const grid = document.getElementById('letterGrid');
+  const done = loadDone(currentMode);
   grid.innerHTML = '';
-  ALPHABET.forEach(l => {
+  /* Words and names are too wide for the square alphabet chips, so those
+     modes get wider auto-sized chips instead. */
+  const wide = currentMode === 'words' || currentMode === 'name';
+  grid.style.gridTemplateColumns = wide
+    ? 'repeat(auto-fill, minmax(76px, 1fr))'
+    : 'repeat(auto-fill, minmax(44px, 1fr))';
+  units.forEach((u, i) => {
     const b = document.createElement('button');
-    b.className = 'letter-chip' + (l === currentLetter ? ' active' : '');
-    b.textContent = dispChar(l);
-    b.setAttribute('aria-label', 'Practise letter ' + dispChar(l));
-    if (done[dispChar(l)]) {
+    b.className = 'letter-chip' + (i === unitIdx ? ' active' : '');
+    b.textContent = u.text;
+    if (wide) { b.style.aspectRatio = 'auto'; b.style.padding = '12px 6px'; b.style.fontSize = '1rem'; }
+    b.setAttribute('aria-label', 'Practise ' + u.text);
+    if (done[u.star]) {
       const s = document.createElement('span');
       s.className = 'star'; s.textContent = '⭐';
       b.appendChild(s);
     }
-    b.addEventListener('click', () => loadLetter(l));
+    b.addEventListener('click', () => loadUnit(i));
     grid.appendChild(b);
   });
 }
+
+/* ══════════════ MODE SWITCHING ══════════════ */
+function setMode(mode) {
+  currentMode = mode;
+  units = buildUnits(mode);
+  const meta = MODES.find(m => m.id === mode) || MODES[0];
+  document.getElementById('headerSub').textContent = meta.sub;
+  document.getElementById('caseToggle').style.display = isLetters() ? '' : 'none';
+  document.getElementById('nameSetup').style.display = mode === 'name' ? 'flex' : 'none';
+  [...document.querySelectorAll('.mode-tab')].forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === mode));
+
+  if (!units.length) {
+    /* Only reachable in "my name" before a name has been entered. */
+    strokes = []; strokeIdx = 0; ink = [];
+    document.getElementById('pillText').textContent = 'Type your name above';
+    document.getElementById('pillEmoji').textContent = '🙋';
+    document.getElementById('letterLabel').textContent = '—';
+    document.getElementById('glossLine').style.display = 'none';
+    document.getElementById('unitStrip').style.display = 'none';
+    updatePips();
+    updateGrid();
+    document.getElementById('nameInput').focus();
+    return;
+  }
+  loadUnit(0);
+}
+
+function buildModeTabs() {
+  const wrap = document.getElementById('modeTabs');
+  wrap.innerHTML = '';
+  MODES.forEach(m => {
+    const b = document.createElement('button');
+    b.className = 'mode-tab' + (m.id === currentMode ? ' active' : '');
+    b.dataset.mode = m.id;
+    b.textContent = m.label;
+    b.addEventListener('click', () => setMode(m.id));
+    wrap.appendChild(b);
+  });
+}
+
+/* ══════════════ MY NAME ══════════════ */
+function saveName() {
+  const raw = document.getElementById('nameInput').value.trim();
+  if (!raw) return;
+  /* Stored as typed: a learner's name is theirs to capitalise. */
+  store.set(NAME_KEY, raw);
+  setMode('name');
+}
+document.getElementById('nameSaveBtn').addEventListener('click', saveName);
+document.getElementById('nameInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveName();
+});
 
 /* ══════════════ CASE TOGGLE ══════════════ */
 function setCaseAndLetter(c, letter) {
   currentCase = c;
   document.getElementById('caseLower').classList.toggle('active', c === 'lower');
   document.getElementById('caseUpper').classList.toggle('active', c === 'upper');
+  units = buildUnits('letters');   /* re-cased glyphs and words */
   loadLetter(letter);
 }
 function setCase(c) {
@@ -873,9 +1232,35 @@ function setCase(c) {
 document.getElementById('caseLower').addEventListener('click', () => setCase('lower'));
 document.getElementById('caseUpper').addEventListener('click', () => setCase('upper'));
 
+/* ══════════════ FIRST-LANGUAGE GLOSS ══════════════ */
+const langSelect = document.getElementById('langSelect');
+WL_I18N.populateSelect(langSelect);
+/* Re-render whatever is on screen once a translation file arrives. */
+WL_I18N.onChange(() => {
+  const u = unit();
+  WL_I18N.applyTo(document.getElementById('glossLine'), WL_I18N.tw(u.word));
+  const celeb = document.getElementById('celebrate');
+  if (celeb.classList.contains('show')) {
+    WL_I18N.applyTo(document.getElementById('celebGloss'), WL_I18N.tw(u.word));
+  }
+});
+langSelect.addEventListener('change', () => WL_I18N.setLang(langSelect.value));
+
 /* ══════════════ INIT ══════════════ */
 fitCanvas();
-loadLetter('a');
+buildModeTabs();
+
+/* ?mode=letters|combos|words|name|digits so the mode can be linked to
+   directly; falls back to letters for anything unrecognised. */
+const wantedMode = new URLSearchParams(location.search).get('mode');
+const nameInput = document.getElementById('nameInput');
+if (savedName()) nameInput.value = savedName();
+setMode(MODES.some(m => m.id === wantedMode) ? wantedMode : 'letters');
+
+/* Restore the language last chosen anywhere in the app. */
+const startLang = WL_I18N.saved();
+if (startLang) { langSelect.value = startLang; WL_I18N.setLang(startLang); }
+
 loop();
 </script>
 
