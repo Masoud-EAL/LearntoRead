@@ -1,8 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <path d="M50,10 L94,84 L6,84 Z" fill="#f5c518" stroke="#2d2a26" stroke-width="6" stroke-linejoin="round"/>
-  <circle cx="41" cy="40" r="5" fill="#2d2a26"/>
-  <path d="M41,47 L52,54 M41,47 L34,60" stroke="#2d2a26" stroke-width="5" stroke-linecap="round" fill="none"/>
-  <path d="M34,60 L60,66" stroke="#2d2a26" stroke-width="5" stroke-linecap="round"/>
-  <path d="M52,54 L63,50" stroke="#2d2a26" stroke-width="4" stroke-linecap="round"/>
-  <path d="M26,72 q10,-5 20,0 q10,5 22,0" stroke="#2d2a26" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- The yellow A-frame board that actually stands on the floor in
+       Australian shopping centres, hospitals and workplaces — far more
+       recognisable to a learner than the AS 1319 warning triangle. -->
+  <!-- rear panel, just showing behind the fold -->
+  <path d="M64,14 L74,14 L88,88 L76,88 Z" fill="#d4a017" stroke="#2d2a26"
+        stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- front panel -->
+  <path d="M32,14 L68,14 L82,88 L18,88 Z" fill="#f5c518" stroke="#2d2a26"
+        stroke-width="4" stroke-linejoin="round"/>
+  <!-- hinge at the top -->
+  <path d="M32,14 L68,14" stroke="#2d2a26" stroke-width="4" stroke-linecap="round"/>
+  <!-- Slipping figure. Kept to five bold, well-separated strokes: at the size
+       this renders in game (~90px) any finer articulation turns to mush. -->
+  <circle cx="62" cy="31" r="6" fill="#2d2a26"/>
+  <g fill="none" stroke="#2d2a26" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- torso, tipping backwards -->
+    <path d="M59,38 L48,51"/>
+    <!-- the leg that slips out in front, thrown up -->
+    <path d="M48,51 L31,45"/>
+    <!-- trailing leg, folding under -->
+    <path d="M48,51 L50,65 L41,68"/>
+    <!-- arms flung out -->
+    <path d="M56,42 L68,37"/>
+    <path d="M55,43 L45,36"/>
+  </g>
+  <!-- spill on the floor -->
+  <path d="M30,78 q7,-5 14,0 q7,5 14,0 q6,-4 12,0" fill="none" stroke="#2d2a26"
+        stroke-width="3.5" stroke-linecap="round"/>
 </svg>
