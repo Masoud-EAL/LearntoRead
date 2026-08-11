@@ -28,7 +28,10 @@
     --radius: 18px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { overscroll-behavior: none; }
+  /* The viewport tag already asks for no scaling, but iOS Safari ignores
+     user-scalable=no — so block the double-tap gesture here too. The canvas
+     sets the stricter touch-action:none for tracing itself. */
+  html, body { overscroll-behavior: none; touch-action: manipulation; }
   body {
     font-family: 'Nunito', sans-serif;
     background: var(--bg);

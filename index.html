@@ -38,6 +38,12 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  /* Stop a fast run of taps turning into double-tap zoom — the letter and
+     word grids invite exactly that. `manipulation` kills the double-tap
+     gesture but leaves pinch-zoom alone, which a learner with low vision may
+     genuinely need, and unlike user-scalable=no iOS Safari honours it. */
+  html, body { touch-action: manipulation; }
+
   body {
     font-family: 'Nunito', sans-serif;
     background: var(--bg);
