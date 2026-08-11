@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v17';
+const CACHE = 'learntoread-v18';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -27,6 +27,30 @@ const OPTIONAL = [
   './icons/neck.svg',
   './icons/stomach.svg',
   './icons/wig.svg',
+  // Signs and notices
+  './icons/sign-no-smoking.svg',
+  './icons/sign-no-parking.svg',
+  './icons/sign-no-entry.svg',
+  './icons/sign-wet-floor.svg',
+  './icons/sign-danger.svg',
+  './icons/sign-first-aid.svg',
+  './icons/sign-exit.svg',
+  './icons/sign-toilets.svg',
+  './icons/sign-wheelchair.svg',
+  './icons/sign-no-food.svg',
+  './icons/sign-bus-stop.svg',
+  // Coins and notes (stylised, value printed — not currency reproductions)
+  './icons/money-5c.svg',
+  './icons/money-10c.svg',
+  './icons/money-20c.svg',
+  './icons/money-50c.svg',
+  './icons/money-1d.svg',
+  './icons/money-2d.svg',
+  './icons/money-5d.svg',
+  './icons/money-10d.svg',
+  './icons/money-20d.svg',
+  './icons/money-50d.svg',
+  './icons/money-100d.svg',
   './fonts/fredoka-one-400.woff2',
   './fonts/nunito-400.woff2',
   './fonts/nunito-600.woff2',

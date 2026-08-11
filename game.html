@@ -250,6 +250,72 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .mc-switch::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s;}
 .mc-toggle-wrap.on .mc-switch{background:var(--teal);}
 .mc-toggle-wrap.on .mc-switch::after{transform:translateX(20px);}
+/* ── CEAL games: signs, text messages ── */
+/* The prompt slot is a 3.2rem emoji box, so anything injected into it resets
+   its own type size. */
+.sign-pic{width:auto;height:130px;max-width:100%;display:block;margin:0 auto;}
+.q-emoji-big .sign-pic{height:86px;}
+.sms-card{font-size:1rem;line-height:1.45;text-align:left;max-width:340px;margin:0 auto;
+  background:#e9f6e4;color:#16281a;border-radius:16px 16px 16px 4px;padding:12px 15px;
+  box-shadow:0 3px 12px rgba(0,0,0,.28);font-family:'Nunito',sans-serif;}
+.sms-from{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;
+  color:#4a7c59;margin-bottom:5px;}
+.sms-body{font-weight:600;}
+.q-emoji-big .sms-card{font-size:.82rem;max-width:280px;}
+
+/* ── Clock ── */
+.clock-section{display:none;flex-direction:column;align-items:center;gap:10px;width:100%;}
+#clock-svg{width:min(74vw,300px);height:min(74vw,300px);touch-action:none;user-select:none;}
+.clock-face{fill:#fdf6ec;stroke:#7c4dff;stroke-width:4;}
+.clock-tick{stroke:#8a7f75;stroke-width:2;stroke-linecap:round;}
+.clock-tick.hour{stroke:#2d2a26;stroke-width:4;}
+.clock-num{fill:#2d2a26;font-family:'Fredoka One',cursive;font-size:16px;text-anchor:middle;dominant-baseline:central;}
+.clock-hand{stroke-linecap:round;cursor:grab;}
+.clock-hand.hour{stroke:#2d2a26;stroke-width:9;}
+.clock-hand.minute{stroke:#f4845f;stroke-width:6;}
+.clock-hand.dragging{cursor:grabbing;}
+/* Fat invisible hit areas — a 6px hand is impossible to grab with a finger. */
+.clock-grab{stroke:transparent;stroke-width:34;stroke-linecap:round;cursor:grab;}
+.clock-pin{fill:#7c4dff;}
+.clock-readout{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--gold);}
+.clock-hint{font-size:.82rem;color:var(--muted);}
+.clock-static{width:min(56vw,220px);height:min(56vw,220px);display:block;margin:0 auto;}
+.q-emoji-big .clock-static{width:130px;height:130px;}
+
+/* ── Shop ── */
+.shop-section{display:none;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:440px;}
+.shop-total-row{display:flex;align-items:baseline;gap:10px;}
+.shop-total-label{font-size:.85rem;color:var(--muted);}
+.shop-total{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--gold);}
+.shop-total.over{color:var(--accent);}
+.shop-total.exact{color:var(--teal);}
+.coin-tray{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;}
+.coin{border:none;background:none;padding:0;cursor:pointer;transition:transform .12s;position:relative;}
+.coin:active{transform:scale(.9);}
+.coin img{width:60px;height:60px;display:block;pointer-events:none;}
+.coin .count{position:absolute;top:-4px;right:-4px;background:var(--teal);color:#fff;
+  font-family:'Fredoka One',cursive;font-size:.72rem;min-width:20px;height:20px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;padding:0 5px;}
+.price-tag{display:inline-block;background:#fffbe6;color:#2d2a26;border:3px dashed #f0b429;
+  border-radius:12px;padding:8px 18px;font-family:'Fredoka One',cursive;font-size:1.6rem;}
+.shop-item{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:3.4rem;line-height:1;}
+.shop-item .shop-name{font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;color:#cfc6bd;}
+.shop-item .paid-with{display:flex;align-items:center;gap:7px;margin-top:4px;
+  font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;color:var(--muted);}
+.shop-item .paid-with img{width:54px;height:54px;}
+.q-emoji-big .paid-with img{width:38px;height:38px;}
+.q-emoji-big .shop-item{font-size:2.2rem;}
+.q-emoji-big .price-tag{font-size:1.1rem;padding:5px 12px;}
+
+/* ── Fill the form ── */
+.form-section{display:none;flex-direction:column;gap:12px;width:100%;max-width:460px;}
+.form-fields{display:flex;flex-direction:column;gap:8px;}
+.form-row{display:flex;align-items:center;gap:9px;}
+.form-label{flex:0 0 40%;font-size:.86rem;font-weight:700;color:#cfc6bd;text-align:right;}
+.form-slot{flex:1;min-height:46px;border:2px dashed rgba(255,255,255,.22);border-radius:10px;
+  display:flex;align-items:center;padding:5px;transition:border-color .2s,border-style .2s;}
+.form-slot.filled{border-style:solid;border-color:var(--teal);}
+.form-slot.drop{border-color:var(--gold);}
 .q-emoji-big{font-size:2.8rem;line-height:1;min-height:1em;text-align:center;margin-bottom:4px;}
 .custom-icon-emoji{height:1em;width:1em;vertical-align:middle;display:inline-block;object-fit:contain;}
 .q-emoji-big .custom-icon-emoji{height:1em;width:1em;}
@@ -341,6 +407,11 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button class="q-type-tab" onclick="selectSoloType('letter',this)">🔤 Letter Names</button>
         <button class="q-type-tab" onclick="selectSoloType('lettersound',this)">🔊 First Sounds</button>
         <button class="q-type-tab" onclick="selectSoloType('oddone',this)">🧩 Odd One Out</button>
+        <button class="q-type-tab" onclick="selectSoloType('signs',this)">🚪 Signs</button>
+        <button class="q-type-tab" onclick="selectSoloType('sms',this)">📱 Messages</button>
+        <button class="q-type-tab" onclick="selectSoloType('clock',this)">⏰ Clock</button>
+        <button class="q-type-tab" onclick="selectSoloType('shop',this)">🛒 Shop</button>
+        <button class="q-type-tab" onclick="selectSoloType('forms',this)">📋 Forms</button>
         <button class="q-type-tab" onclick="selectSoloType('all',this)">All</button>
         <button class="q-type-tab" id="solo-custom-tab" onclick="showBankPicker('solo',this)">📚 Custom</button>
       </div>
@@ -413,6 +484,11 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
           <button class="q-type-tab" onclick="selectQType('letter',this)">🔤 Letter Names</button>
           <button class="q-type-tab" onclick="selectQType('lettersound',this)">🔊 First Sounds</button>
           <button class="q-type-tab" onclick="selectQType('oddone',this)">🧩 Odd One Out</button>
+          <button class="q-type-tab" onclick="selectQType('signs',this)">🚪 Signs</button>
+          <button class="q-type-tab" onclick="selectQType('sms',this)">📱 Messages</button>
+          <button class="q-type-tab" onclick="selectQType('clock',this)">⏰ Clock</button>
+          <button class="q-type-tab" onclick="selectQType('shop',this)">🛒 Shop</button>
+          <button class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
           <button class="q-type-tab" onclick="selectQType('all',this)">All</button>
           <button class="q-type-tab" id="teacher-custom-tab" onclick="showBankPicker('teacher',this)">📚 Custom</button>
         </div>
@@ -569,6 +645,27 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
     </div>
   </div>
   <div class="mc-section" id="mc-section" style="display:none;"></div>
+  <!-- Set-the-clock: drag the hands. Writes "H:MM" into #student-ans-input. -->
+  <div class="clock-section" id="clock-section" style="display:none;">
+    <svg id="clock-svg" viewBox="0 0 200 200" aria-label="Clock — drag the hands"></svg>
+    <div class="clock-readout" id="clock-readout">--:--</div>
+    <div class="clock-hint">Drag the hands to set the time</div>
+  </div>
+  <!-- Shop: tap coins to build an amount. Writes the total into the input. -->
+  <div class="shop-section" id="shop-section" style="display:none;">
+    <div class="shop-total-row">
+      <span class="shop-total-label" id="shop-total-label">You have paid</span>
+      <span class="shop-total" id="shop-total">$0.00</span>
+    </div>
+    <div class="coin-tray" id="coin-tray"></div>
+    <button class="btn btn-ghost btn-sm" id="coin-clear" onclick="shopClear()">↺ Start again</button>
+  </div>
+  <!-- Fill the form: tap a chip into a labelled slot. -->
+  <div class="form-section" id="form-section" style="display:none;">
+    <div class="form-fields" id="form-fields"></div>
+    <div class="unscrm-label">Tap an answer to put it in the next box</div>
+    <div class="word-bank-area" id="form-chips"></div>
+  </div>
   <button class="submit-btn" id="student-submit-btn" onclick="submitAnswer()">✓ Submit</button>
   <div class="submitted-msg" id="submitted-msg"></div>
   <button class="btn btn-ghost btn-sm" id="solo-back-btn" style="display:none;margin-top:4px;" onclick="showScreen('screen-solo-setup')">← Back to categories</button>
@@ -989,7 +1086,221 @@ const LEVEL0_SENTENCES=[
   {en:'I want to find a good job.',fa:'من می‌خواهم یک شغل خوب پیدا کنم.',vi:'Tôi muốn tìm một công việc tốt.',zh:'我想找一份好工作。',ar:'أريد إيجاد عمل جيد.',hi:'मैं एक अच्छी नौकरी ढूंढना चाहता हूँ।',ur:'میں ایک اچھی نوکری ڈھونڈنا چاہتا ہوں۔',km:'ខ្ញុំចង់រកការងារល្អ។',my:'ကျွန်ုပ် ကောင်းသောအလုပ် ရှာချင်သည်',th:'ฉันอยากหางานดีๆ'},
   {en:'I want to help my children with school.',fa:'من می‌خواهم به فرزندانم در مدرسه کمک کنم.',vi:'Tôi muốn giúp con tôi học bài.',zh:'我想帮孩子们学习。',ar:'أريد مساعدة أطفالي في المدرسة.',hi:'मैं अपने बच्चों की पढ़ाई में मदद करना चाहता हूँ।',ur:'میں اپنے بچوں کی پڑھائی میں مدد کرنا چاہتا ہوں۔',km:'ខ្ញុំចង់ជួយកូនៗ​ ក្នុងការរៀន។',my:'ကျွန်ုပ် ကလေးများ ကျောင်းတွင် ကူညီချင်သည်',th:'ฉันอยากช่วยลูกๆ เรื่องการเรียน'},
 ];
-const LANG_NAMES={vi:'Tiếng Việt',fa:'فارسی',ar:'العربية',zh:'中文',hi:'हिन्दी',ur:'اردو',km:'ខ្មែរ',my:'မြန်မာ',th:'ภาษาไทย'};
+const LANG_NAMES={vi:'Tiếng Việt',fa:'فارسی',ar:'العربية',zh:'中文',hi:'हिन्दी',ur:'اردو',km:'ខ្មែរ',my:'မြန်မာ',th:'ภាษាไทย'};
+
+/* ── SIGNS AND NOTICES ──
+   Signs are deliberately symbolic, never worded: a sign that says EXIT tests
+   nothing, but a green running figure asks the learner to read the meaning.
+   Answers are short phrases, so renderMcChoices falls through to its text
+   layout and the round stays a reading task. */
+const SIGNS=[
+  {icon:'no-smoking', answer:'No smoking',      alts:['No cooking','No matches','Smoking area']},
+  {icon:'no-parking', answer:'No parking',      alts:['Parking here','Pay to park','Bus parking']},
+  {icon:'no-entry',   answer:'Do not enter',    alts:['Come in','Stop and wait','Push the door']},
+  {icon:'wet-floor',  answer:'Wet floor',       alts:['Clean the floor','Swimming pool','No running']},
+  {icon:'danger',     answer:'Danger',          alts:['Information','Question','Turn left']},
+  {icon:'first-aid',  answer:'First aid',       alts:['Chemist','Add here','Hospital car park']},
+  {icon:'exit',       answer:'Exit this way',   alts:['Do not run','Sports room','Entry only']},
+  {icon:'toilets',    answer:'Toilets',         alts:['Changing room','Family room','Waiting room']},
+  {icon:'wheelchair', answer:'Wheelchair access', alts:['Hospital','No wheelchairs','Bicycle parking']},
+  {icon:'no-food',    answer:'No food or drink',alts:['Restaurant','Free lunch','Wash your hands']},
+  {icon:'bus-stop',   answer:'Bus stop',        alts:['Train station','No buses','Taxi rank']},
+];
+
+/* ── TEXT MESSAGES AND APPOINTMENT REMINDERS ──
+   One short message, then a question about it. The message renders as a phone
+   bubble through q.icon (which is innerHTML'd), so no runtime change is
+   needed — see showStudentQuestion. */
+const SMS_ITEMS=[
+  { from:'Noble Park Medical', body:'Hi Ali, your appointment with Dr Chen is on Tuesday 14 May at 2:30pm. Reply YES to confirm.',
+    qs:[ {q:'What day is the appointment?', answer:'Tuesday',  alts:['Monday','Thursday','Saturday']},
+         {q:'What time is the appointment?',answer:'2:30pm',   alts:['2:13pm','3:30pm','12:30pm']},
+         {q:'Who is the appointment with?', answer:'Dr Chen',  alts:['Dr Ali','The chemist','A teacher']} ] },
+  { from:'AMES Australia', body:'Your English class starts at 9:00am on Monday. Room 4. Please bring your book.',
+    qs:[ {q:'What time does the class start?',answer:'9:00am', alts:['9:00pm','8:00am','10:00am']},
+         {q:'Which room is the class in?',    answer:'Room 4', alts:['Room 9','Room 14','Room 1']},
+         {q:'What must you bring?',           answer:'Your book',alts:['Your lunch','Your phone','Some money']} ] },
+  { from:'Mum', body:'Can you buy milk and bread on the way home? Thank you.',
+    qs:[ {q:'What must you buy?',   answer:'Milk and bread', alts:['Milk and eggs','Bread and rice','Tea and sugar']},
+         {q:'Who sent the message?',answer:'Mum',            alts:['Your teacher','The doctor','The school']} ] },
+  { from:'Dental Clinic', body:'Reminder: your appointment is tomorrow at 11:15am. Please arrive 10 minutes early.',
+    qs:[ {q:'What time is the appointment?',answer:'11:15am',      alts:['11:50am','10:15am','1:15pm']},
+         {q:'When should you arrive?',      answer:'10 minutes early',alts:['10 minutes late','1 hour early','At 11:15am']} ] },
+  { from:'Your teacher', body:'There is no class on Friday. The centre is closed. See you on Monday.',
+    qs:[ {q:'Which day has no class?', answer:'Friday', alts:['Monday','Sunday','Tuesday']},
+         {q:'When is the next class?', answer:'Monday', alts:['Friday','Saturday','Tomorrow']} ] },
+  { from:'Housing Office', body:'Your rent is due on the 1st of June. Please pay $320 before this date.',
+    qs:[ {q:'How much is the rent?', answer:'$320',       alts:['$302','$3.20','$1320']},
+         {q:'When is the rent due?', answer:'1st of June',alts:['1st of July','6th of January','Today']} ] },
+];
+
+/* ── TIME / CLOCK ──
+   Difficulty ladder matches how time is taught: o'clock, then half past,
+   then quarters, then five-minute steps. */
+const CLOCK_STEPS={oclock:[0],half:[0,30],quarter:[0,15,30,45],five:[0,5,10,15,20,25,30,35,40,45,50,55]};
+const CLOCK_LADDER=['oclock','oclock','half','half','quarter','quarter','five','five'];
+
+function fmtTime(h,m){ return h+':'+String(m).padStart(2,'0'); }
+
+/* Spoken form — "half past seven", not "seven thirty". This is the phrasing
+   learners actually meet, and it's what the listening half of the game tests. */
+const MIN_WORDS={5:'five past',10:'ten past',15:'quarter past',20:'twenty past',25:'twenty-five past',
+  30:'half past',35:'twenty-five to',40:'twenty to',45:'quarter to',50:'ten to',55:'five to'};
+const HOUR_WORDS=['twelve','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve'];
+function timeWords(h,m){
+  if(m===0) return HOUR_WORDS[h]+" o'clock";
+  const nextH=h===12?1:h+1;
+  return MIN_WORDS[m]+' '+HOUR_WORDS[m>30?nextH:h];
+}
+
+/* Static clock face for the read-the-clock rounds. Inline SVG so it can be
+   dropped straight into the question prompt, which is innerHTML'd. */
+function clockSvgMarkup(h,m,cls){
+  const cx=100,cy=100,r=84;
+  let ticks='',nums='';
+  for(let i=0;i<60;i++){
+    const a=i*6*Math.PI/180, big=i%5===0, len=big?7:4;
+    const x1=cx+Math.sin(a)*(r-2), y1=cy-Math.cos(a)*(r-2);
+    const x2=cx+Math.sin(a)*(r-2-len), y2=cy-Math.cos(a)*(r-2-len);
+    ticks+='<line class="clock-tick'+(big?' hour':'')+'" x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)
+          +'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'"/>';
+  }
+  for(let n=1;n<=12;n++){
+    const a=n*30*Math.PI/180;
+    nums+='<text class="clock-num" x="'+(cx+Math.sin(a)*(r-22)).toFixed(1)+'" y="'
+         +(cy-Math.cos(a)*(r-22)).toFixed(1)+'">'+n+'</text>';
+  }
+  const ha=((h%12)+m/60)*30, ma=m*6;
+  const hand=(ang,len,c)=>{
+    const a=ang*Math.PI/180;
+    return '<line class="clock-hand '+c+'" x1="'+cx+'" y1="'+cy+'" x2="'+(cx+Math.sin(a)*len).toFixed(1)
+      +'" y2="'+(cy-Math.cos(a)*len).toFixed(1)+'"/>';
+  };
+  return '<svg class="'+(cls||'clock-static')+'" viewBox="0 0 200 200" role="img" aria-label="clock">'
+    +'<circle class="clock-face" cx="100" cy="100" r="'+r+'"/>'+ticks+nums
+    +hand(ha,40,'hour')+hand(ma,56,'minute')
+    +'<circle class="clock-pin" cx="100" cy="100" r="6"/></svg>';
+}
+
+/* One round per rung of the ladder, alternating read-the-clock and
+   set-the-clock so a game never becomes all of one thing. */
+function genClockQuestions(n){
+  const out=[];
+  const count=n||CLOCK_LADDER.length;
+  for(let i=0;i<count;i++){
+    // Walk the ladder, repeating the hardest rung once past the end.
+    const rung=CLOCK_LADDER[Math.min(i,CLOCK_LADDER.length-1)];
+    const steps=CLOCK_STEPS[rung];
+    const h=1+Math.floor(Math.random()*12);
+    const m=steps[Math.floor(Math.random()*steps.length)];
+    const correct=fmtTime(h,m);
+    if(i%2===0){
+      // Read the clock. Distractors are the mistakes learners actually make:
+      // reading the hands the wrong way round, and slipping an hour or a step.
+      const nextH=h===12?1:h+1, prevH=h===1?12:h-1;
+      const cand=[fmtTime(nextH,m), fmtTime(prevH,m),
+                  fmtTime(h,(m+15)%60), fmtTime(h,(m+30)%60),
+                  fmtTime(m===0?12:Math.max(1,Math.round(m/5)||12),h*5%60)];
+      const alts=[];
+      cand.forEach(c=>{ if(c!==correct&&!alts.includes(c)&&alts.length<3) alts.push(c); });
+      while(alts.length<3){
+        const c=fmtTime(1+Math.floor(Math.random()*12),steps[Math.floor(Math.random()*steps.length)]);
+        if(c!==correct&&!alts.includes(c)) alts.push(c);
+      }
+      out.push({type:'mc',noListen:true,icon:clockSvgMarkup(h,m),
+        question:'What time is it?',answer:correct.toLowerCase(),
+        choices:shuffle([correct,...alts])});
+    } else {
+      out.push({type:'clockset',hour:h,minute:m,answer:correct.toLowerCase(),
+        words:timeWords(h,m),
+        question:'Set the clock to '+correct+'  ·  '+timeWords(h,m)});
+    }
+  }
+  return out;
+}
+
+/* ── MONEY / SHOP ──
+   All arithmetic is in cents; money in floating point produces answers like
+   $6.500000000000001. Denominations are the Australian set.
+   Note: the coin and note graphics are deliberately stylised with the value
+   printed, not reproductions — real banknote imagery is restricted. */
+const DENOMS=[
+  {c:5,file:'5c',label:'5c'},      {c:10,file:'10c',label:'10c'},
+  {c:20,file:'20c',label:'20c'},   {c:50,file:'50c',label:'50c'},
+  {c:100,file:'1d',label:'$1'},    {c:200,file:'2d',label:'$2'},
+  {c:500,file:'5d',label:'$5'},    {c:1000,file:'10d',label:'$10'},
+  {c:2000,file:'20d',label:'$20'}, {c:5000,file:'50d',label:'$50'},
+];
+const SHOP_ITEMS=[
+  {emoji:'👟',name:'shoes'},   {emoji:'🧥',name:'a jacket'}, {emoji:'🎒',name:'a bag'},
+  {emoji:'☂️',name:'an umbrella'}, {emoji:'🍳',name:'a frying pan'}, {emoji:'🧺',name:'a laundry basket'},
+  {emoji:'🪑',name:'a chair'}, {emoji:'📚',name:'books'},    {emoji:'🕰️',name:'a clock'},
+  {emoji:'🚲',name:'a bicycle'},
+];
+function money(cents){ return '$'+(cents/100).toFixed(2); }
+/* The answer string drops the dollar sign — normalize() strips it anyway, so
+   "$67.50" and "67.50" already compare equal; this just keeps stored answers tidy. */
+function moneyAnswer(cents){ return (cents/100).toFixed(2); }
+
+function genShopQuestions(n){
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    const item=SHOP_ITEMS[Math.floor(Math.random()*SHOP_ITEMS.length)];
+    if(i%2===0){
+      // Pay the exact amount. Prices land in the unit's 50–100 range, in 50c
+      // steps so the 50c piece stays in play.
+      const cents=(50+Math.floor(Math.random()*50))*100+(Math.random()<0.5?50:0);
+      out.push({type:'shop',mode:'pay',cents:cents,answer:moneyAnswer(cents),
+        icon:'<div class="shop-item">'+item.emoji+'<span class="shop-name">'+item.name
+             +'</span><span class="price-tag">'+money(cents)+'</span></div>',
+        question:'Pay '+money(cents)+' for '+item.name});
+    } else {
+      // Count the change. Price is small and payment is $100, so the change
+      // itself falls between $50 and $100.
+      const price=(12+Math.floor(Math.random()*34))*100+(Math.random()<0.5?50:0);
+      const change=10000-price;
+      out.push({type:'shop',mode:'change',cents:change,paid:10000,price:price,
+        answer:moneyAnswer(change),
+        // Show the note handed over as well as the price — the sum only makes
+        // sense if you can see both sides of it.
+        icon:'<div class="shop-item">'+item.emoji+'<span class="shop-name">'+item.name
+             +'</span><span class="price-tag">'+money(price)+'</span>'
+             +'<span class="paid-with">you paid <img src="icons/money-100d.svg" alt="$100"></span></div>',
+        question:'You pay $100.00 for '+item.name+'. Tap your change.'});
+    }
+  }
+  return out;
+}
+
+/* ── FILL THE FORM ──
+   Chips of personal detail, dropped into the right labelled field. The answer
+   is composed as the field order the learner produced, so it compares with a
+   plain string like every other round. */
+const FORM_CARDS=[
+  { who:'Ali Hassan',
+    fields:[ {label:'First name',value:'Ali'}, {label:'Family name',value:'Hassan'},
+             {label:'Date of birth',value:'12 March 1990'}, {label:'Phone',value:'0412 345 678'} ] },
+  { who:'Mai Nguyen',
+    fields:[ {label:'First name',value:'Mai'}, {label:'Family name',value:'Nguyen'},
+             {label:'Address',value:'24 Smith St'}, {label:'Postcode',value:'3174'} ] },
+  { who:'Fatima Ahmadi',
+    fields:[ {label:'First name',value:'Fatima'}, {label:'Family name',value:'Ahmadi'},
+             {label:'Country of birth',value:'Afghanistan'}, {label:'Phone',value:'0433 221 100'} ] },
+  { who:'Chen Wei',
+    fields:[ {label:'First name',value:'Chen'}, {label:'Family name',value:'Wei'},
+             {label:'Date of birth',value:'3 July 1985'}, {label:'Address',value:'8 Park Rd'} ] },
+];
+function genFormQuestions(n){
+  const pool=shuffle([...FORM_CARDS]);
+  return pool.slice(0,n||pool.length).map(card=>({
+    type:'form',
+    fields:card.fields.map(f=>f.label),
+    chips:shuffle(card.fields.map(f=>f.value)),
+    answer:card.fields.map(f=>f.value).join(' | ').toLowerCase(),
+    // The type label already says what to do, so the prompt says who for.
+    question:'Fill in the form for '+card.who
+  }));
+}
 
 /* ── PRE-LITERACY PICTURE GAMES ──
    These three types are always multiple choice (they carry their own .choices)
@@ -1083,7 +1394,7 @@ function genOddOneOut(count){
   return out;
 }
 
-let questionBank={wp1:[],wp2:[],beginner:[],elementary:[],questionwords:[],numbers:[],numbers1120:[],numbers2199:[],days:[],months:[],weather:[],fruits:[],body:[],custom:[],unscramble:[],gramscramble:[],translate:[],letter:[],lettersound:[],oddone:[]};
+let questionBank={wp1:[],wp2:[],beginner:[],elementary:[],questionwords:[],numbers:[],numbers1120:[],numbers2199:[],days:[],months:[],weather:[],fruits:[],body:[],custom:[],unscramble:[],gramscramble:[],translate:[],letter:[],lettersound:[],oddone:[],signs:[],sms:[],clock:[],shop:[],forms:[]};
 let customBanks={};        // { bankId: { name, questions:[] } }
 let activeBankId=null;     // bank open in editor
 let selectedBankId=null;   // bank loaded for the game
@@ -1114,6 +1425,31 @@ function buildBank(){
   questionBank.unscramble=UNSCRAMBLE_SENTENCES.map(s=>({type:'unscramble',sentence:s,answer:s,words:s.trim().split(/\s+/)}));
   questionBank.gramscramble=UNSCRAMBLE_SENTENCES.map(s=>({type:'gramscramble',sentence:s,answer:s,words:s.trim().split(/\s+/)}));
   questionBank.translate=LEVEL0_SENTENCES.map(s=>({type:'translate',en:s.en,answer:s.en,translations:{fa:s.fa,vi:s.vi,zh:s.zh,ar:s.ar,hi:s.hi,ur:s.ur,km:s.km,my:s.my,th:s.th}}));
+  // Signs and SMS are plain 4-option MC, so the existing runtime renders and
+  // scores them with no branching. noListen keeps them a reading task —
+  // speaking the question aloud would give the answer away.
+  questionBank.signs=SIGNS.map(s=>({
+    type:'mc', noListen:true,
+    icon:'<img src="icons/sign-'+s.icon+'.svg" class="sign-pic" alt="">',
+    question:'What does this sign mean?',
+    answer:s.answer.toLowerCase(),
+    choices:shuffle([s.answer,...s.alts])
+  }));
+  questionBank.clock=genClockQuestions();
+  questionBank.shop=genShopQuestions();
+  questionBank.forms=genFormQuestions();
+  questionBank.sms=[];
+  SMS_ITEMS.forEach(m=>{
+    const bubble='<div class="sms-card"><div class="sms-from">'+m.from+'</div>'
+      +'<div class="sms-body">'+m.body+'</div></div>';
+    m.qs.forEach(item=>{
+      questionBank.sms.push({
+        type:'mc', noListen:true, icon:bubble, question:item.q,
+        answer:item.answer.toLowerCase(),
+        choices:shuffle([item.answer,...item.alts])
+      });
+    });
+  });
 }
 function poolFor(type){
   const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body];
@@ -1138,12 +1474,22 @@ function poolFor(type){
   if(type==='letter') return [...questionBank.letter];
   if(type==='lettersound') return [...questionBank.lettersound];
   if(type==='oddone') return [...questionBank.oddone];
+  if(type==='signs') return [...questionBank.signs];
+  if(type==='sms') return [...questionBank.sms];
+  if(type==='clock') return [...questionBank.clock];
+  if(type==='shop') return [...questionBank.shop];
+  if(type==='forms') return [...questionBank.forms];
   return [...questionBank.wp1,...questionBank.wp2,...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.numbers1120,...questionBank.numbers2199,...questionBank.custom];
 }
 
 function getQuestions(type,limit){
   // Build a fresh, category-balanced set each game so categories don't cluster.
   if(type==='oddone') return genOddOneOut(limit);
+  // Clock, shop and forms are generated, not fixed lists — rebuild each game
+  // so the same times, prices and cards don't come round every time.
+  if(type==='clock') return genClockQuestions(limit);
+  if(type==='shop')  return genShopQuestions(limit);
+  if(type==='forms') return genFormQuestions(limit);
   const pool=poolFor(type);
   shuffle(pool);
   return pool.slice(0,limit);
@@ -1839,14 +2185,14 @@ function playQuestion(){
   document.getElementById('game-prog').textContent='Question '+(currentQIdx+1)+' of '+total;
   const isMcQ=Array.isArray(q.choices)&&q.choices.length>0;
   const noAudio=q.type==='gramscramble'||q.type==='translate'||q.type==='mc';
-  document.getElementById('q-badge').textContent=q.qword?'QUESTION WORD':q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='lettersound'?'FIRST SOUND':q.type==='oddone'?'ODD ONE OUT':q.type==='mc'?'MULTIPLE CHOICE':'WORD';
-  document.getElementById('q-hint').textContent=q.type==='oddone'?'Students tap the picture that is different':q.type==='mc'?'Students tap the correct answer':(q.type==='unscramble'||q.type==='gramscramble')?(isMcQ?(q.type==='unscramble'?'Students listen and tap the sentence in the right order':'Students tap the sentence in the right order'):'Students arrange word tiles'):q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='translate'?'Students type the English sentence':'';
+  document.getElementById('q-badge').textContent=q.qword?'QUESTION WORD':q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='lettersound'?'FIRST SOUND':q.type==='oddone'?'ODD ONE OUT':q.type==='mc'?'MULTIPLE CHOICE':q.type==='clockset'?'CLOCK':q.type==='shop'?'MONEY':q.type==='form'?'FORM':'WORD';
+  document.getElementById('q-hint').textContent=q.type==='oddone'?'Students tap the picture that is different':q.type==='clockset'?'Students drag the clock hands to this time':q.type==='shop'?'Students tap coins to make this amount':q.type==='form'?'Students put each answer in the right box':q.type==='mc'?'Students tap the correct answer':(q.type==='unscramble'||q.type==='gramscramble')?(isMcQ?(q.type==='unscramble'?'Students listen and tap the sentence in the right order':'Students tap the sentence in the right order'):'Students arrange word tiles'):q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='translate'?'Students type the English sentence':'';
   document.getElementById('ans-bars').innerHTML='';
   document.getElementById('reveal-btn').style.display='';
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('q-emoji').innerHTML=q.icon||(q.type==='word'?emo(q.word):q.type==='letter'?q.letter:'');
-  document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':'🔊 Listen and spell the word';
+  document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':(q.type==='clockset'||q.type==='shop'||q.type==='form')?q.question:'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=(noAudio||q.noListen)?'none':'';
   renderTeacherOptions(q,false);
   // Resolve this question's time budget once (translate questions get double)
@@ -1868,8 +2214,11 @@ function teacherSpeak(){
   // Question-word banks in multiple choice are read-and-pick: no audio.
   if(q.qword&&Array.isArray(q.choices)&&q.choices.length) return;
   if(q.type==='lettersound'){ playSoundFile(q.soundFile); return; }
+  // Shop and form are reading tasks. Returning before the button is marked
+  // playing keeps it from sticking in the active state with nothing to hear.
+  if(q.type==='shop'||q.type==='form') return;
   btn.classList.add('playing');
-  const spokenText=q.type==='letter'?q.letter:q.type==='oddone'?'Tap the one that does not belong.':q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.word;
+  const spokenText=q.type==='letter'?q.letter:q.type==='oddone'?'Tap the one that does not belong.':q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.type==='clockset'?('Set the clock to '+q.words):q.word;
   const utt=new SpeechSynthesisUtterance(spokenText);
   utt.rate=0.7; utt.lang='en-AU';
   utt.onend=utt.onerror=()=>btn.classList.remove('playing');
@@ -2337,8 +2686,15 @@ function showStudentQuestion(q,startedAt,dur){
   const isMc=Array.isArray(q.choices)&&q.choices.length>0;
   const isTile=!isMc&&(q.type==='unscramble'||q.type==='gramscramble');
   const isTranslate=!isMc&&q.type==='translate';
-  document.getElementById('ans-input-section').style.display=(isMc||isTile)?'none':'';
+  // Widget rounds: each owns its own answer surface and writes the answer
+  // into the hidden input, so submitAnswer() needs no branch for them.
+  const isClock=q.type==='clockset', isShop=q.type==='shop', isForm=q.type==='form';
+  const isWidget=isClock||isShop||isForm;
+  document.getElementById('ans-input-section').style.display=(isMc||isTile||isWidget)?'none':'';
   document.getElementById('unscramble-section').style.display=isTile?'flex':'none';
+  document.getElementById('clock-section').style.display=isClock?'flex':'none';
+  document.getElementById('shop-section').style.display=isShop?'flex':'none';
+  document.getElementById('form-section').style.display=isForm?'flex':'none';
   document.getElementById('mc-section').style.display=isMc?'grid':'none';
   document.getElementById('translate-hint-wrap').style.display=isTranslate?'':'none';
   document.getElementById('hint-text').textContent='';
@@ -2352,7 +2708,9 @@ function showStudentQuestion(q,startedAt,dur){
   // Question-word banks carry noListen: no replay button in either mode. In MC
   // the learner reads the question and picks; when typing the question is spoken
   // once as it appears (see studentSpeak).
-  const hideHear=q.type==='gramscramble'||q.type==='translate'||q.type==='mc'||q.noListen;
+  // Clock keeps its audio: hearing "half past seven" and setting the hands is
+  // the listening half of the unit. Shop and form are reading tasks.
+  const hideHear=q.type==='gramscramble'||q.type==='translate'||q.type==='mc'||q.noListen||isShop||isForm;
   document.getElementById('s-hear-btn').style.display=hideHear?'none':'';
   document.getElementById('s-q-type').textContent=
     q.qword?(isMc?'TAP THE QUESTION WORD':'LISTEN — TYPE THE QUESTION WORD'):
@@ -2366,6 +2724,9 @@ function showStudentQuestion(q,startedAt,dur){
       q.type==='unscramble'?'LISTEN — TAP THE SENTENCE IN THE RIGHT ORDER':
       q.type==='gramscramble'?'TAP THE SENTENCE IN THE RIGHT ORDER':
       'LISTEN — TAP THE PICTURE'):
+    isClock?'CLOCK — drag the hands to the right time':
+    isShop?(q.mode==='change'?'MONEY — tap coins to make your change':'MONEY — tap coins to pay the right amount'):
+    isForm?'FORM — put each answer in the right box':
     isTile?(q.type==='gramscramble'?'GRAMMAR — arrange words in order':'UNSCRAMBLE — arrange the word tiles'):
     isTranslate?'TRANSLATE — type the English sentence':
     q.type==='sentence'?'SENTENCE — type the missing word':'WORD — listen and spell it';
@@ -2393,7 +2754,9 @@ function showStudentQuestion(q,startedAt,dur){
     document.getElementById('s-q-text').textContent=mcPrompt;
     setQTextLang(mcLang);
   } else {
-    document.getElementById('s-q-text').textContent=isTile?'Put the words in the correct order:':q.type==='sentence'?q.display:'🔊 Listen carefully…';
+    document.getElementById('s-q-text').textContent=
+      q.question?q.question:
+      isTile?'Put the words in the correct order:':q.type==='sentence'?q.display:'🔊 Listen carefully…';
     setQTextLang(null);
     document.getElementById('student-ans-input').placeholder='Type your answer…';
   }
@@ -2402,6 +2765,9 @@ function showStudentQuestion(q,startedAt,dur){
     const words=Array.isArray(q.words)?q.words:Object.values(q.words||{});
     renderUnscrambleTiles(words);
   }
+  if(isClock) renderClockWidget();
+  if(isShop)  renderShopWidget(q);
+  if(isForm)  renderFormWidget(q);
   showScreen('screen-student-answer');
   // Use the teacher-set budget broadcast with the question; fall back to the
   // local default (solo play, or an older host that didn't send one).
@@ -2431,6 +2797,195 @@ function renderMcChoices(q){
     btn.onclick=()=>selectMc(word,btn);
     box.appendChild(btn);
   });
+}
+
+/* ══════════════ CLOCK WIDGET ══════════════
+   Drag either hand. The minute hand snaps to five-minute steps and drags the
+   hour hand round with it proportionally, so the face always shows a real
+   clock position rather than an hour hand frozen on the numeral.
+   Like selectMc, this writes its answer into #student-ans-input, so
+   submitAnswer() and all the scoring stay untouched. */
+let clockH=12, clockM=0, clockDrag=null;
+
+function clockAngle(cx,cy,x,y){
+  return (Math.atan2(x-cx,cy-y)*180/Math.PI+360)%360;
+}
+function clockApply(){
+  const svg=document.getElementById('clock-svg');
+  const ha=((clockH%12)+clockM/60)*30, ma=clockM*6;
+  const set=(id,ang,len)=>{
+    const a=ang*Math.PI/180;
+    const el=svg.querySelector(id);
+    if(el){ el.setAttribute('x2',(100+Math.sin(a)*len).toFixed(1));
+            el.setAttribute('y2',(100-Math.cos(a)*len).toFixed(1)); }
+  };
+  set('#hand-hour',ha,40); set('#grab-hour',ha,40);
+  set('#hand-min',ma,56);  set('#grab-min',ma,56);
+  const t=fmtTime(clockH,clockM);
+  document.getElementById('clock-readout').textContent=t;
+  document.getElementById('student-ans-input').value=t;
+}
+
+function renderClockWidget(){
+  // Always start away from the answer, so the first round can't be won by
+  // submitting without touching anything.
+  clockH=(Math.floor(Math.random()*12))+1; clockM=0; clockDrag=null;
+  const svg=document.getElementById('clock-svg');
+  let ticks='',nums='';
+  for(let i=0;i<60;i++){
+    const a=i*6*Math.PI/180, big=i%5===0, len=big?7:4;
+    ticks+='<line class="clock-tick'+(big?' hour':'')+'" x1="'+(100+Math.sin(a)*82).toFixed(1)
+      +'" y1="'+(100-Math.cos(a)*82).toFixed(1)+'" x2="'+(100+Math.sin(a)*(82-len)).toFixed(1)
+      +'" y2="'+(100-Math.cos(a)*(82-len)).toFixed(1)+'"/>';
+  }
+  for(let n=1;n<=12;n++){
+    const a=n*30*Math.PI/180;
+    nums+='<text class="clock-num" x="'+(100+Math.sin(a)*62).toFixed(1)+'" y="'
+      +(100-Math.cos(a)*62).toFixed(1)+'">'+n+'</text>';
+  }
+  svg.innerHTML='<circle class="clock-face" cx="100" cy="100" r="84"/>'+ticks+nums
+    +'<line class="clock-hand hour" id="hand-hour" x1="100" y1="100" x2="100" y2="60"/>'
+    +'<line class="clock-hand minute" id="hand-min" x1="100" y1="100" x2="100" y2="44"/>'
+    +'<line class="clock-grab" id="grab-hour" x1="100" y1="100" x2="100" y2="60"/>'
+    +'<line class="clock-grab" id="grab-min" x1="100" y1="100" x2="100" y2="44"/>'
+    +'<circle class="clock-pin" cx="100" cy="100" r="6"/>';
+  clockApply();
+}
+
+function clockPoint(e){
+  const svg=document.getElementById('clock-svg');
+  const r=svg.getBoundingClientRect();
+  // viewBox is 200 wide however big the element renders
+  return [(e.clientX-r.left)/r.width*200,(e.clientY-r.top)/r.height*200];
+}
+function clockDown(e){
+  if(answered) return;
+  const id=e.target&&e.target.id;
+  if(id!=='grab-hour'&&id!=='grab-min') return;
+  clockDrag=id==='grab-hour'?'hour':'min';
+  document.getElementById('clock-svg').setPointerCapture(e.pointerId);
+  e.preventDefault();
+}
+function clockMove(e){
+  if(!clockDrag) return;
+  const [x,y]=clockPoint(e);
+  const ang=clockAngle(100,100,x,y);
+  if(clockDrag==='min'){
+    clockM=(Math.round(ang/30)*5)%60;
+  } else {
+    // Subtract the minute contribution so the hand lands on the hour the
+    // learner is pointing at, not one short of it.
+    let h=Math.round((ang-clockM*0.5)/30)%12;
+    if(h<0) h+=12;
+    clockH=h===0?12:h;
+  }
+  clockApply();
+  e.preventDefault();
+}
+function clockUp(){ clockDrag=null; }
+
+(function bindClock(){
+  const svg=document.getElementById('clock-svg');
+  if(!svg) return;
+  svg.addEventListener('pointerdown',clockDown);
+  svg.addEventListener('pointermove',clockMove);
+  svg.addEventListener('pointerup',clockUp);
+  svg.addEventListener('pointercancel',clockUp);
+  // touch-action:none covers most browsers; iOS Safari can still rubber-band,
+  // so cancel the touch outright while a hand is being dragged.
+  svg.addEventListener('touchmove',e=>{ if(clockDrag) e.preventDefault(); },{passive:false});
+})();
+
+/* ══════════════ SHOP WIDGET ══════════════ */
+let shopCents=0, shopTarget=0, shopCounts={};
+
+function shopApply(){
+  const el=document.getElementById('shop-total');
+  el.textContent=money(shopCents);
+  el.classList.toggle('exact',shopCents===shopTarget);
+  el.classList.toggle('over',shopCents>shopTarget);
+  document.getElementById('student-ans-input').value=moneyAnswer(shopCents);
+  DENOMS.forEach(d=>{
+    const badge=document.getElementById('coin-n-'+d.file);
+    if(badge){ const n=shopCounts[d.file]||0; badge.textContent=n; badge.style.display=n?'flex':'none'; }
+  });
+}
+function shopAdd(file){
+  if(answered) return;
+  const d=DENOMS.find(x=>x.file===file); if(!d) return;
+  shopCents+=d.c; shopCounts[file]=(shopCounts[file]||0)+1;
+  playTilePickup(); shopApply();
+}
+function shopClear(){
+  if(answered) return;
+  shopCents=0; shopCounts={}; playTileReturn(); shopApply();
+}
+function renderShopWidget(q){
+  shopCents=0; shopCounts={}; shopTarget=q.cents;
+  document.getElementById('shop-total-label').textContent=
+    q.mode==='change'?'Your change':'You have paid';
+  const tray=document.getElementById('coin-tray');
+  tray.innerHTML=DENOMS.map(d=>
+    '<button class="coin" onclick="shopAdd(\''+d.file+'\')" aria-label="Add '+d.label+'">'
+    +'<img src="icons/money-'+d.file+'.svg" alt="'+d.label+'">'
+    +'<span class="count" id="coin-n-'+d.file+'" style="display:none">0</span></button>').join('');
+  shopApply();
+}
+
+/* ══════════════ FORM WIDGET ══════════════
+   Labelled slots instead of one open sentence area. Tap a chip to drop it in
+   the first empty slot; tap a placed chip to send it back.
+
+   Note: this borrows the unscramble tile *styling* but deliberately not
+   makeTile(), which wires every tile into the unscramble drag engine —
+   its pointerdown handler would fire alongside ours and fling the chip into
+   the hidden #answer-area. */
+let formFields=[];
+
+function makeFormTile(word){
+  const t=document.createElement('div');
+  t.className='word-tile bank-tile';
+  t.textContent=word; t.dataset.word=word;
+  t.addEventListener('click',()=>formPlace(t));
+  return t;
+}
+
+function formApply(){
+  const vals=formFields.map(f=>{
+    const slot=document.getElementById('form-slot-'+f.i);
+    const tile=slot&&slot.querySelector('.word-tile');
+    slot.classList.toggle('filled',!!tile);
+    return tile?tile.dataset.word:'';
+  });
+  document.getElementById('student-ans-input').value=vals.join(' | ');
+}
+function formPlace(tile){
+  if(answered) return;
+  if(tile.parentNode&&tile.parentNode.classList.contains('form-slot')){
+    document.getElementById('form-chips').appendChild(tile);
+    tile.classList.replace('ans-tile','bank-tile');
+    playTileReturn(); formApply(); return;
+  }
+  const empty=formFields.map(f=>document.getElementById('form-slot-'+f.i))
+    .find(s=>s&&!s.querySelector('.word-tile'));
+  if(!empty) return;
+  empty.appendChild(tile);
+  tile.classList.replace('bank-tile','ans-tile');
+  playTileDrop(); formApply();
+}
+function renderFormWidget(q){
+  formFields=q.fields.map((label,i)=>({label,i}));
+  document.getElementById('form-fields').innerHTML=formFields.map(f=>
+    '<div class="form-row"><div class="form-label">'+f.label+'</div>'
+    +'<div class="form-slot" id="form-slot-'+f.i+'"></div></div>').join('');
+  const chips=document.getElementById('form-chips');
+  chips.innerHTML='';
+  // Each chip keeps its own handler as it moves between the bank and a slot,
+  // and formPlace() reads its current parent to decide which way it's going —
+  // so no delegation is needed (and none should be added: it would fire
+  // alongside the tile's own listener and toggle the chip straight back).
+  q.chips.forEach(v=>chips.appendChild(makeFormTile(v)));
+  formApply();
 }
 
 function selectMc(word,btn){
@@ -2463,6 +3018,10 @@ function studentSpeak(q){
   if(Q.type==='lettersound'){ playSoundFile(Q.soundFile); return; }
   if(Q.type==='letter'){ speakTTS(Q.letter); return; }
   if(Q.type==='oddone'){ speakTTS('Tap the one that does not belong.'); return; }
+  // Shop and form are reading tasks; the clock is the listening half of the
+  // time unit, so it speaks the target as "half past seven".
+  if(Q.type==='shop'||Q.type==='form') return;
+  if(Q.type==='clockset'){ speakTTS('Set the clock to '+Q.words); return; }
   const text=Q.type==='sentence'?Q.sentence.replace('___',Q.blank):Q.type==='unscramble'?Q.sentence:Q.word;
   if(!text) return;
   speakTTS(text);
