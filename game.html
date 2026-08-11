@@ -123,7 +123,125 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .waiting-msg{color:var(--muted);}
 
 /* STUDENT ANSWER */
-#screen-student-answer{padding:20px;align-items:center;gap:18px;}
+/* ── Student answer screen: everything on one screen, never scrolled ──
+   Low-literacy learners don't discover off-screen content — if Submit is
+   below the fold it may as well not exist. So this screen is a fixed-height
+   column: the timer and Submit are pinned, and the two flexible parts (the
+   question card and whatever answer widget is showing) shrink to fit and
+   scroll *inside themselves* only as a last resort.
+   dvh excludes mobile browser chrome, which vh does not; the vh line is the
+   fallback for browsers without dvh. */
+#screen-student-answer{
+  padding:10px 16px;
+  padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
+  align-items:center;
+  gap:clamp(4px,1.2vh,10px);
+  height:100vh;
+  height:100dvh;
+  min-height:0;
+  overflow:hidden;
+}
+/* Pinned: always visible, never shrink. */
+#screen-student-answer > .student-timer,
+#screen-student-answer > .submit-btn,
+#screen-student-answer > .submitted-msg,
+#screen-student-answer > #solo-back-btn{flex:0 0 auto;}
+/* Flexible: shrink first, then scroll within themselves. min-height:0 is what
+   actually lets a flex child shrink below its content. Both take their natural
+   height and shrink proportionally only when the total is too tall — neither
+   may grow, because a growing answer area squeezes the card and clips its own
+   "Hear it again" button. */
+#screen-student-answer > .s-q-card,
+#screen-student-answer > .mc-section,
+#screen-student-answer > .clock-section,
+#screen-student-answer > .shop-section,
+#screen-student-answer > .form-section,
+#screen-student-answer > .unscramble-section,
+#screen-student-answer > .ans-input-wrap,
+#screen-student-answer > #translate-hint-wrap{flex:0 1 auto;min-height:0;overflow-y:auto;}
+/* Whatever room is left over goes above Submit, so it sits at the bottom of
+   the screen in the same place every round. */
+#screen-student-answer > .submit-btn{margin-top:auto;}
+/* An empty prompt slot must take no room — min-height on a 3.2rem font was
+   opening a blank band above the question on rounds with no picture. */
+#screen-student-answer > .s-q-card #s-q-emoji:empty{display:none;}
+
+/* Sizes that have to give way on a short screen. */
+#screen-student-answer .student-timer{font-size:clamp(1.3rem,5.5vh,3.5rem);line-height:1.05;}
+#screen-student-answer .s-q-card{padding:clamp(10px,2.2vh,22px);}
+#screen-student-answer .submit-btn{padding:clamp(11px,2.2vh,18px);font-size:clamp(1rem,2.6vh,1.3rem);}
+#screen-student-answer .s-q-text{font-size:clamp(1rem,3.2vh,1.5rem);margin-bottom:clamp(6px,1.4vh,14px);}
+#screen-student-answer #s-q-emoji{font-size:clamp(1.8rem,7vh,3.2rem)!important;margin:clamp(2px,.8vh,6px) 0 clamp(4px,1.2vh,10px)!important;}
+#screen-student-answer .s-hear-btn{padding:clamp(5px,1.6vh,11px) clamp(12px,4vw,20px);font-size:clamp(.8rem,2.2vh,1.08rem);}
+
+/* Very small phones: trade a little tap area for fitting on screen, since
+   content the learner can't see is worth less than content that's slightly
+   smaller. Floors stay above ~44px for anything you actually tap. */
+@media (max-height:500px){
+  #screen-student-answer .mc-choice{min-height:44px;}
+  #screen-student-answer .word-tile{padding:5px 10px;font-size:.88rem;}
+  #screen-student-answer .form-slot{min-height:28px;}
+  #screen-student-answer .student-timer{font-size:1.1rem;}
+  #screen-student-answer .coin img{width:38px;height:38px;}
+  #screen-student-answer #clock-svg{width:min(62vw,27vh,300px);height:min(62vw,27vh,300px);}
+  #screen-student-answer .shop-item{font-size:clamp(1.2rem,4.5vh,3.4rem);}
+  #screen-student-answer .price-tag{font-size:clamp(.95rem,3vh,1.6rem);padding:3px 12px;}
+  /* Dragging is discoverable from the pulsing hands; the sentence is not
+     worth the row it costs on a screen this short. */
+  #screen-student-answer .clock-hint{display:none;}
+}
+
+/* The shop prompt is the tallest of the five (picture + name + price tag), so
+   it needs trimming a tier earlier than everything else. */
+@media (max-height:560px){
+  /* "Pay $66.00 for an umbrella" only repeats the price tag above it and the
+     instruction in the type label — the first thing worth dropping. */
+  #screen-student-answer[data-qtype="shop"] .s-q-text{display:none;}
+  #screen-student-answer .shop-item{font-size:clamp(1.2rem,4.6vh,3.4rem);}
+  #screen-student-answer .price-tag{font-size:clamp(.95rem,3vh,1.6rem);padding:3px 12px;}
+  #screen-student-answer .coin img{width:clamp(38px,8vh,60px);height:clamp(38px,8vh,60px);}
+}
+
+/* An old 320×480 phone leaves only ~400px once browser chrome is taken off.
+   Last tier of shrinking before internal scrolling is unavoidable. */
+@media (max-height:440px){
+  #screen-student-answer{gap:3px;padding:6px 10px;}
+  #screen-student-answer .word-tile{padding:3px 8px;font-size:.8rem;}
+  #screen-student-answer .form-slot{min-height:24px;}
+  #screen-student-answer .form-label{font-size:.66rem;}
+  #screen-student-answer .form-section{gap:3px;}
+  #screen-student-answer .form-fields{gap:3px;}
+  #screen-student-answer .mc-choice{min-height:38px;padding:4px 8px;font-size:.9rem;}
+  #screen-student-answer .s-q-card{padding:7px;}
+  #screen-student-answer .unscrm-label{display:none;}
+  #screen-student-answer .coin img{width:34px;height:34px;}
+  #screen-student-answer .shop-item{font-size:1.1rem;}
+}
+
+/* Landscape phone: ~330px tall is too short to stack a question above an
+   answer, however small the type gets. Side by side instead, with the timer
+   moved out of the flow into the corner. */
+@media (max-height:520px) and (min-aspect-ratio:1/1){
+  #screen-student-answer{flex-direction:row;flex-wrap:wrap;align-content:flex-start;
+    justify-content:center;column-gap:14px;row-gap:6px;padding-top:44px;}
+  /* Centred, because the fixed Back and Music buttons own both top corners. */
+  #screen-student-answer > .student-timer{position:absolute;top:2px;left:50%;
+    transform:translateX(-50%);font-size:1.5rem;z-index:2;}
+  #screen-student-answer > .s-q-card{flex:1 1 42%;max-width:46%;align-self:stretch;}
+  #screen-student-answer > .mc-section,
+  #screen-student-answer > .clock-section,
+  #screen-student-answer > .shop-section,
+  #screen-student-answer > .form-section,
+  #screen-student-answer > .unscramble-section,
+  #screen-student-answer > .ans-input-wrap,
+  #screen-student-answer > #translate-hint-wrap{flex:1 1 46%;max-width:52%;align-self:stretch;}
+  #screen-student-answer > .submit-btn{flex:0 0 100%;max-width:420px;margin-top:2px;}
+  #screen-student-answer > .submitted-msg,
+  #screen-student-answer > #solo-back-btn{flex:0 0 100%;text-align:center;}
+  #screen-student-answer #clock-svg{width:min(38vw,56vh,240px);height:min(38vw,56vh,240px);}
+  #screen-student-answer .mc-section{grid-template-columns:1fr 1fr;}
+  #screen-student-answer .clock-hint{display:none;}
+}
 .student-timer{font-family:'Fredoka One',cursive;font-size:3.5rem;color:var(--gold);text-shadow:0 0 20px rgba(245,166,35,.5);}
 .student-timer.urgent{color:var(--accent);animation:urgentPulse .5s infinite;}
 @keyframes urgentPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
@@ -205,12 +323,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .lb-row.winner-row{background:rgba(255,215,0,.13);border:1.5px solid rgba(255,215,0,.4);border-radius:10px;}
 
 /* UNSCRAMBLE TILES */
-.unscramble-section{width:100%;max-width:520px;flex-direction:column;gap:12px;}
-.unscrm-label{font-size:.82rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
-.answer-area{display:flex;flex-wrap:wrap;align-content:flex-start;gap:10px;min-height:64px;padding:12px;background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.18);border-radius:12px;transition:border-color .2s,border-style .2s;}
+.unscramble-section{width:100%;max-width:520px;flex-direction:column;gap:clamp(6px,1.4vh,12px);}
+.unscrm-label{font-size:clamp(.68rem,1.7vh,.82rem);font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:clamp(2px,.6vh,4px);}
+.answer-area{display:flex;flex-wrap:wrap;align-content:flex-start;gap:8px;min-height:clamp(46px,9vh,64px);padding:clamp(6px,1.4vh,12px);background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.18);border-radius:12px;transition:border-color .2s,border-style .2s;}
 .answer-area.complete{border-color:var(--teal);border-style:solid;}
 .word-bank-area{display:flex;flex-wrap:wrap;gap:10px;padding:12px;background:rgba(255,255,255,.04);border-radius:12px;}
-.word-tile{display:inline-flex;align-items:center;padding:11px 18px;border-radius:11px;font-family:'Fredoka One',cursive;font-size:1.25rem;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;border:2px solid transparent;transition:transform .12s,filter .12s,background .15s,border-color .15s;line-height:1.2;}
+.word-tile{display:inline-flex;align-items:center;padding:clamp(6px,1.5vh,11px) clamp(11px,3vw,18px);border-radius:11px;font-family:'Fredoka One',cursive;font-size:clamp(.95rem,2.6vh,1.25rem);cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;border:2px solid transparent;transition:transform .12s,filter .12s,background .15s,border-color .15s;line-height:1.2;}
 .word-tile:active{transform:scale(.93);}
 .bank-tile{background:var(--purple);color:white;}
 .bank-tile:hover{transform:translateY(-2px);filter:brightness(1.15);}
@@ -222,7 +340,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 
 /* MULTIPLE CHOICE (4 options) */
 .mc-section{width:100%;max-width:520px;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.mc-choice{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:120px;padding:16px 12px;background:var(--card);border:2px solid rgba(255,255,255,.12);border-radius:16px;cursor:pointer;transition:transform .12s,border-color .15s,background .15s;color:var(--text);font-family:'Fredoka One',cursive;}
+.mc-choice{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:clamp(50px,12vh,120px);padding:clamp(6px,1.6vh,16px) 12px;background:var(--card);border:2px solid rgba(255,255,255,.12);border-radius:16px;cursor:pointer;transition:transform .12s,border-color .15s,background .15s;color:var(--text);font-family:'Fredoka One',cursive;}
 .mc-choice:hover{transform:translateY(-3px);border-color:var(--purple);}
 .mc-choice:active{transform:scale(.96);}
 .mc-choice .mc-pic{font-size:3.2rem;line-height:1;}
@@ -253,9 +371,9 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 /* ── CEAL games: signs, text messages ── */
 /* The prompt slot is a 3.2rem emoji box, so anything injected into it resets
    its own type size. */
-.sign-pic{width:auto;height:130px;max-width:100%;display:block;margin:0 auto;}
+.sign-pic{width:auto;height:clamp(70px,17vh,130px);max-width:100%;display:block;margin:0 auto;}
 .q-emoji-big .sign-pic{height:86px;}
-.sms-card{font-size:1rem;line-height:1.45;text-align:left;max-width:340px;margin:0 auto;
+.sms-card{font-size:clamp(.85rem,2.2vh,1rem);line-height:1.4;text-align:left;max-width:340px;margin:0 auto;
   background:#e9f6e4;color:#16281a;border-radius:16px 16px 16px 4px;padding:12px 15px;
   box-shadow:0 3px 12px rgba(0,0,0,.28);font-family:'Nunito',sans-serif;}
 .sms-from{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;
@@ -265,7 +383,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 
 /* ── Clock ── */
 .clock-section{display:none;flex-direction:column;align-items:center;gap:10px;width:100%;}
-#clock-svg{width:min(74vw,300px);height:min(74vw,300px);touch-action:none;user-select:none;}
+#clock-svg{width:min(72vw,32vh,300px);height:min(72vw,32vh,300px);touch-action:none;user-select:none;flex:0 0 auto;}
 .clock-face{fill:#fdf6ec;stroke:#7c4dff;stroke-width:4;}
 .clock-tick{stroke:#8a7f75;stroke-width:2;stroke-linecap:round;}
 .clock-tick.hour{stroke:#2d2a26;stroke-width:4;}
@@ -277,42 +395,45 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 /* Fat invisible hit areas — a 6px hand is impossible to grab with a finger. */
 .clock-grab{stroke:transparent;stroke-width:34;stroke-linecap:round;cursor:grab;}
 .clock-pin{fill:#7c4dff;}
-.clock-readout{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--gold);}
+.clock-readout{font-family:'Fredoka One',cursive;font-size:clamp(1.2rem,4vh,2rem);color:var(--gold);}
 .clock-hint{font-size:.82rem;color:var(--muted);}
-.clock-static{width:min(56vw,220px);height:min(56vw,220px);display:block;margin:0 auto;}
+/* Height-bounded as well as width-bounded: on a short screen the read-the-clock
+   face was pushing the bottom two answer choices off the edge. */
+.clock-static{width:min(56vw,29vh,220px);height:min(56vw,29vh,220px);display:block;margin:0 auto;}
 .q-emoji-big .clock-static{width:130px;height:130px;}
 
 /* ── Shop ── */
 .shop-section{display:none;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:440px;}
-.shop-total-row{display:flex;align-items:baseline;gap:10px;}
+.shop-total-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;}
+.shop-total-row #coin-clear{padding:5px 12px;font-size:clamp(.72rem,1.8vh,.85rem);}
 .shop-total-label{font-size:.85rem;color:var(--muted);}
-.shop-total{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--gold);}
+.shop-total{font-family:'Fredoka One',cursive;font-size:clamp(1.3rem,4vh,2rem);color:var(--gold);}
 .shop-total.over{color:var(--accent);}
 .shop-total.exact{color:var(--teal);}
-.coin-tray{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;}
+.coin-tray{display:flex;flex-wrap:wrap;gap:clamp(5px,1.2vh,9px);justify-content:center;}
 .coin{border:none;background:none;padding:0;cursor:pointer;transition:transform .12s;position:relative;}
 .coin:active{transform:scale(.9);}
-.coin img{width:60px;height:60px;display:block;pointer-events:none;}
+.coin img{width:clamp(38px,8.5vh,60px);height:clamp(38px,8.5vh,60px);display:block;pointer-events:none;}
 .coin .count{position:absolute;top:-4px;right:-4px;background:var(--teal);color:#fff;
   font-family:'Fredoka One',cursive;font-size:.72rem;min-width:20px;height:20px;border-radius:10px;
   display:flex;align-items:center;justify-content:center;padding:0 5px;}
 .price-tag{display:inline-block;background:#fffbe6;color:#2d2a26;border:3px dashed #f0b429;
-  border-radius:12px;padding:8px 18px;font-family:'Fredoka One',cursive;font-size:1.6rem;}
-.shop-item{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:3.4rem;line-height:1;}
-.shop-item .shop-name{font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;color:#cfc6bd;}
+  border-radius:12px;padding:clamp(4px,1.2vh,8px) 18px;font-family:'Fredoka One',cursive;font-size:clamp(1.1rem,3.6vh,1.6rem);}
+.shop-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:clamp(1.5rem,5.5vh,3.4rem);line-height:1;}
+.shop-item .shop-name{font-family:'Nunito',sans-serif;font-size:clamp(.8rem,2vh,1rem);font-weight:700;color:#cfc6bd;line-height:1.3;}
 .shop-item .paid-with{display:flex;align-items:center;gap:7px;margin-top:4px;
   font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;color:var(--muted);}
-.shop-item .paid-with img{width:54px;height:54px;}
+.shop-item .paid-with img{width:clamp(36px,7vh,54px);height:clamp(36px,7vh,54px);}
 .q-emoji-big .paid-with img{width:38px;height:38px;}
 .q-emoji-big .shop-item{font-size:2.2rem;}
 .q-emoji-big .price-tag{font-size:1.1rem;padding:5px 12px;}
 
 /* ── Fill the form ── */
-.form-section{display:none;flex-direction:column;gap:12px;width:100%;max-width:460px;}
-.form-fields{display:flex;flex-direction:column;gap:8px;}
+.form-section{display:none;flex-direction:column;gap:clamp(5px,1.4vh,12px);width:100%;max-width:460px;}
+.form-fields{display:flex;flex-direction:column;gap:clamp(4px,1vh,8px);}
 .form-row{display:flex;align-items:center;gap:9px;}
-.form-label{flex:0 0 40%;font-size:.86rem;font-weight:700;color:#cfc6bd;text-align:right;}
-.form-slot{flex:1;min-height:46px;border:2px dashed rgba(255,255,255,.22);border-radius:10px;
+.form-label{flex:0 0 38%;font-size:clamp(.72rem,1.9vh,.86rem);line-height:1.2;font-weight:700;color:#cfc6bd;text-align:right;}
+.form-slot{flex:1;min-height:clamp(30px,5.8vh,46px);border:2px dashed rgba(255,255,255,.22);border-radius:10px;
   display:flex;align-items:center;padding:5px;transition:border-color .2s,border-style .2s;}
 .form-slot.filled{border-style:solid;border-color:var(--teal);}
 .form-slot.drop{border-color:var(--gold);}
@@ -656,9 +777,11 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
     <div class="shop-total-row">
       <span class="shop-total-label" id="shop-total-label">You have paid</span>
       <span class="shop-total" id="shop-total">$0.00</span>
+      <!-- Sits on the total row rather than its own: a separate row cost ~40px
+           and was the first thing to fall off the bottom of a small phone. -->
+      <button class="btn btn-ghost btn-sm" id="coin-clear" onclick="shopClear()">↺ Start again</button>
     </div>
     <div class="coin-tray" id="coin-tray"></div>
-    <button class="btn btn-ghost btn-sm" id="coin-clear" onclick="shopClear()">↺ Start again</button>
   </div>
   <!-- Fill the form: tap a chip into a labelled slot. -->
   <div class="form-section" id="form-section" style="display:none;">
@@ -2765,6 +2888,8 @@ function showStudentQuestion(q,startedAt,dur){
     const words=Array.isArray(q.words)?q.words:Object.values(q.words||{});
     renderUnscrambleTiles(words);
   }
+  // Lets the stylesheet adapt per game without :has() (patchy on older Android).
+  document.getElementById('screen-student-answer').dataset.qtype=isMc?'mc':q.type;
   if(isClock) renderClockWidget();
   if(isShop)  renderShopWidget(q);
   if(isForm)  renderFormWidget(q);
@@ -2858,11 +2983,22 @@ function clockPoint(e){
   // viewBox is 200 wide however big the element renders
   return [(e.clientX-r.left)/r.width*200,(e.clientY-r.top)/r.height*200];
 }
+/* Which hand did the finger mean?
+   Not "which invisible grab line is on top" — both are 34 units wide and the
+   minute one is drawn later, so it swallowed every press near the centre and
+   the hour hand could not be grabbed at all when the two pointed the same
+   way. Decide from geometry instead: past the hour hand's reach it can only
+   be the minute hand, and within it, whichever hand the press lines up with. */
 function clockDown(e){
   if(answered) return;
-  const id=e.target&&e.target.id;
-  if(id!=='grab-hour'&&id!=='grab-min') return;
-  clockDrag=id==='grab-hour'?'hour':'min';
+  const [x,y]=clockPoint(e);
+  const r=Math.hypot(x-100,y-100);
+  if(r<7||r>80) return;                       // the centre pin, or off the face
+  const ang=clockAngle(100,100,x,y);
+  const sep=(a,b)=>Math.abs(((a-b)%360+540)%360-180);
+  const hourAng=((clockH%12)+clockM/60)*30;
+  clockDrag = r>44 ? 'min'
+            : (sep(ang,hourAng) <= sep(ang,clockM*6) ? 'hour' : 'min');
   document.getElementById('clock-svg').setPointerCapture(e.pointerId);
   e.preventDefault();
 }
