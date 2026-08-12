@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Collared button-up shirt. Read it by the pointed collar, the button
+       placket down the centre and the chest pocket — not by its colour.
+       Narrow, straight-cut body to sit apart from the bulky jumper. -->
+  <path d="M36,18 L50,30 L64,18 L78,23 L90,60 L77,67 L72,50 L72,88 L28,88 L28,50 L23,67 L10,60 L22,23 Z"
+        fill="#d8e6f2" stroke="#3d5a75" stroke-width="4" stroke-linejoin="round"/>
+  <!-- collar points -->
+  <path d="M36,18 L50,31 L37,35 Z" fill="#b9d0e4" stroke="#3d5a75" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M64,18 L50,31 L63,35 Z" fill="#b9d0e4" stroke="#3d5a75" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- button placket -->
+  <rect x="46" y="31" width="8" height="57" fill="#b9d0e4" stroke="#3d5a75" stroke-width="2.5"/>
+  <circle cx="50" cy="44" r="2.6" fill="#3d5a75"/>
+  <circle cx="50" cy="58" r="2.6" fill="#3d5a75"/>
+  <circle cx="50" cy="72" r="2.6" fill="#3d5a75"/>
+  <!-- chest pocket -->
+  <rect x="58" y="42" width="13" height="13" fill="none" stroke="#3d5a75" stroke-width="3"/>
+  <!-- buttoned cuffs -->
+  <path d="M79,55 L90,60 L77,67 L74,60 Z" fill="#b9d0e4" stroke="#3d5a75" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M21,55 L10,60 L23,67 L26,60 Z" fill="#b9d0e4" stroke="#3d5a75" stroke-width="3" stroke-linejoin="round"/>
+</svg>

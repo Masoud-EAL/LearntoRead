@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v20';
+const CACHE = 'learntoread-v21';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -40,6 +40,7 @@ const OPTIONAL = [
   './icons/sign-no-food.svg',
   './icons/sign-bus-stop.svg',
   // Clothes and accessories with no Unicode emoji
+  './icons/clothes-shirt.svg',
   './icons/clothes-jumper.svg',
   './icons/clothes-jacket.svg',
   './icons/clothes-hoodie.svg',
