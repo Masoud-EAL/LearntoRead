@@ -73,6 +73,21 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 @keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
 .q-type-tabs{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap;}
 
+/* ── Section filter chips ──
+   27 banks is too many to scan. A chip narrows the list to one skill; each
+   bank still appears once, so the existing "highlight the clicked pill"
+   logic is untouched. */
+.section-chips{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;}
+.section-chip{padding:4px 9px;border-radius:50px;font-size:.7rem;font-weight:700;
+  border:1.5px solid rgba(255,255,255,.12);background:transparent;color:var(--muted);
+  cursor:pointer;white-space:nowrap;transition:all .15s;}
+.section-chip.active{background:var(--purple);color:#fff;border-color:var(--purple);}
+/* On a short screen the chip row would eat the category list, which is only
+   ~148px there — scroll it sideways instead of spending two rows on it. */
+@media (max-height:620px){
+  .section-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px;}
+}
+
 /* ── Solo setup: keep "Start Practice" on screen ──
    27 categories wrap to 13-17 rows, which pushed the Start button below the
    fold at every phone size — the same trap as the answer screen, and the one
@@ -564,35 +579,36 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:20px;gap:20px;">
     <div class="card" style="width:100%;max-width:500px;">
       <p style="font-family:'Fredoka One',cursive;font-size:1rem;color:var(--teal);margin-bottom:10px;">📚 Choose a category</p>
+      <div class="section-chips" id="solo-section-chips"></div>
       <div class="q-type-tabs">
-        <button class="q-type-tab active" onclick="selectSoloType('wp1',this)">📖 WP1</button>
-        <button class="q-type-tab" onclick="selectSoloType('wp2',this)">📗 WP2</button>
-        <button class="q-type-tab" onclick="selectSoloType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
-        <button class="q-type-tab" onclick="selectSoloType('elementary',this)">📄 Elementary Listen and Fill Gaps</button>
-        <button class="q-type-tab" onclick="selectSoloType('questionwords',this)">❓ Question Words</button>
-        <button class="q-type-tab" onclick="selectSoloType('numbers',this)">🔢 1–10</button>
-        <button class="q-type-tab" onclick="selectSoloType('numbers1120',this)">🔢 Numbers 11–20</button>
-        <button class="q-type-tab" onclick="selectSoloType('numbers2199',this)">🔢 Numbers 21–99</button>
-        <button class="q-type-tab" onclick="selectSoloType('days',this)">📅 Days</button>
-        <button class="q-type-tab" onclick="selectSoloType('months',this)">🗓️ Months</button>
-        <button class="q-type-tab" onclick="selectSoloType('weather',this)">🌦️ Weather</button>
-        <button class="q-type-tab" onclick="selectSoloType('fruits',this)">🍎 Fruits</button>
-        <button class="q-type-tab" onclick="selectSoloType('body',this)">👤 Body</button>
-        <button class="q-type-tab" onclick="selectSoloType('clothes',this)">👕 Clothes</button>
-        <button class="q-type-tab" onclick="selectSoloType('spelling',this)">🗂️ All Spelling</button>
-        <button class="q-type-tab" onclick="selectSoloType('unscramble',this)">🎧 Listen and Unscramble</button>
-        <button class="q-type-tab" onclick="selectSoloType('gramscramble',this)">🔀 Grammar Unscramble</button>
-        <button class="q-type-tab" onclick="selectSoloType('translate',this)">🌐 Translate</button>
-        <button class="q-type-tab" onclick="selectSoloType('letter',this)">🔤 Letter Names</button>
-        <button class="q-type-tab" onclick="selectSoloType('lettersound',this)">🔊 First Sounds</button>
-        <button class="q-type-tab" onclick="selectSoloType('oddone',this)">🧩 Odd One Out</button>
-        <button class="q-type-tab" onclick="selectSoloType('signs',this)">🚪 Signs</button>
-        <button class="q-type-tab" onclick="selectSoloType('sms',this)">📱 Messages</button>
-        <button class="q-type-tab" onclick="selectSoloType('clock',this)">⏰ Clock</button>
-        <button class="q-type-tab" onclick="selectSoloType('shop',this)">🛒 Shop</button>
-        <button class="q-type-tab" onclick="selectSoloType('forms',this)">📋 Forms</button>
-        <button class="q-type-tab" onclick="selectSoloType('all',this)">🎲 All</button>
-        <button class="q-type-tab" id="solo-custom-tab" onclick="showBankPicker('solo',this)">📚 Custom</button>
+        <button data-type="wp1" class="q-type-tab active" onclick="selectSoloType('wp1',this)">📖 WP1</button>
+        <button data-type="wp2" class="q-type-tab" onclick="selectSoloType('wp2',this)">📗 WP2</button>
+        <button data-type="beginner" class="q-type-tab" onclick="selectSoloType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
+        <button data-type="elementary" class="q-type-tab" onclick="selectSoloType('elementary',this)">📄 Elementary Listen and Fill Gaps</button>
+        <button data-type="questionwords" class="q-type-tab" onclick="selectSoloType('questionwords',this)">❓ Question Words</button>
+        <button data-type="numbers" class="q-type-tab" onclick="selectSoloType('numbers',this)">🔢 1–10</button>
+        <button data-type="numbers1120" class="q-type-tab" onclick="selectSoloType('numbers1120',this)">🔢 Numbers 11–20</button>
+        <button data-type="numbers2199" class="q-type-tab" onclick="selectSoloType('numbers2199',this)">🔢 Numbers 21–99</button>
+        <button data-type="days" class="q-type-tab" onclick="selectSoloType('days',this)">📅 Days</button>
+        <button data-type="months" class="q-type-tab" onclick="selectSoloType('months',this)">🗓️ Months</button>
+        <button data-type="weather" class="q-type-tab" onclick="selectSoloType('weather',this)">🌦️ Weather</button>
+        <button data-type="fruits" class="q-type-tab" onclick="selectSoloType('fruits',this)">🍎 Fruits</button>
+        <button data-type="body" class="q-type-tab" onclick="selectSoloType('body',this)">👤 Body</button>
+        <button data-type="clothes" class="q-type-tab" onclick="selectSoloType('clothes',this)">👕 Clothes</button>
+        <button data-type="spelling" class="q-type-tab" onclick="selectSoloType('spelling',this)">🗂️ All Spelling</button>
+        <button data-type="unscramble" class="q-type-tab" onclick="selectSoloType('unscramble',this)">🎧 Listen and Unscramble</button>
+        <button data-type="gramscramble" class="q-type-tab" onclick="selectSoloType('gramscramble',this)">🔀 Grammar Unscramble</button>
+        <button data-type="translate" class="q-type-tab" onclick="selectSoloType('translate',this)">🌐 Translate</button>
+        <button data-type="letter" class="q-type-tab" onclick="selectSoloType('letter',this)">🔤 Letter Names</button>
+        <button data-type="lettersound" class="q-type-tab" onclick="selectSoloType('lettersound',this)">🔊 First Sounds</button>
+        <button data-type="oddone" class="q-type-tab" onclick="selectSoloType('oddone',this)">🧩 Odd One Out</button>
+        <button data-type="signs" class="q-type-tab" onclick="selectSoloType('signs',this)">🚪 Signs</button>
+        <button data-type="sms" class="q-type-tab" onclick="selectSoloType('sms',this)">📱 Messages</button>
+        <button data-type="clock" class="q-type-tab" onclick="selectSoloType('clock',this)">⏰ Clock</button>
+        <button data-type="shop" class="q-type-tab" onclick="selectSoloType('shop',this)">🛒 Shop</button>
+        <button data-type="forms" class="q-type-tab" onclick="selectSoloType('forms',this)">📋 Forms</button>
+        <button data-type="all" class="q-type-tab" onclick="selectSoloType('all',this)">🎲 All</button>
+        <button data-type="custom" class="q-type-tab" id="solo-custom-tab" onclick="showBankPicker('solo',this)">📚 Custom</button>
       </div>
       <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="solo-count-display">Loading…</div>
       <div class="mc-toggle-wrap" id="solo-mc-toggle" onclick="toggleMcMode('solo')">
@@ -642,35 +658,36 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       </div>
       <div class="card">
         <p style="font-family:'Fredoka One',cursive;font-size:1rem;color:var(--teal);margin-bottom:10px;">📚 Question bank</p>
+        <div class="section-chips" id="teacher-section-chips"></div>
         <div class="q-type-tabs">
-          <button class="q-type-tab active" onclick="selectQType('wp1',this)">📖 WP1</button>
-          <button class="q-type-tab" onclick="selectQType('wp2',this)">📗 WP2</button>
-          <button class="q-type-tab" onclick="selectQType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
-          <button class="q-type-tab" onclick="selectQType('elementary',this)">📄 Elementary Listen and Fill Gaps</button>
-          <button class="q-type-tab" onclick="selectQType('questionwords',this)">❓ Question Words</button>
-          <button class="q-type-tab" onclick="selectQType('numbers',this)">🔢 1–10</button>
-          <button class="q-type-tab" onclick="selectQType('numbers1120',this)">🔢 Numbers 11–20</button>
-          <button class="q-type-tab" onclick="selectQType('numbers2199',this)">🔢 Numbers 21–99</button>
-          <button class="q-type-tab" onclick="selectQType('days',this)">📅 Days</button>
-          <button class="q-type-tab" onclick="selectQType('months',this)">🗓️ Months</button>
-          <button class="q-type-tab" onclick="selectQType('weather',this)">🌦️ Weather</button>
-          <button class="q-type-tab" onclick="selectQType('fruits',this)">🍎 Fruits</button>
-          <button class="q-type-tab" onclick="selectQType('body',this)">👤 Body</button>
-          <button class="q-type-tab" onclick="selectQType('clothes',this)">👕 Clothes</button>
-          <button class="q-type-tab" onclick="selectQType('spelling',this)">🗂️ All Spelling</button>
-          <button class="q-type-tab" onclick="selectQType('unscramble',this)">🎧 Listen and Unscramble</button>
-          <button class="q-type-tab" onclick="selectQType('gramscramble',this)">🔀 Grammar Unscramble</button>
-          <button class="q-type-tab" onclick="selectQType('translate',this)">🌐 Translate</button>
-          <button class="q-type-tab" onclick="selectQType('letter',this)">🔤 Letter Names</button>
-          <button class="q-type-tab" onclick="selectQType('lettersound',this)">🔊 First Sounds</button>
-          <button class="q-type-tab" onclick="selectQType('oddone',this)">🧩 Odd One Out</button>
-          <button class="q-type-tab" onclick="selectQType('signs',this)">🚪 Signs</button>
-          <button class="q-type-tab" onclick="selectQType('sms',this)">📱 Messages</button>
-          <button class="q-type-tab" onclick="selectQType('clock',this)">⏰ Clock</button>
-          <button class="q-type-tab" onclick="selectQType('shop',this)">🛒 Shop</button>
-          <button class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
-          <button class="q-type-tab" onclick="selectQType('all',this)">🎲 All</button>
-          <button class="q-type-tab" id="teacher-custom-tab" onclick="showBankPicker('teacher',this)">📚 Custom</button>
+          <button data-type="wp1" class="q-type-tab active" onclick="selectQType('wp1',this)">📖 WP1</button>
+          <button data-type="wp2" class="q-type-tab" onclick="selectQType('wp2',this)">📗 WP2</button>
+          <button data-type="beginner" class="q-type-tab" onclick="selectQType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
+          <button data-type="elementary" class="q-type-tab" onclick="selectQType('elementary',this)">📄 Elementary Listen and Fill Gaps</button>
+          <button data-type="questionwords" class="q-type-tab" onclick="selectQType('questionwords',this)">❓ Question Words</button>
+          <button data-type="numbers" class="q-type-tab" onclick="selectQType('numbers',this)">🔢 1–10</button>
+          <button data-type="numbers1120" class="q-type-tab" onclick="selectQType('numbers1120',this)">🔢 Numbers 11–20</button>
+          <button data-type="numbers2199" class="q-type-tab" onclick="selectQType('numbers2199',this)">🔢 Numbers 21–99</button>
+          <button data-type="days" class="q-type-tab" onclick="selectQType('days',this)">📅 Days</button>
+          <button data-type="months" class="q-type-tab" onclick="selectQType('months',this)">🗓️ Months</button>
+          <button data-type="weather" class="q-type-tab" onclick="selectQType('weather',this)">🌦️ Weather</button>
+          <button data-type="fruits" class="q-type-tab" onclick="selectQType('fruits',this)">🍎 Fruits</button>
+          <button data-type="body" class="q-type-tab" onclick="selectQType('body',this)">👤 Body</button>
+          <button data-type="clothes" class="q-type-tab" onclick="selectQType('clothes',this)">👕 Clothes</button>
+          <button data-type="spelling" class="q-type-tab" onclick="selectQType('spelling',this)">🗂️ All Spelling</button>
+          <button data-type="unscramble" class="q-type-tab" onclick="selectQType('unscramble',this)">🎧 Listen and Unscramble</button>
+          <button data-type="gramscramble" class="q-type-tab" onclick="selectQType('gramscramble',this)">🔀 Grammar Unscramble</button>
+          <button data-type="translate" class="q-type-tab" onclick="selectQType('translate',this)">🌐 Translate</button>
+          <button data-type="letter" class="q-type-tab" onclick="selectQType('letter',this)">🔤 Letter Names</button>
+          <button data-type="lettersound" class="q-type-tab" onclick="selectQType('lettersound',this)">🔊 First Sounds</button>
+          <button data-type="oddone" class="q-type-tab" onclick="selectQType('oddone',this)">🧩 Odd One Out</button>
+          <button data-type="signs" class="q-type-tab" onclick="selectQType('signs',this)">🚪 Signs</button>
+          <button data-type="sms" class="q-type-tab" onclick="selectQType('sms',this)">📱 Messages</button>
+          <button data-type="clock" class="q-type-tab" onclick="selectQType('clock',this)">⏰ Clock</button>
+          <button data-type="shop" class="q-type-tab" onclick="selectQType('shop',this)">🛒 Shop</button>
+          <button data-type="forms" class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
+          <button data-type="all" class="q-type-tab" onclick="selectQType('all',this)">🎲 All</button>
+          <button data-type="custom" class="q-type-tab" id="teacher-custom-tab" onclick="showBankPicker('teacher',this)">📚 Custom</button>
         </div>
         <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="q-count-display">Loading…</div>
         <div class="mc-toggle-wrap" id="host-mc-toggle" onclick="toggleMcMode('host')">
@@ -773,14 +790,6 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
     <div class="field-label" id="join-name-label" style="font-size:1.1rem;margin-top:4px;">Your Name</div>
     <input class="game-input" id="join-name" maxlength="18" placeholder="Enter your name"
       onkeydown="if(event.key==='Enter')joinGame()">
-    <div class="field-label" style="margin-top:2px;">Language (for Translate games)</div>
-    <select class="game-input" id="join-lang" onchange="localStorage.setItem('translateLang',this.value)" style="margin-bottom:14px;">
-      <option value="vi">Tiếng Việt (Vietnamese)</option><option value="fa">فارسی (Farsi)</option>
-      <option value="ar">العربية (Arabic)</option><option value="zh">中文 (Chinese)</option>
-      <option value="hi">हिन्दी (Hindi)</option><option value="ur">اردو (Urdu)</option>
-      <option value="km">ខ្មែរ (Khmer)</option><option value="my">မြန်မာ (Burmese)</option>
-      <option value="th">ภาษาไทย (Thai)</option>
-    </select>
     <div class="err-msg" id="join-error"></div>
     <button class="btn btn-accent" style="width:100%;" onclick="joinGame()">Join →</button>
   </div>
@@ -794,6 +803,21 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   <div class="waiting-name" id="s-display-name">You</div>
   <div class="waiting-msg">You're in! Waiting for the teacher to start…</div>
   <div style="color:var(--muted);font-size:.85rem;" id="s-room-display"></div>
+  <!-- Only for Translate games, and only while waiting. Lives here rather
+       than on the join screen so it appears for students who joined before
+       the teacher picked Translate, and so joining is just a name. -->
+  <div id="s-lang-wrap" style="display:none;flex-direction:column;align-items:center;gap:8px;margin-top:18px;">
+    <div class="field-label" style="font-size:1rem;">🌐 Your language</div>
+    <select class="game-input" id="s-lang-pick" style="width:auto;margin-bottom:0;"
+      onchange="localStorage.setItem('translateLang',this.value)">
+      <option value="vi">Tiếng Việt (Vietnamese)</option><option value="fa">فارسی (Farsi)</option>
+      <option value="ar">العربية (Arabic)</option><option value="zh">中文 (Chinese)</option>
+      <option value="hi">हिन्दी (Hindi)</option><option value="ur">اردو (Urdu)</option>
+      <option value="km">ខ្មែរ (Khmer)</option><option value="my">မြန်မာ (Burmese)</option>
+      <option value="th">ภาษาไทย (Thai)</option>
+    </select>
+    <div style="color:var(--muted);font-size:.78rem;">You can change this until the game starts</div>
+  </div>
 </div>
 
 <!-- STUDENT ANSWER -->
@@ -2338,7 +2362,10 @@ function cleanupOldRooms(){
 function createRoom(){
   cleanupOldRooms();
   roomCode=makeCode(); roomRef=db.ref('rooms/'+roomCode);
-  roomRef.set({status:'lobby',createdAt:firebase.database.ServerValue.TIMESTAMP,questionIdx:-1,revealed:false,hostUid:authUid});
+  // qType is seeded so the room describes itself from the start — a student
+  // joining before the teacher touches the picker still gets the right answer
+  // about whether this is a Translate game.
+  roomRef.set({status:'lobby',createdAt:firebase.database.ServerValue.TIMESTAMP,questionIdx:-1,revealed:false,hostUid:authUid,qType:selectedQType});
   document.getElementById('room-code-display').textContent=roomCode;
   generateQR(); updateQCountDisplay();
   showScreen('screen-teacher-lobby'); playLobbyMusic();
@@ -2372,7 +2399,15 @@ function toggleMcMode(which){
   ['solo-mc-toggle','host-mc-toggle'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('on',mcMode);});
 }
 
-function selectQType(type,el){ selectedQType=type; document.querySelectorAll('#screen-teacher-lobby .q-type-tab').forEach(t=>t.classList.remove('active')); if(el) el.classList.add('active'); updateQCountDisplay(); }
+function selectQType(type,el){
+  selectedQType=type;
+  document.querySelectorAll('#screen-teacher-lobby .q-type-tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  // Publish the choice so a student already waiting in the lobby is offered
+  // the language picker the moment this becomes a Translate game.
+  if(roomRef) roomRef.update({qType:type});
+  updateQCountDisplay();
+}
 function updateQCountDisplay(){
   const limit=parseInt(document.getElementById('q-limit').value)||10;
   const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body,...questionBank.clothes];
@@ -2699,8 +2734,6 @@ function initStudent(){
   role='student';
   document.getElementById('music-btn').style.display='none';
   const urlCode=new URLSearchParams(window.location.search).get('join');
-  const storedLang=localStorage.getItem('translateLang')||'vi';
-  document.getElementById('join-lang').value=storedLang;
   if(urlCode){
     const code=urlCode.toUpperCase();
     document.getElementById('join-code').value=code;
@@ -2755,6 +2788,19 @@ function listenForGameState(){
   gameListener=roomRef.on('value',snap=>{
     const room=snap.val();
     if(!room) return;
+    // Language picker: only for Translate, only while waiting. Driven off the
+    // live room value so it appears for students who joined before the
+    // teacher chose Translate, and disappears again if they change their mind.
+    const lw=document.getElementById('s-lang-wrap');
+    if(lw){
+      const wanted=room.qType==='translate'&&room.status==='lobby';
+      lw.style.display=wanted?'flex':'none';
+      if(wanted){
+        const pick=document.getElementById('s-lang-pick');
+        // Don't stamp over a choice the student is in the middle of making.
+        if(document.activeElement!==pick) pick.value=localStorage.getItem('translateLang')||'vi';
+      }
+    }
     if(room.status==='playing'&&room.currentQuestion){
       const q=room.currentQuestion;
       if(q.idx!==undefined&&q.idx!==myLastQIdx){ myLastQIdx=q.idx; answered=false; showStudentQuestion(q,room.questionStarted,room.questionDuration); }
@@ -2813,6 +2859,55 @@ function initSolo(){
   showScreen('screen-solo-setup');
   updateSoloCountDisplay();
 }
+/* ══════════════ SECTIONS ══════════════
+   A bank can sit in several sections — "Beginner" is listening, reading,
+   writing and everyday life all at once — so this is a filter, not a
+   re-grouping: each pill still appears exactly once in the list. */
+const BANK_SECTIONS=[
+  {id:'*',          label:'✨ All games',        banks:null},
+  {id:'letters',    label:'🔤 Letters & Sounds', banks:['wp1','wp2','letter','lettersound','elementary']},
+  {id:'vocab',      label:'📚 Vocabulary',       banks:['days','months','weather','fruits','body','clothes','spelling','oddone','translate']},
+  {id:'listening',  label:'👂 Listening',        banks:['wp1','wp2','beginner','elementary','letter','lettersound','unscramble','clock']},
+  {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary']},
+  {id:'writing',    label:'✍️ Writing',          banks:['wp1','wp2','days','months','weather','fruits','body','clothes','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary']},
+  {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble']},
+  {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop']},
+  {id:'translation',label:'🌐 Translation',      banks:['translate']},
+  {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','sms','clock','shop','forms','beginner','unscramble','gramscramble','translate']},
+];
+/* "All" and "Custom" are not a skill — they stay visible under every chip. */
+const SECTION_ALWAYS=['all','custom'];
+const SCOPE_SEL={solo:'#screen-solo-setup',teacher:'#screen-teacher-lobby'};
+
+function filterBanks(scope,sectionId){
+  const sec=BANK_SECTIONS.find(s=>s.id===sectionId)||BANK_SECTIONS[0];
+  const chosen=scope==='solo'?soloSelectedType:selectedQType;
+  document.querySelectorAll(SCOPE_SEL[scope]+' .q-type-tab').forEach(el=>{
+    const t=el.dataset.type;
+    // The chosen bank stays on screen whatever the filter — hiding it while
+    // it is still what Start would launch would be a lie about the state.
+    const show=!sec.banks||sec.banks.indexOf(t)>=0||SECTION_ALWAYS.indexOf(t)>=0||t===chosen;
+    el.style.display=show?'':'none';
+  });
+  document.querySelectorAll(SCOPE_SEL[scope]+' .section-chip').forEach(c=>{
+    const on=c.dataset.section===sec.id;
+    c.classList.toggle('active',on);
+    // On a short screen the chip row scrolls sideways. Keep the active chip
+    // in view, or the list looks filtered for no visible reason.
+    if(on&&c.scrollIntoView) c.scrollIntoView({block:'nearest',inline:'nearest'});
+  });
+}
+
+function renderSectionChips(){
+  Object.keys(SCOPE_SEL).forEach(scope=>{
+    const wrap=document.getElementById(scope+'-section-chips');
+    if(!wrap) return;
+    wrap.innerHTML=BANK_SECTIONS.map(s=>
+      '<button class="section-chip'+(s.id==='*'?' active':'')+'" data-section="'+s.id
+      +'" onclick="filterBanks(\''+scope+'\',\''+s.id+'\')">'+s.label+'</button>').join('');
+  });
+}
+
 function selectSoloType(type,el){
   soloSelectedType=type;
   document.querySelectorAll('#screen-solo-setup .q-type-tab').forEach(t=>t.classList.remove('active'));
@@ -3865,7 +3960,7 @@ function cleanupListeners(){if(roomRef)roomRef.off();clearInterval(timerInterval
 
 /* INIT */
 window.addEventListener('load',()=>{
-  buildBank(); loadCheerAudio();
+  buildBank(); loadCheerAudio(); renderSectionChips();
   const params=new URLSearchParams(window.location.search);
   const urlCode=params.get('join');
   const mode=params.get('mode');
@@ -3880,8 +3975,6 @@ window.addEventListener('load',()=>{
     document.getElementById('join-name-label').style.fontSize='1.25rem';
     document.getElementById('join-name-label').style.color='var(--teal)';
     document.getElementById('join-name-label').textContent='👤 Enter your name to join:';
-    const storedLang=localStorage.getItem('translateLang')||'vi';
-    document.getElementById('join-lang').value=storedLang;
     showScreen('screen-student-join');
     setTimeout(()=>document.getElementById('join-name').focus(),300);
   }
