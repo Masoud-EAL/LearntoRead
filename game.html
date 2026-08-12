@@ -72,6 +72,37 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .player-chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:6px 14px;font-size:.85rem;font-weight:700;animation:popIn .3s ease;}
 @keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
 .q-type-tabs{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap;}
+
+/* ── Solo setup: keep "Start Practice" on screen ──
+   27 categories wrap to 13-17 rows, which pushed the Start button below the
+   fold at every phone size — the same trap as the answer screen, and the one
+   thing a learner will not go looking for. Fixed-height column: the category
+   list is the only part that scrolls, everything else is pinned. */
+#screen-solo-setup{
+  height:100vh;
+  height:100dvh;
+  height:var(--app-h,100dvh);
+  min-height:0;
+  overflow:hidden;
+}
+#screen-solo-setup > .logo-bar{flex:0 0 auto;padding:10px 20px 4px;font-size:1.25rem;}
+#screen-solo-setup > div{min-height:0;padding:10px 16px !important;gap:10px !important;}
+#screen-solo-setup .card{min-height:0;display:flex;flex-direction:column;overflow:hidden;padding:14px;}
+/* the one scrolling part, with a floor so it never collapses to nothing */
+#screen-solo-setup .q-type-tabs{flex:1 1 auto;min-height:74px;overflow-y:auto;margin-bottom:6px;
+  align-content:flex-start;}
+#screen-solo-setup .card > *:not(.q-type-tabs){flex:0 0 auto;}
+#screen-solo-setup .btn{flex:0 0 auto;}
+#screen-solo-setup .mc-toggle-sub{display:none;}
+@media (min-height:700px){
+  #screen-solo-setup .mc-toggle-sub{display:block;}
+}
+
+/* Teacher lobby: not restructured — it is a genuinely dense screen (room
+   code, QR, player list) used by a literate adult, usually on a laptop. But
+   the category list was 443px of it, so cap it and let it scroll in place;
+   that keeps the room code and player list in view without a long scroll. */
+#screen-teacher-lobby .q-type-tabs{max-height:min(32vh,220px);overflow-y:auto;align-content:flex-start;}
 .q-type-tab{padding:5px 11px;border-radius:50px;font-size:.78rem;font-weight:700;border:1.5px solid rgba(255,255,255,.15);cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);}
 .q-type-tab.active{background:var(--teal);color:white;border-color:var(--teal);}
 .lobby-actions{display:flex;gap:12px;justify-content:center;padding:8px 0;flex-wrap:wrap;}
@@ -534,24 +565,24 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
     <div class="card" style="width:100%;max-width:500px;">
       <p style="font-family:'Fredoka One',cursive;font-size:1rem;color:var(--teal);margin-bottom:10px;">📚 Choose a category</p>
       <div class="q-type-tabs">
-        <button class="q-type-tab active" onclick="selectSoloType('wp1',this)">WP1</button>
-        <button class="q-type-tab" onclick="selectSoloType('wp2',this)">WP2</button>
-        <button class="q-type-tab" onclick="selectSoloType('beginner',this)">Beginner Listen and Fill Gaps</button>
-        <button class="q-type-tab" onclick="selectSoloType('elementary',this)">Elementary Listen and Fill Gaps</button>
-        <button class="q-type-tab" onclick="selectSoloType('questionwords',this)">Question Words</button>
-        <button class="q-type-tab" onclick="selectSoloType('numbers',this)">1–10</button>
-        <button class="q-type-tab" onclick="selectSoloType('numbers1120',this)">Numbers 11–20</button>
-        <button class="q-type-tab" onclick="selectSoloType('numbers2199',this)">Numbers 21–99</button>
-        <button class="q-type-tab" onclick="selectSoloType('days',this)">Days</button>
-        <button class="q-type-tab" onclick="selectSoloType('months',this)">Months</button>
-        <button class="q-type-tab" onclick="selectSoloType('weather',this)">Weather</button>
-        <button class="q-type-tab" onclick="selectSoloType('fruits',this)">Fruits</button>
-        <button class="q-type-tab" onclick="selectSoloType('body',this)">Body</button>
+        <button class="q-type-tab active" onclick="selectSoloType('wp1',this)">📖 WP1</button>
+        <button class="q-type-tab" onclick="selectSoloType('wp2',this)">📗 WP2</button>
+        <button class="q-type-tab" onclick="selectSoloType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
+        <button class="q-type-tab" onclick="selectSoloType('elementary',this)">📄 Elementary Listen and Fill Gaps</button>
+        <button class="q-type-tab" onclick="selectSoloType('questionwords',this)">❓ Question Words</button>
+        <button class="q-type-tab" onclick="selectSoloType('numbers',this)">🔢 1–10</button>
+        <button class="q-type-tab" onclick="selectSoloType('numbers1120',this)">🔢 Numbers 11–20</button>
+        <button class="q-type-tab" onclick="selectSoloType('numbers2199',this)">🔢 Numbers 21–99</button>
+        <button class="q-type-tab" onclick="selectSoloType('days',this)">📅 Days</button>
+        <button class="q-type-tab" onclick="selectSoloType('months',this)">🗓️ Months</button>
+        <button class="q-type-tab" onclick="selectSoloType('weather',this)">🌦️ Weather</button>
+        <button class="q-type-tab" onclick="selectSoloType('fruits',this)">🍎 Fruits</button>
+        <button class="q-type-tab" onclick="selectSoloType('body',this)">👤 Body</button>
         <button class="q-type-tab" onclick="selectSoloType('clothes',this)">👕 Clothes</button>
-        <button class="q-type-tab" onclick="selectSoloType('spelling',this)">All Spelling</button>
-        <button class="q-type-tab" onclick="selectSoloType('unscramble',this)">Listen and Unscramble</button>
-        <button class="q-type-tab" onclick="selectSoloType('gramscramble',this)">Grammar Unscramble</button>
-        <button class="q-type-tab" onclick="selectSoloType('translate',this)">Translate</button>
+        <button class="q-type-tab" onclick="selectSoloType('spelling',this)">🗂️ All Spelling</button>
+        <button class="q-type-tab" onclick="selectSoloType('unscramble',this)">🎧 Listen and Unscramble</button>
+        <button class="q-type-tab" onclick="selectSoloType('gramscramble',this)">🔀 Grammar Unscramble</button>
+        <button class="q-type-tab" onclick="selectSoloType('translate',this)">🌐 Translate</button>
         <button class="q-type-tab" onclick="selectSoloType('letter',this)">🔤 Letter Names</button>
         <button class="q-type-tab" onclick="selectSoloType('lettersound',this)">🔊 First Sounds</button>
         <button class="q-type-tab" onclick="selectSoloType('oddone',this)">🧩 Odd One Out</button>
@@ -560,7 +591,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button class="q-type-tab" onclick="selectSoloType('clock',this)">⏰ Clock</button>
         <button class="q-type-tab" onclick="selectSoloType('shop',this)">🛒 Shop</button>
         <button class="q-type-tab" onclick="selectSoloType('forms',this)">📋 Forms</button>
-        <button class="q-type-tab" onclick="selectSoloType('all',this)">All</button>
+        <button class="q-type-tab" onclick="selectSoloType('all',this)">🎲 All</button>
         <button class="q-type-tab" id="solo-custom-tab" onclick="showBankPicker('solo',this)">📚 Custom</button>
       </div>
       <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="solo-count-display">Loading…</div>
@@ -612,24 +643,24 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       <div class="card">
         <p style="font-family:'Fredoka One',cursive;font-size:1rem;color:var(--teal);margin-bottom:10px;">📚 Question bank</p>
         <div class="q-type-tabs">
-          <button class="q-type-tab active" onclick="selectQType('wp1',this)">WP1</button>
-          <button class="q-type-tab" onclick="selectQType('wp2',this)">WP2</button>
-          <button class="q-type-tab" onclick="selectQType('beginner',this)">Beginner Listen and Fill Gaps</button>
-          <button class="q-type-tab" onclick="selectQType('elementary',this)">Elementary Listen and Fill Gaps</button>
-          <button class="q-type-tab" onclick="selectQType('questionwords',this)">Question Words</button>
-          <button class="q-type-tab" onclick="selectQType('numbers',this)">1–10</button>
-          <button class="q-type-tab" onclick="selectQType('numbers1120',this)">Numbers 11–20</button>
-          <button class="q-type-tab" onclick="selectQType('numbers2199',this)">Numbers 21–99</button>
-          <button class="q-type-tab" onclick="selectQType('days',this)">Days</button>
-          <button class="q-type-tab" onclick="selectQType('months',this)">Months</button>
-          <button class="q-type-tab" onclick="selectQType('weather',this)">Weather</button>
-          <button class="q-type-tab" onclick="selectQType('fruits',this)">Fruits</button>
-          <button class="q-type-tab" onclick="selectQType('body',this)">Body</button>
+          <button class="q-type-tab active" onclick="selectQType('wp1',this)">📖 WP1</button>
+          <button class="q-type-tab" onclick="selectQType('wp2',this)">📗 WP2</button>
+          <button class="q-type-tab" onclick="selectQType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
+          <button class="q-type-tab" onclick="selectQType('elementary',this)">📄 Elementary Listen and Fill Gaps</button>
+          <button class="q-type-tab" onclick="selectQType('questionwords',this)">❓ Question Words</button>
+          <button class="q-type-tab" onclick="selectQType('numbers',this)">🔢 1–10</button>
+          <button class="q-type-tab" onclick="selectQType('numbers1120',this)">🔢 Numbers 11–20</button>
+          <button class="q-type-tab" onclick="selectQType('numbers2199',this)">🔢 Numbers 21–99</button>
+          <button class="q-type-tab" onclick="selectQType('days',this)">📅 Days</button>
+          <button class="q-type-tab" onclick="selectQType('months',this)">🗓️ Months</button>
+          <button class="q-type-tab" onclick="selectQType('weather',this)">🌦️ Weather</button>
+          <button class="q-type-tab" onclick="selectQType('fruits',this)">🍎 Fruits</button>
+          <button class="q-type-tab" onclick="selectQType('body',this)">👤 Body</button>
           <button class="q-type-tab" onclick="selectQType('clothes',this)">👕 Clothes</button>
-          <button class="q-type-tab" onclick="selectQType('spelling',this)">All Spelling</button>
-          <button class="q-type-tab" onclick="selectQType('unscramble',this)">Listen and Unscramble</button>
-          <button class="q-type-tab" onclick="selectQType('gramscramble',this)">Grammar Unscramble</button>
-          <button class="q-type-tab" onclick="selectQType('translate',this)">Translate</button>
+          <button class="q-type-tab" onclick="selectQType('spelling',this)">🗂️ All Spelling</button>
+          <button class="q-type-tab" onclick="selectQType('unscramble',this)">🎧 Listen and Unscramble</button>
+          <button class="q-type-tab" onclick="selectQType('gramscramble',this)">🔀 Grammar Unscramble</button>
+          <button class="q-type-tab" onclick="selectQType('translate',this)">🌐 Translate</button>
           <button class="q-type-tab" onclick="selectQType('letter',this)">🔤 Letter Names</button>
           <button class="q-type-tab" onclick="selectQType('lettersound',this)">🔊 First Sounds</button>
           <button class="q-type-tab" onclick="selectQType('oddone',this)">🧩 Odd One Out</button>
@@ -638,7 +669,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
           <button class="q-type-tab" onclick="selectQType('clock',this)">⏰ Clock</button>
           <button class="q-type-tab" onclick="selectQType('shop',this)">🛒 Shop</button>
           <button class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
-          <button class="q-type-tab" onclick="selectQType('all',this)">All</button>
+          <button class="q-type-tab" onclick="selectQType('all',this)">🎲 All</button>
           <button class="q-type-tab" id="teacher-custom-tab" onclick="showBankPicker('teacher',this)">📚 Custom</button>
         </div>
         <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="q-count-display">Loading…</div>
