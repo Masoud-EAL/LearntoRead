@@ -547,6 +547,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button class="q-type-tab" onclick="selectSoloType('weather',this)">Weather</button>
         <button class="q-type-tab" onclick="selectSoloType('fruits',this)">Fruits</button>
         <button class="q-type-tab" onclick="selectSoloType('body',this)">Body</button>
+        <button class="q-type-tab" onclick="selectSoloType('clothes',this)">👕 Clothes</button>
         <button class="q-type-tab" onclick="selectSoloType('spelling',this)">All Spelling</button>
         <button class="q-type-tab" onclick="selectSoloType('unscramble',this)">Listen and Unscramble</button>
         <button class="q-type-tab" onclick="selectSoloType('gramscramble',this)">Grammar Unscramble</button>
@@ -624,6 +625,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
           <button class="q-type-tab" onclick="selectQType('weather',this)">Weather</button>
           <button class="q-type-tab" onclick="selectQType('fruits',this)">Fruits</button>
           <button class="q-type-tab" onclick="selectQType('body',this)">Body</button>
+          <button class="q-type-tab" onclick="selectQType('clothes',this)">👕 Clothes</button>
           <button class="q-type-tab" onclick="selectQType('spelling',this)">All Spelling</button>
           <button class="q-type-tab" onclick="selectQType('unscramble',this)">Listen and Unscramble</button>
           <button class="q-type-tab" onclick="selectQType('gramscramble',this)">Grammar Unscramble</button>
@@ -1124,6 +1126,16 @@ const SPELL_DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday',
 const SPELL_MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const SPELL_WEATHER=['sunny','cloudy','rainy','windy','snowy','stormy','foggy','hot','cold','warm','cool','humid'];
 const SPELL_FRUITS=['apple','banana','orange','grape','mango','peach','plum','pear','lemon','cherry','strawberry','watermelon','pineapple','coconut','kiwi'];
+/* Australian English throughout: jumper not sweater, thongs are the footwear,
+   pants not trousers. Deliberately no bathers/swimmers or runners/sneakers —
+   too regional to be worth teaching.
+   Every word here has a distinct picture, which matters: renderMcChoices only
+   shows pictures when all four options have one and none repeat, so a single
+   duplicate would silently turn a whole round into text. */
+const SPELL_CLOTHES=['shirt','jumper','jacket','coat','dress','skirt','pants','jeans','shorts',
+  'singlet','hoodie','socks','shoes','boots','sandals','thongs','hat','cap','beanie','helmet',
+  'scarf','gloves','belt','tie','glasses','sunglasses','watch','bag','backpack','umbrella',
+  'ring','bracelet','necklace','wallet'];
 const SPELL_BODY=['head','eye','ear','nose','mouth','tooth','tongue','neck','shoulder','arm','elbow','wrist','hand','finger','thumb','chest','stomach','back','hip','leg','knee','ankle','foot','toe'];
 const UNSCRAMBLE_SENTENCES=[
   'My name is David.','My last name is Johnson.','My full name is David Johnson.',
@@ -1552,7 +1564,7 @@ function genOddOneOut(count){
   return out;
 }
 
-let questionBank={wp1:[],wp2:[],beginner:[],elementary:[],questionwords:[],numbers:[],numbers1120:[],numbers2199:[],days:[],months:[],weather:[],fruits:[],body:[],custom:[],unscramble:[],gramscramble:[],translate:[],letter:[],lettersound:[],oddone:[],signs:[],sms:[],clock:[],shop:[],forms:[]};
+let questionBank={wp1:[],wp2:[],beginner:[],elementary:[],questionwords:[],numbers:[],numbers1120:[],numbers2199:[],days:[],months:[],weather:[],fruits:[],body:[],clothes:[],custom:[],unscramble:[],gramscramble:[],translate:[],letter:[],lettersound:[],oddone:[],signs:[],sms:[],clock:[],shop:[],forms:[]};
 let customBanks={};        // { bankId: { name, questions:[] } }
 let activeBankId=null;     // bank open in editor
 let selectedBankId=null;   // bank loaded for the game
@@ -1580,6 +1592,7 @@ function buildBank(){
   questionBank.weather=SPELL_WEATHER.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.fruits=SPELL_FRUITS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.body=SPELL_BODY.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
+  questionBank.clothes=SPELL_CLOTHES.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.unscramble=UNSCRAMBLE_SENTENCES.map(s=>({type:'unscramble',sentence:s,answer:s,words:s.trim().split(/\s+/)}));
   questionBank.gramscramble=UNSCRAMBLE_SENTENCES.map(s=>({type:'gramscramble',sentence:s,answer:s,words:s.trim().split(/\s+/)}));
   questionBank.translate=LEVEL0_SENTENCES.map(s=>({type:'translate',en:s.en,answer:s.en,translations:{fa:s.fa,vi:s.vi,zh:s.zh,ar:s.ar,hi:s.hi,ur:s.ur,km:s.km,my:s.my,th:s.th}}));
@@ -1610,7 +1623,7 @@ function buildBank(){
   });
 }
 function poolFor(type){
-  const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body];
+  const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body,...questionBank.clothes];
   if(type==='wp1') return [...questionBank.wp1];
   if(type==='wp2') return [...questionBank.wp2];
   if(type==='beginner') return [...questionBank.beginner];
@@ -1624,6 +1637,7 @@ function poolFor(type){
   if(type==='weather') return [...questionBank.weather];
   if(type==='fruits') return [...questionBank.fruits];
   if(type==='body') return [...questionBank.body];
+  if(type==='clothes') return [...questionBank.clothes];
   if(type==='spelling') return allSpelling;
   if(type==='custom') return [...questionBank.custom];
   if(type==='unscramble') return [...questionBank.unscramble];
@@ -1753,6 +1767,23 @@ let hintLevel=0;
 let mcMode=false;
 
 const EMOJI={
+  /* Clothes and accessories. Australian English: jumper, not sweater;
+     thongs are the footwear. */
+  'shirt':'👕','jeans':'👖','shorts':'🩳','singlet':'🎽',
+  'socks':'🧦','shoes':'👞','boots':'🥾','sandals':'👡',
+  'thongs':'🩴','scarf':'🧣','gloves':'🧤','glasses':'👓',
+  'sunglasses':'🕶️','backpack':'🎒','umbrella':'☂️','ring':'💍',
+  'jumper':'<img src="icons/clothes-jumper.svg" class="custom-icon-emoji" alt="jumper">',
+  'jacket':'<img src="icons/clothes-jacket.svg" class="custom-icon-emoji" alt="jacket">',
+  'hoodie':'<img src="icons/clothes-hoodie.svg" class="custom-icon-emoji" alt="hoodie">',
+  'skirt':'<img src="icons/clothes-skirt.svg" class="custom-icon-emoji" alt="skirt">',
+  'pants':'<img src="icons/clothes-pants.svg" class="custom-icon-emoji" alt="pants">',
+  'beanie':'<img src="icons/clothes-beanie.svg" class="custom-icon-emoji" alt="beanie">',
+  'helmet':'<img src="icons/clothes-helmet.svg" class="custom-icon-emoji" alt="helmet">',
+  'belt':'<img src="icons/clothes-belt.svg" class="custom-icon-emoji" alt="belt">',
+  'bracelet':'<img src="icons/clothes-bracelet.svg" class="custom-icon-emoji" alt="bracelet">',
+  'necklace':'<img src="icons/clothes-necklace.svg" class="custom-icon-emoji" alt="necklace">',
+  'wallet':'<img src="icons/clothes-wallet.svg" class="custom-icon-emoji" alt="wallet">',
   'ant':'🐜','bat':'🦇','bee':'🐝','bug':'🐛','cat':'🐱','cow':'🐄','crab':'🦀','dog':'🐶','duck':'🦆','elephant':'🐘','fish':'🐟','fox':'🦊','hen':'🐓','pig':'🐷','ram':'🐏','rat':'🐀',
   'boy':'👦','dad':'👨','king':'👑','man':'👨','men':'👥','teacher':'👩‍🏫','student':'🧑‍🎓',
   'apple':'🍎','bun':'<img src="icons/bun.svg" class="custom-icon-emoji" alt="bun">','cake':'🎂','chip':'🍟','chop':'🥩','cup':'🥤','egg':'🥚','fig':'<img src="icons/fig.svg" class="custom-icon-emoji" alt="fig">','food':'🍱','ham':'🥩','ice':'🧊','jam':'🫙','meat':'🥩','pan':'🍳','pie':'🥧','pop':'🥤','yam':'🍠',
@@ -2313,7 +2344,7 @@ function toggleMcMode(which){
 function selectQType(type,el){ selectedQType=type; document.querySelectorAll('#screen-teacher-lobby .q-type-tab').forEach(t=>t.classList.remove('active')); if(el) el.classList.add('active'); updateQCountDisplay(); }
 function updateQCountDisplay(){
   const limit=parseInt(document.getElementById('q-limit').value)||10;
-  const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body];
+  const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body,...questionBank.clothes];
   let pool=selectedQType==='all'?[...questionBank.wp1,...questionBank.wp2,...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.numbers1120,...questionBank.numbers2199,...questionBank.custom]:selectedQType==='spelling'?allSpelling:(questionBank[selectedQType]||[]);
   const disp=document.getElementById('q-count-display');
   if(!disp) return;
@@ -2767,7 +2798,7 @@ function updateSoloCountDisplay(){
   const display=document.getElementById('solo-count-display');
   if(!display) return;
   const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
-  const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body];
+  const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body,...questionBank.clothes];
   let pool=soloSelectedType==='all'?[...questionBank.wp1,...questionBank.wp2,...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.numbers1120,...questionBank.numbers2199,...questionBank.custom]:soloSelectedType==='spelling'?allSpelling:(questionBank[soloSelectedType]||[]);
   if(soloSelectedType==='custom') display.textContent=(selectedBankName?'"'+selectedBankName+'" — ':'')+pool.length+' questions available — '+Math.min(pool.length,limit)+' will be used';
   else display.textContent=pool.length+' available — '+Math.min(pool.length,limit)+' will be used';

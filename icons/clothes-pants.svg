@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- long trousers -->
+  <path d="M27,20 L73,20 L77,88 L57,88 L50,50 L43,88 L23,88 Z"
+        fill="#37474f" stroke="#1c262b" stroke-width="4" stroke-linejoin="round"/>
+  <!-- waistband -->
+  <rect x="25" y="14" width="50" height="11" rx="3" fill="#263238" stroke="#1c262b" stroke-width="3.5"/>
+  <!-- fly -->
+  <path d="M50,26 L50,44" stroke="#1c262b" stroke-width="3" stroke-linecap="round"/>
+</svg>

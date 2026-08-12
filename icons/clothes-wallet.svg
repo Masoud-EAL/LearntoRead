@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- note poking out of the top -->
+  <rect x="26" y="18" width="48" height="20" rx="3" fill="#a8d6ae" stroke="#4a8f57" stroke-width="3"/>
+  <!-- body -->
+  <rect x="10" y="30" width="80" height="54" rx="8" fill="#8b5a2b" stroke="#5a3818" stroke-width="4"/>
+  <!-- flap -->
+  <path d="M10,48 L90,48" stroke="#5a3818" stroke-width="3.5"/>
+  <!-- clasp -->
+  <rect x="56" y="54" width="26" height="18" rx="4" fill="#c8873f" stroke="#5a3818" stroke-width="3.5"/>
+</svg>

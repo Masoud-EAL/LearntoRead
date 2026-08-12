@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v19';
+const CACHE = 'learntoread-v20';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -39,6 +39,18 @@ const OPTIONAL = [
   './icons/sign-wheelchair.svg',
   './icons/sign-no-food.svg',
   './icons/sign-bus-stop.svg',
+  // Clothes and accessories with no Unicode emoji
+  './icons/clothes-jumper.svg',
+  './icons/clothes-jacket.svg',
+  './icons/clothes-hoodie.svg',
+  './icons/clothes-skirt.svg',
+  './icons/clothes-pants.svg',
+  './icons/clothes-beanie.svg',
+  './icons/clothes-helmet.svg',
+  './icons/clothes-belt.svg',
+  './icons/clothes-bracelet.svg',
+  './icons/clothes-necklace.svg',
+  './icons/clothes-wallet.svg',
   // Coins and notes (stylised, value printed — not currency reproductions)
   './icons/money-5c.svg',
   './icons/money-10c.svg',

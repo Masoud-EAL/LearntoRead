@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- pom -->
+  <circle cx="50" cy="17" r="9" fill="#1e8449" stroke="#145a32" stroke-width="3.5"/>
+  <!-- crown -->
+  <path d="M20,64 Q20,24 50,24 Q80,24 80,64 Z" fill="#27ae60" stroke="#145a32" stroke-width="4" stroke-linejoin="round"/>
+  <!-- folded brim -->
+  <rect x="14" y="62" width="72" height="20" rx="9" fill="#1e8449" stroke="#145a32" stroke-width="4"/>
+  <!-- knit ribs -->
+  <path d="M34,66 L34,78 M50,66 L50,78 M66,66 L66,78" stroke="#145a32" stroke-width="3" stroke-linecap="round"/>
+</svg>

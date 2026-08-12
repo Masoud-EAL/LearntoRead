@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- A-line skirt -->
+  <path d="M30,24 L70,24 L86,80 Q50,90 14,80 Z"
+        fill="#8e44ad" stroke="#5b2c6f" stroke-width="4" stroke-linejoin="round"/>
+  <!-- waistband -->
+  <rect x="28" y="18" width="44" height="11" rx="3" fill="#6c3483" stroke="#5b2c6f" stroke-width="3.5"/>
+  <!-- pleats -->
+  <path d="M44,32 L38,80 M56,32 L62,80" stroke="#6c3483" stroke-width="3" stroke-linecap="round"/>
+</svg>
