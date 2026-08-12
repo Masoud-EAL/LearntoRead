@@ -76,16 +76,31 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 /* ── Section filter chips ──
    27 banks is too many to scan. A chip narrows the list to one skill; each
    bank still appears once, so the existing "highlight the clicked pill"
-   logic is untouched. */
-.section-chips{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;}
-.section-chip{padding:4px 9px;border-radius:50px;font-size:.7rem;font-weight:700;
-  border:1.5px solid rgba(255,255,255,.12);background:transparent;color:var(--muted);
+   logic is untouched.
+
+   A chip must never be mistaken for a game. The two rows differ on three
+   axes at once — the chips sit on their own tinted panel, their corners are
+   squared where a game pill is round, and their active colour is purple, not
+   teal — so the difference still reads at a glance, at chip size, and
+   without reading the step labels. */
+.step-label{font-family:'Fredoka One',cursive;font-size:.78rem;margin-bottom:4px;}
+.step-label.skill{color:#b8a4ff;}
+.step-label.game{color:var(--teal);}
+.section-panel{background:rgba(124,77,255,.13);border:1.5px solid rgba(124,77,255,.32);
+  border-radius:10px;padding:6px 7px;margin-bottom:8px;}
+.section-chips{display:flex;gap:4px;flex-wrap:wrap;}
+.section-chip{padding:4px 9px;border-radius:8px;font-size:.7rem;font-weight:700;
+  border:1.5px solid rgba(124,77,255,.5);background:rgba(124,77,255,.1);color:var(--text);
   cursor:pointer;white-space:nowrap;transition:all .15s;}
-.section-chip.active{background:var(--purple);color:#fff;border-color:var(--purple);}
-/* On a short screen the chip row would eat the category list, which is only
-   ~148px there — scroll it sideways instead of spending two rows on it. */
+.section-chip.active{background:var(--purple);color:#fff;border-color:var(--purple);
+  box-shadow:0 2px 10px rgba(124,77,255,.45);}
+/* On a short screen the chip row would eat the game list, which has barely
+   two rows there — scroll it sideways instead of spending two rows on it,
+   and let the panel itself carry the distinction without the step labels. */
 @media (max-height:620px){
   .section-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px;}
+  .section-panel{padding:5px 6px;margin-bottom:6px;}
+  .step-label{font-size:.7rem;margin-bottom:3px;}
 }
 
 /* ── Solo setup: keep "Start Practice" on screen ──
@@ -578,12 +593,15 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   <div class="logo-bar">WordLink <span>🎮</span> Practice</div>
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:20px;gap:20px;">
     <div class="card" style="width:100%;max-width:500px;">
-      <p style="font-family:'Fredoka One',cursive;font-size:1rem;color:var(--teal);margin-bottom:10px;">📚 Choose a category</p>
-      <div class="section-chips" id="solo-section-chips"></div>
+      <div class="section-panel">
+        <p class="step-label skill">① Choose a skill</p>
+        <div class="section-chips" id="solo-section-chips"></div>
+      </div>
+      <p class="step-label game">② Choose a game</p>
       <div class="q-type-tabs">
-        <button data-type="wp1" class="q-type-tab active" onclick="selectSoloType('wp1',this)">📖 WP1</button>
-        <button data-type="wp2" class="q-type-tab" onclick="selectSoloType('wp2',this)">📗 WP2</button>
-        <button data-type="beginner" class="q-type-tab" onclick="selectSoloType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
+        <button data-type="wp1" class="q-type-tab" onclick="selectSoloType('wp1',this)">📖 Beginner Word Pronunciation</button>
+        <button data-type="wp2" class="q-type-tab" onclick="selectSoloType('wp2',this)">📗 Elementary Word Pronunciation</button>
+        <button data-type="beginner" class="q-type-tab active" onclick="selectSoloType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
         <button data-type="elementary" class="q-type-tab" onclick="selectSoloType('elementary',this)">📄 Elementary Listen and Fill Gaps</button>
         <button data-type="questionwords" class="q-type-tab" onclick="selectSoloType('questionwords',this)">❓ Question Words</button>
         <button data-type="numbers" class="q-type-tab" onclick="selectSoloType('numbers',this)">🔢 1–10</button>
@@ -607,11 +625,11 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="clock" class="q-type-tab" onclick="selectSoloType('clock',this)">⏰ Clock</button>
         <button data-type="shop" class="q-type-tab" onclick="selectSoloType('shop',this)">🛒 Shop</button>
         <button data-type="forms" class="q-type-tab" onclick="selectSoloType('forms',this)">📋 Forms</button>
-        <button data-type="all" class="q-type-tab" onclick="selectSoloType('all',this)">🎲 All</button>
+        <button data-type="all" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">🎲 All games</button>
         <button data-type="custom" class="q-type-tab" id="solo-custom-tab" onclick="showBankPicker('solo',this)">📚 Custom</button>
       </div>
       <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="solo-count-display">Loading…</div>
-      <div class="mc-toggle-wrap" id="solo-mc-toggle" onclick="toggleMcMode('solo')">
+      <div class="mc-toggle-wrap on" id="solo-mc-toggle" onclick="toggleMcMode('solo')">
         <div class="mc-switch"></div>
         <div>
           <div class="mc-toggle-txt">🔵 Multiple Choice (4 options)</div>
@@ -657,12 +675,15 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <div class="player-chips scrollable" id="player-chips"></div>
       </div>
       <div class="card">
-        <p style="font-family:'Fredoka One',cursive;font-size:1rem;color:var(--teal);margin-bottom:10px;">📚 Question bank</p>
-        <div class="section-chips" id="teacher-section-chips"></div>
+        <div class="section-panel">
+          <p class="step-label skill">① Choose a skill</p>
+          <div class="section-chips" id="teacher-section-chips"></div>
+        </div>
+        <p class="step-label game">② Choose a game</p>
         <div class="q-type-tabs">
-          <button data-type="wp1" class="q-type-tab active" onclick="selectQType('wp1',this)">📖 WP1</button>
-          <button data-type="wp2" class="q-type-tab" onclick="selectQType('wp2',this)">📗 WP2</button>
-          <button data-type="beginner" class="q-type-tab" onclick="selectQType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
+          <button data-type="wp1" class="q-type-tab" onclick="selectQType('wp1',this)">📖 Beginner Word Pronunciation</button>
+          <button data-type="wp2" class="q-type-tab" onclick="selectQType('wp2',this)">📗 Elementary Word Pronunciation</button>
+          <button data-type="beginner" class="q-type-tab active" onclick="selectQType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
           <button data-type="elementary" class="q-type-tab" onclick="selectQType('elementary',this)">📄 Elementary Listen and Fill Gaps</button>
           <button data-type="questionwords" class="q-type-tab" onclick="selectQType('questionwords',this)">❓ Question Words</button>
           <button data-type="numbers" class="q-type-tab" onclick="selectQType('numbers',this)">🔢 1–10</button>
@@ -686,11 +707,11 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
           <button data-type="clock" class="q-type-tab" onclick="selectQType('clock',this)">⏰ Clock</button>
           <button data-type="shop" class="q-type-tab" onclick="selectQType('shop',this)">🛒 Shop</button>
           <button data-type="forms" class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
-          <button data-type="all" class="q-type-tab" onclick="selectQType('all',this)">🎲 All</button>
+          <button data-type="all" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">🎲 All games</button>
           <button data-type="custom" class="q-type-tab" id="teacher-custom-tab" onclick="showBankPicker('teacher',this)">📚 Custom</button>
         </div>
         <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="q-count-display">Loading…</div>
-        <div class="mc-toggle-wrap" id="host-mc-toggle" onclick="toggleMcMode('host')">
+        <div class="mc-toggle-wrap on" id="host-mc-toggle" onclick="toggleMcMode('host')">
           <div class="mc-switch"></div>
           <div>
             <div class="mc-toggle-txt">🔵 Multiple Choice (4 options)</div>
@@ -1706,7 +1727,31 @@ function poolFor(type){
   if(type==='clock') return [...questionBank.clock];
   if(type==='shop') return [...questionBank.shop];
   if(type==='forms') return [...questionBank.forms];
+  // "All" inside a section means all of *that section's* banks — the type
+  // string carries the section ("all:numeracy") so nothing needs hidden state.
+  const sec=sectionOf(type);
+  if(sec) return sec.banks.reduce((out,b)=>out.concat(poolFor(b)),[]);
   return [...questionBank.wp1,...questionBank.wp2,...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.numbers1120,...questionBank.numbers2199,...questionBank.custom];
+}
+/* Does this selection include translate questions? A section's "All" can
+   sweep the Translate bank in, and those questions need a language chosen. */
+function typeUsesTranslate(type){
+  if(type==='translate') return true;
+  const s=sectionOf(type);
+  return !!(s&&s.banks.indexOf('translate')>=0);
+}
+/* What the picker should say about a selection. Clock and Shop invent their
+   rounds, so their bank size is not a ceiling — ask getQuestions, which is
+   what actually plays, rather than reporting a bank that will be exceeded. */
+function countFor(type,limit){
+  const will=getQuestions(type,limit).length;
+  return {will:will,avail:Math.max(poolFor(type).length,will)};
+}
+/* The BANK_SECTIONS entry an "all:<section>" type refers to, or null. */
+function sectionOf(type){
+  if(typeof type!=='string'||type.indexOf('all:')!==0) return null;
+  const s=BANK_SECTIONS.find(x=>x.id===type.slice(4));
+  return s&&s.banks?s:null;
 }
 
 function getQuestions(type,limit){
@@ -1717,6 +1762,15 @@ function getQuestions(type,limit){
   if(type==='clock') return genClockQuestions(limit);
   if(type==='shop')  return genShopQuestions(limit);
   if(type==='forms') return genFormQuestions(limit);
+  // A section's "All" draws through getQuestions, not through the bank, so
+  // the generated banks (clock, shop, forms, odd one out) come out fresh
+  // instead of serving the same eight clock faces every game.
+  const sec=sectionOf(type);
+  if(sec){
+    const mixed=sec.banks.reduce((out,b)=>out.concat(getQuestions(b,limit)),[]);
+    shuffle(mixed);
+    return mixed.slice(0,limit);
+  }
   const pool=poolFor(type);
   shuffle(pool);
   return pool.slice(0,limit);
@@ -1811,15 +1865,15 @@ let role=null,roomCode=null,roomRef=null;
 let playerName=null,playerId=null;
 let currentQuestions=[],currentQIdx=0;
 let timerInterval=null,timerLeft=30;
-let selectedQType='wp1';
+let selectedQType='beginner';
 let answered=false,revealed=false;
 let myScore=0,myLastQIdx=-1;
 let answerListener=null,gameListener=null;
 const TIMER_DURATION=30;
 let totalPlayers=0;
-let soloMode=false,soloQuestions=[],soloQIdx=0,soloSelectedType='wp1';
+let soloMode=false,soloQuestions=[],soloQIdx=0,soloSelectedType='beginner';
 let hintLevel=0;
-let mcMode=false;
+let mcMode=true;
 
 const EMOJI={
   /* Clothes and accessories. Australian English: jumper, not sweater;
@@ -2391,11 +2445,12 @@ function generateQR(){
   const el=document.getElementById('qr-wrap'); el.innerHTML='';
   new QRCode(el,{text:'https://masoud-eal.github.io/LearntoRead/game.html?join='+roomCode,width:260,height:260,colorDark:'#000000',colorLight:'#ffffff'});
 }
-function toggleMcMode(which){
-  mcMode=!mcMode;
-  const w=document.getElementById(which==='host'?'host-mc-toggle':'solo-mc-toggle');
-  if(w) w.classList.toggle('on',mcMode);
-  // keep both toggles visually in sync
+function toggleMcMode(which){ setMcMode(!mcMode); }
+/* Set the mode outright rather than flipping it — choosing a skill picks the
+   mode that suits that skill's default game, which a toggle can't express. */
+function setMcMode(on){
+  mcMode=!!on;
+  // both toggles stay visually in sync
   ['solo-mc-toggle','host-mc-toggle'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('on',mcMode);});
 }
 
@@ -2410,12 +2465,11 @@ function selectQType(type,el){
 }
 function updateQCountDisplay(){
   const limit=parseInt(document.getElementById('q-limit').value)||10;
-  const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body,...questionBank.clothes];
-  let pool=selectedQType==='all'?[...questionBank.wp1,...questionBank.wp2,...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.numbers1120,...questionBank.numbers2199,...questionBank.custom]:selectedQType==='spelling'?allSpelling:(questionBank[selectedQType]||[]);
   const disp=document.getElementById('q-count-display');
   if(!disp) return;
-  if(selectedQType==='custom') disp.textContent=(selectedBankName?'"'+selectedBankName+'" — ':'')+pool.length+' questions available — '+Math.min(pool.length,limit)+' will be used';
-  else disp.textContent=pool.length+' available — '+Math.min(pool.length,limit)+' will be used';
+  const c=countFor(selectedQType,limit);
+  if(selectedQType==='custom') disp.textContent=(selectedBankName?'"'+selectedBankName+'" — ':'')+c.avail+' questions available — '+c.will+' will be used';
+  else disp.textContent=c.avail+' available — '+c.will+' will be used';
 }
 
 function startGame(){
@@ -2793,7 +2847,7 @@ function listenForGameState(){
     // teacher chose Translate, and disappears again if they change their mind.
     const lw=document.getElementById('s-lang-wrap');
     if(lw){
-      const wanted=room.qType==='translate'&&room.status==='lobby';
+      const wanted=typeUsesTranslate(room.qType)&&room.status==='lobby';
       lw.style.display=wanted?'flex':'none';
       if(wanted){
         const pick=document.getElementById('s-lang-pick');
@@ -2878,15 +2932,45 @@ const BANK_SECTIONS=[
 /* "All" and "Custom" are not a skill — they stay visible under every chip. */
 const SECTION_ALWAYS=['all','custom'];
 const SCOPE_SEL={solo:'#screen-solo-setup',teacher:'#screen-teacher-lobby'};
+/* Choosing a skill also picks that skill's best game, so every section opens
+   on something worth playing rather than on whatever was selected before.
+   Multiple choice comes with it: the ordering games are the arranging, and
+   All Spelling is the writing section, so those open with typing. */
+const SECTION_DEFAULTS={
+  '*':          {type:'beginner',     mc:true},
+  letters:      {type:'letter',       mc:true},
+  vocab:        {type:'clothes',      mc:true},
+  listening:    {type:'unscramble',   mc:false},
+  reading:      {type:'sms',          mc:true},
+  writing:      {type:'spelling',     mc:false},
+  grammar:      {type:'gramscramble', mc:false},
+  numeracy:     {type:'clock',        mc:true},
+  translation:  {type:'translate',    mc:true},
+  everyday:     {type:'beginner',     mc:true},
+};
 
 function filterBanks(scope,sectionId){
   const sec=BANK_SECTIONS.find(s=>s.id===sectionId)||BANK_SECTIONS[0];
+  // Retarget the All pill before selecting, so picking "All" inside a section
+  // means all of that section.
+  const allPill=document.querySelector(SCOPE_SEL[scope]+' .q-type-tab[data-type^="all"]');
+  if(allPill){
+    allPill.dataset.type=sec.banks?'all:'+sec.id:'all';
+    allPill.textContent='🎲 All '+(sec.banks?sec.label.replace(/^\S+\s+/,''):'games');
+  }
+  const def=SECTION_DEFAULTS[sec.id];
+  if(def){
+    setMcMode(def.mc);
+    const pick=document.querySelector(SCOPE_SEL[scope]+' .q-type-tab[data-type="'+def.type+'"]');
+    if(pick){ if(scope==='solo') selectSoloType(def.type,pick); else selectQType(def.type,pick); }
+  }
   const chosen=scope==='solo'?soloSelectedType:selectedQType;
   document.querySelectorAll(SCOPE_SEL[scope]+' .q-type-tab').forEach(el=>{
     const t=el.dataset.type;
     // The chosen bank stays on screen whatever the filter — hiding it while
     // it is still what Start would launch would be a lie about the state.
-    const show=!sec.banks||sec.banks.indexOf(t)>=0||SECTION_ALWAYS.indexOf(t)>=0||t===chosen;
+    // With per-section defaults this should no longer fire; it is a backstop.
+    const show=!sec.banks||sec.banks.indexOf(t)>=0||SECTION_ALWAYS.indexOf(t.split(':')[0])>=0||t===chosen;
     el.style.display=show?'':'none';
   });
   document.querySelectorAll(SCOPE_SEL[scope]+' .section-chip').forEach(c=>{
@@ -2913,8 +2997,9 @@ function selectSoloType(type,el){
   document.querySelectorAll('#screen-solo-setup .q-type-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
   const lw=document.getElementById('solo-lang-wrap');
-  lw.style.display=type==='translate'?'flex':'none';
-  if(type==='translate'){
+  const wantsLang=typeUsesTranslate(type);
+  lw.style.display=wantsLang?'flex':'none';
+  if(wantsLang){
     const stored=localStorage.getItem('translateLang')||'vi';
     document.getElementById('solo-lang-pick').value=stored;
   }
@@ -2924,13 +3009,12 @@ function updateSoloCountDisplay(){
   const display=document.getElementById('solo-count-display');
   if(!display) return;
   const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
-  const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body,...questionBank.clothes];
-  let pool=soloSelectedType==='all'?[...questionBank.wp1,...questionBank.wp2,...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.numbers1120,...questionBank.numbers2199,...questionBank.custom]:soloSelectedType==='spelling'?allSpelling:(questionBank[soloSelectedType]||[]);
-  if(soloSelectedType==='custom') display.textContent=(selectedBankName?'"'+selectedBankName+'" — ':'')+pool.length+' questions available — '+Math.min(pool.length,limit)+' will be used';
-  else display.textContent=pool.length+' available — '+Math.min(pool.length,limit)+' will be used';
+  const c=countFor(soloSelectedType,limit);
+  if(soloSelectedType==='custom') display.textContent=(selectedBankName?'"'+selectedBankName+'" — ':'')+c.avail+' questions available — '+c.will+' will be used';
+  else display.textContent=c.avail+' available — '+c.will+' will be used';
 }
 function startSoloGame(){
-  if(soloSelectedType==='translate'){
+  if(typeUsesTranslate(soloSelectedType)){
     localStorage.setItem('translateLang',document.getElementById('solo-lang-pick').value);
   }
   const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
