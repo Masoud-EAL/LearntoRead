@@ -147,8 +147,14 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
   padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
   align-items:center;
   gap:clamp(4px,1.2vh,10px);
+  /* Three tiers, last supported wins. vh is wrong on mobile — it is measured
+     with the URL bar hidden, so the bottom of the page sits behind the
+     browser chrome. dvh fixes that where it exists. --app-h is measured from
+     visualViewport in JS and beats both, so this is right even on a browser
+     that has neither unit. */
   height:100vh;
   height:100dvh;
+  height:var(--app-h,100dvh);
   min-height:0;
   overflow:hidden;
 }
@@ -173,6 +179,15 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 /* Whatever room is left over goes above Submit, so it sits at the bottom of
    the screen in the same place every round. */
 #screen-student-answer > .submit-btn{margin-top:auto;}
+/* The money is the part you have to reach, so it never gives way — the
+   prompt above it shrinks and scrolls first. Same for the form's chips and
+   the answer choices. */
+#screen-student-answer > .shop-section,
+#screen-student-answer > .mc-section{flex-shrink:0;}
+#screen-student-answer[data-qtype="shop"] > .s-q-card,
+#screen-student-answer[data-qtype="form"] > .s-q-card,
+#screen-student-answer[data-qtype="mc"] > .s-q-card{flex-shrink:6;}
+#screen-student-answer .coin-tray{flex-shrink:0;}
 /* An empty prompt slot must take no room — min-height on a 3.2rem font was
    opening a blank band above the question on rounds with no picture. */
 #screen-student-answer > .s-q-card #s-q-emoji:empty{display:none;}
@@ -1389,18 +1404,27 @@ function genShopQuestions(n){
              +'</span><span class="price-tag">'+money(cents)+'</span></div>',
         question:'Pay '+money(cents)+' for '+item.name});
     } else {
-      // Count the change. Price is small and payment is $100, so the change
-      // itself falls between $50 and $100.
-      const price=(12+Math.floor(Math.random()*34))*100+(Math.random()<0.5?50:0);
-      const change=10000-price;
-      out.push({type:'shop',mode:'change',cents:change,paid:10000,price:price,
+      // Count the change. You don't always hand over $100 in real life, so
+      // the note varies: a $20 for something small, a $50, or a $100. Each
+      // price is set well below the note so the change is worth counting.
+      const notes=[
+        {cents:2000, file:'20d',  min:300,  max:1800},
+        {cents:5000, file:'50d',  min:800,  max:4200},
+        {cents:10000,file:'100d', min:1500, max:8500},
+      ];
+      const n=notes[Math.floor(Math.random()*notes.length)];
+      const span=(n.max-n.min)/100;
+      const price=(Math.floor(Math.random()*span)*100)+n.min+(Math.random()<0.5?50:0);
+      const change=n.cents-price;
+      out.push({type:'shop',mode:'change',cents:change,paid:n.cents,price:price,
         answer:moneyAnswer(change),
         // Show the note handed over as well as the price — the sum only makes
         // sense if you can see both sides of it.
         icon:'<div class="shop-item">'+item.emoji+'<span class="shop-name">'+item.name
              +'</span><span class="price-tag">'+money(price)+'</span>'
-             +'<span class="paid-with">you paid <img src="icons/money-100d.svg" alt="$100"></span></div>',
-        question:'You pay $100.00 for '+item.name+'. Tap your change.'});
+             +'<span class="paid-with">you paid <img src="icons/money-'+n.file
+             +'.svg" alt="'+money(n.cents)+'"></span></div>',
+        question:'You pay '+money(n.cents)+' for '+item.name+'. Tap your change.'});
     }
   }
   return out;
@@ -3042,6 +3066,20 @@ function clockUp(){ clockDrag=null; }
   // so cancel the touch outright while a hand is being dragged.
   svg.addEventListener('touchmove',e=>{ if(clockDrag) e.preventDefault(); },{passive:false});
 })();
+
+/* ══════════════ REAL VIEWPORT HEIGHT ══════════════
+   CSS vh is measured with the mobile URL bar hidden, so a 100vh page runs
+   off the bottom of the screen; dvh fixes it but is missing on older
+   Android browsers. visualViewport is what the learner can actually see,
+   so measure that and let the stylesheet prefer it over both units. */
+function setAppHeight(){
+  const h=(window.visualViewport&&window.visualViewport.height)||window.innerHeight;
+  if(h) document.documentElement.style.setProperty('--app-h',Math.round(h)+'px');
+}
+setAppHeight();
+window.addEventListener('resize',setAppHeight);
+window.addEventListener('orientationchange',()=>setTimeout(setAppHeight,150));
+if(window.visualViewport) window.visualViewport.addEventListener('resize',setAppHeight);
 
 /* ══════════════ SHOP WIDGET ══════════════ */
 let shopCents=0, shopTarget=0, shopCounts={};
