@@ -610,12 +610,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       </div>
       <p class="step-label game">② Choose a game</p>
       <div class="q-type-tabs">
-        <button data-type="wp1:gap" class="q-type-tab" onclick="selectSoloType('wp1:gap',this)">🔡 Beginner Missing Sound</button>
-        <button data-type="wp1:word" class="q-type-tab" onclick="selectSoloType('wp1:word',this)">👆 Beginner Tap the Word</button>
-        <button data-type="wp1:build" class="q-type-tab" onclick="selectSoloType('wp1:build',this)">🧱 Beginner Build the Word</button>
-        <button data-type="wp2:gap" class="q-type-tab" onclick="selectSoloType('wp2:gap',this)">🔡 Elementary Missing Sound</button>
-        <button data-type="wp2:word" class="q-type-tab" onclick="selectSoloType('wp2:word',this)">👆 Elementary Tap the Word</button>
-        <button data-type="wp2:build" class="q-type-tab" onclick="selectSoloType('wp2:build',this)">🧱 Elementary Build the Word</button>
+        <button data-type="wp1:gap" class="q-type-tab" onclick="selectSoloType('wp1:gap',this)">🔡 Beginner Sound Gap</button>
+        <button data-type="wp1:word" class="q-type-tab" onclick="selectSoloType('wp1:word',this)">👆 Beginner Tap Word</button>
+        <button data-type="wp1:build" class="q-type-tab" onclick="selectSoloType('wp1:build',this)">🧱 Beginner Build Word</button>
+        <button data-type="wp2:gap" class="q-type-tab" onclick="selectSoloType('wp2:gap',this)">🔡 Elementary Sound Gap</button>
+        <button data-type="wp2:word" class="q-type-tab" onclick="selectSoloType('wp2:word',this)">👆 Elementary Tap Word</button>
+        <button data-type="wp2:build" class="q-type-tab" onclick="selectSoloType('wp2:build',this)">🧱 Elementary Build Word</button>
         <button data-type="beginner" class="q-type-tab active" onclick="selectSoloType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
         <button data-type="elementary" class="q-type-tab" onclick="selectSoloType('elementary',this)">📄 Elementary Listen and Fill Gaps</button>
         <button data-type="questionwords" class="q-type-tab" onclick="selectSoloType('questionwords',this)">❓ Question Words</button>
@@ -696,12 +696,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         </div>
         <p class="step-label game">② Choose a game</p>
         <div class="q-type-tabs">
-          <button data-type="wp1:gap" class="q-type-tab" onclick="selectQType('wp1:gap',this)">🔡 Beginner Missing Sound</button>
-          <button data-type="wp1:word" class="q-type-tab" onclick="selectQType('wp1:word',this)">👆 Beginner Tap the Word</button>
-          <button data-type="wp1:build" class="q-type-tab" onclick="selectQType('wp1:build',this)">🧱 Beginner Build the Word</button>
-          <button data-type="wp2:gap" class="q-type-tab" onclick="selectQType('wp2:gap',this)">🔡 Elementary Missing Sound</button>
-          <button data-type="wp2:word" class="q-type-tab" onclick="selectQType('wp2:word',this)">👆 Elementary Tap the Word</button>
-          <button data-type="wp2:build" class="q-type-tab" onclick="selectQType('wp2:build',this)">🧱 Elementary Build the Word</button>
+          <button data-type="wp1:gap" class="q-type-tab" onclick="selectQType('wp1:gap',this)">🔡 Beginner Sound Gap</button>
+          <button data-type="wp1:word" class="q-type-tab" onclick="selectQType('wp1:word',this)">👆 Beginner Tap Word</button>
+          <button data-type="wp1:build" class="q-type-tab" onclick="selectQType('wp1:build',this)">🧱 Beginner Build Word</button>
+          <button data-type="wp2:gap" class="q-type-tab" onclick="selectQType('wp2:gap',this)">🔡 Elementary Sound Gap</button>
+          <button data-type="wp2:word" class="q-type-tab" onclick="selectQType('wp2:word',this)">👆 Elementary Tap Word</button>
+          <button data-type="wp2:build" class="q-type-tab" onclick="selectQType('wp2:build',this)">🧱 Elementary Build Word</button>
           <button data-type="beginner" class="q-type-tab active" onclick="selectQType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
           <button data-type="elementary" class="q-type-tab" onclick="selectQType('elementary',this)">📄 Elementary Listen and Fill Gaps</button>
           <button data-type="questionwords" class="q-type-tab" onclick="selectQType('questionwords',this)">❓ Question Words</button>
@@ -1630,9 +1630,13 @@ function genSoundQuestions(){
    that — with distractors drawn at random from all 77 words, so "cat" could
    appear beside "elephant" and nothing in the round pointed at the letters.
 
-   Now every round belongs to one rhyme or pattern family, sounds the word out
-   from the recordings in audio/ (phonics.js), and is answered by tapping or
-   by building the word from its graphemes. Three shapes, easiest first:
+   Now every round belongs to one rhyme or pattern family and is answered by
+   tapping or by building the word from its graphemes — never by typing a
+   word only heard. The word itself is spoken plainly, the same way every
+   other bank speaks its answer (studentSpeak/teacherSpeak fall through to
+   the ordinary q.word case); phonics.js's recorded phonemes are still what
+   phonicsTiles() uses to build the correct graphemes for the Build the Word
+   tiles, just not what gets played aloud. Three shapes, easiest first:
 
      phgap    _at        — tap the missing sound
      phword   🔊         — tap the word; the rivals rhyme, so one sound decides
@@ -2693,12 +2697,6 @@ function teacherSpeak(){
   // Question-word banks in multiple choice are read-and-pick: no audio.
   if(q.qword&&Array.isArray(q.choices)&&q.choices.length) return;
   if(q.type==='lettersound'){ playSoundFile(q.soundFile); return; }
-  if(q.type==='phgap'||q.type==='phword'||q.type==='phbuild'){
-    btn.classList.add('playing');
-    cancelWordSounds=playWordSounds(q.word,{speakPart:t=>speakTTS(t,0.6),
-      done:()=>{ speakTTS(q.word,0.6); btn.classList.remove('playing'); }});
-    return;
-  }
   // Shop and form are reading tasks. Returning before the button is marked
   // playing keeps it from sticking in the active state with nothing to hear.
   if(q.type==='shop'||q.type==='form') return;
@@ -3264,7 +3262,6 @@ function showStudentQuestion(q,startedAt,dur){
   // looking at this screen themselves, so keep the calm game music going.
   if(soloMode) playGameMusic(); else stopMusic();
   answered=false; hintLevel=0;
-  if(cancelWordSounds){ cancelWordSounds(); cancelWordSounds=null; }
   document.getElementById('student-ans-input').value='';
   document.getElementById('submitted-msg').textContent='';
   const isMc=Array.isArray(q.choices)&&q.choices.length>0;
@@ -3622,7 +3619,7 @@ function selectMc(word,btn){
   submitAnswer();
 }
 
-let sfxAudio=null,cancelWordSounds=null;
+let sfxAudio=null;
 function playSoundFile(file){
   try{ if(sfxAudio){sfxAudio.pause();} sfxAudio=new Audio('audio/'+file+'.wav'); sfxAudio.play().catch(()=>{}); }catch(e){}
 }
@@ -3647,14 +3644,6 @@ function studentSpeak(q){
   // give the answer away. When typing, fall through so the full question is read.
   if(Q.qword&&Array.isArray(Q.choices)&&Q.choices.length) return;
   if(Q.type==='lettersound'){ playSoundFile(Q.soundFile); return; }
-  // Sound it out from the recordings first, then say the whole word. The
-  // learner always hears one authentic rendering, whatever voice the device
-  // has — which is the point of these two banks.
-  if(Q.type==='phgap'||Q.type==='phword'||Q.type==='phbuild'){
-    cancelWordSounds=playWordSounds(Q.word,{speakPart:t=>speakTTS(t,0.6),
-      done:()=>{ if(currentStudentQ===Q) speakTTS(Q.word,0.6); }});
-    return;
-  }
   if(Q.type==='letter'){ speakTTS(Q.letter); return; }
   if(Q.type==='oddone'){ speakTTS('Tap the one that does not belong.'); return; }
   // Shop and form are reading tasks; the clock is the listening half of the
@@ -4253,7 +4242,7 @@ function handlePlayerVisibility(){
     roomRef.child('players/'+playerId).onDisconnect().remove();
   }
 }
-function cleanupListeners(){if(cancelWordSounds){cancelWordSounds();cancelWordSounds=null;}if(roomRef)roomRef.off();clearInterval(timerInterval);clearInterval(studentTimerInt);window.speechSynthesis&&window.speechSynthesis.cancel();document.removeEventListener('visibilitychange',handlePlayerVisibility);}
+function cleanupListeners(){if(roomRef)roomRef.off();clearInterval(timerInterval);clearInterval(studentTimerInt);window.speechSynthesis&&window.speechSynthesis.cancel();document.removeEventListener('visibilitychange',handlePlayerVisibility);}
 
 /* INIT */
 window.addEventListener('load',()=>{
