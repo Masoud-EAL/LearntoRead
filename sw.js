@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v24';
+const CACHE = 'learntoread-v25';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -7,6 +7,7 @@ const CORE = [
   './game.html',
   './tracing.html',
   './i18n.js',
+  './phonics.js',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',

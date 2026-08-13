@@ -259,6 +259,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 #screen-student-answer .submit-btn{padding:clamp(11px,2.2vh,18px);font-size:clamp(1rem,2.6vh,1.3rem);}
 #screen-student-answer .s-q-text{font-size:clamp(1rem,3.2vh,1.5rem);margin-bottom:clamp(6px,1.4vh,14px);}
 #screen-student-answer #s-q-emoji{font-size:clamp(1.8rem,7vh,3.2rem)!important;margin:clamp(2px,.8vh,6px) 0 clamp(4px,1.2vh,10px)!important;}
+#screen-student-answer[data-round="phgap"] #s-q-emoji{font-size:clamp(2.2rem,9vh,4rem)!important;}
 #screen-student-answer .s-hear-btn{padding:clamp(5px,1.6vh,11px) clamp(12px,4vw,20px);font-size:clamp(.8rem,2.2vh,1.08rem);}
 
 /* Very small phones: trade a little tap area for fitting on screen, since
@@ -417,6 +418,16 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .word-bank-area{display:flex;flex-wrap:wrap;gap:10px;padding:12px;background:rgba(255,255,255,.04);border-radius:12px;}
 .word-tile{display:inline-flex;align-items:center;padding:clamp(6px,1.5vh,11px) clamp(11px,3vw,18px);border-radius:11px;font-family:'Fredoka One',cursive;font-size:clamp(.95rem,2.6vh,1.25rem);cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;border:2px solid transparent;transition:transform .12s,filter .12s,background .15s,border-color .15s;line-height:1.2;}
 .word-tile:active{transform:scale(.93);}
+/* ── Word pronunciation ──
+   The gapped word is the whole prompt on a phgap round, so it has to read
+   from the back of a classroom. Grapheme tiles are one or two characters
+   where a sentence tile is a word, so they need a floor on their width to
+   stay a real touch target. */
+.ph-word{font-family:'Fredoka One',cursive;letter-spacing:.06em;line-height:1.1;
+  color:var(--text);white-space:nowrap;}
+.ph-gap{color:var(--gold);border-bottom:4px solid var(--gold);padding:0 .18em;margin:0 .04em;}
+[data-round="phbuild"] .word-tile{min-width:2.4em;justify-content:center;letter-spacing:.04em;}
+
 .bank-tile{background:var(--purple);color:white;}
 .bank-tile:hover{transform:translateY(-2px);filter:brightness(1.15);}
 .ans-tile{background:var(--teal);color:white;}
@@ -861,11 +872,11 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   </div>
   <div class="unscramble-section" id="unscramble-section" style="display:none;">
     <div>
-      <div class="unscrm-label">Your sentence</div>
+      <div class="unscrm-label" id="unscrm-label-answer">Your sentence</div>
       <div class="answer-area" id="answer-area"></div>
     </div>
     <div>
-      <div class="unscrm-label">Tap (or drag) words to build your sentence</div>
+      <div class="unscrm-label" id="unscrm-label-bank">Tap (or drag) words to build your sentence</div>
       <div class="word-bank-area" id="word-bank-area"></div>
     </div>
   </div>
@@ -1038,6 +1049,8 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 
 <div class="toast" id="toast"></div>
 
+<!-- Word families, grapheme→recording maps and voice picking, shared with index.html -->
+<script src="phonics.js"></script>
 <script>
 /* FIREBASE */
 const firebaseConfig={apiKey:"AIzaSyARGfXd7nArpjS87r_TOiujIy8pjHpBBoA",authDomain:"wordlink-game-d1f97.firebaseapp.com",databaseURL:"https://wordlink-game-d1f97-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"wordlink-game-d1f97",storageBucket:"wordlink-game-d1f97.firebasestorage.app",messagingSenderId:"126959375644",appId:"1:126959375644:web:f2a39eb6057426382b96d9"};
@@ -1062,8 +1075,6 @@ function serverNow(){ return Date.now()+serverTimeOffset; }
 function banksRef(){ return db.ref('customBanks/'+authUid); }
 
 /* QUESTION BANK */
-const WP1_WORDS=['man','can','pan','ran','fan','tan','van','cat','bat','hat','mat','rat','sat','pat','cap','map','nap','tap','lap','gap','bag','tag','rag','wag','lag','ham','jam','ram','dam','yam','pet','net','set','bet','met','wet','pen','hen','ten','men','den','big','dig','fig','pig','wig','pin','bin','fin','tin','win','lip','dip','hip','sip','tip','zip','hop','mop','top','pop','cop','hot','pot','dot','lot','not','bug','dug','hug','mug','rug','sun','fun','run','bun','gun'];
-const WP2_WORDS=['ship','shop','fish','dish','shed','shell','chip','chat','much','rich','chop','chest','this','that','these','those','thin','think','bath','teeth','when','what','why','phone','photo','graph','elephant','see','bee','feet','eat','team','meat','read','rain','train','mail','tail','day','play','say','way','boat','coat','road','soap','toe','goes','pie','tie','blue','glue','true','clue','moon','food','soon','pool','cool','book','look','cook','foot','good','out','loud','sound','found','mouth','count','could','would','should','cow','now','snow','low','coin','join','boil','soil','boy','toy','enjoy','saw','law','paw','draw','haul','cake','make','take','lake','late','mate','gate','fine','line','mine','nine','hope','rope','ride','side','game','name','same','came','more','core','sore','stop','step','stand','stick','black','block','blow','tree','truck','trip','drop','drum','dress','drink','class','clap','clock','clean','flag','flat','flip','fly','green','grab','grow','plan','plant','please','brown','bring','bread','brush','crab','cry','crop','cross','slip','slow','sleep','spin','spot','speak','spoon','back','duck','pick','rock','ball','bell','fill','doll','catch','match','watch','pitch','bridge','edge','badge','judge','nation','station','action','motion','section','mission','session','vision','tension','picture','nature','future','culture','mixture','capture','musician','magician','technician'];
 const BEGINNER_SENTENCE_BLANKS=[
   {sentence:'My ___ is David.',blank:'name'},
   {sentence:'My ___ name is David Johnson.',blank:'full'},
@@ -1605,6 +1616,138 @@ function genSoundQuestions(){
   });
   return out;
 }
+/* ══════════════ WORD PRONUNCIATION ══════════════
+   Both banks are decoding games, not spelling tests. A learner at this level
+   cannot type a word they have only heard, and the old rounds asked exactly
+   that — with distractors drawn at random from all 77 words, so "cat" could
+   appear beside "elephant" and nothing in the round pointed at the letters.
+
+   Now every round belongs to one rhyme or pattern family, sounds the word out
+   from the recordings in audio/ (phonics.js), and is answered by tapping or
+   by building the word from its graphemes. Three shapes, easiest first:
+
+     phgap    _at        — tap the missing sound
+     phword   🔊         — tap the word; the rivals rhyme, so one sound decides
+     phbuild  sh|i|p     — put the graphemes in order (graphemes, not letters:
+                           that distinction is the whole point of Elementary)
+
+   Families come straight from phonics.js, so this stays in step with the
+   study pages in index.html. */
+
+// -tion/-sion/-cian/-ture are polysyllabic academic words, far past ACSF
+// pre-level, and the only ones whose sounds have no recording. They stay in
+// index.html for study; they are not a game.
+const PHONICS_SKIP=/^Word endings/;
+
+function phonicsFamilies(level){
+  // allowSpoken: a silent letter is fine, and one chunk without a recording
+  // (the -ed ending) is worth keeping the past-tense family for.
+  const keep=ws=>ws.map(w=>w.toLowerCase()).filter(w=>canSoundOut(w,true));
+  if(level==='wp1'){
+    return wp1Families.map(f=>({cat:'wp1', label:'-'+f.ending+' words',
+      words:keep(f.words), focus:null, ending:f.ending}))
+      .filter(f=>f.words.length>=4);
+  }
+  return wp2Families.filter(f=>!PHONICS_SKIP.test(f.cat))
+    .map(f=>({cat:f.cat, label:f.ending+' words',
+      words:keep(f.words), focus:f.focus.join(''), ending:f.ending}))
+    .filter(f=>f.words.length>=3);
+}
+
+/* Which slice of the word this round is about, and what could stand there
+   instead. For a rhyme family the answer is the onset — the family IS the
+   rime, so the front is the only thing that varies. For a pattern family it
+   is the pattern itself, with the other patterns in the same category as the
+   rivals: sh against ch, th, wh. Returns null when neither can offer three
+   real alternatives, in which case the word gets a different round shape. */
+function phonicsContrast(fam,word,fams){
+  const byFocus=()=>{
+    if(!fam.focus) return null;
+    const at=word.indexOf(fam.focus);
+    if(at<0) return null;
+    const rivals=[...new Set(fams.filter(f=>f.cat===fam.cat&&f.focus&&f.focus!==fam.focus)
+      .map(f=>f.focus))];
+    if(rivals.length<3) return null;
+    return {at:at,len:fam.focus.length,answer:fam.focus,rivals:shuffle(rivals).slice(0,3)};
+  };
+  const byOnset=()=>{
+    // Everything before the family's ending. Silent-e words end in the
+    // pattern as well, so fall back to the first letter.
+    const cut=word.length-fam.ending.length;
+    const len=(cut>0&&word.slice(cut)===fam.ending)?cut:1;
+    const answer=word.slice(0,len);
+    const rivals=[...new Set(fam.words.map(w=>w.slice(0,len)).filter(o=>o&&o!==answer))];
+    if(rivals.length<3) return null;
+    return {at:0,len:len,answer:answer,rivals:shuffle(rivals).slice(0,3)};
+  };
+  return fam.cat==='wp1' ? (byOnset()||byFocus()) : (byFocus()||byOnset());
+}
+
+/* Start on the easiest shape and work up, then keep cycling all three so a
+   long game doesn't turn into twenty rounds of the same thing. */
+const PHONICS_RAMP=['gap','gap','word','word','build','word','build'];
+function phonicsRung(i){
+  return i<PHONICS_RAMP.length?PHONICS_RAMP[i]:['word','build','gap'][(i-PHONICS_RAMP.length)%3];
+}
+
+function phonicsQ(level,fam,word,rung,fams){
+  const base={level:level, word:word, family:fam.label, textOnly:true};
+  if(rung==='gap'){
+    const c=phonicsContrast(fam,word,fams);
+    if(c) return Object.assign(base,{
+      type:'phgap', answer:c.answer,
+      choices:shuffle([c.answer,...c.rivals]),
+      icon:'<div class="ph-word">'+word.slice(0,c.at)
+        +'<span class="ph-gap">?</span>'+word.slice(c.at+c.len)+'</div>'
+    });
+    rung='word';   // no three honest rivals — ask it a different way
+  }
+  if(rung==='word'){
+    const rivals=fam.words.filter(w=>w!==word);
+    // A family of three still needs four options; borrow from its category.
+    const pad=rivals.length>=3?[]:shuffle(fams.filter(f=>f.cat===fam.cat)
+      .reduce((a,f)=>a.concat(f.words),[]).filter(w=>w!==word&&rivals.indexOf(w)<0));
+    return Object.assign(base,{
+      type:'phword', answer:word,
+      choices:shuffle([word,...shuffle(rivals).slice(0,3),...pad].slice(0,4))
+    });
+  }
+  const tiles=phonicsTiles(word);
+  return Object.assign(base,{
+    type:'phbuild', answer:word, textOnly:false,
+    words:tiles?tiles.map(t=>t.d):word.split('')
+  });
+}
+
+/* Draw a game: a few families, played two-to-four rounds at a time so
+   consecutive words rhyme and the pattern gets a chance to land. */
+function genPhonicsQuestions(level,limit){
+  const fams=phonicsFamilies(level);
+  if(!fams.length) return [];
+  const n=Math.max(1,limit||10);
+  const run=Math.max(2,Math.min(4,Math.ceil(n/3)));
+  const out=[];
+  let pool=shuffle([...fams]);
+  while(out.length<n){
+    if(!pool.length) pool=shuffle([...fams]);
+    const fam=pool.shift();
+    const words=shuffle([...fam.words]);
+    const take=Math.min(words.length,run,n-out.length);
+    for(let k=0;k<take;k++) out.push(phonicsQ(level,fam,words[k],phonicsRung(out.length),fams));
+  }
+  return out;
+}
+
+/* The whole bank, one round per word, so the picker's count is the real
+   number of words and the mixed "All" games can draw from it. */
+function genPhonicsBank(level){
+  const fams=phonicsFamilies(level);
+  const out=[];
+  fams.forEach(fam=>fam.words.forEach(w=>
+    out.push(phonicsQ(level,fam,w,phonicsRung(out.length),fams))));
+  return out;
+}
+
 function genOddOneOut(count){
   const groups=Object.keys(ODD_GROUPS);
   const out=[],seen=new Set();
@@ -1651,8 +1794,8 @@ function buildBank(){
   questionBank.letter=genLetterQuestions();
   questionBank.lettersound=genSoundQuestions();
   questionBank.oddone=genOddOneOut(40);
-  questionBank.wp1=WP1_WORDS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
-  questionBank.wp2=WP2_WORDS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
+  questionBank.wp1=genPhonicsBank('wp1');
+  questionBank.wp2=genPhonicsBank('wp2');
   questionBank.beginner=BEGINNER_SENTENCE_BLANKS.map(s=>({type:'sentence',sentence:s.sentence,blank:s.blank,display:s.sentence,answer:s.blank.toLowerCase()}));
   questionBank.elementary=ELEMENTARY_SENTENCE_BLANKS.map(s=>({type:'sentence',sentence:s.sentence,blank:s.blank,display:s.sentence,answer:s.blank.toLowerCase()}));
   questionBank.questionwords=QUESTION_WORD_QUESTIONS.map(function(item){
@@ -1762,6 +1905,9 @@ function getQuestions(type,limit){
   if(type==='clock') return genClockQuestions(limit);
   if(type==='shop')  return genShopQuestions(limit);
   if(type==='forms') return genFormQuestions(limit);
+  // Both word-pronunciation banks are drawn fresh so the families, the words
+  // and the round shapes vary between games.
+  if(type==='wp1'||type==='wp2') return genPhonicsQuestions(type,limit);
   // A section's "All" draws through getQuestions, not through the bank, so
   // the generated banks (clock, shop, forms, odd one out) come out fresh
   // instead of serving the same eight clock faces every game.
@@ -2494,14 +2640,14 @@ function playQuestion(){
   document.getElementById('game-prog').textContent='Question '+(currentQIdx+1)+' of '+total;
   const isMcQ=Array.isArray(q.choices)&&q.choices.length>0;
   const noAudio=q.type==='gramscramble'||q.type==='translate'||q.type==='mc';
-  document.getElementById('q-badge').textContent=q.qword?'QUESTION WORD':q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='lettersound'?'FIRST SOUND':q.type==='oddone'?'ODD ONE OUT':q.type==='mc'?'MULTIPLE CHOICE':q.type==='clockset'?'CLOCK':q.type==='shop'?'MONEY':q.type==='form'?'FORM':'WORD';
-  document.getElementById('q-hint').textContent=q.type==='oddone'?'Students tap the picture that is different':q.type==='clockset'?'Students drag the clock hands to this time':q.type==='shop'?'Students tap coins to make this amount':q.type==='form'?'Students put each answer in the right box':q.type==='mc'?'Students tap the correct answer':(q.type==='unscramble'||q.type==='gramscramble')?(isMcQ?(q.type==='unscramble'?'Students listen and tap the sentence in the right order':'Students tap the sentence in the right order'):'Students arrange word tiles'):q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='translate'?'Students type the English sentence':'';
+  document.getElementById('q-badge').textContent=q.qword?'QUESTION WORD':q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='lettersound'?'FIRST SOUND':q.type==='oddone'?'ODD ONE OUT':q.type==='phgap'?'MISSING SOUND':q.type==='phword'?'DECODE':q.type==='phbuild'?'BUILD THE WORD':q.type==='mc'?'MULTIPLE CHOICE':q.type==='clockset'?'CLOCK':q.type==='shop'?'MONEY':q.type==='form'?'FORM':'WORD';
+  document.getElementById('q-hint').textContent=q.type==='phgap'?'Students hear the sounds and tap the missing one':q.type==='phword'?'Students hear the sounds and tap the word':q.type==='phbuild'?'Students put the sounds in order to build the word':q.type==='oddone'?'Students tap the picture that is different':q.type==='clockset'?'Students drag the clock hands to this time':q.type==='shop'?'Students tap coins to make this amount':q.type==='form'?'Students put each answer in the right box':q.type==='mc'?'Students tap the correct answer':(q.type==='unscramble'||q.type==='gramscramble')?(isMcQ?(q.type==='unscramble'?'Students listen and tap the sentence in the right order':'Students tap the sentence in the right order'):'Students arrange word tiles'):q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='translate'?'Students type the English sentence':'';
   document.getElementById('ans-bars').innerHTML='';
   document.getElementById('reveal-btn').style.display='';
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('q-emoji').innerHTML=q.icon||(q.type==='word'?emo(q.word):q.type==='letter'?q.letter:'');
-  document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':(q.type==='clockset'||q.type==='shop'||q.type==='form')?q.question:'🔊 Listen and spell the word';
+  document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':q.type==='phgap'?('🔤 '+q.family+' — which sound is missing?'):q.type==='phword'?('🔊 '+q.family+' — students tap the word'):q.type==='phbuild'?('🔤 '+q.family+' — students build "'+q.word+'"'):(q.type==='clockset'||q.type==='shop'||q.type==='form')?q.question:'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=(noAudio||q.noListen)?'none':'';
   renderTeacherOptions(q,false);
   // Resolve this question's time budget once (translate questions get double)
@@ -2523,6 +2669,12 @@ function teacherSpeak(){
   // Question-word banks in multiple choice are read-and-pick: no audio.
   if(q.qword&&Array.isArray(q.choices)&&q.choices.length) return;
   if(q.type==='lettersound'){ playSoundFile(q.soundFile); return; }
+  if(q.type==='phgap'||q.type==='phword'||q.type==='phbuild'){
+    btn.classList.add('playing');
+    cancelWordSounds=playWordSounds(q.word,{speakPart:t=>speakTTS(t,0.6),
+      done:()=>{ speakTTS(q.word,0.6); btn.classList.remove('playing'); }});
+    return;
+  }
   // Shop and form are reading tasks. Returning before the button is marked
   // playing keeps it from sticking in the active state with nothing to hear.
   if(q.type==='shop'||q.type==='form') return;
@@ -2530,6 +2682,7 @@ function teacherSpeak(){
   const spokenText=q.type==='letter'?q.letter:q.type==='oddone'?'Tap the one that does not belong.':q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.type==='clockset'?('Set the clock to '+q.words):q.word;
   const utt=new SpeechSynthesisUtterance(spokenText);
   utt.rate=0.7; utt.lang='en-AU';
+  if(typeof applyVoice==='function') applyVoice(utt);
   utt.onend=utt.onerror=()=>btn.classList.remove('playing');
   window.speechSynthesis.cancel(); window.speechSynthesis.speak(utt);
 }
@@ -2562,7 +2715,9 @@ function renderTeacherOptions(q,showCorrect){
   box.innerHTML='';
   const emojis=choices.map(w=>emo(w));
   const hasDup=emojis.some((e,i)=>e&&emojis.indexOf(e)!==i);
-  const usePics=emojis.every(e=>e)&&!hasDup;
+  // A picture beside "cat" hands over the answer without any decoding, so
+  // phonics rounds opt out rather than relying on emoji coverage by accident.
+  const usePics=!q.textOnly&&emojis.every(e=>e)&&!hasDup;
   const isSentence=choices.some(w=>!emo(w)&&/\s/.test(w));
   box.style.gridTemplateColumns=isSentence?'1fr':'repeat(2,1fr)';
   choices.forEach(word=>{
@@ -2676,6 +2831,8 @@ function revealAnswers(){
   });
   listenForAnswers();
   renderTeacherOptions(q,true);
+  // A gap round's answer is one sound; showing the finished word is what
+  // the class needs to see.
   const revealWord=q.type==='sentence'?q.blank:q.type==='unscramble'||q.type==='gramscramble'?q.sentence:q.type==='translate'||q.type==='mc'?q.answer:(q.word||q.answer);
   const revealSentence=q.type==='sentence'?q.sentence.replace('___',q.blank):'';
   document.getElementById('q-text').innerHTML=q.type==='gramscramble'
@@ -3042,6 +3199,9 @@ function showSoloResult(submittedAns,correctAns,timeLeft){
     document.getElementById('result-word').innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;line-height:2;text-align:center;">'+diffHtml(submittedAns||'',correctAns)+'</div>'+(tier!=='correct'?'<div style="font-size:.78rem;color:var(--muted);margin-top:6px;">Correct: <em style="color:var(--green)">'+correctAns+'</em></div>':'');
   } else {
     document.getElementById('result-word').innerHTML=tier==='correct'?'<span class="correct-answer">'+correctAns+'</span> ✅':'<span class="wrong-answer">'+(submittedAns||'(blank)')+'</span> → <span class="correct-answer">'+correctAns+'</span>';
+    // The answer to a gap round is one sound; show the word it completes.
+    if(currentStudentQ&&currentStudentQ.type==='phgap')
+      document.getElementById('result-word').innerHTML+='<div style="font-size:.9rem;color:var(--muted);margin-top:6px;">'+currentStudentQ.word+'</div>';
   }
   document.getElementById('result-points').textContent=tier==='correct'?'+'+pts+' points 🎯':tier==='partial'?'+'+pts+' points 🌟 (partly correct)':'No points this round';
   document.getElementById('result-total').textContent='Your total: '+myScore+' pts';
@@ -3080,10 +3240,11 @@ function showStudentQuestion(q,startedAt,dur){
   // looking at this screen themselves, so keep the calm game music going.
   if(soloMode) playGameMusic(); else stopMusic();
   answered=false; hintLevel=0;
+  if(cancelWordSounds){ cancelWordSounds(); cancelWordSounds=null; }
   document.getElementById('student-ans-input').value='';
   document.getElementById('submitted-msg').textContent='';
   const isMc=Array.isArray(q.choices)&&q.choices.length>0;
-  const isTile=!isMc&&(q.type==='unscramble'||q.type==='gramscramble');
+  const isTile=!isMc&&(q.type==='unscramble'||q.type==='gramscramble'||q.type==='phbuild');
   const isTranslate=!isMc&&q.type==='translate';
   // Widget rounds: each owns its own answer surface and writes the answer
   // into the hidden input, so submitAnswer() needs no branch for them.
@@ -3119,6 +3280,8 @@ function showStudentQuestion(q,startedAt,dur){
       q.type==='letter'?'LISTEN — TAP THE LETTER':
       q.type==='lettersound'?'TAP THE PICTURE WITH THIS SOUND':
       q.type==='oddone'?'TAP THE ONE THAT IS DIFFERENT':
+      q.type==='phgap'?'LISTEN — TAP THE MISSING SOUND':
+      q.type==='phword'?'LISTEN TO THE SOUNDS — TAP THE WORD':
       q.type==='translate'?'TAP THE ENGLISH SENTENCE':
       q.type==='unscramble'?'LISTEN — TAP THE SENTENCE IN THE RIGHT ORDER':
       q.type==='gramscramble'?'TAP THE SENTENCE IN THE RIGHT ORDER':
@@ -3126,7 +3289,7 @@ function showStudentQuestion(q,startedAt,dur){
     isClock?'CLOCK — drag the hands to the right time':
     isShop?(q.mode==='change'?'MONEY — tap coins to make your change':'MONEY — tap coins to pay the right amount'):
     isForm?'FORM — put each answer in the right box':
-    isTile?(q.type==='gramscramble'?'GRAMMAR — arrange words in order':'UNSCRAMBLE — arrange the word tiles'):
+    isTile?(q.type==='gramscramble'?'GRAMMAR — arrange words in order':q.type==='phbuild'?'BUILD THE WORD — put the sounds in order':'UNSCRAMBLE — arrange the word tiles'):
     isTranslate?'TRANSLATE — type the English sentence':
     q.type==='sentence'?'SENTENCE — type the missing word':'WORD — listen and spell it';
   // For a picture round, don't show the answer's own picture as the prompt.
@@ -3143,6 +3306,8 @@ function showStudentQuestion(q,startedAt,dur){
     else if(q.type==='sentence') mcPrompt=q.display;
     else if(q.type==='oddone') mcPrompt='Which one is different?';
     else if(q.type==='letter') mcPrompt='🔊 Listen, then tap the letter';
+    else if(q.type==='phgap') mcPrompt='🔊 '+q.family+' — which sound is missing?';
+    else if(q.type==='phword') mcPrompt='🔊 '+q.family+' — listen, then tap the word';
     else if(q.type==='lettersound') mcPrompt='🔊 Listen to the sound';
     else if(q.type==='gramscramble') mcPrompt='Which sentence is correct?';
     else if(q.type==='unscramble') mcPrompt='🔊 Listen, then tap the sentence in the right order';
@@ -3155,6 +3320,7 @@ function showStudentQuestion(q,startedAt,dur){
   } else {
     document.getElementById('s-q-text').textContent=
       q.question?q.question:
+      q.type==='phbuild'?('🔊 '+q.family+' — put the sounds in order'):
       isTile?'Put the words in the correct order:':q.type==='sentence'?q.display:'🔊 Listen carefully…';
     setQTextLang(null);
     document.getElementById('student-ans-input').placeholder='Type your answer…';
@@ -3162,10 +3328,18 @@ function showStudentQuestion(q,startedAt,dur){
   if(isMc) renderMcChoices(q);
   if(isTile){
     const words=Array.isArray(q.words)?q.words:Object.values(q.words||{});
+    // The same engine builds words out of sounds and sentences out of words.
+    const isWord=q.type==='phbuild';
+    document.getElementById('unscrm-label-answer').textContent=isWord?'Your word':'Your sentence';
+    document.getElementById('unscrm-label-bank').textContent=
+      isWord?'Tap (or drag) the sounds to build the word':'Tap (or drag) words to build your sentence';
     renderUnscrambleTiles(words);
   }
   // Lets the stylesheet adapt per game without :has() (patchy on older Android).
   document.getElementById('screen-student-answer').dataset.qtype=isMc?'mc':q.type;
+  // qtype collapses every choices-carrying round to "mc" for layout; round
+  // keeps the real one for the few rules that need it.
+  document.getElementById('screen-student-answer').dataset.round=q.type;
   if(isClock) renderClockWidget();
   if(isShop)  renderShopWidget(q);
   if(isForm)  renderFormWidget(q);
@@ -3183,7 +3357,9 @@ function renderMcChoices(q){
   box.innerHTML='';
   const emojis=q.choices.map(w=>emo(w));
   const hasDup=emojis.some((e,i)=>e&&emojis.indexOf(e)!==i);
-  const usePics=emojis.every(e=>e)&&!hasDup;
+  // A picture beside "cat" hands over the answer without any decoding, so
+  // phonics rounds opt out rather than relying on emoji coverage by accident.
+  const usePics=!q.textOnly&&emojis.every(e=>e)&&!hasDup;
   q.choices.forEach(word=>{
     const pic=emo(word);
     const btn=document.createElement('button');
@@ -3422,13 +3598,18 @@ function selectMc(word,btn){
   submitAnswer();
 }
 
-let sfxAudio=null;
+let sfxAudio=null,cancelWordSounds=null;
 function playSoundFile(file){
   try{ if(sfxAudio){sfxAudio.pause();} sfxAudio=new Audio('audio/'+file+'.wav'); sfxAudio.play().catch(()=>{}); }catch(e){}
 }
-function speakTTS(text){
+/* rate: single words are clearer slower; whole sentences don't need it. */
+function speakTTS(text,rate){
   const utt=new SpeechSynthesisUtterance(text);
-  utt.rate=0.7; utt.lang='en-AU';
+  utt.rate=rate||0.7; utt.lang='en-AU';
+  // Setting lang alone does NOT choose a voice — without this the browser
+  // reads English with whatever the device default is, which on many phones
+  // is not an English voice at all. Isolated words are where that hurts most.
+  if(typeof applyVoice==='function') applyVoice(utt);
   window.speechSynthesis.cancel(); window.speechSynthesis.speak(utt);
 }
 
@@ -3442,6 +3623,14 @@ function studentSpeak(q){
   // give the answer away. When typing, fall through so the full question is read.
   if(Q.qword&&Array.isArray(Q.choices)&&Q.choices.length) return;
   if(Q.type==='lettersound'){ playSoundFile(Q.soundFile); return; }
+  // Sound it out from the recordings first, then say the whole word. The
+  // learner always hears one authentic rendering, whatever voice the device
+  // has — which is the point of these two banks.
+  if(Q.type==='phgap'||Q.type==='phword'||Q.type==='phbuild'){
+    cancelWordSounds=playWordSounds(Q.word,{speakPart:t=>speakTTS(t,0.6),
+      done:()=>{ if(currentStudentQ===Q) speakTTS(Q.word,0.6); }});
+    return;
+  }
   if(Q.type==='letter'){ speakTTS(Q.letter); return; }
   if(Q.type==='oddone'){ speakTTS('Tap the one that does not belong.'); return; }
   // Shop and form are reading tasks; the clock is the listening half of the
@@ -3489,7 +3678,7 @@ function submitAnswer(auto){
   if(!auto) playSubmitSound();
   const elapsed=parseInt(document.getElementById('student-timer').textContent)||0;
   let ans;
-  const tileMode=currentStudentQ&&(currentStudentQ.type==='unscramble'||currentStudentQ.type==='gramscramble')
+  const tileMode=currentStudentQ&&(currentStudentQ.type==='unscramble'||currentStudentQ.type==='gramscramble'||currentStudentQ.type==='phbuild')
     &&!(Array.isArray(currentStudentQ.choices)&&currentStudentQ.choices.length);
   if(tileMode){
     ans=Array.from(document.querySelectorAll('#answer-area .word-tile')).map(t=>t.dataset.word).join(' ');
@@ -4040,7 +4229,7 @@ function handlePlayerVisibility(){
     roomRef.child('players/'+playerId).onDisconnect().remove();
   }
 }
-function cleanupListeners(){if(roomRef)roomRef.off();clearInterval(timerInterval);clearInterval(studentTimerInt);window.speechSynthesis&&window.speechSynthesis.cancel();document.removeEventListener('visibilitychange',handlePlayerVisibility);}
+function cleanupListeners(){if(cancelWordSounds){cancelWordSounds();cancelWordSounds=null;}if(roomRef)roomRef.off();clearInterval(timerInterval);clearInterval(studentTimerInt);window.speechSynthesis&&window.speechSynthesis.cancel();document.removeEventListener('visibilitychange',handlePlayerVisibility);}
 
 /* INIT */
 window.addEventListener('load',()=>{
