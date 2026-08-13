@@ -610,8 +610,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       </div>
       <p class="step-label game">② Choose a game</p>
       <div class="q-type-tabs">
-        <button data-type="wp1" class="q-type-tab" onclick="selectSoloType('wp1',this)">📖 Beginner Word Pronunciation</button>
-        <button data-type="wp2" class="q-type-tab" onclick="selectSoloType('wp2',this)">📗 Elementary Word Pronunciation</button>
+        <button data-type="wp1:gap" class="q-type-tab" onclick="selectSoloType('wp1:gap',this)">🔡 Beginner Missing Sound</button>
+        <button data-type="wp1:word" class="q-type-tab" onclick="selectSoloType('wp1:word',this)">👆 Beginner Tap the Word</button>
+        <button data-type="wp1:build" class="q-type-tab" onclick="selectSoloType('wp1:build',this)">🧱 Beginner Build the Word</button>
+        <button data-type="wp2:gap" class="q-type-tab" onclick="selectSoloType('wp2:gap',this)">🔡 Elementary Missing Sound</button>
+        <button data-type="wp2:word" class="q-type-tab" onclick="selectSoloType('wp2:word',this)">👆 Elementary Tap the Word</button>
+        <button data-type="wp2:build" class="q-type-tab" onclick="selectSoloType('wp2:build',this)">🧱 Elementary Build the Word</button>
         <button data-type="beginner" class="q-type-tab active" onclick="selectSoloType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
         <button data-type="elementary" class="q-type-tab" onclick="selectSoloType('elementary',this)">📄 Elementary Listen and Fill Gaps</button>
         <button data-type="questionwords" class="q-type-tab" onclick="selectSoloType('questionwords',this)">❓ Question Words</button>
@@ -692,8 +696,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         </div>
         <p class="step-label game">② Choose a game</p>
         <div class="q-type-tabs">
-          <button data-type="wp1" class="q-type-tab" onclick="selectQType('wp1',this)">📖 Beginner Word Pronunciation</button>
-          <button data-type="wp2" class="q-type-tab" onclick="selectQType('wp2',this)">📗 Elementary Word Pronunciation</button>
+          <button data-type="wp1:gap" class="q-type-tab" onclick="selectQType('wp1:gap',this)">🔡 Beginner Missing Sound</button>
+          <button data-type="wp1:word" class="q-type-tab" onclick="selectQType('wp1:word',this)">👆 Beginner Tap the Word</button>
+          <button data-type="wp1:build" class="q-type-tab" onclick="selectQType('wp1:build',this)">🧱 Beginner Build the Word</button>
+          <button data-type="wp2:gap" class="q-type-tab" onclick="selectQType('wp2:gap',this)">🔡 Elementary Missing Sound</button>
+          <button data-type="wp2:word" class="q-type-tab" onclick="selectQType('wp2:word',this)">👆 Elementary Tap the Word</button>
+          <button data-type="wp2:build" class="q-type-tab" onclick="selectQType('wp2:build',this)">🧱 Elementary Build the Word</button>
           <button data-type="beginner" class="q-type-tab active" onclick="selectQType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
           <button data-type="elementary" class="q-type-tab" onclick="selectQType('elementary',this)">📄 Elementary Listen and Fill Gaps</button>
           <button data-type="questionwords" class="q-type-tab" onclick="selectQType('questionwords',this)">❓ Question Words</button>
@@ -1631,8 +1639,15 @@ function genSoundQuestions(){
      phbuild  sh|i|p     — put the graphemes in order (graphemes, not letters:
                            that distinction is the whole point of Elementary)
 
+   Each shape is its own bank at each level, so a session can stay on one of
+   them: the type string carries both ("wp2:build"). For a mixed game, the
+   Letters & Sounds section's All pill draws across all six.
+
    Families come straight from phonics.js, so this stays in step with the
    study pages in index.html. */
+const PHONICS_RUNGS=['gap','word','build'];
+const PHONICS_TYPES=['wp1','wp2'].reduce((a,lv)=>a.concat(PHONICS_RUNGS.map(r=>lv+':'+r)),[]);
+function isPhonicsType(t){ return PHONICS_TYPES.indexOf(t)>=0; }
 
 // -tion/-sion/-cian/-ture are polysyllabic academic words, far past ACSF
 // pre-level, and the only ones whose sounds have no recording. They stay in
@@ -1683,24 +1698,21 @@ function phonicsContrast(fam,word,fams){
   return fam.cat==='wp1' ? (byOnset()||byFocus()) : (byFocus()||byOnset());
 }
 
-/* Start on the easiest shape and work up, then keep cycling all three so a
-   long game doesn't turn into twenty rounds of the same thing. */
-const PHONICS_RAMP=['gap','gap','word','word','build','word','build'];
-function phonicsRung(i){
-  return i<PHONICS_RAMP.length?PHONICS_RAMP[i]:['word','build','gap'][(i-PHONICS_RAMP.length)%3];
-}
-
+/* One round, or null when this word cannot make this shape. Returning null
+   rather than quietly substituting another shape matters now that the shape
+   IS the bank: a Missing Sound game must never serve a Tap the Word round.
+   In practice only the three-word -ute family is affected. */
 function phonicsQ(level,fam,word,rung,fams){
   const base={level:level, word:word, family:fam.label, textOnly:true};
   if(rung==='gap'){
     const c=phonicsContrast(fam,word,fams);
-    if(c) return Object.assign(base,{
+    if(!c) return null;   // no three honest rivals
+    return Object.assign(base,{
       type:'phgap', answer:c.answer,
       choices:shuffle([c.answer,...c.rivals]),
       icon:'<div class="ph-word">'+word.slice(0,c.at)
         +'<span class="ph-gap">?</span>'+word.slice(c.at+c.len)+'</div>'
     });
-    rung='word';   // no three honest rivals — ask it a different way
   }
   if(rung==='word'){
     const rivals=fam.words.filter(w=>w!==word);
@@ -1720,31 +1732,45 @@ function phonicsQ(level,fam,word,rung,fams){
 }
 
 /* Draw a game: a few families, played two-to-four rounds at a time so
-   consecutive words rhyme and the pattern gets a chance to land. */
-function genPhonicsQuestions(level,limit){
+   consecutive words rhyme and the pattern gets a chance to land. Every round
+   is the bank's own shape. */
+function genPhonicsQuestions(type,limit){
+  const [level,rung]=type.split(':');
   const fams=phonicsFamilies(level);
   if(!fams.length) return [];
   const n=Math.max(1,limit||10);
   const run=Math.max(2,Math.min(4,Math.ceil(n/3)));
   const out=[];
-  let pool=shuffle([...fams]);
   while(out.length<n){
-    if(!pool.length) pool=shuffle([...fams]);
-    const fam=pool.shift();
-    const words=shuffle([...fam.words]);
-    const take=Math.min(words.length,run,n-out.length);
-    for(let k=0;k<take;k++) out.push(phonicsQ(level,fam,words[k],phonicsRung(out.length),fams));
+    const before=out.length;
+    // One pass over every family, in a fresh order, taking a short run from
+    // each. Repeat until the game is full.
+    for(const fam of shuffle([...fams])){
+      if(out.length>=n) break;
+      const start=out.length;
+      for(const w of shuffle([...fam.words])){
+        if(out.length-start>=run||out.length>=n) break;
+        const q=phonicsQ(level,fam,w,rung,fams);
+        if(q) out.push(q);
+      }
+    }
+    // A whole pass that added nothing means no family can make this shape —
+    // without this the loop would spin forever.
+    if(out.length===before) break;
   }
   return out;
 }
 
-/* The whole bank, one round per word, so the picker's count is the real
-   number of words and the mixed "All" games can draw from it. */
-function genPhonicsBank(level){
+/* The whole bank, one round per word it can express, so the picker's count is
+   the real number of words this shape has to offer. */
+function genPhonicsBank(type){
+  const [level,rung]=type.split(':');
   const fams=phonicsFamilies(level);
   const out=[];
-  fams.forEach(fam=>fam.words.forEach(w=>
-    out.push(phonicsQ(level,fam,w,phonicsRung(out.length),fams))));
+  fams.forEach(fam=>fam.words.forEach(w=>{
+    const q=phonicsQ(level,fam,w,rung,fams);
+    if(q) out.push(q);
+  }));
   return out;
 }
 
@@ -1783,7 +1809,7 @@ function genOddOneOut(count){
   return out;
 }
 
-let questionBank={wp1:[],wp2:[],beginner:[],elementary:[],questionwords:[],numbers:[],numbers1120:[],numbers2199:[],days:[],months:[],weather:[],fruits:[],body:[],clothes:[],custom:[],unscramble:[],gramscramble:[],translate:[],letter:[],lettersound:[],oddone:[],signs:[],sms:[],clock:[],shop:[],forms:[]};
+let questionBank={'wp1:gap':[],'wp1:word':[],'wp1:build':[],'wp2:gap':[],'wp2:word':[],'wp2:build':[],beginner:[],elementary:[],questionwords:[],numbers:[],numbers1120:[],numbers2199:[],days:[],months:[],weather:[],fruits:[],body:[],clothes:[],custom:[],unscramble:[],gramscramble:[],translate:[],letter:[],lettersound:[],oddone:[],signs:[],sms:[],clock:[],shop:[],forms:[]};
 let customBanks={};        // { bankId: { name, questions:[] } }
 let activeBankId=null;     // bank open in editor
 let selectedBankId=null;   // bank loaded for the game
@@ -1794,8 +1820,7 @@ function buildBank(){
   questionBank.letter=genLetterQuestions();
   questionBank.lettersound=genSoundQuestions();
   questionBank.oddone=genOddOneOut(40);
-  questionBank.wp1=genPhonicsBank('wp1');
-  questionBank.wp2=genPhonicsBank('wp2');
+  PHONICS_TYPES.forEach(t=>{ questionBank[t]=genPhonicsBank(t); });
   questionBank.beginner=BEGINNER_SENTENCE_BLANKS.map(s=>({type:'sentence',sentence:s.sentence,blank:s.blank,display:s.sentence,answer:s.blank.toLowerCase()}));
   questionBank.elementary=ELEMENTARY_SENTENCE_BLANKS.map(s=>({type:'sentence',sentence:s.sentence,blank:s.blank,display:s.sentence,answer:s.blank.toLowerCase()}));
   questionBank.questionwords=QUESTION_WORD_QUESTIONS.map(function(item){
@@ -1843,8 +1868,7 @@ function buildBank(){
 }
 function poolFor(type){
   const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body,...questionBank.clothes];
-  if(type==='wp1') return [...questionBank.wp1];
-  if(type==='wp2') return [...questionBank.wp2];
+  if(isPhonicsType(type)) return [...questionBank[type]];
   if(type==='beginner') return [...questionBank.beginner];
   if(type==='elementary') return [...questionBank.elementary];
   if(type==='questionwords') return [...questionBank.questionwords];
@@ -1874,7 +1898,7 @@ function poolFor(type){
   // string carries the section ("all:numeracy") so nothing needs hidden state.
   const sec=sectionOf(type);
   if(sec) return sec.banks.reduce((out,b)=>out.concat(poolFor(b)),[]);
-  return [...questionBank.wp1,...questionBank.wp2,...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.numbers1120,...questionBank.numbers2199,...questionBank.custom];
+  return [...PHONICS_TYPES.reduce((a,t)=>a.concat(questionBank[t]),[]),...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.numbers1120,...questionBank.numbers2199,...questionBank.custom];
 }
 /* Does this selection include translate questions? A section's "All" can
    sweep the Translate bank in, and those questions need a language chosen. */
@@ -1907,7 +1931,7 @@ function getQuestions(type,limit){
   if(type==='forms') return genFormQuestions(limit);
   // Both word-pronunciation banks are drawn fresh so the families, the words
   // and the round shapes vary between games.
-  if(type==='wp1'||type==='wp2') return genPhonicsQuestions(type,limit);
+  if(isPhonicsType(type)) return genPhonicsQuestions(type,limit);
   // A section's "All" draws through getQuestions, not through the bank, so
   // the generated banks (clock, shop, forms, odd one out) come out fresh
   // instead of serving the same eight clock faces every game.
@@ -3076,11 +3100,11 @@ function initSolo(){
    re-grouping: each pill still appears exactly once in the list. */
 const BANK_SECTIONS=[
   {id:'*',          label:'✨ All games',        banks:null},
-  {id:'letters',    label:'🔤 Letters & Sounds', banks:['wp1','wp2','letter','lettersound','elementary']},
+  {id:'letters',    label:'🔤 Letters & Sounds', banks:[...PHONICS_TYPES,'letter','lettersound','elementary']},
   {id:'vocab',      label:'📚 Vocabulary',       banks:['days','months','weather','fruits','body','clothes','spelling','oddone','translate']},
-  {id:'listening',  label:'👂 Listening',        banks:['wp1','wp2','beginner','elementary','letter','lettersound','unscramble','clock']},
+  {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','lettersound','unscramble','clock']},
   {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary']},
-  {id:'writing',    label:'✍️ Writing',          banks:['wp1','wp2','days','months','weather','fruits','body','clothes','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary']},
+  {id:'writing',    label:'✍️ Writing',          banks:['wp1:gap','wp1:build','wp2:gap','wp2:build','days','months','weather','fruits','body','clothes','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary']},
   {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble']},
   {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop']},
   {id:'translation',label:'🌐 Translation',      banks:['translate']},
