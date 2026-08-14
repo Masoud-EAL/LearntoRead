@@ -3,7 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WordLink Game</title>
+<title>English Reading and Spelling Games for Adult Learners | WordLink</title>
+<meta name="description" content="Free reading and spelling games for adult English learners. Practise solo at your own pace, or join a class game with a room code from your teacher.">
+<link rel="canonical" href="https://wordlink.au/game.html">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="WordLink">
+<meta property="og:locale" content="en_AU">
+<meta property="og:url" content="https://wordlink.au/game.html">
+<meta property="og:title" content="English Reading and Spelling Games for Adult Learners">
+<meta property="og:description" content="Free reading and spelling games for adult English learners. Practise solo at your own pace, or join a class game with a room code from your teacher.">
+<meta property="og:image" content="https://wordlink.au/icon-512.png">
+<meta name="twitter:card" content="summary">
+
 <script data-goatcounter="https://masoud-eal.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 <link href="fonts/fonts.css" rel="stylesheet">
@@ -50,7 +62,10 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 
 /* HOME */
 #screen-home{align-items:center;justify-content:center;padding:40px 20px;gap:28px;}
-.home-title{font-family:'Fredoka One',cursive;font-size:clamp(2rem,6vw,3.5rem);text-align:center;line-height:1.1;background:linear-gradient(135deg,var(--accent),var(--gold),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+/* font-weight is pinned so the h1 on the home screen renders identically to
+   the .home-title divs on the other screens — Fredoka One ships one weight,
+   and a bold h1 would get synthesised. */
+.home-title{font-family:'Fredoka One',cursive;font-weight:400;font-size:clamp(2rem,6vw,3.5rem);text-align:center;line-height:1.1;background:linear-gradient(135deg,var(--accent),var(--gold),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .home-sub{color:var(--muted);font-size:1rem;text-align:center;margin-top:-16px;}
 .role-cards{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;max-width:600px;}
 .role-card{flex:1;min-width:220px;max-width:260px;background:var(--card);border:2px solid rgba(255,255,255,.08);border-radius:20px;padding:32px 24px;text-align:center;cursor:pointer;transition:all .2s;box-shadow:0 8px 32px rgba(0,0,0,.4);}
@@ -560,8 +575,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 <div class="screen active" id="screen-home">
   <div class="logo-bar">WordLink <span>🎮</span> Game</div>
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:24px;">
-    <div class="home-title">Ready to Play?</div>
-    <p class="home-sub">Teacher sets up · Students join on their phones</p>
+    <!-- The landing screen's h1: this is the one screen a search engine sees
+         before any JS runs, so it carries the page's heading rather than a
+         plain div. The other screens keep .home-title as a div — they are
+         hidden panels of the same page, not separate documents. -->
+    <h1 class="home-title">Ready to Play?</h1>
+    <p class="home-sub">English reading and spelling games · Teacher sets up, students join on their phones</p>
     <div class="role-cards">
       <div class="role-card" onclick="goTeacher()">
         <div class="icon">👩‍🏫</div>
