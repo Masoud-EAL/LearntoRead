@@ -19,10 +19,10 @@
 <script data-goatcounter="https://masoud-eal.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 <link href="fonts/fonts.css" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="vendor/qrcode.min.js"></script>
+<meta name="theme-color" content="#0d0d1a">
+<link rel="icon" href="icon-192.png">
+<!-- Firebase and the QR library load at the foot of the page, next to the
+     script that uses them — see the note there. -->
 <style>
 :root{--bg:#0d0d1a;--card:#16213e;--accent:#e94560;--gold:#f5a623;--teal:#0f9b8e;--purple:#7c4dff;--green:#00c853;--text:#f0f0ff;--muted:#8888aa;--radius:16px;}
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -67,6 +67,10 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
    and a bold h1 would get synthesised. */
 .home-title{font-family:'Fredoka One',cursive;font-weight:400;font-size:clamp(2rem,6vw,3.5rem);text-align:center;line-height:1.1;background:linear-gradient(135deg,var(--accent),var(--gold),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .home-sub{color:var(--muted);font-size:1rem;text-align:center;margin-top:-16px;}
+/* Sits at the foot of the landing screen only — the inner column above it
+   takes flex:1, so this stays pinned to the bottom without scrolling. */
+.page-foot{max-width:520px;margin:0 auto;padding:12px 18px 4px;border-top:1px solid rgba(255,255,255,.10);font-size:.72rem;line-height:1.45;color:var(--muted);text-align:center;}
+.page-foot a{color:var(--gold);}
 .role-cards{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;max-width:600px;}
 .role-card{flex:1;min-width:220px;max-width:260px;background:var(--card);border:2px solid rgba(255,255,255,.08);border-radius:20px;padding:32px 24px;text-align:center;cursor:pointer;transition:all .2s;box-shadow:0 8px 32px rgba(0,0,0,.4);}
 .role-card:hover{transform:translateY(-6px);border-color:var(--accent);box-shadow:0 16px 48px rgba(233,69,96,.25);}
@@ -595,6 +599,8 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
     </div>
     <button class="btn btn-ghost btn-sm" onclick="showEditor()">✏️ Question Editor</button>
   </div>
+  <p class="page-foot">Reading and spelling games for adult English learners — play as a class
+    on the projector, or practise on your own. <a href="about.html">About WordLink</a></p>
 </div>
 
 <!-- STUDENT HOME -->
@@ -699,7 +705,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       <div class="room-code-box">
         <div class="rc-label">Room Code</div>
         <div class="rc-code" id="room-code-display">----</div>
-        <div class="rc-url">masoud-eal.github.io/LearntoRead/game.html</div>
+        <div class="rc-url">wordlink.au/game.html</div>
         <div id="qr-wrap"></div>
       </div>
     </div>
@@ -1075,6 +1081,16 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- These four used to sit in <head>, where ~300KB of third-party JS blocked
+     the parser before anything painted — including for solo practice, which
+     never touches Firebase. They run here instead, immediately before the
+     inline script that calls firebase.initializeApp, so load order is
+     unchanged and only the blocking is gone. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="vendor/qrcode.min.js"></script>
 
 <!-- Word families, grapheme→recording maps and voice picking, shared with index.html -->
 <script src="phonics.js"></script>
@@ -2636,7 +2652,7 @@ function createRoom(){
 }
 function generateQR(){
   const el=document.getElementById('qr-wrap'); el.innerHTML='';
-  new QRCode(el,{text:'https://masoud-eal.github.io/LearntoRead/game.html?join='+roomCode,width:260,height:260,colorDark:'#000000',colorLight:'#ffffff'});
+  new QRCode(el,{text:'https://wordlink.au/game.html?join='+roomCode,width:260,height:260,colorDark:'#000000',colorLight:'#ffffff'});
 }
 function toggleMcMode(which){ setMcMode(!mcMode); }
 /* Set the mode outright rather than flipping it — choosing a skill picks the

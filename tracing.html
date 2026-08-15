@@ -18,7 +18,13 @@
 
 <script data-goatcounter="https://masoud-eal.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#4a90d9">
+<link rel="icon" href="icon-192.png">
+<!-- Fredoka One and Nunito are self-hosted (same as index.html) so the page
+     paints without waiting on a third-party stylesheet. Andika is not in the
+     local set, so it alone still comes from Google Fonts. -->
+<link href="fonts/fonts.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap" rel="stylesheet">
 <!-- Noto scripts for first-language glosses. Loaded from Google Fonts rather
      than self-hosted: pre-subset local copies broke shaping for some scripts
      (e.g. Farsi ی). Glosses simply render in a fallback face when offline. -->
@@ -234,6 +240,17 @@ header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 
   display: inline-flex; align-items: center; gap: 6px;
 }
 
+/* ── page footer ──
+   The body is a centred column, so this sits under the back link and stays
+   out of the tracing area above it. */
+.page-foot {
+  max-width: 460px; margin: 18px auto 0; padding: 12px 18px 0;
+  border-top: 2px solid var(--light);
+  font-size: 0.75rem; line-height: 1.45; font-weight: 600;
+  color: var(--mid); text-align: center;
+}
+.page-foot a { color: var(--accent2); }
+
 /* ── celebration overlay ── */
 .celebrate {
   position: fixed; inset: 0; z-index: 50;
@@ -328,6 +345,10 @@ header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 
 <div class="letter-grid" id="letterGrid"></div>
 
 <a class="back-link" href="index.html">← Back to WordLink</a>
+
+<p class="page-foot">Handwriting practice for adults learning English — trace the letters of
+  the alphabet, letter combinations, numbers and your own name.
+  <a href="about.html">About WordLink</a></p>
 
 <div class="celebrate" id="celebrate">
   <div class="celebrate-card">

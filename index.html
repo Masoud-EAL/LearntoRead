@@ -421,6 +421,22 @@
 
   footer { text-align:center; padding:18px; font-size:0.85rem; color:var(--mid); font-weight:600; border-top:2px solid var(--light); margin-top:12px; }
   footer strong { color:var(--accent1); }
+  footer a { color:var(--accent2); }
+
+  /* Per-activity heading and closing line. Only one .section-page is shown at
+     a time, so each panel names the activity in front of the learner instead
+     of the whole page carrying one generic title. Deliberately small — the
+     letters and words are what this screen is for, so these sit quietly at
+     the top and bottom and never compete with the activity itself. */
+  .sec-title {
+    font-family:'Fredoka One',cursive; font-weight:400; font-size:1.05rem;
+    color:var(--accent2); text-align:center; line-height:1.25; padding:12px 16px 0;
+  }
+  .sec-foot {
+    max-width:560px; margin:16px auto 0; padding:9px 16px 0;
+    font-size:0.75rem; line-height:1.4; font-weight:600;
+    color:var(--mid); text-align:center; border-top:2px solid var(--light);
+  }
 
   @media (max-width:480px) {
     header { padding:18px 20px 6px; }
@@ -1107,6 +1123,7 @@
 
 <!-- SECTION 1 — ALPHABET -->
 <div class="section-page active" id="sec-alphabet">
+  <h2 class="sec-title">The English Alphabet — Letter Names</h2>
   <p class="sec-intro">Tap any letter to hear its name — the way you say the alphabet.<br>
     <strong style="color:var(--accent2)">Blue = vowel</strong> &nbsp;·&nbsp; <strong style="color:var(--teal)">Green = consonant</strong>
   </p>
@@ -1114,10 +1131,12 @@
     <a class="trace-btn" href="tracing.html">✏️ Trace Letters</a>
   </div>
   <div class="alpha-grid" id="nameGrid"></div>
+  <p class="sec-foot">Learn the 26 letter names of the English alphabet — free practice for adult learners.</p>
 </div>
 
 <!-- SECTION 2 — LETTER SOUNDS -->
 <div class="section-page" id="sec-sounds">
+  <h2 class="sec-title">English Letter Sounds — Phonics</h2>
   <p class="sec-intro">Tap any word to hear it spoken slowly. Listen for the sound that letter makes.<br>
     <strong style="color:var(--accent2)">Blue = vowel</strong> &nbsp;·&nbsp; <strong style="color:var(--teal)">Green = consonant</strong> &nbsp;·&nbsp; <strong style="color:var(--accent4)">Yellow = second sound</strong>
   </p>
@@ -1125,10 +1144,12 @@
     <button class="test-btn" onclick="openTest('sounds')">🧪 Test Yourself — 10 random words</button>
   </div>
   <div class="sounds-wrap" id="soundsWrap"></div>
+  <p class="sec-foot">Phonics practice: hear the sound each letter makes inside real English words.</p>
 </div>
 
 <!-- SECTION 3 — WORD PRONUNCIATION 1 -->
 <div class="section-page" id="sec-wp1">
+  <h2 class="sec-title">Reading Words 1 — Short Vowels and Digraphs</h2>
   <div class="section-test-bar">
     <button class="test-btn" onclick="openTest('wp1')">🧪 Test Yourself — 10 random words</button>
   </div>
@@ -1165,10 +1186,12 @@
     <div class="trophy-msg" id="wp1-trophy"><div style="font-size:3rem">🏆</div><h2>Well done!</h2><p>You read all the words in this group.<br>Pick another group to keep going!</p></div>
     <div class="word-grid" id="wp1-grid"></div>
   </div>
+  <p class="sec-foot">Decode short-vowel and digraph words — CVC reading practice for adult beginners.</p>
 </div>
 
 <!-- SECTION 4 — WORD PRONUNCIATION 2 -->
 <div class="section-page" id="sec-wp2">
+  <h2 class="sec-title">Reading Words 2 — Blends and Spelling Patterns</h2>
   <div class="section-test-bar">
     <button class="test-btn" onclick="openTest('wp2')">🧪 Test Yourself — 10 random words</button>
   </div>
@@ -1205,10 +1228,12 @@
     <div class="trophy-msg" id="wp2-trophy"><div style="font-size:3rem">🏆</div><h2>Well done!</h2><p>You read all the words in this group.<br>Pick another group to keep going!</p></div>
     <div class="word-grid" id="wp2-grid"></div>
   </div>
+  <p class="sec-foot">Read words with consonant blends and common English spelling patterns.</p>
 </div>
 
 <!-- SECTION 5 — READ SENTENCES -->
 <div class="section-page" id="sec-sentences">
+  <h2 class="sec-title">Reading Sentences</h2>
   <div class="speed-row" style="margin-bottom:6px">
     <span class="speed-label">Speed:</span>
     <div class="speed-btns">
@@ -1235,12 +1260,15 @@
     </div>
     <div id="sent-level-1-groups"></div>
   </div>
+  <p class="sec-foot">Read whole English sentences aloud, from beginner to elementary level.</p>
 </div>
 
 <!-- SECTION 6 — SPEAKING PRACTICE -->
 <div class="section-page" id="sec-speaking">
+  <h2 class="sec-title">Speaking Practice</h2>
   <p class="sentence-level-intro">Listen to a question, record yourself answering, then compare your answer with David's.</p>
   <div id="speaking-groups"></div>
+  <p class="sec-foot">Practise speaking English — record your voice and compare it with the model answer.</p>
 </div>
 
 <!-- ══════════════════════════════════════════
@@ -1574,7 +1602,7 @@
   </div>
 </div>
 
-<footer>Created by <strong>Masoud Fakhr</strong></footer>
+<footer>Created by <strong>Masoud Fakhr</strong> · <a href="about.html">About WordLink</a></footer>
 
 <!-- Word families, grapheme→recording maps and voice picking, shared with game.html -->
 <script src="phonics.js"></script>
