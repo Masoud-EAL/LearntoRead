@@ -1885,6 +1885,24 @@ function money(cents){ return '$'+(cents/100).toFixed(2); }
    "$67.50" and "67.50" already compare equal; this just keeps stored answers tidy. */
 function moneyAnswer(cents){ return (cents/100).toFixed(2); }
 
+/* Speech engines make a mess of "$50.50": depending on the voice it comes out
+   as "dollar fifty point five zero" or drops the sign altogether. Spelling the
+   amount out in words is the only way to be sure the learner hears the number
+   they have to build out of coins. */
+function moneySpoken(cents){
+  const d=Math.floor(cents/100), c=cents%100;
+  const dollars=d?(d+(d===1?' dollar':' dollars')):'';
+  const coins=c?(c+(c===1?' cent':' cents')):'';
+  if(dollars&&coins) return dollars+' and '+coins;
+  return dollars||coins||'zero dollars';
+}
+/* A prompt as written, with every amount in it swapped for its spoken form,
+   so what is heard is what is on the screen. */
+function moneySpeech(text){
+  return String(text||'').replace(/\$(\d+)(?:\.(\d{2}))?/g,
+    (m,d,c)=>moneySpoken(parseInt(d,10)*100+(c?parseInt(c,10):0)));
+}
+
 function genShopQuestions(n){
   const out=[];
   for(let i=0;i<(n||8);i++){
@@ -3169,11 +3187,11 @@ function teacherSpeak(){
   // Question-word banks in multiple choice are read-and-pick: no audio.
   if(q.qword&&Array.isArray(q.choices)&&q.choices.length) return;
   if(q.type==='lettersound'){ playSoundFile(q.soundFile); return; }
-  // Shop and form are reading tasks. Returning before the button is marked
-  // playing keeps it from sticking in the active state with nothing to hear.
-  if(q.type==='shop'||q.type==='form') return;
+  // Form is a reading task. Returning before the button is marked playing keeps
+  // it from sticking in the active state with nothing to hear.
+  if(q.type==='form') return;
   btn.classList.add('playing');
-  const spokenText=q.type==='letter'?q.letter:q.type==='oddone'?'Tap the one that does not belong.':q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.type==='clockset'?('Set the clock to '+q.words):q.word;
+  const spokenText=q.type==='letter'?q.letter:q.type==='oddone'?'Tap the one that does not belong.':q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.type==='clockset'?('Set the clock to '+q.words):q.type==='shop'?moneySpeech(q.question):q.word;
   const utt=new SpeechSynthesisUtterance(spokenText);
   utt.rate=0.7; utt.lang='en-AU';
   if(typeof applyVoice==='function') applyVoice(utt);
@@ -3807,8 +3825,10 @@ function showStudentQuestion(q,startedAt,dur){
   // the learner reads the question and picks; when typing the question is spoken
   // once as it appears (see studentSpeak).
   // Clock keeps its audio: hearing "half past seven" and setting the hands is
-  // the listening half of the unit. Shop and form are reading tasks.
-  const hideHear=q.type==='gramscramble'||q.type==='translate'||q.type==='mc'||q.noListen||isShop||isForm;
+  // the listening half of the unit. Money keeps its audio too — the instruction
+  // carries the amount to pay, so it is read out and can be replayed. Form is a
+  // reading task.
+  const hideHear=q.type==='gramscramble'||q.type==='translate'||q.type==='mc'||q.noListen||isForm;
   document.getElementById('s-hear-btn').style.display=hideHear?'none':'';
   document.getElementById('s-q-type').textContent=
     q.qword?(isMc?'TAP THE QUESTION WORD':'LISTEN — TYPE THE QUESTION WORD'):
@@ -4203,9 +4223,13 @@ function studentSpeak(q){
   if(Q.type==='lettersound'){ playSoundFile(Q.soundFile); return; }
   if(Q.type==='letter'){ speakTTS(Q.letter); return; }
   if(Q.type==='oddone'){ speakTTS('Tap the one that does not belong.'); return; }
-  // Shop and form are reading tasks; the clock is the listening half of the
-  // time unit, so it speaks the target as "half past seven".
-  if(Q.type==='shop'||Q.type==='form') return;
+  // Money speaks its instruction: the amount is the whole task, and on a short
+  // screen the written prompt is the first thing dropped (see the lt560 rule),
+  // so hearing "Pay fifty dollars and fifty cents for a chair" is the only way
+  // a pre-reader gets it at all. Form stays a reading task; the clock is the
+  // listening half of the time unit, so it speaks the target as "half past seven".
+  if(Q.type==='shop'){ speakTTS(moneySpeech(Q.question)); return; }
+  if(Q.type==='form') return;
   if(Q.type==='clockset'){ speakTTS('Set the clock to '+Q.words); return; }
   const text=Q.type==='sentence'?Q.sentence.replace('___',Q.blank):Q.type==='unscramble'?Q.sentence:Q.word;
   if(!text) return;
