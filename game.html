@@ -147,7 +147,11 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .player-chips{display:flex;flex-wrap:wrap;gap:8px;min-height:44px;}
 .player-chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:6px 14px;font-size:.85rem;font-weight:700;animation:popIn .3s ease;}
 @keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
-.q-type-tabs{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap;}
+/* The game list. Wrapping pills spent a whole row on each of 30 games,
+   because a pill is as wide as its label; equal columns fit two or three to a
+   row instead and cut the list to a third of its height. */
+.q-type-tabs{display:grid;gap:5px;margin-bottom:10px;
+  grid-template-columns:repeat(auto-fill,minmax(148px,1fr));}
 
 /* ── Section filter chips ──
    27 banks is too many to scan. A chip narrows the list to one skill; each
@@ -177,26 +181,27 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 :root[data-app-h~="lt620"] .section-panel{padding:5px 6px;margin-bottom:6px;}
 :root[data-app-h~="lt620"] .step-label{font-size:.7rem;margin-bottom:3px;}
 
-/* ── Solo setup: keep "Start Practice" on screen ──
-   27 categories wrap to 13-17 rows, which pushed the Start button below the
-   fold at every phone size — the same trap as the answer screen, and the one
-   thing a learner will not go looking for. Fixed-height column: the category
-   list is the only part that scrolls, everything else is pinned. */
-#screen-solo-setup{
-  height:100vh;
-  height:100dvh;
-  height:var(--app-h,100dvh);
-  min-height:0;
-  overflow:hidden;
-}
-#screen-solo-setup > .logo-bar{flex:0 0 auto;padding:10px 20px 4px;font-size:1.25rem;}
-#screen-solo-setup > div{min-height:0;padding:10px 16px !important;gap:10px !important;}
-#screen-solo-setup .card{min-height:0;display:flex;flex-direction:column;overflow:hidden;padding:14px;}
-/* the one scrolling part, with a floor so it never collapses to nothing */
-#screen-solo-setup .q-type-tabs{flex:1 1 auto;min-height:74px;overflow-y:auto;margin-bottom:6px;
-  align-content:flex-start;}
-#screen-solo-setup .card > *:not(.q-type-tabs){flex:0 0 auto;}
-#screen-solo-setup .btn{flex:0 0 auto;}
+/* ── Solo setup: one ordinary page, scrolled as a whole ──
+   This screen used to be a fixed-height column with the game list as its only
+   scrolling part, to keep Start Practice above the fold. That holds only while
+   the list is the sole thing that overflows. Dice adds a target picker, an
+   out-or-retry pair and a "how to play" panel *below* the list, so the pinned
+   parts alone outgrew the phone: the list collapsed to its floor and the new
+   settings were clipped off the bottom of a box that could not scroll to them.
+   A setup screen is read top to bottom once, so it scrolls like any other page
+   — nothing is trapped in a box, and Start Practice is simply the last thing
+   on it. Packing the game list several to a row (below) keeps the ordinary
+   case short enough to need no scrolling at all. */
+#screen-solo-setup > .logo-bar{padding:10px 20px 4px;font-size:1.25rem;}
+#screen-solo-setup > div{padding:10px 16px !important;gap:10px !important;}
+#screen-solo-setup .card{padding:14px;}
+#screen-solo-setup .q-type-tabs{margin-bottom:8px;}
+/* The "← WordLink" chip is pinned to the viewport, which was harmless while
+   this screen could not scroll. Now that it can, a pinned chip would hover
+   over the skill chips it happens to be sitting on — and it is a link off the
+   site, so a learner reaching for the chip underneath would leave the app.
+   On this one screen it scrolls away with the header space reserved for it. */
+body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 /* The explainer under the toggle is the first thing to go when the column is
    tight — measured against what the phone shows, not the layout viewport. */
 :root[data-app-h~="lt700"] #screen-solo-setup .mc-toggle-sub{display:none;}
@@ -212,8 +217,10 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
    code, QR, player list) used by a literate adult, usually on a laptop. But
    the category list was 443px of it, so cap it and let it scroll in place;
    that keeps the room code and player list in view without a long scroll. */
-#screen-teacher-lobby .q-type-tabs{max-height:min(32vh,220px);overflow-y:auto;align-content:flex-start;}
-.q-type-tab{padding:5px 11px;border-radius:50px;font-size:.78rem;font-weight:700;border:1.5px solid rgba(255,255,255,.15);cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);}
+#screen-teacher-lobby .q-type-tabs{max-height:min(32vh,220px);overflow-y:auto;align-content:start;}
+/* A grid cell is as wide as its column, so a long label wraps inside the pill
+   instead of stretching it — centred, with room for the second line. */
+.q-type-tab{padding:7px 10px;border-radius:50px;font-size:.78rem;font-weight:700;border:1.5px solid rgba(255,255,255,.15);cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);text-align:center;line-height:1.25;}
 .q-type-tab.active{background:var(--teal);color:white;border-color:var(--teal);}
 .lobby-actions{display:flex;gap:12px;justify-content:center;padding:8px 0;flex-wrap:wrap;}
 
@@ -1186,7 +1193,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   </div>
   <button class="submit-btn" id="student-submit-btn" onclick="submitAnswer()">✓ Submit</button>
   <div class="submitted-msg" id="submitted-msg"></div>
-  <button class="btn btn-ghost btn-sm" id="solo-back-btn" style="display:none;margin-top:4px;" onclick="showScreen('screen-solo-setup')">← Back to categories</button>
+  <button class="btn btn-ghost btn-sm" id="solo-back-btn" style="display:none;margin-top:4px;" onclick="quitSoloGame()">← Back to categories</button>
 </div>
 
 <!-- STUDENT RESULT -->
@@ -3696,6 +3703,21 @@ function showSoloResult(submittedAns,correctAns,timeLeft){
   document.getElementById('multiplayer-wait-msg').style.display='none';
   showScreen('screen-student-result');
   if(tier==='correct'||tier==='partial') playCorrectJingle(); else playWrongJingle();
+}
+/* Leaving a practice run mid-question has to actually end the question.
+   The countdown is an interval, not part of the screen, so it kept ticking
+   after "Back to categories" swapped the screen — and when it reached zero it
+   auto-submitted and showed the result, dragging the learner out of the menu
+   and back into a game they had already left. Nothing else stops it: the run
+   is local, so there is no room state to leave. */
+function quitSoloGame(){
+  clearInterval(studentTimerInt);
+  answered=true;              // a late tick or a stray Submit is now a no-op
+  try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(e){}
+  soloQuestions=[]; soloQIdx=0;
+  document.getElementById('solo-back-btn').style.display='none';
+  showScreen('screen-solo-setup');
+  updateSoloCountDisplay();
 }
 function soloNextQuestion(){
   soloQIdx++;
