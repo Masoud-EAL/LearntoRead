@@ -1267,6 +1267,9 @@
 <div class="section-page" id="sec-speaking">
   <h2 class="sec-title">Speaking Practice</h2>
   <p class="sentence-level-intro">Listen to a question, record yourself answering, then compare your answer with David's.</p>
+  <div class="section-test-bar">
+    <button class="test-btn" onclick="openSpeakingTest()">🧪 Test Yourself — 10 random questions</button>
+  </div>
   <div id="speaking-groups"></div>
   <p class="sec-foot">Practise speaking English — record your voice and compare it with the model answer.</p>
 </div>
@@ -1428,7 +1431,7 @@
 ══════════════════════════════════════════ -->
 <div class="practice-overlay" id="conversationOverlay">
 
-  <div class="practice-header" style="background:linear-gradient(135deg,#8a5cf0,#5a2ec7)">
+  <div class="practice-header" id="cvHeader" style="background:linear-gradient(135deg,#8a5cf0,#5a2ec7)">
     <button class="practice-back" onclick="closeConversation()" title="Back" aria-label="Back">←</button>
     <div class="practice-header-text">
       <h2 id="cvTitle">🗣️ Speaking Practice</h2>
@@ -1511,10 +1514,13 @@
 
     <!-- FINISH -->
     <div class="practice-finish" id="cvFinish" style="display:none">
-      <div class="finish-icon">🏅</div>
-      <h2>Speaking practice complete!</h2>
-      <p>Great work! You practised all the questions in this topic.<br>Head back and try another topic.</p>
+      <div class="finish-icon" id="cvFinishIcon">🏅</div>
+      <h2 id="cvFinishTitle">Speaking practice complete!</h2>
+      <p id="cvFinishText">Great work! You practised all the questions in this topic.<br>Head back and try another topic.</p>
       <br>
+      <button class="practice-next-btn" id="cvTryAgainBtn" onclick="openSpeakingTest()" style="margin-right:10px; display:none">
+        🔁 Try again
+      </button>
       <button class="practice-next-btn" onclick="closeConversation()" style="margin-top:10px">
         ← Back to lessons
       </button>
@@ -2602,14 +2608,24 @@ var cvStream   = null;
 var cvRecorder = null;
 var cvChunks   = [];
 var cvTimer    = null;
+var cvIsTest   = false;
+
+var CV_HEADER_PRACTICE = 'linear-gradient(135deg,#8a5cf0,#5a2ec7)';
+var CV_HEADER_TEST     = 'linear-gradient(135deg,#5cb85c,#3a7a3a)';
 
 /* ── Open / Close ── */
-function openConversation(items, label) {
+function openConversation(items, label, isTest) {
   if (!items || items.length < 1) { alert('Need at least 1 question to practise.'); return; }
-  cvItems = items.slice();
-  cvIdx   = 0;
-  cvAudio = null;
+  cvItems  = items.slice();
+  cvIdx    = 0;
+  cvAudio  = null;
+  cvIsTest = !!isTest;
   document.getElementById('cvSubtitle').textContent = label || '';
+  document.getElementById('cvTitle').textContent = cvIsTest ? '🧪 Test Yourself' : '🗣️ Speaking Practice';
+  document.getElementById('cvHeader').style.background = cvIsTest ? CV_HEADER_TEST : CV_HEADER_PRACTICE;
+  document.getElementById('cvProgressFill').style.background = cvIsTest
+    ? 'linear-gradient(90deg,#5cb85c,#3a7a3a)'
+    : 'linear-gradient(90deg,#8a5cf0,#5a2ec7)';
   cvCleanup();
   cvShowQuestion();
   document.getElementById('conversationOverlay').classList.add('active');
@@ -2842,12 +2858,35 @@ function cvAdvance() {
   if (cvIdx >= cvItems.length) {
     cvHideAllPhases();
     var fin = document.getElementById('cvFinish');
+    document.getElementById('cvFinishIcon').textContent  = cvIsTest ? '🏆' : '🏅';
+    document.getElementById('cvFinishTitle').textContent = cvIsTest
+      ? 'Test complete!'
+      : 'Speaking practice complete!';
+    document.getElementById('cvFinishText').innerHTML = cvIsTest
+      ? 'You answered ' + cvItems.length + ' random questions.<br>Try again for a new set of questions.'
+      : 'Great work! You practised all the questions in this topic.<br>Head back and try another topic.';
+    document.getElementById('cvTryAgainBtn').style.display = cvIsTest ? '' : 'none';
     fin.style.display = ''; fin.classList.add('show');
     document.getElementById('cvProgressFill').style.width = '100%';
     document.getElementById('cvStepCounter').textContent  = 'All done! 🎉';
     return;
   }
   cvShowQuestion();
+}
+
+/* ── Test Yourself: 10 random questions from every speaking topic ── */
+function openSpeakingTest() {
+  var pool = [], seen = {};
+  conversationData.forEach(function(group) {
+    group.items.forEach(function(item) {
+      if (seen[item.q]) return;      // same question can appear in two topics
+      seen[item.q] = true;
+      pool.push(item);
+    });
+  });
+  if (!pool.length) return;
+  var picked = shuffle(pool).slice(0, 10);
+  openConversation(picked, picked.length + ' random questions', true);
 }
 
 /* ══════════════════════════════════════════
