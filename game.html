@@ -37,10 +37,13 @@ html,body{touch-action:manipulation;}
    out from the ancestor chain, so this is belt and braces for the elements
    that get tapped fastest. */
 button,.coin,.mc-choice,.q-type-tab,.form-slot,.role-card,a,input,select{touch-action:manipulation;}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;min-height:var(--app-h,100dvh);overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 20% 20%,rgba(124,77,255,.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(233,69,96,.10) 0%,transparent 60%);}
 body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(1px 1px at 15% 25%,rgba(255,255,255,.5) 0%,transparent 100%),radial-gradient(1px 1px at 75% 10%,rgba(255,255,255,.4) 0%,transparent 100%),radial-gradient(2px 2px at 40% 70%,rgba(255,255,255,.3) 0%,transparent 100%),radial-gradient(1px 1px at 90% 40%,rgba(255,255,255,.4) 0%,transparent 100%),radial-gradient(1px 1px at 5% 60%,rgba(255,255,255,.5) 0%,transparent 100%);}
-.screen{display:none;min-height:100vh;position:relative;z-index:1;}
+/* Same three tiers as the answer screen below: a plain 100vh floor is taller
+   than the phone, so every centred screen got a screenful of padding it could
+   not show and the page scrolled even when its content would have fitted. */
+.screen{display:none;min-height:100vh;min-height:100dvh;min-height:var(--app-h,100dvh);position:relative;z-index:1;}
 .screen.active{display:flex;flex-direction:column;}
 .logo-bar{text-align:center;padding:18px 20px 10px;font-family:'Fredoka One',cursive;font-size:1.6rem;color:var(--accent);letter-spacing:1px;text-shadow:0 0 20px rgba(233,69,96,.5);}
 .logo-bar span{color:var(--gold);}
@@ -77,6 +80,60 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .role-card .icon{font-size:3rem;margin-bottom:12px;}
 .role-card h2{font-family:'Fredoka One',cursive;font-size:1.4rem;margin-bottom:8px;}
 .role-card p{color:var(--muted);font-size:.9rem;line-height:1.4;}
+
+/* ── The landing screens on a phone ──
+   Stacked, the two choice cards plus the title, the strapline and the footer
+   came to about 820px against the ~650px a phone with its URL bar showing
+   actually has, so "I'm a Student" sat below the fold — on the one screen
+   where both options have to be visible at once to be a choice at all.
+   Two changes buy back the difference. The cards turn side-on, picture at
+   the left and words beside it, which is the same card at roughly a third
+   of the height; and the paddings and gaps built for a desktop column come
+   down. Nothing is removed: both cards, their descriptions and the footer
+   are all still there, just no longer spread over a screen and a half. */
+@media (max-width:600px){
+  #screen-home{padding:0 14px 10px;gap:8px;}
+  /* 34px of it is the fixed Back and Music chips, which sit at top:12 and are
+     ~34px tall — the old 40px screen padding was clearing them by accident. */
+  #screen-home > .logo-bar,#screen-student-home > .logo-bar{padding:34px 20px 2px;font-size:1.3rem;}
+  /* :not(.logo-bar) because the wordmark is a div too, and this rule carries
+     !important to beat the inline padding on the column. */
+  #screen-home > div:not(.logo-bar),
+  #screen-student-home > div:not(.logo-bar){padding:6px 4px!important;gap:14px!important;}
+  .home-title{font-size:clamp(1.6rem,8vw,2.2rem);}
+  .home-sub{font-size:.88rem;line-height:1.35;margin-top:-8px;}
+  .role-cards{gap:12px;width:100%;}
+  /* Grid rather than flex: the icon, the heading and the description are
+     three siblings with no wrapper, so the icon takes column one across both
+     rows and the words stack beside it. */
+  .role-card{flex:0 0 auto;width:100%;max-width:420px;min-width:0;
+    display:grid;grid-template-columns:auto 1fr;column-gap:16px;align-items:center;
+    text-align:left;padding:16px 18px;}
+  .role-card .icon{font-size:2.4rem;margin-bottom:0;line-height:1;grid-row:1/span 2;}
+  .role-card h2{font-size:1.15rem;margin-bottom:3px;align-self:end;}
+  .role-card p{font-size:.82rem;line-height:1.3;align-self:start;}
+  .page-foot{padding:8px 14px 2px;font-size:.68rem;line-height:1.35;}
+}
+/* A short screen, whatever its width — a small handset, or a phone turned
+   sideways, where the cards sit two abreast and the width rules above never
+   fire. The strapline and the footer are the two lines a learner does not
+   need in order to choose between two cards, so they go first; the rest is
+   the same trim, applied by height instead. */
+:root[data-app-h~="lt500"] .home-sub,
+:root[data-app-h~="lt500"] .page-foot{display:none;}
+:root[data-app-h~="lt500"] #screen-home{padding:0 14px 8px;gap:6px;}
+/* The wordmark is the one thing on these screens that is not a choice, and
+   the fixed "← WordLink" chip already names the site — so on a screen this
+   short it gives up its row, and the column starts below the chips instead. */
+:root[data-app-h~="lt500"] #screen-home > .logo-bar,
+:root[data-app-h~="lt500"] #screen-student-home > .logo-bar{display:none;}
+:root[data-app-h~="lt500"] #screen-home > div:not(.logo-bar),
+:root[data-app-h~="lt500"] #screen-student-home > div:not(.logo-bar){padding:50px 4px 4px!important;gap:10px!important;}
+:root[data-app-h~="lt500"] .home-title{font-size:clamp(1.4rem,6vw,1.8rem);}
+:root[data-app-h~="lt500"] .role-card{padding:12px 16px;}
+:root[data-app-h~="lt500"] .role-card .icon{font-size:1.9rem;margin-bottom:4px;}
+:root[data-app-h~="lt500"] .role-card h2{font-size:1.05rem;margin-bottom:2px;}
+:root[data-app-h~="lt500"] .role-card p{font-size:.78rem;line-height:1.25;}
 
 /* TEACHER LOBBY */
 #screen-teacher-lobby{padding:20px;gap:20px;}
@@ -116,11 +173,9 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 /* On a short screen the chip row would eat the game list, which has barely
    two rows there — scroll it sideways instead of spending two rows on it,
    and let the panel itself carry the distinction without the step labels. */
-@media (max-height:620px){
-  .section-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px;}
-  .section-panel{padding:5px 6px;margin-bottom:6px;}
-  .step-label{font-size:.7rem;margin-bottom:3px;}
-}
+:root[data-app-h~="lt620"] .section-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px;}
+:root[data-app-h~="lt620"] .section-panel{padding:5px 6px;margin-bottom:6px;}
+:root[data-app-h~="lt620"] .step-label{font-size:.7rem;margin-bottom:3px;}
 
 /* ── Solo setup: keep "Start Practice" on screen ──
    27 categories wrap to 13-17 rows, which pushed the Start button below the
@@ -142,9 +197,15 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
   align-content:flex-start;}
 #screen-solo-setup .card > *:not(.q-type-tabs){flex:0 0 auto;}
 #screen-solo-setup .btn{flex:0 0 auto;}
-#screen-solo-setup .mc-toggle-sub{display:none;}
-@media (min-height:700px){
-  #screen-solo-setup .mc-toggle-sub{display:block;}
+/* The explainer under the toggle is the first thing to go when the column is
+   tight — measured against what the phone shows, not the layout viewport. */
+:root[data-app-h~="lt700"] #screen-solo-setup .mc-toggle-sub{display:none;}
+/* On a phone "WordLink 🎮 Practice" is wide enough to run under the fixed
+   Music chip, and the fixed "← WordLink" chip beside it already names the
+   site — so the wordmark stands down and gives its row to the categories. */
+@media (max-width:600px){
+  #screen-solo-setup > .logo-bar{display:none;}
+  #screen-solo-setup > div{padding-top:52px!important;}
 }
 
 /* Teacher lobby: not restructured — it is a genuinely dense screen (room
@@ -226,7 +287,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
   padding:10px 16px;
   padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
   align-items:center;
-  gap:clamp(4px,1.2vh,10px);
+  gap:clamp(4px,calc(var(--vh,1vh)*1.2),10px);
   /* Three tiers, last supported wins. vh is wrong on mobile — it is measured
      with the URL bar hidden, so the bottom of the page sits behind the
      browser chrome. dvh fixes that where it exists. --app-h is measured from
@@ -272,58 +333,77 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
    opening a blank band above the question on rounds with no picture. */
 #screen-student-answer > .s-q-card #s-q-emoji:empty{display:none;}
 
-/* Sizes that have to give way on a short screen. */
-#screen-student-answer .student-timer{font-size:clamp(1.3rem,5.5vh,3.5rem);line-height:1.05;}
-#screen-student-answer .s-q-card{padding:clamp(10px,2.2vh,22px);}
-#screen-student-answer .submit-btn{padding:clamp(11px,2.2vh,18px);font-size:clamp(1rem,2.6vh,1.3rem);}
-#screen-student-answer .s-q-text{font-size:clamp(1rem,3.2vh,1.5rem);margin-bottom:clamp(6px,1.4vh,14px);}
-#screen-student-answer #s-q-emoji{font-size:clamp(1.8rem,7vh,3.2rem)!important;margin:clamp(2px,.8vh,6px) 0 clamp(4px,1.2vh,10px)!important;}
-#screen-student-answer[data-round="phgap"] #s-q-emoji{font-size:clamp(2.2rem,9vh,4rem)!important;}
-#screen-student-answer .s-hear-btn{padding:clamp(5px,1.6vh,11px) clamp(12px,4vw,20px);font-size:clamp(.8rem,2.2vh,1.08rem);}
+/* Sizes that have to give way on a short screen. They are all measured
+   against --vh (one per cent of the height the learner can actually see)
+   rather than the vh unit, which is a screenful of URL bar too generous —
+   see setAppHeight(). The 1vh fallback keeps them sane before the first
+   measurement lands. */
+#screen-student-answer .student-timer{font-size:clamp(1.3rem,calc(var(--vh,1vh)*5),3.5rem);line-height:1.05;}
+#screen-student-answer .s-q-card{padding:clamp(10px,calc(var(--vh,1vh)*2.2),22px);}
+#screen-student-answer .submit-btn{padding:clamp(11px,calc(var(--vh,1vh)*2.2),18px);font-size:clamp(1rem,calc(var(--vh,1vh)*2.6),1.3rem);}
+#screen-student-answer .s-q-text{font-size:clamp(1rem,calc(var(--vh,1vh)*3.2),1.5rem);margin-bottom:clamp(6px,calc(var(--vh,1vh)*1.4),14px);}
+#screen-student-answer #s-q-emoji{font-size:clamp(1.8rem,calc(var(--vh,1vh)*7),3.2rem)!important;margin:clamp(2px,calc(var(--vh,1vh)*.8),6px) 0 clamp(4px,calc(var(--vh,1vh)*1.2),10px)!important;}
+#screen-student-answer[data-round="phgap"] #s-q-emoji{font-size:clamp(2.2rem,calc(var(--vh,1vh)*9),4rem)!important;}
+#screen-student-answer .s-hear-btn{padding:clamp(5px,calc(var(--vh,1vh)*1.6),11px) clamp(12px,4vw,20px);font-size:clamp(.8rem,calc(var(--vh,1vh)*2.2),1.08rem);}
+/* Reserved-but-empty rows are the other half of the wasted space: on solo
+   rounds this line never gets text, and its min-height plus the column gap
+   were spending ~34px above "Back to categories" on every screen. */
+#screen-student-answer > .submitted-msg:empty{display:none;}
+
+/* The short-screen tiers key off data-app-h, not `@media (max-height:…)`.
+   A media query asks the layout viewport, which on a phone is the URL bar
+   taller than the page — a 375×667 handset showing 500px never reached the
+   500px tier that was written for exactly that phone. setAppHeight() puts
+   the measured height into cumulative tokens, so lt440 also carries lt500
+   and lt560 and the tiers still stack the way the media queries did. */
 
 /* Very small phones: trade a little tap area for fitting on screen, since
    content the learner can't see is worth less than content that's slightly
    smaller. Floors stay above ~44px for anything you actually tap. */
-@media (max-height:500px){
-  #screen-student-answer .mc-choice{min-height:44px;}
-  #screen-student-answer .word-tile{padding:5px 10px;font-size:.88rem;}
-  #screen-student-answer .form-slot{min-height:28px;}
-  #screen-student-answer .student-timer{font-size:1.1rem;}
-  #screen-student-answer .coin img{width:38px;height:38px;}
-  #screen-student-answer #clock-svg{width:min(62vw,27vh,300px);height:min(62vw,27vh,300px);}
-  #screen-student-answer .shop-item{font-size:clamp(1.2rem,4.5vh,3.4rem);}
-  #screen-student-answer .price-tag{font-size:clamp(.95rem,3vh,1.6rem);padding:3px 12px;}
-  /* Dragging is discoverable from the pulsing hands; the sentence is not
-     worth the row it costs on a screen this short. */
-  #screen-student-answer .clock-hint{display:none;}
-}
+:root[data-app-h~="lt500"] #screen-student-answer .mc-choice{min-height:44px;}
+:root[data-app-h~="lt500"] #screen-student-answer .word-tile{padding:5px 10px;font-size:.88rem;}
+:root[data-app-h~="lt500"] #screen-student-answer .form-slot{min-height:28px;}
+:root[data-app-h~="lt500"] #screen-student-answer .student-timer{font-size:1.1rem;}
+:root[data-app-h~="lt500"] #screen-student-answer .coin img{width:38px;height:38px;}
+:root[data-app-h~="lt500"] #screen-student-answer .shop-item{font-size:clamp(1.2rem,calc(var(--vh,1vh)*4.5),3.4rem);}
+:root[data-app-h~="lt500"] #screen-student-answer .price-tag{font-size:clamp(.95rem,calc(var(--vh,1vh)*3),1.6rem);padding:3px 12px;}
+/* Dragging is discoverable from the pulsing hands; the sentence is not
+   worth the row it costs on a screen this short. */
+:root[data-app-h~="lt500"] #screen-student-answer .clock-hint{display:none;}
+/* Once the timer shrinks to 1.1rem it no longer fills the band the fixed
+   Back and Music chips occupy, and the question card slid up underneath
+   them. Same answer as the landscape rule below: reserve the band, and put
+   the timer in it, centred between the two chips. */
+:root[data-app-h~="lt500"] #screen-student-answer{padding-top:42px;}
+:root[data-app-h~="lt500"] #screen-student-answer > .student-timer{position:absolute;top:8px;left:50%;
+  transform:translateX(-50%);z-index:2;}
 
 /* The shop prompt is the tallest of the five (picture + name + price tag), so
-   it needs trimming a tier earlier than everything else. */
-@media (max-height:560px){
-  /* "Pay $66.00 for an umbrella" only repeats the price tag above it and the
-     instruction in the type label — the first thing worth dropping. */
-  #screen-student-answer[data-qtype="shop"] .s-q-text{display:none;}
-  #screen-student-answer .shop-item{font-size:clamp(1.2rem,4.6vh,3.4rem);}
-  #screen-student-answer .price-tag{font-size:clamp(.95rem,3vh,1.6rem);padding:3px 12px;}
-  #screen-student-answer .coin img{width:clamp(38px,8vh,60px);height:clamp(38px,8vh,60px);}
-}
+   it needs trimming a tier earlier than everything else.
+   "Pay $66.00 for an umbrella" only repeats the price tag above it and the
+   instruction in the type label — the first thing worth dropping. */
+:root[data-app-h~="lt560"] #screen-student-answer[data-qtype="shop"] .s-q-text{display:none;}
+:root[data-app-h~="lt560"] #screen-student-answer .shop-item{font-size:clamp(1.2rem,calc(var(--vh,1vh)*4.6),3.4rem);}
+:root[data-app-h~="lt560"] #screen-student-answer .price-tag{font-size:clamp(.95rem,calc(var(--vh,1vh)*3),1.6rem);padding:3px 12px;}
+:root[data-app-h~="lt560"] #screen-student-answer .coin img{width:clamp(38px,calc(var(--vh,1vh)*8),60px);height:clamp(38px,calc(var(--vh,1vh)*8),60px);}
 
 /* An old 320×480 phone leaves only ~400px once browser chrome is taken off.
    Last tier of shrinking before internal scrolling is unavoidable. */
-@media (max-height:440px){
-  #screen-student-answer{gap:3px;padding:6px 10px;}
-  #screen-student-answer .word-tile{padding:3px 8px;font-size:.8rem;}
-  #screen-student-answer .form-slot{min-height:24px;}
-  #screen-student-answer .form-label{font-size:.66rem;}
-  #screen-student-answer .form-section{gap:3px;}
-  #screen-student-answer .form-fields{gap:3px;}
-  #screen-student-answer .mc-choice{min-height:38px;padding:4px 8px;font-size:.9rem;}
-  #screen-student-answer .s-q-card{padding:7px;}
-  #screen-student-answer .unscrm-label{display:none;}
-  #screen-student-answer .coin img{width:34px;height:34px;}
-  #screen-student-answer .shop-item{font-size:1.1rem;}
-}
+/* Longhands, not the padding shorthand: the lt500 tier above reserves the
+   band the fixed chips sit in, and a shorthand here would silently give it
+   back. Bottom keeps the safe-area inset from the base rule. */
+:root[data-app-h~="lt440"] #screen-student-answer{gap:3px;padding-left:10px;padding-right:10px;
+  padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));}
+:root[data-app-h~="lt440"] #screen-student-answer .word-tile{padding:3px 8px;font-size:.8rem;}
+:root[data-app-h~="lt440"] #screen-student-answer .form-slot{min-height:24px;}
+:root[data-app-h~="lt440"] #screen-student-answer .form-label{font-size:.66rem;}
+:root[data-app-h~="lt440"] #screen-student-answer .form-section{gap:3px;}
+:root[data-app-h~="lt440"] #screen-student-answer .form-fields{gap:3px;}
+:root[data-app-h~="lt440"] #screen-student-answer .mc-choice{min-height:38px;padding:4px 8px;font-size:.9rem;}
+:root[data-app-h~="lt440"] #screen-student-answer .s-q-card{padding:7px;}
+:root[data-app-h~="lt440"] #screen-student-answer .unscrm-label{display:none;}
+:root[data-app-h~="lt440"] #screen-student-answer .coin img{width:34px;height:34px;}
+:root[data-app-h~="lt440"] #screen-student-answer .shop-item{font-size:1.1rem;}
 
 /* Landscape phone: ~330px tall is too short to stack a question above an
    answer, however small the type gets. Side by side instead, with the timer
@@ -345,7 +425,9 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
   #screen-student-answer > .submit-btn{flex:0 0 100%;max-width:420px;margin-top:2px;}
   #screen-student-answer > .submitted-msg,
   #screen-student-answer > #solo-back-btn{flex:0 0 100%;text-align:center;}
-  #screen-student-answer #clock-svg{width:min(38vw,56vh,240px);height:min(38vw,56vh,240px);}
+  /* 46, not 56: sideways the column still carries Submit and the solo Back
+     link under the face, and 56 spent the difference on overflow. */
+  #screen-student-answer #clock-svg{width:min(38vw,calc(var(--vh,1vh)*46),240px);height:min(38vw,calc(var(--vh,1vh)*46),240px);}
   #screen-student-answer .mc-section{grid-template-columns:1fr 1fr;}
   #screen-student-answer .clock-hint{display:none;}
 }
@@ -374,6 +456,19 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .result-points{font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--gold);}
 .result-rank{color:var(--muted);font-size:.9rem;}
 .result-total{font-family:'Fredoka One',cursive;font-size:1.1rem;}
+/* The three centred screens between rounds — join, waiting, result — were
+   built on a 40px frame that a phone cannot spare. The result screen is the
+   one that matters: the 5rem emoji, four lines of feedback and the "Next"
+   button add up past the fold on a small handset, and Next is the button
+   the round cannot continue without. */
+@media (max-width:600px){
+  #screen-student-join,#screen-student-lobby,#screen-student-result{padding:16px 16px 20px;}
+  #screen-student-result{gap:10px;}
+  .result-icon{font-size:clamp(2.6rem,calc(var(--vh,1vh)*9),5rem);}
+  .result-word{font-size:clamp(1.3rem,calc(var(--vh,1vh)*3.6),1.9rem);}
+  .result-points{font-size:clamp(1.1rem,calc(var(--vh,1vh)*2.6),1.4rem);}
+  .waiting-blob{width:82px;height:82px;font-size:2.2rem;}
+}
 
 /* EDITOR */
 #screen-editor{padding:20px;gap:14px;}
@@ -499,8 +594,13 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .q-emoji-big .sms-card{font-size:.82rem;max-width:280px;}
 
 /* ── Clock ── */
-.clock-section{display:none;flex-direction:column;align-items:center;gap:10px;width:100%;}
-#clock-svg{width:min(72vw,32vh,300px);height:min(72vw,32vh,300px);touch-action:none;user-select:none;flex:0 0 auto;}
+.clock-section{display:none;flex-direction:column;align-items:center;gap:clamp(3px,calc(var(--vh,1vh)*1.2),10px);width:100%;}
+/* Shrinkable, not fixed: when the column above it runs long the face gives
+   way rather than scrolling half of itself out of the section. Squashing the
+   box does not squash the clock — the viewBox keeps it circular and centred,
+   and clockPoint() reads the live matrix, so the hit areas follow it. */
+#clock-svg{width:min(72vw,calc(var(--vh,1vh)*32),300px);height:min(72vw,calc(var(--vh,1vh)*32),300px);
+  touch-action:none;user-select:none;flex:0 1 auto;min-height:0;}
 .clock-face{fill:#fdf6ec;stroke:#7c4dff;stroke-width:4;}
 .clock-tick{stroke:#8a7f75;stroke-width:2;stroke-linecap:round;}
 .clock-tick.hour{stroke:#2d2a26;stroke-width:4;}
@@ -512,11 +612,16 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 /* Fat invisible hit areas — a 6px hand is impossible to grab with a finger. */
 .clock-grab{stroke:transparent;stroke-width:34;stroke-linecap:round;cursor:grab;}
 .clock-pin{fill:#7c4dff;}
-.clock-readout{font-family:'Fredoka One',cursive;font-size:clamp(1.2rem,4vh,2rem);color:var(--gold);}
+.clock-readout{font-family:'Fredoka One',cursive;font-size:clamp(1.2rem,calc(var(--vh,1vh)*4),2rem);color:var(--gold);}
+/* Blank until the learner moves a hand. A time sitting under the face from
+   the moment the round opens reads as part of the question — learners were
+   taking the start position for the answer and submitting it untouched. The
+   row still holds its height so nothing shifts when the first digits land. */
+.clock-readout.untouched{visibility:hidden;}
 .clock-hint{font-size:.82rem;color:var(--muted);}
 /* Height-bounded as well as width-bounded: on a short screen the read-the-clock
    face was pushing the bottom two answer choices off the edge. */
-.clock-static{width:min(56vw,29vh,220px);height:min(56vw,29vh,220px);display:block;margin:0 auto;}
+.clock-static{width:min(56vw,calc(var(--vh,1vh)*29),220px);height:min(56vw,calc(var(--vh,1vh)*29),220px);display:block;margin:0 auto;}
 .q-emoji-big .clock-static{width:130px;height:130px;}
 
 /* ── Shop ── */
@@ -3761,7 +3866,7 @@ function renderMcChoices(q){
    clock position rather than an hour hand frozen on the numeral.
    Like selectMc, this writes its answer into #student-ans-input, so
    submitAnswer() and all the scoring stay untouched. */
-let clockH=12, clockM=0, clockDrag=null;
+let clockH=12, clockM=0, clockDrag=null, clockTouched=false;
 
 function clockAngle(cx,cy,x,y){
   return (Math.atan2(x-cx,cy-y)*180/Math.PI+360)%360;
@@ -3778,14 +3883,19 @@ function clockApply(){
   set('#hand-hour',ha,40); set('#grab-hour',ha,40);
   set('#hand-min',ma,56);  set('#grab-min',ma,56);
   const t=fmtTime(clockH,clockM);
-  document.getElementById('clock-readout').textContent=t;
-  document.getElementById('student-ans-input').value=t;
+  const readout=document.getElementById('clock-readout');
+  readout.textContent=t;
+  // The starting position is not an answer the learner has given, so it is
+  // not shown as one. The hands still stand somewhere — a clock has to —
+  // but the digits only appear once a hand has been moved.
+  readout.classList.toggle('untouched',!clockTouched);
+  document.getElementById('student-ans-input').value=clockTouched?t:'';
 }
 
 function renderClockWidget(){
   // Always start away from the answer, so the first round can't be won by
   // submitting without touching anything.
-  clockH=(Math.floor(Math.random()*12))+1; clockM=0; clockDrag=null;
+  clockH=(Math.floor(Math.random()*12))+1; clockM=0; clockDrag=null; clockTouched=false;
   const svg=document.getElementById('clock-svg');
   let ticks='',nums='';
   for(let i=0;i<60;i++){
@@ -3810,6 +3920,17 @@ function renderClockWidget(){
 
 function clockPoint(e){
   const svg=document.getElementById('clock-svg');
+  // Ask the element where the drawing actually is. The box can end up taller
+  // or wider than the face when the column squeezes it, and the viewBox then
+  // centres a smaller circle inside — dividing by the box would put the
+  // finger somewhere the learner is not pointing.
+  const ctm=svg.getScreenCTM&&svg.getScreenCTM();
+  if(ctm&&svg.createSVGPoint){
+    const p=svg.createSVGPoint();
+    p.x=e.clientX; p.y=e.clientY;
+    const q=p.matrixTransform(ctm.inverse());
+    return [q.x,q.y];
+  }
   const r=svg.getBoundingClientRect();
   // viewBox is 200 wide however big the element renders
   return [(e.clientX-r.left)/r.width*200,(e.clientY-r.top)/r.height*200];
@@ -3835,6 +3956,7 @@ function clockDown(e){
 }
 function clockMove(e){
   if(!clockDrag) return;
+  clockTouched=true;
   const [x,y]=clockPoint(e);
   const ang=clockAngle(100,100,x,y);
   if(clockDrag==='min'){
@@ -3867,10 +3989,33 @@ function clockUp(){ clockDrag=null; }
    CSS vh is measured with the mobile URL bar hidden, so a 100vh page runs
    off the bottom of the screen; dvh fixes it but is missing on older
    Android browsers. visualViewport is what the learner can actually see,
-   so measure that and let the stylesheet prefer it over both units. */
+   so measure that and let the stylesheet prefer it over both units.
+
+   Two things come out of the measurement:
+
+   --vh   one per cent of the *visible* height. Every size that used to be
+          written in vh on the answer screen now multiplies this instead.
+          That mattered more than it sounds: on a phone with 100px of URL
+          bar the page had ~650px to spend but every `32vh` clock and
+          `5.5vh` timer was sized against 850px, so the column asked for
+          about 120px more than existed and the clock ended up half off the
+          top of its own scroll box.
+
+   data-app-h  the short-screen tiers. `@media (max-height:500px)` asks the
+          layout viewport the same too-tall question, so a 375×667 phone
+          with 500px actually visible never reached the tier meant for it.
+          The tokens are cumulative — a 430px screen carries lt620, lt560,
+          lt500 and lt440 — so a rule written for one tier keeps applying
+          on every screen below it, exactly like the media queries did. */
 function setAppHeight(){
-  const h=(window.visualViewport&&window.visualViewport.height)||window.innerHeight;
-  if(h) document.documentElement.style.setProperty('--app-h',Math.round(h)+'px');
+  const vv=window.visualViewport;
+  const h=(vv&&vv.height)||window.innerHeight;
+  if(!h) return;
+  const root=document.documentElement;
+  root.style.setProperty('--app-h',Math.round(h)+'px');
+  root.style.setProperty('--vh',(h/100).toFixed(3)+'px');
+  root.dataset.appH=[[700,'lt700'],[620,'lt620'],[560,'lt560'],[500,'lt500'],[440,'lt440']]
+    .filter(t=>h<=t[0]).map(t=>t[1]).join(' ');
 }
 setAppHeight();
 window.addEventListener('resize',setAppHeight);
