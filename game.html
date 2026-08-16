@@ -558,7 +558,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .custom-icon-emoji{height:1em;width:1em;vertical-align:middle;display:inline-block;object-fit:contain;}
 .q-emoji-big .custom-icon-emoji{height:1em;width:1em;}
 
-/* ── Close to the Target (dice) ──
+/* ── Dice ──
    Two surfaces share this block: the learner's board (#screen-target-play) and
    the projector (#screen-target-host). Both are built from the same rod track,
    so a student and the teacher are looking at the same picture of the class. */
@@ -747,13 +747,13 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="sms" class="q-type-tab" onclick="selectSoloType('sms',this)">📱 Messages</button>
         <button data-type="clock" class="q-type-tab" onclick="selectSoloType('clock',this)">⏰ Clock</button>
         <button data-type="shop" class="q-type-tab" onclick="selectSoloType('shop',this)">🛒 Shop</button>
-        <button data-type="target" class="q-type-tab" onclick="selectSoloType('target',this)">🎯 Close to the Target</button>
+        <button data-type="target" class="q-type-tab" onclick="selectSoloType('target',this)">🎲 Dice</button>
         <button data-type="forms" class="q-type-tab" onclick="selectSoloType('forms',this)">📋 Forms</button>
-        <button data-type="all" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">🎲 All games</button>
+        <button data-type="all" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">✨ All games</button>
         <button data-type="custom" class="q-type-tab" id="solo-custom-tab" onclick="showBankPicker('solo',this)">📚 Custom</button>
       </div>
       <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="solo-count-display">Loading…</div>
-      <!-- Close to the Target has no question bank, so it swaps the question
+      <!-- The Dice game has no question bank, so it swaps the question
            count, the multiple-choice toggle and the length inputs for its own
            settings. Built once per scope; see applyTargetSetup(). -->
       <div class="tgt-opts" id="tgt-opts-solo">
@@ -864,9 +864,9 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
           <button data-type="sms" class="q-type-tab" onclick="selectQType('sms',this)">📱 Messages</button>
           <button data-type="clock" class="q-type-tab" onclick="selectQType('clock',this)">⏰ Clock</button>
           <button data-type="shop" class="q-type-tab" onclick="selectQType('shop',this)">🛒 Shop</button>
-          <button data-type="target" class="q-type-tab" onclick="selectQType('target',this)">🎯 Close to the Target</button>
+          <button data-type="target" class="q-type-tab" onclick="selectQType('target',this)">🎲 Dice</button>
           <button data-type="forms" class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
-          <button data-type="all" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">🎲 All games</button>
+          <button data-type="all" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">✨ All games</button>
           <button data-type="custom" class="q-type-tab" id="teacher-custom-tab" onclick="showBankPicker('teacher',this)">📚 Custom</button>
         </div>
         <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="q-count-display">Loading…</div>
@@ -1099,7 +1099,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   <div id="multiplayer-wait-msg" style="color:var(--muted);font-size:.85rem;margin-top:4px;">Waiting for next question…</div>
 </div>
 
-<!-- CLOSE TO THE TARGET — the learner's board.
+<!-- DICE — the learner's board.
      One screen serves the solo player and every student in a class game. The
      class track sits above the turn card so a player can see where they are
      against the room while they are still rolling; once they finish, the turn
@@ -1147,7 +1147,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   </div>
 </div>
 
-<!-- CLOSE TO THE TARGET — the projector. Same track, teacher's controls. -->
+<!-- DICE — the projector. Same track, teacher's controls. -->
 <div class="screen" id="screen-target-host">
   <div class="tgt-wrap">
     <div class="tgt-banner"><span class="lbl">Target</span><span class="val" id="tgt-host-target">50</span></div>
@@ -2292,7 +2292,7 @@ function buildChoices(q,sourceWords){
 let role=null,roomCode=null,roomRef=null;
 let playerName=null,playerId=null;
 /* Which game the room is running: null for the question games, 'target' for
-   Close to the Target. Set by the host at kickoff and mirrored on every
+   the Dice game. Set by the host at kickoff and mirrored on every
    student from the room snapshot, so the leaderboard knows how to rank. */
 let roomGame=null;
 let currentQuestions=[],currentQIdx=0;
@@ -2887,7 +2887,7 @@ function setMcMode(on){
   ['solo-mc-toggle','host-mc-toggle'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('on',mcMode);});
 }
 
-/* ══════════════ CLOSE TO THE TARGET — setup ══════════════
+/* ══════════════ DICE — setup ══════════════
    The target and the wrong-answer rule are shared between the solo and the
    teacher panels, the same way mcMode is: a teacher who sets up a class game
    and then practises solo shouldn't have to choose twice. */
@@ -2969,7 +2969,7 @@ function updateQCountDisplay(){
 }
 
 function startGame(){
-  // Close to the Target is self-paced and has no questions, so it takes over
+  // Dice is self-paced and has no questions, so it takes over
   // here rather than going round the question loop.
   if(selectedQType==='target'){ roomGame='target'; startTargetGame(); return; }
   roomGame=null;
@@ -2984,7 +2984,7 @@ function startGame(){
     Object.keys(players).forEach(id=>{ updates['players/'+id+'/score']=0; updates['players/'+id+'/lastPoints']=0; });
     roomRef.update(updates);
   });
-  // game:null clears a previous Close to the Target round, or a "play again"
+  // game:null clears a previous Dice round, or a "play again"
   // with a question bank would hand every student the dice board.
   roomRef.update({status:'playing',totalQuestions:currentQuestions.length,game:null});
   playQuestion();
@@ -3235,7 +3235,7 @@ function showLeaderboard(){
   });
 }
 /* What a leaderboard row shows on the right. Points in a question game; in
-   Close to the Target it is the score you finished on, or "out" if you went
+   the Dice game it is the score you finished on, or "out" if you went
    over the target or added up wrong. */
 function lbScore(p){
   if(isTargetRoom()){
@@ -3244,7 +3244,7 @@ function lbScore(p){
   }
   return '⭐ '+(p.score||0);
 }
-/* Who stands on the podium. In Close to the Target a player who went over or
+/* Who stands on the podium. In the Dice game a player who went over or
    added up wrong has no score to celebrate, so they never take a medal even
    when only one or two people finished. */
 function podiumPlayers(players){
@@ -3382,7 +3382,7 @@ function listenForGameState(){
       }
     }
     roomGame=room.game||null;
-    // Close to the Target: everyone is handed the board at once and then rolls
+    // Dice: everyone is handed the board at once and then rolls
     // at their own pace, so this fires once and the room stops driving them.
     if(room.status==='playing'&&room.game==='target'){
       if(!TG) startStudentTarget(room);
@@ -3487,7 +3487,7 @@ function filterBanks(scope,sectionId){
   const allPill=document.querySelector(SCOPE_SEL[scope]+' .q-type-tab[data-type^="all"]');
   if(allPill){
     allPill.dataset.type=sec.banks?'all:'+sec.id:'all';
-    allPill.textContent='🎲 All '+(sec.banks?sec.label.replace(/^\S+\s+/,''):'games');
+    allPill.textContent='✨ All '+(sec.banks?sec.label.replace(/^\S+\s+/,''):'games');
   }
   const def=SECTION_DEFAULTS[sec.id];
   if(def){
@@ -4607,7 +4607,7 @@ function handlePlayerVisibility(){
 }
 function cleanupListeners(){if(roomRef)roomRef.off();clearInterval(timerInterval);clearInterval(studentTimerInt);window.speechSynthesis&&window.speechSynthesis.cancel();document.removeEventListener('visibilitychange',handlePlayerVisibility);stopTargetGame();}
 
-/* ══════════════ CLOSE TO THE TARGET — the board ══════════════
+/* ══════════════ DICE — the board ══════════════
    Unlike every other game here there is no question, no shared countdown and
    no single submit: each player rolls at their own pace and decides for
    themselves when to stop. So it runs on its own screens rather than through
@@ -4958,7 +4958,7 @@ function showTargetSoloResult(){
   stopMusic();
   const out=tgtIsOut(TG.state);
   const gap=TG.target-TG.total;
-  document.getElementById('lb-title').textContent=out?'🎯 Close to the Target':'🎉 Close to the Target';
+  document.getElementById('lb-title').textContent=out?'🎲 Dice':'🎉 Dice';
   document.getElementById('podium').innerHTML=
     '<div class="podium-place p1" style="min-width:170px;"><div class="medal">'+(out?'💥':gap===0?'🎯':'🏆')+
     '</div><div class="pname">You</div><div class="pscore">⭐'+TG.total+'</div></div>';
