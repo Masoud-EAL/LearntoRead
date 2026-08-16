@@ -193,9 +193,34 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
    on it. Packing the game list several to a row (below) keeps the ordinary
    case short enough to need no scrolling at all. */
 #screen-solo-setup > .logo-bar{padding:10px 20px 4px;font-size:1.25rem;}
-#screen-solo-setup > div{padding:10px 16px !important;gap:10px !important;}
+/* The bottom padding is the floating bar's landing space: without it the last
+   control on the page can never be scrolled out from under the bar. The
+   :not() matters — the bar is a direct div child of this screen too, and this
+   padding on the bar itself would push Start 96px off the bottom of the phone. */
+#screen-solo-setup > div:not(.solo-start-bar){
+  padding:10px 16px calc(96px + env(safe-area-inset-bottom,0px)) !important;
+  gap:10px !important;}
 #screen-solo-setup .card{padding:14px;}
 #screen-solo-setup .q-type-tabs{margin-bottom:8px;}
+/* ── Start Practice floats at the bottom of the screen ──
+   Now that this screen scrolls, Start was simply its last element — on a small
+   phone that is 1065px below the fold, so someone opening practice for the
+   first time met a wall of games with no visible way to begin. Pinned to the
+   bottom, it is on screen from the first second and still there after they
+   have scrolled the list and chosen — which is exactly when they want it, and
+   exactly when a copy moved to the top of the page would have scrolled away.
+   Below the bank picker (200) and the toast (999), which must still cover it. */
+#screen-solo-setup .solo-start-bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  display:flex;justify-content:center;
+  padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));
+  /* --bg at zero alpha, not `transparent`: a gradient to `transparent`
+     fades through grey in most engines. */
+  background:linear-gradient(to top,var(--bg) 0%,var(--bg) 62%,rgba(13,13,26,0) 100%);
+}
+/* A shade smaller than a stock btn-lg — it is on screen the whole time, so it
+   buys back a row of the list while staying a full-size adult touch target. */
+#screen-solo-setup .solo-start-bar .btn-lg{font-size:1.2rem;padding:15px 38px;}
 /* The "← WordLink" chip is pinned to the viewport, which was harmless while
    this screen could not scroll. Now that it can, a pinned chip would hover
    over the skill chips it happens to be sitting on — and it is a link off the
@@ -210,7 +235,10 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
    site — so the wordmark stands down and gives its row to the categories. */
 @media (max-width:600px){
   #screen-solo-setup > .logo-bar{display:none;}
-  #screen-solo-setup > div{padding-top:52px!important;}
+  /* :not() for the same reason as the padding rule above — this is the column's
+     clearance under the fixed chips, and on the bar it would stack 52px of dead
+     space on top of Start and swallow the Back button underneath it. */
+  #screen-solo-setup > div:not(.solo-start-bar){padding-top:52px!important;}
 }
 
 /* Teacher lobby: not restructured — it is a genuinely dense screen (room
@@ -918,8 +946,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         </select>
       </div>
     </div>
-    <button class="btn btn-gold btn-lg" onclick="startSoloGame()">▶ Start Practice</button>
     <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-student-home')">← Back</button>
+  </div>
+  <!-- Outside the scrolling column: Start rides at the bottom of the screen.
+       Back stays in the column, so the bar is only ever one button tall. -->
+  <div class="solo-start-bar">
+    <button class="btn btn-gold btn-lg" onclick="startSoloGame()">▶ Start Practice</button>
   </div>
 </div>
 
