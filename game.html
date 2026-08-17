@@ -2995,18 +2995,21 @@ function toggleMusic(){
   if(!musicOn){ musicResumeType=null; stopMusic(); return; }
   const s=document.querySelector('.screen.active');
   if(!s) return;
-  if(s.id==='screen-teacher-lobby'||s.id==='screen-student-lobby') playLobbyMusic();
-  if(s.id==='screen-teacher-game') playGameMusic();
   if(s.id==='screen-leaderboard') playWinnerFanfare();
+  // Solo keeps the calm loop on its own question and dice screens, which are
+  // not screen music: multiplayer students get silence there.
+  else if(soloMode&&(s.id==='screen-student-answer'||s.id==='screen-target-play')) playGameMusic();
+  else startScreenMusic(s.id);
 }
 
 /* SCREENS */
 // Which background music belongs to a given screen.
 const LOBBY_SCREENS=['screen-home','screen-student-home','screen-solo-setup','screen-teacher-lobby','screen-student-lobby'];
+const GAME_SCREENS=['screen-teacher-game','screen-target-host'];
 function startScreenMusic(id){
   if(!musicOn) return;
   if(LOBBY_SCREENS.includes(id)) playLobbyMusic();
-  else if(id==='screen-teacher-game') playGameMusic();
+  else if(GAME_SCREENS.includes(id)) playGameMusic();
   // other screens (questions, results, leaderboard) manage their own audio
 }
 function showScreen(id){
@@ -3034,6 +3037,10 @@ function unlockAudio(){
    them: two grooves at different points in the rhythm. Tear the loop down on
    the way out and rebuild it on the way back in. */
 function restoreMusic(){
+  // The context has to come back whether or not any music does. A multiplayer
+  // student sits on screens that play nothing at all, and leaving the context
+  // suspended there would silence every sound effect — the dice roll included.
+  if(audioCtx&&audioCtx.state!=='running') audioCtx.resume().catch(()=>{});
   if(!musicOn) return;
   const t=musicResumeType; musicResumeType=null;
   if(t==='lobby') playLobbyMusic();
@@ -4947,11 +4954,15 @@ let tgtPlayersListener=null;
    then two harder ones as they come to rest. */
 function playDiceRoll(){
   if(!musicOn) return;
-  const ctx=getCtx(),now=ctx.currentTime;
+  // A tick of noise through a narrow bandpass keeps very little of its level, so
+  // these numbers run high: measured at the speakers the roll still lands about
+  // where the music does. It is the only feedback the dice game gives, and on a
+  // phone in a classroom the old level was inaudible.
+  const ctx=getCtx(),now=ctx.currentTime+0.02;
   for(let i=0;i<7;i++)
-    noiseBurst(ctx,now+i*0.075+Math.random()*0.02,0.05,0.22,1400+Math.random()*900,1.1,(Math.random()-.5)*0.6);
-  noiseBurst(ctx,now+0.60,0.07,0.34,1200,1.2,0);
-  noiseBurst(ctx,now+0.66,0.06,0.24,900,1.2,0);
+    noiseBurst(ctx,now+i*0.075+Math.random()*0.02,0.05,0.75,1400+Math.random()*900,0.8,(Math.random()-.5)*0.6);
+  noiseBurst(ctx,now+0.60,0.07,1.05,1200,0.9,0);
+  noiseBurst(ctx,now+0.66,0.06,0.80,900,0.9,0);
 }
 
 function drawTargetDie(el,n){
@@ -5043,8 +5054,10 @@ function startTargetGame(){
   roomRef.update({status:'playing',game:'target',target:target,strict:TG.strict,
     currentQuestion:null,questionIdx:-1,revealed:false,midLeaderboard:false,correctAnswer:''});
   document.getElementById('tgt-host-target').textContent=target;
+  // showScreen starts the calm game loop for this screen. It used to play the
+  // menu music instead, so the projector sat on the lobby groove — far louder
+  // than the dice — for the whole round.
   showScreen('screen-target-host');
-  playLobbyMusic();
   watchTargetPlayers();
 }
 
