@@ -351,6 +351,11 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 @keyframes blobPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
 .waiting-name{font-family:'Fredoka One',cursive;font-size:1.8rem;}
 .waiting-msg{color:var(--muted);}
+/* Between rounds the student is still in the room, so the waiting line says so
+   in the teal the rest of the app uses for "you're in", not the muted grey of
+   an idle screen. */
+.waiting-msg.in-game{color:var(--teal);font-family:'Fredoka One',cursive;font-size:1.1rem;}
+.stay-in{font-family:'Fredoka One',cursive;font-size:1.15rem;color:var(--teal);text-align:center;}
 
 /* STUDENT ANSWER */
 /* ── Student answer screen: everything on one screen, never scrolled ──
@@ -1166,6 +1171,15 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       <button class="btn btn-gold btn-lg" id="mid-next-btn" onclick="continueToNextQuestion()">▶ Next Question</button>
       <div style="color:var(--muted);font-size:.85rem;" id="lb-waiting-msg"></div>
     </div>
+    <!-- What a student sees on the final board instead of the teacher's
+         controls. Ending a class game is the teacher's call, so the student's
+         board offers nothing to press — only that they are still in the room
+         and what happens next. -->
+    <div id="lb-controls-student" style="display:none;flex-direction:column;align-items:center;gap:6px;margin-top:4px;">
+      <div style="font-size:1.8rem;">⏳</div>
+      <div class="stay-in">You are still in the game</div>
+      <div style="color:var(--muted);font-size:.85rem;">Wait for the teacher</div>
+    </div>
   </div>
 </div>
 
@@ -1199,7 +1213,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   <div class="logo-bar">WordLink <span>🎮</span> Game</div>
   <div class="waiting-blob">🎉</div>
   <div class="waiting-name" id="s-display-name">You</div>
-  <div class="waiting-msg">You're in! Waiting for the teacher to start…</div>
+  <div class="waiting-msg" id="s-wait-msg">You're in! Waiting for the teacher to start…</div>
   <div style="color:var(--muted);font-size:.85rem;" id="s-room-display"></div>
   <!-- Only for Translate games, and only while waiting. Lives here rather
        than on the join screen so it appears for students who joined before
@@ -3118,8 +3132,21 @@ window.addEventListener('pagehide',suspendMusic);
 window.addEventListener('pageshow',e=>{ if(e.persisted) restoreMusic(); });
 // musicOn is restored from localStorage, so the chip has to match it on load.
 if(!musicOn) document.getElementById('music-btn').textContent='🎵 Music: Off';
-function goHome(){ stopMusic(); cleanupListeners(); soloMode=false; document.getElementById('music-btn').style.display=''; document.getElementById('solo-back-btn').style.display='none'; showScreen('screen-home'); playLobbyMusic(); }
+function goHome(){ endHostedRoom(); stopMusic(); cleanupListeners(); soloMode=false; setClassGameLock(false); document.getElementById('music-btn').style.display=''; document.getElementById('solo-back-btn').style.display='none'; showScreen('screen-home'); playLobbyMusic(); }
 function goStudentHome(){ document.getElementById('music-btn').style.display='none'; showScreen('screen-student-home'); }
+/* A student in a class game has no way out of it — leaving is the teacher's
+   call. The site-wide back link is the last exit left on their phone once the
+   leaderboard's buttons are gone, so it goes with them. */
+function setClassGameLock(on){
+  const b=document.querySelector('.back-btn');
+  if(b) b.style.display=on?'none':'';
+}
+/* The teacher walking away is the end of the room. Say so on the way out, or
+   every student is left waiting on a game that will never come back. */
+function endHostedRoom(){
+  if(role!=='teacher'||!roomRef) return;
+  roomRef.update({status:'ended'}).catch(()=>{});
+}
 
 /* TEACHER FLOW */
 function goTeacher(){ role='teacher'; document.getElementById('music-btn').style.display=''; buildBank(); authReady.then(()=>{ loadCustomBanks(); createRoom(); }); }
@@ -3136,7 +3163,8 @@ function cleanupOldRooms(){
     const rooms = snap.val() || {};
     Object.entries(rooms).forEach(([code, room]) => {
       const created = room.createdAt || 0;
-      if (created < AGE_24H || (room.status === 'finished' && created < AGE_2H)) {
+      const over = room.status === 'finished' || room.status === 'ended';
+      if (created < AGE_24H || (over && created < AGE_2H)) {
         db.ref('rooms/' + code).remove().catch(()=>{});
       }
     });
@@ -3506,8 +3534,7 @@ function nextQuestion(){
     const players=sortPlayersForBoard(Object.values(snap.val()||{}).filter(p=>p&&p.name));
     document.getElementById('lb-title').textContent='📊 Current Standings';
     renderLeaderboard(players);
-    document.getElementById('lb-controls-final').style.display='none';
-    document.getElementById('lb-controls-mid').style.display='flex';
+    setLeaderboardControls('mid');
     document.getElementById('mid-next-btn').style.display='';
     document.getElementById('lb-waiting-msg').textContent='';
     showScreen('screen-leaderboard');
@@ -3515,8 +3542,7 @@ function nextQuestion(){
 }
 function continueToNextQuestion(){
   currentQIdx++;
-  document.getElementById('lb-controls-final').style.display='flex';
-  document.getElementById('lb-controls-mid').style.display='none';
+  setLeaderboardControls('final');
   roomRef.update({revealed:false,midLeaderboard:false});
   playQuestion();
 }
@@ -3526,8 +3552,9 @@ function showLeaderboard(){
   roomRef.child('players').once('value',snap=>{
     const players=sortPlayersForBoard(Object.values(snap.val()||{}).filter(p=>p&&p.name));
     document.getElementById('lb-title').textContent='🏆 Final Leaderboard';
-    document.getElementById('lb-controls-final').style.display='none';
-    document.getElementById('lb-controls-mid').style.display='none';
+    setLeaderboardControls(null);
+    // A solo run before this one renames the button; this board is a class game.
+    document.getElementById('play-again-btn').textContent='🔄 Play Again';
     showScreen('screen-leaderboard');
     revealLeaderboard(players);
   });
@@ -3547,6 +3574,16 @@ function lbScore(p){
    when only one or two people finished. */
 function podiumPlayers(players){
   return (isTargetRoom()?players.filter(p=>!tgtIsOut(p.tstate)):players).slice(0,3);
+}
+/* One place decides what sits under the board: the teacher's controls, the
+   mid-game controls, or — for a student — no controls at all, just a note that
+   they are still in the game. */
+function setLeaderboardControls(which){
+  const map={final:'lb-controls-final',mid:'lb-controls-mid',student:'lb-controls-student'};
+  Object.keys(map).forEach(k=>{
+    const el=document.getElementById(map[k]);
+    if(el) el.style.display=(k===which)?'flex':'none';
+  });
 }
 function renderLeaderboard(players){
   players=players.filter(p=>p&&p.name);
@@ -3595,12 +3632,43 @@ function revealLeaderboard(players){
           order.forEach(i=>{ if(!top3[i]) return; const p=top3[i],el=document.createElement('div'); el.className='podium-place '+classes[i]; el.innerHTML='<div class="medal">'+medals[i]+'</div><div class="pname">'+p.name+'</div><div class="pscore">'+lbScore(p).replace(/^⭐ /,'⭐')+'</div>'; podium.appendChild(el); });
         },400);
         playWinnerFanfare();
-        setTimeout(()=>{ document.getElementById('lb-controls-final').style.display='flex'; },3200);
+        setTimeout(()=>setLeaderboardControls('final'),3200);
       }
     },revealAt);
   }
 }
-function playAgain(){ if(soloMode){ showScreen('screen-solo-setup'); updateSoloCountDisplay(); } else { showScreen('screen-teacher-lobby'); playLobbyMusic(); } }
+function playAgain(){
+  if(soloMode){ showScreen('screen-solo-setup'); updateSoloCountDisplay(); return; }
+  // Keep the class: the room goes back to the lobby it started in, with the
+  // same players and their scores wiped, so nobody has to rejoin. Without this
+  // the room stayed "finished" — students were left holding a dead leaderboard
+  // and a new student could not join the next round at all.
+  resetRoomForNextGame();
+  showScreen('screen-teacher-lobby'); playLobbyMusic();
+}
+/* Put a finished room back in the lobby, players and all. */
+function resetRoomForNextGame(){
+  if(!roomRef||role!=='teacher') return;
+  stopTargetGame();
+  roomGame=null;
+  currentQIdx=0;
+  roomRef.child('answers').remove();
+  roomRef.child('players').once('value',snap=>{
+    const players=snap.val()||{},updates={};
+    Object.keys(players).forEach(id=>{
+      updates['players/'+id+'/score']=0;
+      updates['players/'+id+'/lastPoints']=0;
+      updates['players/'+id+'/total']=0;
+      updates['players/'+id+'/tstate']='playing';
+      updates['players/'+id+'/finishedAt']=null;
+    });
+    if(Object.keys(updates).length) roomRef.update(updates);
+  });
+  // currentQuestion is cleared as well as the status: a student whose phone
+  // still holds the last question must not be dragged back onto it.
+  roomRef.update({status:'lobby',game:null,currentQuestion:null,questionIdx:-1,
+    revealed:false,correctAnswer:'',midLeaderboard:false,qType:selectedQType});
+}
 
 /* STUDENT FLOW */
 function initStudent(){
@@ -3631,6 +3699,7 @@ function joinGame(){
   authReady.then(()=>db.ref('rooms/'+code).once('value',snap=>{
     if(!snap.exists()){err.textContent='Room not found.';return;}
     if(snap.val().status==='finished'){err.textContent='This game has already finished.';return;}
+    if(snap.val().status==='ended'){err.textContent='This game has ended.';return;}
     roomCode=code; roomRef=db.ref('rooms/'+code);
     playerName=name;
     // Reuse a stable id for this room so a student who reloads or reconnects
@@ -3656,6 +3725,10 @@ function joinGame(){
     document.addEventListener('visibilitychange',handlePlayerVisibility);
     document.getElementById('s-display-name').textContent=name;
     document.getElementById('s-room-display').textContent='Room: '+roomCode;
+    const wm=document.getElementById('s-wait-msg');
+    wm.classList.remove('in-game');
+    wm.textContent="You're in! Waiting for the teacher to start…";
+    setClassGameLock(true);
     showScreen('screen-student-lobby');
     listenForGameState();
   }));
@@ -3680,6 +3753,13 @@ function listenForGameState(){
       }
     }
     roomGame=room.game||null;
+    // The teacher closed the room. This is the one thing that lets a student
+    // out of a class game, so it comes before everything else.
+    if(room.status==='ended'){ leaveEndedRoom(); return; }
+    // The teacher pressed "Play Again": the room is back in the lobby and this
+    // student is still in it. Come off whatever the last round left on screen
+    // and wait. Everything below only applies to a round in progress.
+    if(room.status==='lobby'){ returnStudentToLobby(); return; }
     // Dice: everyone is handed the board at once and then rolls
     // at their own pace, so this fires once and the room stops driving them.
     if(room.status==='playing'&&room.game==='target'){
@@ -3704,8 +3784,9 @@ function listenForGameState(){
         const players=sortPlayersForBoard(Object.values(snap2.val()||{}).filter(p=>p&&p.name));
         document.getElementById('lb-title').textContent='🏆 Final Leaderboard';
         renderLeaderboard(players);
-        document.getElementById('lb-controls-final').style.display='flex';
-        document.getElementById('lb-controls-mid').style.display='none';
+        // No "Play Again", no "Home": those are the teacher's to press, and a
+        // student who pressed them ended up on the teacher's own lobby screen.
+        setLeaderboardControls('student');
         showScreen('screen-leaderboard');
         stopMusic();
       });
@@ -3713,13 +3794,40 @@ function listenForGameState(){
   });
 }
 
+/* Back to the waiting screen between rounds. The round's local state goes with
+   it: a stale myLastQIdx would make the next game's first question — index 0
+   again — look like one this phone had already answered. */
+function returnStudentToLobby(){
+  if(soloMode) return;
+  const onLobby=document.getElementById('screen-student-lobby').classList.contains('active');
+  clearInterval(studentTimerInt);
+  stopTargetGame();
+  try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(e){}
+  answered=false; myLastQIdx=-1; myScore=0; hintLevel=0; currentStudentQ=null;
+  if(onLobby) return;   // a fresh join, or already waiting — leave the wording alone
+  const msg=document.getElementById('s-wait-msg');
+  msg.classList.add('in-game');
+  msg.textContent='✅ You are still in the game. Please wait…';
+  showScreen('screen-student-lobby');
+}
+
+/* The teacher ended the room: hand the phone back rather than leave a student
+   waiting on a game that is not coming. */
+function leaveEndedRoom(){
+  if(soloMode) return;
+  cleanupListeners();
+  gameListener=null;
+  setClassGameLock(false);
+  showToast('The teacher ended the game.',3000);
+  goStudentHome();
+}
+
 function showMidStudentLeaderboard(){
   roomRef.child('players').once('value',snap=>{
     const players=sortPlayersForBoard(Object.values(snap.val()||{}).filter(p=>p&&p.name));
     document.getElementById('lb-title').textContent='📊 Current Standings';
     renderLeaderboard(players);
-    document.getElementById('lb-controls-final').style.display='none';
-    document.getElementById('lb-controls-mid').style.display='flex';
+    setLeaderboardControls('mid');
     document.getElementById('mid-next-btn').style.display='none';
     document.getElementById('lb-waiting-msg').textContent='Waiting for next question…';
     showScreen('screen-leaderboard');
@@ -3917,8 +4025,7 @@ function showSoloFinal(){
   document.getElementById('lb-title').textContent='🎉 Practice Complete!';
   document.getElementById('podium').innerHTML='<div class="podium-place p1" style="min-width:160px;"><div class="medal">🏆</div><div class="pname">You</div><div class="pscore">⭐'+myScore+'</div></div>';
   document.getElementById('lb-list').innerHTML='<div class="lb-row" style="justify-content:center;font-family:\'Fredoka One\',cursive;font-size:1.1rem;color:var(--gold);">'+soloQuestions.length+' questions · '+myScore+' pts total</div>';
-  document.getElementById('lb-controls-final').style.display='flex';
-  document.getElementById('lb-controls-mid').style.display='none';
+  setLeaderboardControls('final');
   document.getElementById('play-again-btn').textContent='🔄 Practice Again';
   showScreen('screen-leaderboard');
   playWinnerFanfare();
@@ -5339,8 +5446,7 @@ function showTargetSoloResult(){
   row.textContent=line;
   const list=document.getElementById('lb-list');
   list.innerHTML=''; list.appendChild(row);
-  document.getElementById('lb-controls-final').style.display='flex';
-  document.getElementById('lb-controls-mid').style.display='none';
+  setLeaderboardControls('final');
   document.getElementById('play-again-btn').textContent='🔄 Play Again';
   showScreen('screen-leaderboard');
   if(out) playWrongJingle(); else { playWinnerFanfare(); if(gap===0) playCheer(1); }

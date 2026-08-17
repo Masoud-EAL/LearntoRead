@@ -33,7 +33,7 @@
           "$playerId": { ".write": "auth != null" }
         },
 
-        ".write": "auth != null && (!data.exists() || data.child('hostUid').val() === auth.uid || (!newData.exists() && (now - data.child('createdAt').val() > 86400000 || (data.child('status').val() === 'finished' && now - data.child('createdAt').val() > 7200000))))"
+        ".write": "auth != null && (!data.exists() || data.child('hostUid').val() === auth.uid || (!newData.exists() && (now - data.child('createdAt').val() > 86400000 || ((data.child('status').val() === 'finished' || data.child('status').val() === 'ended') && now - data.child('createdAt').val() > 7200000))))"
       }
     }
   }
