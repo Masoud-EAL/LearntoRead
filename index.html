@@ -3,6 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+// wordlink.au is the only home for this site. GitHub Pages also serves it at
+// masoud-eal.github.io/LearntoRead/, and if the custom domain ever lapses that
+// copy answers on its own — which is how Google ended up treating the github.io
+// URL as the canonical one. Bounce visitors and crawlers to the real domain so
+// the two hosts can never look like duplicate sites again.
+if (location.hostname.endsWith('github.io')) {
+  location.replace('https://wordlink.au' +
+    location.pathname.replace(/^\/LearntoRead/, '') +
+    location.search + location.hash);
+}
+</script>
 <title>Learn to Read English — Free Adult EAL Phonics Practice | WordLink</title>
 <meta name="description" content="Free phonics practice for adult EAL and English learners. Tap a letter or word to hear it, learn letter sounds, and practise reading and speaking aloud.">
 <link rel="canonical" href="https://wordlink.au/">
