@@ -1154,6 +1154,9 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
     <button class="btn btn-accent" id="reveal-btn" onclick="revealAnswers()">👁 Reveal Answers</button>
     <button class="btn btn-teal" id="next-btn" onclick="nextQuestion()" style="display:none;">Next →</button>
     <button class="btn btn-gold" id="finish-btn" onclick="showLeaderboard()" style="display:none;">🏆 Leaderboard</button>
+    <!-- A class runs out of time more often than it runs out of questions.
+         Hidden on the last question, where 🏆 Leaderboard already ends it. -->
+    <button class="btn btn-ghost" id="end-now-btn" onclick="endGameNow()">🏁 End game now</button>
   </div>
 </div>
 
@@ -1168,7 +1171,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       <button class="btn btn-ghost" id="home-btn" onclick="goHome()">🏠 Home</button>
     </div>
     <div id="lb-controls-mid" style="display:none;flex-direction:column;align-items:center;gap:10px;margin-top:4px;">
-      <button class="btn btn-gold btn-lg" id="mid-next-btn" onclick="continueToNextQuestion()">▶ Next Question</button>
+      <!-- Wrapped as one row so the student's standings can hide the teacher's
+           controls in a single move. -->
+      <div id="mid-teacher-actions" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center;">
+        <button class="btn btn-gold btn-lg" id="mid-next-btn" onclick="continueToNextQuestion()">▶ Next Question</button>
+        <button class="btn btn-ghost" id="mid-end-btn" onclick="endGameNow()">🏁 End game now</button>
+      </div>
       <div style="color:var(--muted);font-size:.85rem;" id="lb-waiting-msg"></div>
     </div>
     <!-- What a student sees on the final board instead of the teacher's
@@ -3328,6 +3336,7 @@ function playQuestion(){
   document.getElementById('reveal-btn').style.display='';
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
+  document.getElementById('end-now-btn').style.display='';
   document.getElementById('q-emoji').innerHTML=q.icon||(q.type==='word'?emo(q.word):q.type==='letter'?q.letter:'');
   document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':q.type==='phgap'?('🔤 '+q.family+' — which sound is missing?'):q.type==='phword'?('🔊 '+q.family+' — students tap the word'):q.type==='phbuild'?('🔤 '+q.family+' — students build "'+q.word+'"'):(q.type==='clockset'||q.type==='shop'||q.type==='form')?q.question:'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=(noAudio||q.noListen)?'none':'';
@@ -3524,6 +3533,7 @@ function revealAnswers(){
   const isLast=currentQIdx>=currentQuestions.length-1;
   document.getElementById('next-btn').style.display=isLast?'none':'';
   document.getElementById('finish-btn').style.display=isLast?'':'none';
+  document.getElementById('end-now-btn').style.display=isLast?'none':'';
   playCorrectJingle();
 }
 
@@ -3535,10 +3545,20 @@ function nextQuestion(){
     document.getElementById('lb-title').textContent='📊 Current Standings';
     renderLeaderboard(players);
     setLeaderboardControls('mid');
-    document.getElementById('mid-next-btn').style.display='';
+    document.getElementById('mid-teacher-actions').style.display='flex';
     document.getElementById('lb-waiting-msg').textContent='';
     showScreen('screen-leaderboard');
   });
+}
+/* A class runs out of time more often than it runs out of questions. Stop the
+   round here and show the final board exactly as if the last question had just
+   been played — scores stand as they are, and the questions not reached are
+   simply not played. */
+function endGameNow(){
+  if(!roomRef) return;
+  if(!confirm('End the game now and show the final scores?')) return;
+  clearInterval(timerInterval);
+  showLeaderboard();
 }
 function continueToNextQuestion(){
   currentQIdx++;
@@ -3780,6 +3800,11 @@ function listenForGameState(){
     if(room.status==='finished'){
       // Drop the board so a "play again" on the same room deals a fresh one.
       stopTargetGame();
+      // The teacher can end a round mid-question. The countdown is an interval,
+      // not part of the screen, so it would keep running under the leaderboard
+      // and auto-submit an answer to a game that is already over.
+      clearInterval(studentTimerInt);
+      answered=true;
       roomRef.child('players').once('value',snap2=>{
         const players=sortPlayersForBoard(Object.values(snap2.val()||{}).filter(p=>p&&p.name));
         document.getElementById('lb-title').textContent='🏆 Final Leaderboard';
@@ -3828,7 +3853,7 @@ function showMidStudentLeaderboard(){
     document.getElementById('lb-title').textContent='📊 Current Standings';
     renderLeaderboard(players);
     setLeaderboardControls('mid');
-    document.getElementById('mid-next-btn').style.display='none';
+    document.getElementById('mid-teacher-actions').style.display='none';
     document.getElementById('lb-waiting-msg').textContent='Waiting for next question…';
     showScreen('screen-leaderboard');
   });
