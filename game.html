@@ -152,8 +152,8 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 /* The game list. Wrapping pills spent a whole row on each of 30 games,
    because a pill is as wide as its label; equal columns fit two or three to a
    row instead and cut the list to a third of its height. */
-.q-type-tabs{display:grid;gap:5px;margin-bottom:10px;
-  grid-template-columns:repeat(auto-fill,minmax(148px,1fr));}
+.q-type-tabs{display:grid;gap:7px;margin-bottom:10px;
+  grid-template-columns:repeat(auto-fill,minmax(152px,1fr));}
 
 /* ── Section filter chips ──
    27 banks is too many to scan. A chip narrows the list to one skill; each
@@ -165,23 +165,36 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
    squared where a game pill is round, and their active colour is purple, not
    teal — so the difference still reads at a glance, at chip size, and
    without reading the step labels. */
-.step-label{font-family:'Fredoka One',cursive;font-size:.78rem;margin-bottom:4px;}
+.step-label{font-family:'Fredoka One',cursive;font-size:.95rem;margin-bottom:6px;}
 .step-label.skill{color:#b8a4ff;}
 .step-label.game{color:var(--teal);}
 .section-panel{background:rgba(124,77,255,.13);border:1.5px solid rgba(124,77,255,.32);
-  border-radius:10px;padding:6px 7px;margin-bottom:8px;}
-.section-chips{display:flex;gap:4px;flex-wrap:wrap;}
-.section-chip{padding:4px 9px;border-radius:8px;font-size:.7rem;font-weight:700;
+  border-radius:10px;padding:9px 10px;margin-bottom:10px;}
+.section-chips{display:flex;gap:6px;flex-wrap:wrap;}
+.section-chip{padding:8px 13px;border-radius:10px;font-size:.85rem;font-weight:700;
   border:1.5px solid rgba(124,77,255,.5);background:rgba(124,77,255,.1);color:var(--text);
   cursor:pointer;white-space:nowrap;transition:all .15s;}
 .section-chip.active{background:var(--purple);color:#fff;border-color:var(--purple);
   box-shadow:0 2px 10px rgba(124,77,255,.45);}
+/* Wrapped, the ten chips fall into ragged rows of two and three. On the solo
+   screen — where the panel is the width of the card — two even columns read
+   as a list instead. The host lobby keeps wrapping: its panel is narrower and
+   sits beside the room code. */
+@media (max-width:899px){
+  #screen-solo-setup .section-chips{display:grid;grid-template-columns:1fr 1fr;}
+  #screen-solo-setup .section-chip{width:100%;text-align:left;white-space:normal;padding:9px 10px;}
+}
 /* On a short screen the chip row would eat the game list, which has barely
    two rows there — scroll it sideways instead of spending two rows on it,
    and let the panel itself carry the distinction without the step labels. */
 :root[data-app-h~="lt620"] .section-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px;}
 :root[data-app-h~="lt620"] .section-panel{padding:5px 6px;margin-bottom:6px;}
-:root[data-app-h~="lt620"] .step-label{font-size:.7rem;margin-bottom:3px;}
+:root[data-app-h~="lt620"] .step-label{font-size:.85rem;margin-bottom:4px;}
+:root[data-app-h~="lt620"] .section-chip{padding:6px 11px;font-size:.8rem;}
+:root[data-app-h~="lt620"] .q-type-tab{padding:8px 10px;font-size:.82rem;}
+/* The sideways scroller needs the flex row back. */
+:root[data-app-h~="lt620"] #screen-solo-setup .section-chips{display:flex;}
+:root[data-app-h~="lt620"] #screen-solo-setup .section-chip{width:auto;white-space:nowrap;}
 
 /* ── Solo setup: one ordinary page, scrolled as a whole ──
    This screen used to be a fixed-height column with the game list as its only
@@ -250,9 +263,35 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 #screen-teacher-lobby .q-type-tabs{max-height:min(32vh,220px);overflow-y:auto;align-content:start;}
 /* A grid cell is as wide as its column, so a long label wraps inside the pill
    instead of stretching it — centred, with room for the second line. */
-.q-type-tab{padding:7px 10px;border-radius:50px;font-size:.78rem;font-weight:700;border:1.5px solid rgba(255,255,255,.15);cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);text-align:center;line-height:1.25;}
+.q-type-tab{padding:10px 12px;border-radius:50px;font-size:.86rem;font-weight:700;border:1.5px solid rgba(255,255,255,.15);cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);text-align:center;line-height:1.25;}
 .q-type-tab.active{background:var(--teal);color:white;border-color:var(--teal);}
 .lobby-actions{display:flex;gap:12px;justify-content:center;padding:8px 0;flex-wrap:wrap;}
+
+/* ── Desktop: solo practice stops being a phone in the middle of a monitor ──
+   A 500px column on a 1440px screen wastes the room a computer has, so past
+   900px the card widens and the skills become a real left-hand column beside
+   the games. The host lobby keeps its layout — it already uses the width for
+   the room code and the player list — and only takes the larger skill text. */
+@media (min-width:900px){
+  #screen-solo-setup .step-label{font-size:1.15rem;margin-bottom:8px;}
+  #screen-solo-setup .section-panel{padding:12px 14px;margin-bottom:14px;}
+  #screen-solo-setup .section-chip{padding:9px 13px;font-size:1rem;border-radius:12px;}
+  #screen-solo-setup .q-type-tabs{gap:10px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
+  #screen-solo-setup .q-type-tab{padding:14px;font-size:1rem;}
+  #screen-solo-setup > div:not(.solo-start-bar){padding:14px 28px calc(104px + env(safe-area-inset-bottom,0px))!important;}
+  /* Two children only — the skill panel and .setup-main — so the split needs
+     no per-child placement. Sticky keeps the skills in reach while the game
+     list scrolls past them. */
+  #screen-solo-setup .card{padding:22px 24px;
+    display:grid;grid-template-columns:290px minmax(0,1fr);column-gap:26px;align-items:start;}
+  #screen-solo-setup .card > .section-panel{margin-bottom:0;position:sticky;top:14px;}
+  #screen-solo-setup .section-chips{display:flex;flex-direction:column;flex-wrap:nowrap;}
+  #screen-solo-setup .section-chip{width:100%;text-align:left;}
+  #screen-solo-setup .solo-start-bar .btn-lg{font-size:1.3rem;padding:17px 46px;}
+
+  #screen-teacher-lobby .step-label.skill{font-size:1.05rem;}
+  #screen-teacher-lobby .section-chip{padding:8px 12px;font-size:.92rem;}
+}
 
 /* TEACHER GAME */
 #screen-teacher-game{padding:16px 20px;gap:12px;}
@@ -853,11 +892,14 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 <div class="screen" id="screen-solo-setup">
   <div class="logo-bar">WordLink <span>🎮</span> Practice</div>
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:20px;gap:20px;">
-    <div class="card" style="width:100%;max-width:500px;">
+    <div class="card" style="width:100%;max-width:1180px;">
       <div class="section-panel">
         <p class="step-label skill">① Choose a skill</p>
         <div class="section-chips" id="solo-section-chips"></div>
       </div>
+      <!-- Everything but the skill panel lives in one wrapper, so on a wide
+           screen the card is a two-column grid of exactly two children. -->
+      <div class="setup-main">
       <p class="step-label game">② Choose a game</p>
       <div class="q-type-tabs">
         <button data-type="wp1:gap" class="q-type-tab" onclick="selectSoloType('wp1:gap',this)">🔡 Beginner Sound Gap</button>
@@ -947,6 +989,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
           <option value="th">ภาษาไทย</option>
         </select>
       </div>
+      </div><!-- /.setup-main -->
     </div>
     <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-student-home')">← Back</button>
   </div>
