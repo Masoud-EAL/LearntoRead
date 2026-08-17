@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v31';
+const CACHE = 'learntoread-v32';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -13,6 +13,7 @@ const CORE = [
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
+  './favicon.ico',
   './fonts/fonts.css',
   './vendor/qrcode.min.js',
 ];

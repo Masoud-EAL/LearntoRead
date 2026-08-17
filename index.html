@@ -44,12 +44,17 @@
  <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#4a90d9">
 
-<link rel="apple-touch-icon" href="icon-192.png">
-
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-<link rel="icon" href="icon-192.png">
+<!-- The same app icon, in the three places something asks for it: favicon.ico
+     for search engines and browser tabs (Google's crawler looks for the
+     <link> and independently fetches /favicon.ico, so the file has to sit at
+     the site root and carry small 16/32/48 renderings), the 192 PNG for tabs
+     on high-DPI screens, and apple-touch-icon for the iOS home screen. -->
+<link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link href="fonts/fonts.css" rel="stylesheet">
 <!-- Translation-display fonts stay on Google Fonts (not self-hosted): the
      pre-subset local copies broke shaping for some scripts (e.g. Farsi ی).
