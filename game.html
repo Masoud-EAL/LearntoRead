@@ -2518,8 +2518,19 @@ function emo(w){ return EMOJI[w]||EMOJI[(w||'').toLowerCase()]||''; }
    Game question: calm sparse loop, no stress.
    Last 5 seconds: soft heartbeat pulse only.
    Winner: fanfare then back to lobby. */
-let audioCtx=null,musicOn=true,musicType=null;
+let audioCtx=null,musicType=null;
+// The learner's mute choice, remembered across reloads. Storage can throw in
+// private browsing, and this runs before everything else, so it is guarded.
+let musicOn=true;
+try{ musicOn=localStorage.getItem('musicOn')!=='0'; }catch(e){}
 let oscNodes=[],musicTimeout=null;
+// Every stop bumps the generation. A loop schedules its next bar only while it
+// is still the current generation, so an abandoned loop can never keep running
+// underneath a new one — that is what put two copies of the groove on top of
+// each other, each at a different point in the bar.
+let musicGen=0;
+// Which looping track to bring back when the page becomes visible again.
+let musicResumeType=null;
 // True only once a looping track has actually scheduled sound on a running
 // context. musicType records the *desired* track immediately, but until the
 // AudioContext is unlocked by a gesture nothing plays — so we must not treat a
@@ -2529,8 +2540,19 @@ let musicStarted=false,pendingAudioStart=null;
 const MASTER_VOL=0.38;
 
 function getCtx(){
-  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-  if(audioCtx.state==='suspended') audioCtx.resume();
+  if(!audioCtx){
+    audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    /* iOS parks the context in 'interrupted' after a call or a screen lock, and
+       audio focus can be lost on Android without the page ever being hidden. When
+       the context comes back on its own, the track has to be rebuilt — its loop
+       was torn down on the way out. Deferred by a tick so that a resume() issued
+       from inside a start cannot re-enter and race the track that triggered it. */
+    audioCtx.addEventListener('statechange',()=>{
+      setTimeout(()=>{ if(audioCtx.state==='running'&&musicOn&&!musicStarted) restoreMusic(); },0);
+    });
+  }
+  // Anything that is not 'running' — 'suspended' or iOS's 'interrupted'.
+  if(audioCtx.state!=='running') audioCtx.resume().catch(()=>{});
   return audioCtx;
 }
 /* resume() is async, and a context can only leave the suspended state after a
@@ -2559,10 +2581,18 @@ function whenAudioRunning(cb){
 }
 function stopMusic(){
   cancelPendingAudioStart();
+  musicGen++;
   if(musicTimeout){clearTimeout(musicTimeout);musicTimeout=null;}
   oscNodes.forEach(n=>{try{n.stop();}catch(e){}});
   oscNodes=[];
   musicType=null; musicStarted=false;
+}
+/* Nodes live in oscNodes only so stopMusic() can silence them. A looping track
+   creates ~190 of them a bar, so without this a long session would drag a list
+   of thousands of finished oscillators through every stop. */
+function trackNode(n){
+  oscNodes.push(n);
+  n.onended=()=>{ const i=oscNodes.indexOf(n); if(i>=0) oscNodes.splice(i,1); };
 }
 function tone(ctx,freq,start,dur,vol,wave,pan){
   wave=wave||'sine'; pan=pan||0; vol=vol*MASTER_VOL;
@@ -2575,7 +2605,7 @@ function tone(ctx,freq,start,dur,vol,wave,pan){
   p.pan.value=pan;
   o.connect(g); g.connect(p); p.connect(ctx.destination);
   o.start(start); o.stop(start+dur+0.05);
-  oscNodes.push(o);
+  trackNode(o);
 }
 function chord(ctx,freqs,start,dur,vol,wave,pan){
   freqs.forEach(f=>tone(ctx,f,start,dur,vol/freqs.length,wave||'sine',pan||0));
@@ -2597,15 +2627,19 @@ function noiseBurst(ctx,start,dur,vol,filterFreq,filterQ,pan,atk){
   g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
   src.connect(flt); flt.connect(g); g.connect(p); p.connect(ctx.destination);
   src.start(start); src.stop(start+dur+0.06);
-  oscNodes.push(src);
+  trackNode(src);
 }
 
 /* LOBBY — upbeat 32-beat C-pentatonic groove */
 function playLobbyMusic(){
   if(!musicOn||(musicType==='lobby'&&musicStarted)) return;
   stopMusic(); musicType='lobby';
+  // Captured before the start is deferred: if anything stops or restarts the
+  // music while we are waiting for the context, this request is stale and must
+  // not start a second loop alongside the newer one.
+  const myGen=musicGen;
   whenAudioRunning(ctx=>{
-  if(musicType!=='lobby'||!musicOn) return;
+  if(myGen!==musicGen||!musicOn) return;
   musicStarted=true;
   const bpm=118,b=60/bpm,now=ctx.currentTime+0.05;
   const C3=130.8,F3=174.6,G3=196,A3=220;
@@ -2615,7 +2649,10 @@ function playLobbyMusic(){
   const chordHits=[[C4,E4,G4],[C4,E4,G4],[F3*2,A4,C5],[G4,E4,C4],[C4,E4,G4],[C4,E4,G4],[F3*2,A4,C5],[G4,D5,G5],[C4,E4,G4],[C4,E4,G4],[A3*2,C5,E5],[G4,D5,G5],[C4,E4,G4],[F3*2,A4,C5],[G4,D5,G5],[C4,E4,G4]];
   const melody=[C5,E5,G5,E5,C5,D5,E5,0,G5,E5,D5,C5,D5,0,C5,0,E5,G5,A5,G5,E5,D5,C5,0,D5,E5,G5,E5,C5,0,0,0];
   function scheduleLoop(startT){
-    if(musicType!=='lobby'||!musicOn) return;
+    if(myGen!==musicGen||!musicOn) return;
+    // A suspended context freezes currentTime while setTimeout keeps running,
+    // so scheduling here would pile whole bars onto the same frozen instant.
+    if(ctx.state!=='running'){ musicTimeout=setTimeout(()=>scheduleLoop(ctx.currentTime),500); return; }
     bassLine.forEach((f,i)=>{ if(f>0) tone(ctx,f,startT+i*b*0.5,b*0.42,0.18,'sine',-0.25); });
     chordHits.forEach((ch,i)=>chord(ctx,ch,startT+i*b*2,b*1.6,0.10,'triangle',0.2));
     for(let i=0;i<32;i++) tone(ctx,6000,startT+i*b,0.05,0.04,'square',0);
@@ -2631,8 +2668,9 @@ function playLobbyMusic(){
 function playGameMusic(){
   if(!musicOn||(musicType==='game'&&musicStarted)) return;
   stopMusic(); musicType='game';
+  const myGen=musicGen;
   whenAudioRunning(ctx=>{
-  if(musicType!=='game'||!musicOn) return;
+  if(myGen!==musicGen||!musicOn) return;
   musicStarted=true;
   const bpm=100,b=60/bpm,now=ctx.currentTime+0.05;
   const C3=130.8,F3=174.6,G3=196;
@@ -2641,7 +2679,8 @@ function playGameMusic(){
   const bassLine=[C3,0,G3,0,F3,0,G3,0,C3,0,G3,0,F3,0,G3,0];
   const chordHits=[[C4,E4,G4],[F3*2,C5,E5],[G4,587.3,G5],[C4,E4,G4]];
   function scheduleLoop(startT){
-    if(musicType!=='game'||!musicOn) return;
+    if(myGen!==musicGen||!musicOn) return;
+    if(ctx.state!=='running'){ musicTimeout=setTimeout(()=>scheduleLoop(ctx.currentTime),500); return; }
     bassLine.forEach((f,i)=>{ if(f>0) tone(ctx,f,startT+i*b,b*0.55,0.10,'sine',-0.2); });
     chordHits.forEach((ch,i)=>chord(ctx,ch,startT+i*b*4,b*3.4,0.06,'triangle',0.15));
     musicTimeout=setTimeout(()=>scheduleLoop(ctx.currentTime),(16*b-0.12)*1000);
@@ -2718,7 +2757,7 @@ function playCheer(rank){
     p.pan.value=Math.max(-1,Math.min(1,pan||0));
     o.connect(g);g.connect(p);p.connect(comp);
     o.start(start);o.stop(start+dur+0.05);
-    oscNodes.push(o);
+    trackNode(o);
   }
 
   function cNoise(start,dur,vol,ffreq,ftype,Q,pan,atk){
@@ -2741,7 +2780,7 @@ function playCheer(rank){
     g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
     src.connect(flt);flt.connect(g);g.connect(p);p.connect(comp);
     src.start(start);src.stop(start+dur+0.05);
-    oscNodes.push(src);
+    trackNode(src);
   }
 
   function crowd(t,dur,intensity,pan){
@@ -2796,7 +2835,7 @@ function playCheer(rank){
     car.connect(carG);carG.connect(pp);pp.connect(comp);
     mod.start(t);mod.stop(t+0.35);
     car.start(t);car.stop(t+0.35);
-    oscNodes.push(mod,car);
+    trackNode(mod);trackNode(car);
   }
 
   if(rank===3){
@@ -2914,7 +2953,7 @@ function playTileReturn(){
   const v=0.065*MASTER_VOL;
   g.gain.setValueAtTime(v,now); g.gain.exponentialRampToValueAtTime(0.0001,now+0.09);
   o.connect(g); g.connect(p); p.connect(ctx.destination);
-  o.start(now); o.stop(now+0.12); oscNodes.push(o);
+  o.start(now); o.stop(now+0.12); trackNode(o);
 }
 function playTileSwap(){
   if(!musicOn) return;
@@ -2950,8 +2989,10 @@ function playRevealTone(rank){
 }
 function toggleMusic(){
   musicOn=!musicOn;
+  // Remembered, so turning the music off stays off across screens and reloads.
+  try{ localStorage.setItem('musicOn',musicOn?'1':'0'); }catch(e){}
   document.getElementById('music-btn').textContent=musicOn?'🎵 Music: On':'🎵 Music: Off';
-  if(!musicOn){ stopMusic(); return; }
+  if(!musicOn){ musicResumeType=null; stopMusic(); return; }
   const s=document.querySelector('.screen.active');
   if(!s) return;
   if(s.id==='screen-teacher-lobby'||s.id==='screen-student-lobby') playLobbyMusic();
@@ -2984,6 +3025,47 @@ function unlockAudio(){
   if(s) startScreenMusic(s.id);
 }
 ['pointerdown','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,unlockAudio));
+
+/* Leaving the app suspends the AudioContext but not the page's timers. The
+   looping tracks reschedule themselves on a timer and anchor each bar to
+   ctx.currentTime — which is frozen while suspended — so every tick queued
+   another whole bar onto the same instant. Coming back played all of them at
+   once, and the still-armed timer then started a fresh bar part-way through
+   them: two grooves at different points in the rhythm. Tear the loop down on
+   the way out and rebuild it on the way back in. */
+function restoreMusic(){
+  if(!musicOn) return;
+  const t=musicResumeType; musicResumeType=null;
+  if(t==='lobby') playLobbyMusic();
+  else if(t==='game') playGameMusic();
+  else {
+    // Nothing remembered (audio lost without the page ever being hidden):
+    // fall back to whatever the screen on show is meant to be playing.
+    const s=document.querySelector('.screen.active');
+    if(s) startScreenMusic(s.id);
+  }
+}
+function suspendMusic(){
+  // Looping tracks come back as themselves. A celebration is one-shot and is
+  // not worth replaying, but both fanfare and cheer hand over to the lobby loop
+  // when they finish — so that is what a learner who steps away during one
+  // should come back to.
+  if(musicType==='lobby'||musicType==='game') musicResumeType=musicType;
+  else if(musicType==='winner'||musicType==='cheer1') musicResumeType='lobby';
+  stopMusic();
+  if(audioCtx) try{ audioCtx.suspend(); }catch(e){}
+}
+function handleAudioVisibility(){
+  if(document.visibilityState==='hidden') suspendMusic(); else restoreMusic();
+}
+document.addEventListener('visibilitychange',handleAudioVisibility);
+// pagehide can fire while visibilityState is still 'visible', so it goes
+// straight to the tear-down rather than through the visibility branch.
+window.addEventListener('pagehide',suspendMusic);
+// Coming back out of the back/forward cache does not always change visibility.
+window.addEventListener('pageshow',e=>{ if(e.persisted) restoreMusic(); });
+// musicOn is restored from localStorage, so the chip has to match it on load.
+if(!musicOn) document.getElementById('music-btn').textContent='🎵 Music: Off';
 function goHome(){ stopMusic(); cleanupListeners(); soloMode=false; document.getElementById('music-btn').style.display=''; document.getElementById('solo-back-btn').style.display='none'; showScreen('screen-home'); playLobbyMusic(); }
 function goStudentHome(){ document.getElementById('music-btn').style.display='none'; showScreen('screen-student-home'); }
 
@@ -3603,7 +3685,9 @@ function showHint(){
 /* SOLO PRACTICE */
 function initSolo(){
   soloMode=true; role='student';
-  document.getElementById('music-btn').style.display='none';
+  // Solo plays both the lobby loop and the game loop, so the learner keeps the
+  // Music On/Off chip — hiding it left them with no way to silence it.
+  document.getElementById('music-btn').style.display='';
   buildBank(); authReady.then(()=>loadCustomBanks());
   showScreen('screen-solo-setup');
   updateSoloCountDisplay();
