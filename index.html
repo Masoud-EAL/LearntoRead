@@ -498,14 +498,16 @@
   .practice-header-text h2 { font-family: 'Fredoka One', cursive; font-size: 1.4rem; line-height: 1; }
   .practice-header-text p { font-size: 0.82rem; font-weight: 600; opacity: 0.88; margin-top: 3px; }
 
-  .practice-body { max-width: 580px; margin: 0 auto; padding: 24px 16px 0; }
+  /* Wider than the phone-sized column it started as, so a sentence at the
+     bigger overlay size still gets few lines on a laptop. */
+  .practice-body { max-width: 760px; margin: 0 auto; padding: 24px 16px 0; }
 
   /* Step indicator */
   .practice-step-info {
     text-align: center; margin-bottom: 20px;
   }
   .practice-step-info .step-counter {
-    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    font-family: 'Fredoka One', cursive; font-size: clamp(0.95rem, 0.6vw + 0.65rem, 1.2rem);
     color: var(--mid); letter-spacing: 1px;
   }
   .practice-progress {
@@ -534,7 +536,7 @@
     color: var(--dark); letter-spacing: 2px; margin-bottom: 6px;
   }
   .practice-word-label {
-    font-size: 0.78rem; font-weight: 800; text-transform: uppercase;
+    font-size: clamp(0.78rem, 0.5vw + 0.6rem, 1rem); font-weight: 800; text-transform: uppercase;
     letter-spacing: 1.5px; color: var(--mid); margin-bottom: 20px;
   }
 
@@ -542,7 +544,7 @@
      Kept visually flat (no bordered pill / fill / shadow) so pre-literate users
      don't mistake it for one of the action buttons below it. */
   .phase-banner {
-    font-family: 'Fredoka One', cursive; font-size: 0.92rem;
+    font-family: 'Fredoka One', cursive; font-size: clamp(0.95rem, 0.7vw + 0.65rem, 1.25rem);
     display: inline-block; margin-bottom: 18px; letter-spacing: 0.5px;
     background: none; border: none; padding: 0;
   }
@@ -555,10 +557,10 @@
     display: flex; flex-direction: column; align-items: center; gap: 12px;
   }
   .example-label {
-    font-size: 0.82rem; font-weight: 700; color: var(--mid); text-align: center; line-height: 1.5;
+    font-size: clamp(0.85rem, 0.6vw + 0.62rem, 1.1rem); font-weight: 700; color: var(--mid); text-align: center; line-height: 1.5;
   }
   .listen-play-btn {
-    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    font-family: 'Fredoka One', cursive; font-size: clamp(1rem, 0.7vw + 0.7rem, 1.25rem);
     padding: 11px 28px; border-radius: 36px; border: none;
     background: linear-gradient(135deg, var(--accent2), #2d6cbf);
     color: white; cursor: pointer;
@@ -599,7 +601,7 @@
     70%  { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 20px rgba(255,26,26,0); }
     100% { box-shadow: 0 6px 0 rgba(150,0,0,0.4), 0 0 0 0 rgba(255,26,26,0); }
   }
-  .record-hint { font-size: 0.85rem; font-weight: 700; color: var(--mid); }
+  .record-hint { font-size: clamp(0.85rem, 0.6vw + 0.62rem, 1.1rem); font-weight: 700; color: var(--mid); }
 
   /* Playback + compare row */
   .compare-controls { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
@@ -607,7 +609,7 @@
   .playback-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
   .playback-btn {
-    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    font-family: 'Fredoka One', cursive; font-size: clamp(0.95rem, 0.7vw + 0.68rem, 1.2rem);
     padding: 10px 22px; border-radius: 36px; border: none;
     cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
     transition: all 0.15s;
@@ -689,6 +691,13 @@
   .sentence-level-page { display: none; }
   .sentence-level-page.active { display: block; }
 
+  /* The sentence and speaking lists used to run edge to edge, so on a desktop
+     a short sentence sat in a corner of a very wide white band. Hold them to a
+     reading width and centre them — the text below can then grow instead. */
+  #sent-level-0-groups, #sent-level-1-groups, #speaking-groups {
+    max-width: 880px; margin: 0 auto; padding: 0 16px;
+  }
+
   .sentence-group {
     background: white; border-radius: var(--radius);
     box-shadow: var(--shadow); border: 2px solid var(--light);
@@ -696,25 +705,29 @@
   }
   .sentence-group-header {
     background: linear-gradient(135deg, #f0f4ff, #e4eaff);
-    padding: 12px 18px; font-family: 'Fredoka One', cursive;
-    font-size: 1rem; color: var(--accent2);
+    padding: 14px 20px; font-family: 'Fredoka One', cursive;
+    font-size: clamp(1.05rem, 1vw + 0.7rem, 1.45rem); color: var(--accent2);
     border-bottom: 2px solid var(--light);
     display: flex; align-items: center; gap: 8px;
   }
   .sentence-row {
-    display: flex; align-items: center; gap: 10px;
-    padding: 11px 16px; border-bottom: 1px solid var(--light);
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px; border-bottom: 1px solid var(--light);
     transition: background 0.15s;
   }
   .sentence-row:last-child { border-bottom: none; }
   .sentence-row:hover { background: #f8faff; }
+  /* Reading size, not caption size: these lines are the thing being read, so
+     they scale with the viewport instead of staying at body text on a laptop. */
   .sentence-text {
-    flex: 1; font-size: 1rem; font-weight: 600; color: var(--dark); line-height: 1.4;
+    flex: 1; font-size: clamp(1.15rem, 1.5vw + 0.7rem, 1.75rem);
+    font-weight: 600; color: var(--dark); line-height: 1.45;
   }
   .sentence-play-btn {
     background: linear-gradient(135deg, var(--accent2), #2d6cbf);
-    border: none; border-radius: 50%; width: 36px; height: 36px;
-    color: white; font-size: 1rem; cursor: pointer; flex-shrink: 0;
+    border: none; border-radius: 50%;
+    width: clamp(44px, 3.4vw, 56px); height: clamp(44px, 3.4vw, 56px);
+    color: white; font-size: clamp(1.2rem, 1.2vw + 0.7rem, 1.6rem); cursor: pointer; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 2px 6px rgba(74,144,217,0.3); transition: all 0.15s;
   }
@@ -722,12 +735,12 @@
   .sentence-play-btn.speaking { animation: pulse 0.6s ease-in-out infinite alternate; }
 
   .convo-pattern-hint {
-    font-size: 0.85rem; font-weight: 600; color: var(--mid);
-    font-style: italic; margin-top: 3px;
+    font-size: clamp(1rem, 1vw + 0.6rem, 1.35rem); font-weight: 600; color: var(--mid);
+    font-style: italic; margin-top: 5px;
   }
   /* English answer in the main Speaking list: black and a little larger */
   #speaking-groups .convo-pattern-hint {
-    color: #000; font-size: 0.95rem;
+    color: #000; font-size: clamp(1.1rem, 1.4vw + 0.65rem, 1.6rem);
   }
 
   /* Speaking Practice overlay — model answer reveal */
@@ -737,16 +750,16 @@
     padding: 14px 18px; margin: 14px 0; text-align: center;
   }
   .convo-model-label {
-    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    font-family: 'Fredoka One', cursive; font-size: clamp(0.95rem, 0.8vw + 0.6rem, 1.2rem);
     color: #6a3ec7; margin-bottom: 6px;
   }
   .convo-model-text {
-    font-size: 1.1rem; font-weight: 700; color: var(--dark);
+    font-size: clamp(1.25rem, 1.6vw + 0.8rem, 1.9rem); font-weight: 700; color: var(--dark);
     line-height: 1.5; margin-bottom: 10px;
   }
 
   .sentence-level-intro {
-    padding: 14px 18px 0; font-size: 0.9rem; color: var(--mid);
+    padding: 14px 18px 0; font-size: clamp(0.95rem, 0.8vw + 0.62rem, 1.2rem); color: var(--mid);
     font-weight: 600; line-height: 1.6; text-align: center;
   }
 
@@ -857,9 +870,11 @@
   }
   .result-item .ri-play:hover { opacity: 1; }
 
-  /* Sentence mode in test overlay — smaller font, text wraps */
+  /* Sentence mode in the practice and test overlays — smaller than a single
+     word (it has to wrap) but still read-aloud size, and it grows on a wide
+     screen where there is room for it. */
   .test-sentence-mode {
-    font-size: 1.15rem !important; letter-spacing: 0 !important;
+    font-size: clamp(1.35rem, 2vw + 0.8rem, 2.2rem) !important; letter-spacing: 0 !important;
     line-height: 1.5 !important; word-break: normal !important;
   }
 
@@ -974,8 +989,8 @@
   }
   .spell-listen-btn:hover { transform: translateY(-1px); }
   .spell-listen-btn.speaking { opacity: 0.6; }
-  .sent-spelling-wrap .spell-input { font-size: 1.05rem; }
-  .sent-spelling-wrap .spell-diff  { font-size: 1rem; letter-spacing: 2px; }
+  .sent-spelling-wrap .spell-input { font-size: clamp(1.05rem, 1.2vw + 0.6rem, 1.45rem); }
+  .sent-spelling-wrap .spell-diff  { font-size: clamp(1rem, 1vw + 0.6rem, 1.3rem); letter-spacing: 2px; }
 
   /* ── TRANSLATION ── */
   .word-translation {
@@ -986,8 +1001,8 @@
   }
   .sentence-translation {
     font-family: 'Noto Sans Arabic','Noto Sans SC','Noto Sans Khmer','Noto Sans Myanmar','Noto Sans Devanagari','Noto Sans',sans-serif;
-    font-size: 0.9rem; color: var(--mid);
-    margin-top: 4px; line-height: 1.7;
+    font-size: clamp(1rem, 1.1vw + 0.6rem, 1.4rem); color: var(--mid);
+    margin-top: 5px; line-height: 1.7;
   }
   .lang-select {
     font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700;
