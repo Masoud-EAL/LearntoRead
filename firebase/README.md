@@ -10,8 +10,9 @@
 - **`rooms/$code`** — only the room's creator (`hostUid`, set once at
   creation and immutable) can update or delete it. Anyone signed in can still
   garbage-collect a room, but only a room that is *actually* stale by the
-  **server clock** (`now`, not a client-supplied timestamp) — 24h old, or
-  finished and 2h old — so a device with a wrong clock can't be tricked (or
+  **server clock** (`now`, not a client-supplied timestamp) — 24h old, or 2h
+  old and over (`status` of `finished`, i.e. the leaderboard was shown, or
+  `ended`, i.e. the teacher left) — so a device with a wrong clock can't be tricked (or
   used) into deleting someone else's live game. `createdAt` is validated to
   equal `now`, i.e. it must be written with `firebase.database.ServerValue.TIMESTAMP`.
   `players/$playerId` and `answers/$playerId` stay writable by any signed-in
@@ -36,6 +37,13 @@ deployed automatically. Apply them by either:
    ```
 2. **Console**: open the project's Realtime Database → Rules tab and paste
    the contents of `database.rules.json`.
+
+Either way the deploy **replaces the whole rule set** — it is not a merge. So
+before applying, read what is live (Console → Realtime Database → Rules) and
+check it against this file: anything edited straight into the console since the
+last deploy is reverted otherwise. `--only database` is what keeps the deploy
+off Hosting and everything else; never run a bare `firebase deploy` here.
+The Rules tab keeps a version history, so a bad deploy can be rolled back.
 
 Also enable **Anonymous** sign-in under Authentication → Sign-in method —
 `game.html` now calls `firebase.auth().signInAnonymously()` on load and
