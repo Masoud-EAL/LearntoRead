@@ -930,6 +930,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="spelling" class="q-type-tab" onclick="selectSoloType('spelling',this)">🗂️ All Spelling</button>
         <button data-type="unscramble" class="q-type-tab" onclick="selectSoloType('unscramble',this)">🎧 Listen and Unscramble</button>
         <button data-type="gramscramble" class="q-type-tab" onclick="selectSoloType('gramscramble',this)">🔀 Grammar Unscramble</button>
+        <button data-type="speaking" class="q-type-tab" onclick="selectSoloType('speaking',this)">🗣️ Speaking</button>
         <button data-type="translate" class="q-type-tab" onclick="selectSoloType('translate',this)">🌐 Translate</button>
         <button data-type="letter" class="q-type-tab" onclick="selectSoloType('letter',this)">🔤 Letter Names</button>
         <button data-type="lettersound" class="q-type-tab" onclick="selectSoloType('lettersound',this)">🔊 First Sounds</button>
@@ -1052,6 +1053,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
           <button data-type="spelling" class="q-type-tab" onclick="selectQType('spelling',this)">🗂️ All Spelling</button>
           <button data-type="unscramble" class="q-type-tab" onclick="selectQType('unscramble',this)">🎧 Listen and Unscramble</button>
           <button data-type="gramscramble" class="q-type-tab" onclick="selectQType('gramscramble',this)">🔀 Grammar Unscramble</button>
+          <button data-type="speaking" class="q-type-tab" onclick="selectQType('speaking',this)">🗣️ Speaking</button>
           <button data-type="translate" class="q-type-tab" onclick="selectQType('translate',this)">🌐 Translate</button>
           <button data-type="letter" class="q-type-tab" onclick="selectQType('letter',this)">🔤 Letter Names</button>
           <button data-type="lettersound" class="q-type-tab" onclick="selectQType('lettersound',this)">🔊 First Sounds</button>
@@ -1717,6 +1719,125 @@ const UNSCRAMBLE_SENTENCES=[
   'I want to help my children with school.',
 ];
 
+/* ══════════════ SPEAKING ══════════════
+   The Speaking Practice questions from the main app (index.html), turned into
+   a game bank. The question is spoken to the class and the learner taps word
+   tiles to build the answer — the same tile engine as Unscramble, but the
+   tiles are an *answer to a question*, not a sentence read aloud first.
+
+   The answers are David Johnson's, the same imaginary character the Speaking
+   Practice list and the sentence banks already use, so the details a learner
+   has to fill in — a name, an age, a suburb — are always his. Long model
+   answers are shortened here: a pre-level learner has one timed round to
+   place every tile, so anything past about eight tiles is a memory test
+   rather than a speaking one. Answers built from digit strings (phone
+   number, address, spelling a name out loud) are left out entirely —
+   they make tiles nobody can read. */
+const SPEAKING_QA=[
+  {icon:'👋',items:[
+    {q:'Hello! How are you?',a:"Hi, I'm good, thank you."},
+    {q:'How are you today?',a:"I'm fine, thanks."},
+    {q:'Nice to meet you.',a:'Nice to meet you too.'},
+  ]},
+  {icon:'👤',items:[
+    {q:'What is your name?',a:'My name is David.'},
+    {q:'What is your last name?',a:'My last name is Johnson.'},
+    {q:'What is your full name?',a:'My full name is David Johnson.'},
+  ]},
+  {icon:'🌏',items:[
+    {q:'How old are you?',a:'I am 30 years old.'},
+    {q:'When is your birthday?',a:'My birthday is on 15 June 1995.'},
+    {q:'Where are you from?',a:'I am from Vietnam.'},
+    {q:'What city are you from?',a:'I am from Ho Chi Minh City.'},
+    {q:'What language do you speak?',a:'I speak Vietnamese and a little English.'},
+    {q:'When did you come to Australia?',a:'I came to Australia in 2022.'},
+    {q:'Do you like Australia?',a:'Yes, I do. I like Australia.'},
+  ]},
+  {icon:'🏫',items:[
+    {q:"What's your teacher's name?",a:"My teacher's name is Sarah."},
+    {q:'When do you go to English class?',a:'I go to English class on Mondays.'},
+    {q:'What time does your class start?',a:"My class starts at 9 o'clock."},
+    {q:'What time does your class finish?',a:'My class finishes at 2:30.'},
+    {q:'How do you go to class?',a:'I take the bus to class.'},
+    {q:'Do you like your class?',a:'Yes, I do. I like my class.'},
+  ]},
+  {icon:'🏠',items:[
+    {q:'Where do you live?',a:'I live in Springvale.'},
+    {q:'Do you live in a house or a flat?',a:'I live in a house.'},
+    {q:'How many bedrooms does your house have?',a:'I live in a three-bedroom house.'},
+  ]},
+  {icon:'👨‍👩‍👧‍👦',items:[
+    {q:'Are you married?',a:'Yes, I am. I am married.'},
+    {q:'Do you have children?',a:'Yes, I do. I have two children.'},
+    {q:'How many children do you have?',a:'I have one son and one daughter.'},
+    {q:'How many people are there in your family?',a:'There are four people in my family.'},
+    {q:'How many brothers and sisters do you have?',a:'I have one brother and one sister.'},
+  ]},
+  {icon:'👩',items:[
+    {q:"What is your wife's name?",a:"My wife's name is Linh."},
+    {q:'How old is your wife?',a:'She is 28 years old.'},
+    {q:'Where is she from?',a:'She is from Vietnam too.'},
+    {q:'What does she like?',a:'She likes cooking and music.'},
+    {q:'Can she drive?',a:'Yes, she can. She can drive.'},
+  ]},
+  {icon:'📅',items:[
+    {q:'What day is today?',a:'Today is Monday.',dynamic:'day'},
+    {q:'What day is tomorrow?',a:'Tomorrow is Tuesday.',dynamic:'dayTomorrow'},
+    {q:'How is the weather today?',a:'The weather is sunny and warm.'},
+    {q:'What time is it?',a:"It's ten o'clock."},
+  ]},
+  {icon:'⏰',items:[
+    {q:'What time do you wake up?',a:"I wake up at 7 o'clock."},
+    {q:'What time do you eat breakfast?',a:'I eat breakfast at 7:30.'},
+    {q:'What time do you have lunch?',a:'I have lunch at 12:30.'},
+    {q:'What time do you cook dinner?',a:"I cook dinner at 6 o'clock."},
+    {q:'What time do you go to bed?',a:"I go to bed at 10 o'clock."},
+  ]},
+  {icon:'🌅',items:[
+    {q:'How was your weekend?',a:'It was good, thank you.'},
+    {q:'What did you do on Saturday?',a:'On Saturday, I stayed at home.'},
+    {q:'What did you do on Sunday?',a:'On Sunday, I visited my friend.'},
+  ]},
+  {icon:'❤️',items:[
+    {q:'What do you like?',a:'I like football, music, and cooking.'},
+    {q:'What is your favourite colour?',a:'My favourite colour is blue.'},
+    {q:'What is your favourite fruit?',a:'My favourite fruit is apple.'},
+    {q:'What is your favourite food?',a:'My favourite food is rice and chicken.'},
+    {q:'Do you like coffee or tea?',a:'I like tea.'},
+  ]},
+  {icon:'🎒',items:[
+    {q:'What do you have in your bag?',a:'I have a book in my bag.'},
+    {q:'What colour is your bag?',a:"It's black."},
+    {q:'What are you wearing today?',a:"I'm wearing a white t-shirt today."},
+    {q:'How much is the milk?',a:"It's three dollars."},
+  ]},
+  {icon:'✅',items:[
+    {q:'What can you do?',a:'I can drive and cook.'},
+    {q:'Can you drive?',a:'Yes, I can. I can drive.'},
+    {q:'Can you speak English?',a:'Yes, I can speak a little English.'},
+    {q:'Do you work?',a:"No, I don't. I'm a student."},
+  ]},
+];
+const SPEAKING_DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+/* "What day is today?" has to answer with today, or the class is being taught
+   something false. The two dated answers are filled in when the bank is built. */
+function speakingAnswer(item){
+  const now=new Date();
+  if(item.dynamic==='day') return 'Today is '+SPEAKING_DAYS[now.getDay()]+'.';
+  if(item.dynamic==='dayTomorrow') return 'Tomorrow is '+SPEAKING_DAYS[(now.getDay()+1)%7]+'.';
+  return item.a;
+}
+function genSpeakingQuestions(){
+  const out=[];
+  SPEAKING_QA.forEach(topic=>{
+    topic.items.forEach(item=>{
+      const a=speakingAnswer(item);
+      out.push({type:'speak',icon:topic.icon,question:item.q,answer:a,words:a.trim().split(/\s+/)});
+    });
+  });
+  return out;
+}
+
 const LEVEL0_SENTENCES=[
   {en:'My name is David.',fa:'اسم من دیوید است.',vi:'Tên tôi là David.',zh:'我叫大卫。',ar:'اسمي ديفيد.',hi:'मेरा नाम डेविड है।',ur:'میرا نام ڈیوڈ ہے۔',km:'ឈ្មោះខ្ញុំ ដេវីដ។',my:'ကျွန်ုပ်၏နာမည် ဒေးဗစ် ဖြစ်သည်။',th:'ฉันชื่อเดวิด'},
   {en:'My last name is Johnson.',fa:'نام خانوادگی من جانسون است.',vi:'Họ của tôi là Johnson.',zh:'我的姓是约翰逊。',ar:'اسم عائلتي جونسون.',hi:'मेरा सरनेम जॉनसन है।',ur:'میرا آخری نام جانسن ہے۔',km:'នាមត្រកូលរបស់ខ្ញុំគឺ Johnson។',my:'ကျွန်ုပ်၏ နောက်ဆုံးနာမည်မှာ Johnson ဖြစ်သည်',th:'นามสกุลของฉันคือจอห์นสัน'},
@@ -2287,7 +2408,7 @@ function genOddOneOut(count){
   return out;
 }
 
-let questionBank={'wp1:gap':[],'wp1:word':[],'wp1:build':[],'wp2:gap':[],'wp2:word':[],'wp2:build':[],beginner:[],elementary:[],questionwords:[],numbers:[],numbers1120:[],numbers2199:[],days:[],months:[],weather:[],fruits:[],body:[],clothes:[],custom:[],unscramble:[],gramscramble:[],translate:[],letter:[],lettersound:[],oddone:[],signs:[],sms:[],clock:[],shop:[],forms:[]};
+let questionBank={'wp1:gap':[],'wp1:word':[],'wp1:build':[],'wp2:gap':[],'wp2:word':[],'wp2:build':[],beginner:[],elementary:[],questionwords:[],numbers:[],numbers1120:[],numbers2199:[],days:[],months:[],weather:[],fruits:[],body:[],clothes:[],custom:[],unscramble:[],gramscramble:[],speaking:[],translate:[],letter:[],lettersound:[],oddone:[],signs:[],sms:[],clock:[],shop:[],forms:[]};
 let customBanks={};        // { bankId: { name, questions:[] } }
 let activeBankId=null;     // bank open in editor
 let selectedBankId=null;   // bank loaded for the game
@@ -2317,6 +2438,7 @@ function buildBank(){
   questionBank.clothes=SPELL_CLOTHES.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.unscramble=UNSCRAMBLE_SENTENCES.map(s=>({type:'unscramble',sentence:s,answer:s,words:s.trim().split(/\s+/)}));
   questionBank.gramscramble=UNSCRAMBLE_SENTENCES.map(s=>({type:'gramscramble',sentence:s,answer:s,words:s.trim().split(/\s+/)}));
+  questionBank.speaking=genSpeakingQuestions();
   questionBank.translate=LEVEL0_SENTENCES.map(s=>({type:'translate',en:s.en,answer:s.en,translations:{fa:s.fa,vi:s.vi,zh:s.zh,ar:s.ar,hi:s.hi,ur:s.ur,km:s.km,my:s.my,th:s.th}}));
   // Signs and SMS are plain 4-option MC, so the existing runtime renders and
   // scores them with no branching. noListen keeps them a reading task —
@@ -2369,6 +2491,7 @@ function poolFor(type){
   if(type==='custom') return [...questionBank.custom];
   if(type==='unscramble') return [...questionBank.unscramble];
   if(type==='gramscramble') return [...questionBank.gramscramble];
+  if(type==='speaking') return [...questionBank.speaking];
   if(type==='translate') return [...questionBank.translate];
   if(type==='letter') return [...questionBank.letter];
   if(type==='lettersound') return [...questionBank.lettersound];
@@ -2450,6 +2573,7 @@ function attachMcChoices(questions,type){
   questions.forEach(q=>{
     if(mcSupported(q)) q.choices=buildChoices(q,sourceWords);
     else if(q.type==='unscramble'||q.type==='gramscramble') q.choices=buildOrderChoices(q);
+    else if(q.type==='speak') q.choices=buildAnswerChoices(q);
     else if(q.type==='translate') q.choices=buildSentenceChoices(q);
   });
   return questions;
@@ -2476,6 +2600,15 @@ function buildOrderChoices(q){
   if(prompt===correct&&words.length>1) prompt=shuffle([...words]).join(' ');
   q.promptText=prompt;
   return shuffle([correct,...wrong]);
+}
+/* Speaking as MC: hear the question, pick the sentence that answers it. The
+   distractors are other real answers from the bank rather than scrambles of
+   the right one — the task is choosing what answers the question, so a wrong
+   option has to be a sentence that could be said, just not to this question. */
+function buildAnswerChoices(q){
+  const correct=q.answer;
+  const pool=shuffle([...new Set(poolFor('speaking').map(x=>x.answer))].filter(a=>a!==correct));
+  return shuffle([correct,...pool.slice(0,3)]);
 }
 /* Translate as MC: show the native-language sentence, pick the English one. */
 function buildSentenceChoices(q){
@@ -3330,21 +3463,22 @@ function playQuestion(){
   document.getElementById('game-prog').textContent='Question '+(currentQIdx+1)+' of '+total;
   const isMcQ=Array.isArray(q.choices)&&q.choices.length>0;
   const noAudio=q.type==='gramscramble'||q.type==='translate'||q.type==='mc';
-  document.getElementById('q-badge').textContent=q.qword?'QUESTION WORD':q.type==='sentence'?'SENTENCE':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='lettersound'?'FIRST SOUND':q.type==='oddone'?'ODD ONE OUT':q.type==='phgap'?'MISSING SOUND':q.type==='phword'?'DECODE':q.type==='phbuild'?'BUILD THE WORD':q.type==='mc'?'MULTIPLE CHOICE':q.type==='clockset'?'CLOCK':q.type==='shop'?'MONEY':q.type==='form'?'FORM':'WORD';
-  document.getElementById('q-hint').textContent=q.type==='phgap'?'Students hear the sounds and tap the missing one':q.type==='phword'?'Students hear the sounds and tap the word':q.type==='phbuild'?'Students put the sounds in order to build the word':q.type==='oddone'?'Students tap the picture that is different':q.type==='clockset'?'Students drag the clock hands to this time':q.type==='shop'?'Students tap coins to make this amount':q.type==='form'?'Students put each answer in the right box':q.type==='mc'?'Students tap the correct answer':(q.type==='unscramble'||q.type==='gramscramble')?(isMcQ?(q.type==='unscramble'?'Students listen and tap the sentence in the right order':'Students tap the sentence in the right order'):'Students arrange word tiles'):q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='translate'?'Students type the English sentence':'';
+  document.getElementById('q-badge').textContent=q.qword?'QUESTION WORD':q.type==='sentence'?'SENTENCE':q.type==='speak'?'SPEAKING':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='lettersound'?'FIRST SOUND':q.type==='oddone'?'ODD ONE OUT':q.type==='phgap'?'MISSING SOUND':q.type==='phword'?'DECODE':q.type==='phbuild'?'BUILD THE WORD':q.type==='mc'?'MULTIPLE CHOICE':q.type==='clockset'?'CLOCK':q.type==='shop'?'MONEY':q.type==='form'?'FORM':'WORD';
+  document.getElementById('q-hint').textContent=q.type==='speak'?(isMcQ?'Students hear the question and tap the answer':'Students hear the question and build their answer with word tiles'):q.type==='phgap'?'Students hear the sounds and tap the missing one':q.type==='phword'?'Students hear the sounds and tap the word':q.type==='phbuild'?'Students put the sounds in order to build the word':q.type==='oddone'?'Students tap the picture that is different':q.type==='clockset'?'Students drag the clock hands to this time':q.type==='shop'?'Students tap coins to make this amount':q.type==='form'?'Students put each answer in the right box':q.type==='mc'?'Students tap the correct answer':(q.type==='unscramble'||q.type==='gramscramble')?(isMcQ?(q.type==='unscramble'?'Students listen and tap the sentence in the right order':'Students tap the sentence in the right order'):'Students arrange word tiles'):q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='translate'?'Students type the English sentence':'';
   document.getElementById('ans-bars').innerHTML='';
   document.getElementById('reveal-btn').style.display='';
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('end-now-btn').style.display='';
   document.getElementById('q-emoji').innerHTML=q.icon||(q.type==='word'?emo(q.word):q.type==='letter'?q.letter:'');
-  document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':q.type==='phgap'?('🔤 '+q.family+' — which sound is missing?'):q.type==='phword'?('🔊 '+q.family+' — students tap the word'):q.type==='phbuild'?('🔤 '+q.family+' — students build "'+q.word+'"'):(q.type==='clockset'||q.type==='shop'||q.type==='form')?q.question:'🔊 Listen and spell the word';
+  document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='speak'?('🗣️ '+q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':q.type==='phgap'?('🔤 '+q.family+' — which sound is missing?'):q.type==='phword'?('🔊 '+q.family+' — students tap the word'):q.type==='phbuild'?('🔤 '+q.family+' — students build "'+q.word+'"'):(q.type==='clockset'||q.type==='shop'||q.type==='form')?q.question:'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=(noAudio||q.noListen)?'none':'';
   renderTeacherOptions(q,false);
-  // Resolve this question's time budget once (translate questions get double)
+  // Resolve this question's time budget once (translate and speaking rounds,
+  // which ask for a whole sentence back, get double)
   // and broadcast it so every student counts down for exactly the amount of
   // time the teacher set — not a hardcoded default.
-  currentTimerDuration=q.type==='translate'?teacherTimerDuration*2:teacherTimerDuration;
+  currentTimerDuration=(q.type==='translate'||q.type==='speak')?teacherTimerDuration*2:teacherTimerDuration;
   roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:firebase.database.ServerValue.TIMESTAMP,questionDuration:currentTimerDuration,revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
   showScreen('screen-teacher-game');
@@ -3364,7 +3498,7 @@ function teacherSpeak(){
   // it from sticking in the active state with nothing to hear.
   if(q.type==='form') return;
   btn.classList.add('playing');
-  const spokenText=q.type==='letter'?q.letter:q.type==='oddone'?'Tap the one that does not belong.':q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.type==='clockset'?('Set the clock to '+q.words):q.type==='shop'?moneySpeech(q.question):q.word;
+  const spokenText=q.type==='letter'?q.letter:q.type==='oddone'?'Tap the one that does not belong.':q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.type==='speak'?q.question:q.type==='clockset'?('Set the clock to '+q.words):q.type==='shop'?moneySpeech(q.question):q.word;
   const utt=new SpeechSynthesisUtterance(spokenText);
   utt.rate=0.7; utt.lang='en-AU';
   if(typeof applyVoice==='function') applyVoice(utt);
@@ -3522,7 +3656,7 @@ function revealAnswers(){
   const revealSentence=q.type==='sentence'?q.sentence.replace('___',q.blank):'';
   document.getElementById('q-text').innerHTML=q.type==='gramscramble'
     ?`<div class="q-hint" style="font-size:1rem;color:var(--green)">✅ Answer revealed to students</div>`
-    :q.type==='unscramble'
+    :(q.type==='unscramble'||q.type==='speak')
     ?`<div class="reveal-word" style="font-size:clamp(1rem,3.5vw,1.6rem);line-height:1.4">${revealWord}</div>`
     :q.type==='translate'
     ?`<div class="reveal-word" style="font-size:clamp(.85rem,2.8vw,1.3rem);line-height:1.5">${revealWord}</div>`
@@ -3535,6 +3669,9 @@ function revealAnswers(){
   document.getElementById('finish-btn').style.display=isLast?'':'none';
   document.getElementById('end-now-btn').style.display=isLast?'none':'';
   playCorrectJingle();
+  // A speaking round ends with the class hearing the model answer, so they can
+  // say it back together. It waits for the jingle rather than talking over it.
+  if(q.type==='speak') setTimeout(()=>speakTTS(q.answer),1200);
 }
 
 function nextQuestion(){
@@ -3885,13 +4022,14 @@ const BANK_SECTIONS=[
   {id:'*',          label:'✨ All games',        banks:null},
   {id:'letters',    label:'🔤 Letters & Sounds', banks:[...PHONICS_TYPES,'letter','lettersound','elementary']},
   {id:'vocab',      label:'📚 Vocabulary',       banks:['days','months','weather','fruits','body','clothes','spelling','oddone','translate']},
-  {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','lettersound','unscramble','clock']},
+  {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','lettersound','unscramble','speaking','clock']},
+  {id:'speaking',   label:'🗣️ Speaking',         banks:['speaking','questionwords','unscramble']},
   {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary']},
   {id:'writing',    label:'✍️ Writing',          banks:['wp1:gap','wp1:build','wp2:gap','wp2:build','days','months','weather','fruits','body','clothes','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary']},
   {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble']},
   {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target']},
   {id:'translation',label:'🌐 Translation',      banks:['translate']},
-  {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','sms','clock','shop','forms','beginner','unscramble','gramscramble','translate']},
+  {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','sms','clock','shop','forms','beginner','unscramble','gramscramble','speaking','translate']},
 ];
 /* "All" and "Custom" are not a skill — they stay visible under every chip. */
 const SECTION_ALWAYS=['all','custom'];
@@ -3905,6 +4043,7 @@ const SECTION_DEFAULTS={
   letters:      {type:'letter',       mc:true},
   vocab:        {type:'clothes',      mc:true},
   listening:    {type:'unscramble',   mc:false},
+  speaking:     {type:'speaking',     mc:false},
   reading:      {type:'sms',          mc:true},
   writing:      {type:'spelling',     mc:false},
   grammar:      {type:'gramscramble', mc:false},
@@ -4070,7 +4209,7 @@ function showStudentQuestion(q,startedAt,dur){
   document.getElementById('student-ans-input').value='';
   document.getElementById('submitted-msg').textContent='';
   const isMc=Array.isArray(q.choices)&&q.choices.length>0;
-  const isTile=!isMc&&(q.type==='unscramble'||q.type==='gramscramble'||q.type==='phbuild');
+  const isTile=!isMc&&(q.type==='unscramble'||q.type==='gramscramble'||q.type==='speak'||q.type==='phbuild');
   const isTranslate=!isMc&&q.type==='translate';
   // Widget rounds: each owns its own answer surface and writes the answer
   // into the hidden input, so submitAnswer() needs no branch for them.
@@ -4111,13 +4250,14 @@ function showStudentQuestion(q,startedAt,dur){
       q.type==='phgap'?'LISTEN — TAP THE MISSING SOUND':
       q.type==='phword'?'LISTEN TO THE SOUNDS — TAP THE WORD':
       q.type==='translate'?'TAP THE ENGLISH SENTENCE':
+      q.type==='speak'?'LISTEN — TAP THE ANSWER TO THE QUESTION':
       q.type==='unscramble'?'LISTEN — TAP THE SENTENCE IN THE RIGHT ORDER':
       q.type==='gramscramble'?'TAP THE SENTENCE IN THE RIGHT ORDER':
       'LISTEN — TAP THE PICTURE'):
     isClock?'CLOCK — drag the hands to the right time':
     isShop?(q.mode==='change'?'MONEY — tap coins to make your change':'MONEY — tap coins to pay the right amount'):
     isForm?'FORM — put each answer in the right box':
-    isTile?(q.type==='gramscramble'?'GRAMMAR — arrange words in order':q.type==='phbuild'?'BUILD THE WORD — put the sounds in order':'UNSCRAMBLE — arrange the word tiles'):
+    isTile?(q.type==='gramscramble'?'GRAMMAR — arrange words in order':q.type==='phbuild'?'BUILD THE WORD — put the sounds in order':q.type==='speak'?'SPEAKING — listen, then build your answer':'UNSCRAMBLE — arrange the word tiles'):
     isTranslate?'TRANSLATE — type the English sentence':
     q.type==='sentence'?'SENTENCE — type the missing word':'WORD — listen and spell it';
   // For a picture round, don't show the answer's own picture as the prompt.
@@ -4138,6 +4278,7 @@ function showStudentQuestion(q,startedAt,dur){
     else if(q.type==='phword') mcPrompt='🔊 '+q.family+' — listen, then tap the word';
     else if(q.type==='lettersound') mcPrompt='🔊 Listen to the sound';
     else if(q.type==='gramscramble') mcPrompt='Which sentence is correct?';
+    else if(q.type==='speak') mcPrompt=q.question;
     else if(q.type==='unscramble') mcPrompt='🔊 Listen, then tap the sentence in the right order';
     else if(q.type==='translate'){
       mcLang=localStorage.getItem('translateLang')||'vi';
@@ -4158,9 +4299,12 @@ function showStudentQuestion(q,startedAt,dur){
     const words=Array.isArray(q.words)?q.words:Object.values(q.words||{});
     // The same engine builds words out of sounds and sentences out of words.
     const isWord=q.type==='phbuild';
-    document.getElementById('unscrm-label-answer').textContent=isWord?'Your word':'Your sentence';
+    const isAnswer=q.type==='speak';
+    document.getElementById('unscrm-label-answer').textContent=isWord?'Your word':isAnswer?'Your answer':'Your sentence';
     document.getElementById('unscrm-label-bank').textContent=
-      isWord?'Tap (or drag) the sounds to build the word':'Tap (or drag) words to build your sentence';
+      isWord?'Tap (or drag) the sounds to build the word'
+      :isAnswer?'Tap (or drag) words to answer the question'
+      :'Tap (or drag) words to build your sentence';
     renderUnscrambleTiles(words);
   }
   // Lets the stylesheet adapt per game without :has() (patchy on older Android).
@@ -4174,7 +4318,9 @@ function showStudentQuestion(q,startedAt,dur){
   showScreen('screen-student-answer');
   // Use the teacher-set budget broadcast with the question; fall back to the
   // local default (solo play, or an older host that didn't send one).
-  const timerDur=dur||(q.type==='translate'?60:TIMER_DURATION);
+  // A spoken question plus a whole answer to build needs the same room to
+  // work as a translation, so it gets the same doubled budget (see playQuestion).
+  const timerDur=dur||((q.type==='translate'||q.type==='speak')?60:TIMER_DURATION);
   studentSpeak(q); startStudentTimer(startedAt, timerDur);
 }
 
@@ -4501,7 +4647,9 @@ function studentSpeak(q){
   if(Q.type==='shop'){ speakTTS(moneySpeech(Q.question)); return; }
   if(Q.type==='form') return;
   if(Q.type==='clockset'){ speakTTS('Set the clock to '+Q.words); return; }
-  const text=Q.type==='sentence'?Q.sentence.replace('___',Q.blank):Q.type==='unscramble'?Q.sentence:Q.word;
+  // Speaking asks the question out loud — that is the whole prompt. The answer
+  // is what the learner is building, so it is never spoken here.
+  const text=Q.type==='sentence'?Q.sentence.replace('___',Q.blank):Q.type==='unscramble'?Q.sentence:Q.type==='speak'?Q.question:Q.word;
   if(!text) return;
   speakTTS(text);
 }
@@ -4542,7 +4690,7 @@ function submitAnswer(auto){
   if(!auto) playSubmitSound();
   const elapsed=parseInt(document.getElementById('student-timer').textContent)||0;
   let ans;
-  const tileMode=currentStudentQ&&(currentStudentQ.type==='unscramble'||currentStudentQ.type==='gramscramble'||currentStudentQ.type==='phbuild')
+  const tileMode=currentStudentQ&&(currentStudentQ.type==='unscramble'||currentStudentQ.type==='gramscramble'||currentStudentQ.type==='speak'||currentStudentQ.type==='phbuild')
     &&!(Array.isArray(currentStudentQ.choices)&&currentStudentQ.choices.length);
   if(tileMode){
     ans=Array.from(document.querySelectorAll('#answer-area .word-tile')).map(t=>t.dataset.word).join(' ');
