@@ -2768,6 +2768,8 @@ let answered=false,revealed=false;
 let myScore=0,myLastQIdx=-1;
 let answerListener=null,gameListener=null;
 const TIMER_DURATION=30;
+// Shop rounds need longer: the answer is built coin by coin, not typed once.
+const SHOP_TIMER_DURATION=60;
 let totalPlayers=0;
 let soloMode=false,soloQuestions=[],soloQIdx=0,soloSelectedType='beginner';
 let hintLevel=0;
@@ -3728,10 +3730,12 @@ function playQuestion(){
   document.getElementById('hear-btn').style.display=(noAudio||q.noListen)?'none':'';
   renderTeacherOptions(q,false);
   // Resolve this question's time budget once (translate and speaking rounds,
-  // which ask for a whole sentence back, get double)
+  // which ask for a whole sentence back, get double; shop rounds, where coins
+  // are tapped one at a time to build an amount, get at least 60s)
   // and broadcast it so every student counts down for exactly the amount of
   // time the teacher set — not a hardcoded default.
-  currentTimerDuration=(q.type==='translate'||q.type==='speak')?teacherTimerDuration*2:teacherTimerDuration;
+  currentTimerDuration=(q.type==='translate'||q.type==='speak')?teacherTimerDuration*2
+    :q.type==='shop'?Math.max(SHOP_TIMER_DURATION,teacherTimerDuration):teacherTimerDuration;
   roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:firebase.database.ServerValue.TIMESTAMP,questionDuration:currentTimerDuration,revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
   showScreen('screen-teacher-game');
@@ -4829,7 +4833,8 @@ function showStudentQuestion(q,startedAt,dur){
   // local default (solo play, or an older host that didn't send one).
   // A spoken question plus a whole answer to build needs the same room to
   // work as a translation, so it gets the same doubled budget (see playQuestion).
-  const timerDur=dur||((q.type==='translate'||q.type==='speak')?60:TIMER_DURATION);
+  const timerDur=dur||((q.type==='translate'||q.type==='speak')?60
+    :q.type==='shop'?SHOP_TIMER_DURATION:TIMER_DURATION);
   studentSpeak(q); startStudentTimer(startedAt, timerDur);
 }
 
