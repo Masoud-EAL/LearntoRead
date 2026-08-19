@@ -1,10 +1,11 @@
-const CACHE = 'learntoread-v34';
+const CACHE = 'learntoread-v35';
 
 // Core files — must all succeed or install fails
 const CORE = [
   './',
   './index.html',
   './game.html',
+  './solo.html',
   './tracing.html',
   './about.html',
   './404.html',
