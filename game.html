@@ -329,7 +329,7 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 .podium-place .medal{font-size:1.6rem;}
 .podium-place .pname{font-size:.85rem;margin:4px 0;word-break:break-all;}
 .podium-place .pscore{font-size:1.1rem;}
-.lb-list{width:100%;max-width:480px;display:flex;flex-direction:column;gap:8px;}
+.lb-list{width:100%;max-width:480px;max-height:320px;display:flex;flex-direction:column;gap:8px;}
 .lb-row{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:10px;padding:10px 16px;border:1px solid rgba(255,255,255,.07);}
 .lb-rank{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--muted);width:28px;}
 .lb-name{font-weight:700;flex:1;}
@@ -600,12 +600,95 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:12px 24px;font-weight:700;font-size:.9rem;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .3s;z-index:999;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
-@keyframes revealPop{0%{transform:scale(0) translateY(20px);opacity:0;}70%{transform:scale(1.12);opacity:1;}100%{transform:scale(1) translateY(0);opacity:1;}}
-.reveal-pop{animation:revealPop .55s cubic-bezier(.34,1.56,.64,1) both;}
-@keyframes podiumDrop{0%{transform:scale(0) translateY(-30px);opacity:0;}70%{transform:scale(1.08);opacity:1;}100%{transform:scale(1) translateY(0);opacity:1;}}
-.podium-place{animation:podiumDrop .6s cubic-bezier(.34,1.56,.64,1) both;}
 .lb-row.dimmed{opacity:.28;}
 .lb-row.winner-row{background:rgba(255,215,0,.13);border:1.5px solid rgba(255,215,0,.4);border-radius:10px;}
+
+/* ── FINAL REVEAL ──
+   The final board is read off a projector from the back of a classroom, so it
+   runs wider, taller and bigger than the mid-game standings — a whole class has
+   to find its own name on it without anyone scrolling. The `final-board` class
+   is set only for a final board, which leaves the standings and the two solo
+   result cards at the compact size they were designed for. */
+#screen-leaderboard.final-board .lb-list{gap:10px;width:min(720px,94vw);max-width:none;max-height:min(56vh,640px);}
+#screen-leaderboard.final-board .lb-row{padding:14px 20px;gap:16px;}
+#screen-leaderboard.final-board .lb-rank{font-size:clamp(1.3rem,3.4vw,2.1rem);width:clamp(34px,5vw,52px);color:var(--gold);}
+#screen-leaderboard.final-board .lb-name{font-size:clamp(1.05rem,2.9vw,1.8rem);}
+#screen-leaderboard.final-board .lb-score{font-size:clamp(1.05rem,2.9vw,1.8rem);}
+#screen-leaderboard.final-board .lb-row.dimmed{padding:9px 20px;}
+#screen-leaderboard.final-board .lb-row.dimmed .lb-rank,#screen-leaderboard.final-board .lb-row.dimmed .lb-name,#screen-leaderboard.final-board .lb-row.dimmed .lb-score{font-size:1rem;}
+/* The podium grows with the board, and the winner's block stands clearly taller
+   than the other two rather than merely a little. */
+#screen-leaderboard.final-board .podium{width:min(660px,94vw);max-width:none;}
+#screen-leaderboard.final-board .podium-place.p1{min-height:min(20vh,180px);}
+#screen-leaderboard.final-board .podium-place.p2{min-height:min(15vh,135px);}
+#screen-leaderboard.final-board .podium-place.p3{min-height:min(12vh,108px);}
+#screen-leaderboard.final-board .podium-place .medal{font-size:clamp(1.8rem,3.2vw,2.8rem);}
+#screen-leaderboard.final-board .podium-place .pname{font-size:clamp(.9rem,1.8vw,1.4rem);}
+#screen-leaderboard.final-board .podium-place .pscore{font-size:clamp(1.1rem,2.2vw,1.7rem);}
+
+/* The row arrives oversized and bright, then settles — a landing rather than
+   a fade, so it reads as an event from the back of a room. */
+@keyframes revealSlam{0%{transform:scale(1.45);opacity:0;filter:brightness(2.2);}
+  45%{opacity:1;filter:brightness(1.35);}
+  72%{transform:scale(.965);}
+  100%{transform:scale(1);opacity:1;filter:brightness(1);}}
+.reveal-slam{animation:revealSlam .5s cubic-bezier(.22,1.2,.36,1) both;}
+/* Ranks 6+ are context, not news: they fade rather than land. */
+@keyframes dimFade{0%{opacity:0;transform:translateY(8px);}100%{opacity:.28;transform:none;}}
+.lb-row.dimmed.dim-in{animation:dimFade .45s ease-out both;}
+
+/* The winner keeps a permanent gold presence, and a light sweeps across it
+   once as it lands. */
+#screen-leaderboard.final-board .lb-row.winner-row{background:linear-gradient(90deg,rgba(245,166,35,.22),rgba(245,166,35,.10));
+  border:2px solid rgba(245,166,35,.65);box-shadow:0 0 34px rgba(245,166,35,.42);position:relative;overflow:hidden;}
+#screen-leaderboard.final-board .lb-row.winner-row .lb-rank,#screen-leaderboard.final-board .lb-row.winner-row .lb-name{color:#ffd76a;}
+.lb-row.winner-row::after{content:'';position:absolute;top:0;bottom:0;width:45%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.30),transparent);
+  transform:translateX(-160%);animation:goldSpotlight 2.4s ease-out .15s 1 both;pointer-events:none;}
+@keyframes goldSpotlight{0%{transform:translateX(-160%);}100%{transform:translateX(360%);}}
+
+/* Podium blocks rise from the floor rather than dropping from above, so a
+   staggered set reads as three separate arrivals. --pr-delay defaults to 0s,
+   which is what keeps the solo result cards — they write .podium-place
+   straight into #podium — landing immediately as before. */
+@keyframes podiumRise{0%{transform:translateY(60%) scaleY(.55);opacity:0;}
+  62%{transform:translateY(-6%) scaleY(1.06);opacity:1;}
+  100%{transform:translateY(0) scaleY(1);opacity:1;}}
+.podium-place{transform-origin:bottom center;animation:podiumRise .62s cubic-bezier(.34,1.56,.64,1) var(--pr-delay,0s) both;}
+.podium-place.p1{box-shadow:0 0 30px rgba(245,166,35,.5);}
+
+/* Confetti sits over the board but under the fixed music/back chips (z 100). */
+#confettiCanvas{position:fixed;inset:0;z-index:49;pointer-events:none;display:none;}
+
+/* The teacher's escape hatch while the reveal is running. Deliberately quiet:
+   it is for cutting a ceremony short, not a thing to reach for. */
+#lb-skip{position:fixed;right:14px;bottom:14px;z-index:100;background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:8px 16px;font-size:.82rem;
+  color:var(--muted);cursor:pointer;display:none;font-family:'Nunito',sans-serif;font-weight:700;}
+#lb-skip:hover{background:rgba(255,255,255,.14);color:var(--text);}
+
+/* ── STUDENT: waiting for their placing, then the placing itself ──
+   Minimal words: the ordinal carries the message and the icon carries the
+   wait. Both are sized for a phone held at arm's length. */
+/* Waiting and placing are each a single message, so they sit in the middle of
+   the phone rather than stranded under a heading. */
+#screen-leaderboard.stage-solo>div{flex:1;justify-content:center;}
+#lb-hold{flex-direction:column;align-items:center;gap:14px;padding:30px 0;}
+.hold-dot{font-size:3.4rem;animation:blobPulse 1.6s ease-in-out infinite;}
+.hold-msg{font-family:'Fredoka One',cursive;font-size:1.15rem;color:var(--teal);text-align:center;}
+#lb-placing{flex-direction:column;align-items:center;gap:6px;padding:18px 0;}
+.placing-ord{font-family:'Fredoka One',cursive;font-size:clamp(3.2rem,20vw,6.5rem);line-height:1;color:var(--gold);
+  text-shadow:0 0 34px rgba(245,166,35,.55);}
+.placing-line{font-family:'Fredoka One',cursive;font-size:clamp(1.1rem,5vw,1.5rem);text-align:center;}
+.placing-score{font-family:'Fredoka One',cursive;font-size:1.2rem;color:var(--gold);}
+
+/* Reduced motion keeps every reveal — nothing is animation-only — but takes
+   the movement out of it. The confetti already opts itself out. */
+@media (prefers-reduced-motion:reduce){
+  .reveal-slam,.lb-row.dimmed.dim-in,.podium-place,.placing-ord{animation:none;}
+  .lb-row.winner-row::after{animation:none;display:none;}
+  .hold-dot{animation:none;}
+}
 
 /* UNSCRAMBLE TILES */
 .unscramble-section{width:100%;max-width:520px;flex-direction:column;gap:clamp(6px,1.4vh,12px);}
@@ -843,6 +926,9 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 </style>
 </head>
 <body>
+<canvas id="confettiCanvas"></canvas>
+<!-- Only the teacher sees this, and only while a final reveal is running. -->
+<button id="lb-skip" onclick="skipReveal()">Skip ▶</button>
 <button class="music-btn" id="music-btn" onclick="toggleMusic()">🎵 Music: On</button>
 <a href="index.html" class="back-btn">← WordLink</a>
 
@@ -1166,8 +1252,20 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 <div class="screen" id="screen-leaderboard">
   <div style="padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:18px;">
     <div class="lb-title" id="lb-title">🏆 Final Leaderboard</div>
+    <!-- A student holds here while the projector counts down, then sees their
+         own placing. Both sit above the board so the phone shows the personal
+         answer first and the full list only afterwards. -->
+    <div id="lb-hold" style="display:none;">
+      <div class="hold-dot">⏳</div>
+      <div class="hold-msg">Results coming…</div>
+    </div>
+    <div id="lb-placing" style="display:none;">
+      <div class="placing-ord" id="placing-ord"></div>
+      <div class="placing-line" id="placing-line"></div>
+      <div class="placing-score" id="placing-score"></div>
+    </div>
     <div class="podium" id="podium"></div>
-    <div class="lb-list scrollable" id="lb-list" style="max-height:320px;"></div>
+    <div class="lb-list scrollable" id="lb-list"></div>
     <div id="lb-controls-final" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:4px;">
       <button class="btn btn-teal" id="play-again-btn" onclick="playAgain()">🔄 Play Again</button>
       <button class="btn btn-ghost" id="home-btn" onclick="goHome()">🏠 Home</button>
@@ -2920,23 +3018,123 @@ function playWinnerFanfare(){
   for(let i=0;i<9;i++) noiseBurst(ctx,cs+i*0.38,0.085,0.42,1380,1.4,i%2?0.35:-0.35);
   musicTimeout=setTimeout(()=>{ musicType=null; playLobbyMusic(); },(p2+2.1-now)*1000);
 }
+/* The roll fills a held gap, so it has to grow rather than just repeat: the
+   hits accelerate and get louder, a sub swells underneath, and a riser climbs
+   over the top. All three land together on the reveal. */
 function playDrumroll(duration){
   if(!musicOn) return;
   const ctx=getCtx(),now=ctx.currentTime+0.02;
   let t=0,interval=1/7;
   while(t<duration){
-    noiseBurst(ctx,now+t,0.04,0.20,1800,2.5,0);
-    interval=Math.max(1/20,interval*0.87); t+=interval;
+    const grow=0.14+0.30*(t/duration);
+    noiseBurst(ctx,now+t,0.045,grow,1800,2.5,0);
+    noiseBurst(ctx,now+t,0.030,grow*0.5,420,1.2,0);
+    interval=Math.max(1/24,interval*0.88); t+=interval;
   }
+  // Swelling sub — felt more than heard, and the reason the gap has weight.
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.type='sine'; o.frequency.setValueAtTime(48,now);
+  o.frequency.linearRampToValueAtTime(62,now+duration);
+  g.gain.setValueAtTime(0.0001,now);
+  g.gain.exponentialRampToValueAtTime(0.22*MASTER_VOL,now+duration*0.95);
+  g.gain.exponentialRampToValueAtTime(0.0001,now+duration+0.05);
+  o.connect(g); g.connect(ctx.destination);
+  o.start(now); o.stop(now+duration+0.1);
+  trackNode(o);
+  playRiser(duration);
 }
-function loadCheerAudio(){} // procedural — no WAV files needed
 
-function playCheer(rank){
+/* A pitch-and-brightness climb that ends exactly on the beat it precedes. The
+   silence between reveals was reading as a stall; this is what turns it into
+   anticipation. */
+function playRiser(duration){
+  if(!musicOn) return;
+  const ctx=getCtx(),now=ctx.currentTime+0.02;
+  const o=ctx.createOscillator(),g=ctx.createGain(),flt=ctx.createBiquadFilter();
+  o.type='sawtooth';
+  o.frequency.setValueAtTime(120,now);
+  o.frequency.exponentialRampToValueAtTime(760,now+duration);
+  flt.type='lowpass';
+  flt.frequency.setValueAtTime(500,now);
+  flt.frequency.exponentialRampToValueAtTime(5200,now+duration);
+  flt.Q.value=3;
+  g.gain.setValueAtTime(0.0001,now);
+  g.gain.exponentialRampToValueAtTime(0.13*MASTER_VOL,now+duration*0.93);
+  g.gain.exponentialRampToValueAtTime(0.0001,now+duration+0.06);
+  o.connect(flt); flt.connect(g); g.connect(ctx.destination);
+  o.start(now); o.stop(now+duration+0.1);
+  trackNode(o);
+  // Air over the top: a band-pass sweeping up through the same span.
+  const frames=Math.ceil(ctx.sampleRate*duration);
+  const buf=ctx.createBuffer(1,frames,ctx.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<frames;i++) d[i]=Math.random()*2-1;
+  const src=ctx.createBufferSource(); src.buffer=buf;
+  const nf=ctx.createBiquadFilter(),ng=ctx.createGain();
+  nf.type='bandpass'; nf.Q.value=1.6;
+  nf.frequency.setValueAtTime(700,now);
+  nf.frequency.exponentialRampToValueAtTime(7000,now+duration);
+  ng.gain.setValueAtTime(0.0001,now);
+  ng.gain.exponentialRampToValueAtTime(0.16*MASTER_VOL,now+duration*0.95);
+  ng.gain.exponentialRampToValueAtTime(0.0001,now+duration+0.05);
+  src.connect(nf); nf.connect(ng); ng.connect(ctx.destination);
+  src.start(now); src.stop(now+duration+0.06);
+  trackNode(src);
+}
+
+/* A quiet pulse held under the whole final reveal. Generation-guarded like the
+   other loops, so the hard cut to silence before first place — a plain
+   stopMusic() — actually silences it. */
+function playSuspenseBed(){
+  if(!musicOn) return;
+  stopMusic(); musicType='suspense';
+  const myGen=musicGen;
+  whenAudioRunning(ctx=>{
+    if(myGen!==musicGen||!musicOn) return;
+    musicStarted=true;
+    const b=60/104,BARS=8;
+    function scheduleLoop(startT){
+      if(myGen!==musicGen||!musicOn) return;
+      if(ctx.state!=='running'){ musicTimeout=setTimeout(()=>scheduleLoop(ctx.currentTime),500); return; }
+      for(let i=0;i<BARS;i++){
+        tone(ctx,55,startT+i*b,b*0.5,0.17,'sine',0);
+        noiseBurst(ctx,startT+i*b+b*0.5,0.045,0.05,3200,2.4,i%2?0.3:-0.3);
+      }
+      // A held, unresolved pair: it wants somewhere to go, which is the point.
+      chord(ctx,[130.8,155.6],startT,BARS*b,0.05,'triangle',0);
+      musicTimeout=setTimeout(()=>scheduleLoop(ctx.currentTime),(BARS*b-0.12)*1000);
+    }
+    scheduleLoop(ctx.currentTime+0.05);
+  });
+}
+
+/* The winner's payoff.
+
+   playWinnerFanfare() cannot do this job: playCheer(1) sets musicType='cheer1'
+   and the fanfare's own first line bails on exactly that value, so calling the
+   two in sequence — as the reveal used to — played the cheer and silently
+   dropped the fanfare. Instead the cheer is delayed by a lead-in and the
+   fanfare's rising run is scheduled into that gap, topping out on the boom.
+   playCheer(1) keeps ownership of stopMusic() and of the hand-back to the
+   lobby loop, so there is still only one of each. */
+function playWinnerMoment(){
+  if(!musicOn) return;
+  const LEAD=0.40;
+  playCheer(1,LEAD);
+  const ctx=getCtx(),now=ctx.currentTime+0.02;
+  [261.6,329.6,392,523.3,659.3,783.9,1046.5].forEach((f,i)=>{
+    tone(ctx,f,now+i*0.078,0.26,0.15,'triangle',0);
+    tone(ctx,f*1.5,now+i*0.078+0.02,0.16,0.045,'sine',0);
+  });
+}
+
+/* `delay` pushes the whole arrangement back so something else can lead into it.
+   Only the winner moment uses it; every other caller lands immediately. */
+function playCheer(rank,delay){
   if(!musicOn) return;
   const ctx=getCtx();
   if(rank===1){stopMusic();musicType='cheer1';}
 
-  const now=ctx.currentTime+0.05;
+  const now=ctx.currentTime+0.05+(delay||0);
   const comp=ctx.createDynamicsCompressor();
   comp.threshold.value=-16;comp.knee.value=8;comp.ratio.value=5;
   comp.attack.value=0.003;comp.release.value=0.15;
@@ -3195,11 +3393,59 @@ function toggleMusic(){
   if(!musicOn){ musicResumeType=null; stopMusic(); return; }
   const s=document.querySelector('.screen.active');
   if(!s) return;
-  if(s.id==='screen-leaderboard') playWinnerFanfare();
+  // Turning sound back on mid-ceremony should rejoin it, not fire the payoff
+  // early: the bed is what belongs under a reveal that is still running.
+  if(s.id==='screen-leaderboard') revealTimers.length?playSuspenseBed():playWinnerFanfare();
   // Solo keeps the calm loop on its own question and dice screens, which are
   // not screen music: multiplayer students get silence there.
   else if(soloMode&&(s.id==='screen-student-answer'||s.id==='screen-target-play')) playGameMusic();
   else startScreenMusic(s.id);
+}
+
+/* ══════════════ CONFETTI ══════════════
+   Ported from tracing.html's unit-complete celebration — same particle model,
+   scaled up for a projector and recoloured to the game's palette. It opts
+   itself out of reduced motion. */
+let confetti=[],confettiRAF=null,cCanvas=null,cCtx=null;
+const REDUCED_MOTION=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+function launchConfetti(count){
+  if(REDUCED_MOTION) return;
+  if(!cCanvas){ cCanvas=document.getElementById('confettiCanvas'); if(!cCanvas) return; cCtx=cCanvas.getContext('2d'); }
+  // Only resize on a fresh burst; a top-up mid-flight would clear the canvas.
+  if(!confettiRAF){ cCanvas.width=window.innerWidth; cCanvas.height=window.innerHeight; }
+  cCanvas.style.display='block';
+  const colors=['#f5a623','#0f9b8e','#7c4dff','#e94560','#00c853','#ffd76a'];
+  const batch=Array.from({length:count||140},()=>({
+    x:Math.random()*cCanvas.width,
+    y:-20-Math.random()*cCanvas.height*0.5,
+    r:5+Math.random()*7,
+    c:colors[Math.floor(Math.random()*colors.length)],
+    vy:2.5+Math.random()*3.5,
+    vx:-1.8+Math.random()*3.6,
+    rot:Math.random()*Math.PI, vr:-0.12+Math.random()*0.24
+  }));
+  confetti=confetti.concat(batch);
+  if(confettiRAF) return;
+  const tick=()=>{
+    cCtx.clearRect(0,0,cCanvas.width,cCanvas.height);
+    confetti.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      cCtx.save(); cCtx.translate(p.x,p.y); cCtx.rotate(p.rot);
+      cCtx.fillStyle=p.c;
+      cCtx.fillRect(-p.r,-p.r/2,p.r*2,p.r);
+      cCtx.restore();
+    });
+    confetti=confetti.filter(p=>p.y<cCanvas.height+30);
+    if(confetti.length) confettiRAF=requestAnimationFrame(tick);
+    else{ confettiRAF=null; stopConfetti(); }
+  };
+  confettiRAF=requestAnimationFrame(tick);
+}
+function stopConfetti(){
+  if(confettiRAF) cancelAnimationFrame(confettiRAF);
+  confettiRAF=null; confetti=[];
+  if(cCanvas){ if(cCtx) cCtx.clearRect(0,0,cCanvas.width,cCanvas.height); cCanvas.style.display='none'; }
 }
 
 /* SCREENS */
@@ -3213,6 +3459,9 @@ function startScreenMusic(id){
   // other screens (questions, results, leaderboard) manage their own audio
 }
 function showScreen(id){
+  // A final reveal is a queue of timed sound and speech. Walking away from the
+  // board has to take it with you, or the cheers land over the next screen.
+  if(id!=='screen-leaderboard') endReveal();
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   startScreenMusic(id);
@@ -3705,9 +3954,17 @@ function continueToNextQuestion(){
 }
 
 function showLeaderboard(){
-  stopMusic(); roomRef.update({status:'finished'});
+  stopMusic();
   roomRef.child('players').once('value',snap=>{
     const players=sortPlayersForBoard(Object.values(snap.val()||{}).filter(p=>p&&p.name));
+    /* Stamped on the server clock, and written together with the status the
+       phones are watching for, so a phone can work out how far into the
+       ceremony it has arrived and hold in step with the projector rather than
+       showing everyone the winner fifteen seconds early. */
+    roomRef.update({status:'finished',
+                    revealStartedAt:firebase.database.ServerValue.TIMESTAMP,
+                    revealCount:Math.min(REVEAL_FULL.length,players.length),
+                    revealSkipped:false});
     document.getElementById('lb-title').textContent='🏆 Final Leaderboard';
     setLeaderboardControls(null);
     // A solo run before this one renames the button; this board is a class game.
@@ -3742,57 +3999,222 @@ function setLeaderboardControls(which){
     if(el) el.style.display=(k===which)?'flex':'none';
   });
 }
+/* Shows one of the leaderboard screen's three stages: the student's wait, the
+   student's own placing, or the board itself. */
+/* Projector scale on, or off. renderLeaderboard() turns it off as part of its
+   reset, so a caller that wants the big board asks for it after rendering. */
+function setFinalBoard(on){
+  document.getElementById('screen-leaderboard').classList.toggle('final-board',!!on);
+}
+function setLeaderboardStage(which){
+  ['lb-hold','lb-placing'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display=(id==='lb-'+which)?'flex':'none';
+  });
+  const board=which==='board';
+  document.getElementById('podium').style.display=board?'':'none';
+  document.getElementById('lb-list').style.display=board?'':'none';
+  document.getElementById('lb-title').style.display=board?'':'none';
+  document.getElementById('screen-leaderboard').classList.toggle('stage-solo',!board);
+}
+/* The plain, instant board — the mid-game standings, the student's final view,
+   the skip path and both solo result cards all land here. It also resets the
+   screen's stage and its projector-scale sizing, so it is the one place that
+   knows what an untouched leaderboard looks like. */
 function renderLeaderboard(players){
   players=players.filter(p=>p&&p.name);
   const podium=document.getElementById('podium'),list=document.getElementById('lb-list');
+  setLeaderboardStage('board');
+  setFinalBoard(false);
   podium.innerHTML=''; list.innerHTML='';
   const top3=podiumPlayers(players),order=top3.length>=3?[1,0,2]:top3.map((_,i)=>i);
   const medals=['🥇','🥈','🥉'],classes=['p1','p2','p3'];
   order.forEach(i=>{ if(!top3[i]) return; const p=top3[i],el=document.createElement('div'); el.className='podium-place '+classes[i]; el.innerHTML='<div class="medal">'+medals[i]+'</div><div class="pname">'+p.name+'</div><div class="pscore">'+lbScore(p).replace(/^⭐ /,'⭐')+'</div>'; podium.appendChild(el); });
   players.forEach((p,i)=>{ const row=document.createElement('div'); row.className='lb-row'; row.innerHTML='<div class="lb-rank">'+(i+1)+'</div><div class="lb-name">'+p.name+'</div><div class="lb-score">'+lbScore(p)+'</div>'; list.appendChild(row); });
 }
-function revealLeaderboard(players){
-  const podium=document.getElementById('podium'),list=document.getElementById('lb-list');
-  podium.innerHTML=''; list.innerHTML='';
-  const revealCount=Math.min(5,players.length);
-  const rest=players.slice(revealCount);
-  // Show 6th place and below immediately, dimmed
-  rest.forEach((p,i)=>{
-    const row=document.createElement('div');
-    row.className='lb-row dimmed';
-    row.innerHTML='<div class="lb-rank">'+(revealCount+1+i)+'</div><div class="lb-name">'+p.name+'</div><div class="lb-score">'+lbScore(p)+'</div>';
-    list.appendChild(row);
+/* ── THE FINAL REVEAL ──
+
+   A beat sheet, not a list of delays. Each beat is an absolute second from the
+   moment the board appears, and carries the sound that leads into it: a riser
+   for the cheap places, a drumroll for the medals, and for the winner a hush —
+   the roll stops early and the payoff lands out of silence.
+
+   The build is the whole point, so a small class does not simply get a shorter
+   version: the medal beats and their rolls keep full length, the 5th/4th beats
+   are dropped when there is nobody to put in them, and the rest slides earlier
+   to close the gap.
+
+   `hush` is how long before the beat the roll stops and everything is cut.
+   `WINNER_LEAD` is how long before the beat the winner's rising run starts, so
+   that the run tops out exactly on the row landing. */
+const REVEAL_FULL=[
+  {rank:5,at:3.0,riser:0.5},
+  {rank:4,at:5.2,riser:0.5},
+  {rank:3,at:8.4,roll:1.6},
+  {rank:2,at:12.6,roll:2.0},
+  {rank:1,at:18.0,roll:2.25,hush:0.88}
+];
+const REVEAL_TAIL=6.5;   // winner beat → the buttons appearing
+const WINNER_LEAD=0.55;  // matches playWinnerMoment()'s run-up to the boom
+
+function revealBeats(revealCount){
+  const n=Math.max(1,Math.min(REVEAL_FULL.length,revealCount||0));
+  const beats=REVEAL_FULL.slice(REVEAL_FULL.length-n).map(b=>Object.assign({},b));
+  const first=beats[0];
+  // The first beat needs room for its own lead-in before it, plus a moment for
+  // the board to settle. Everything shifts by whatever that leaves over.
+  const startAt=Math.max(3.0,(first.roll||first.riser||0)+(first.hush||0)+1.2);
+  const shift=first.at-startAt;
+  beats.forEach(b=>{ b.at-=shift; });
+  return {beats:beats,total:beats[beats.length-1].at+REVEAL_TAIL};
+}
+
+/* A reveal in flight owns timers, confetti and a speech queue. They are torn
+   down in one place, because leaving the screen part-way through used to let
+   cheers and spoken names fire over whatever came next. */
+let revealTimers=[];
+function revealTimer(fn,ms){ revealTimers.push(setTimeout(fn,Math.max(0,ms))); }
+function endReveal(){
+  revealTimers.forEach(clearTimeout); revealTimers=[];
+  stopConfetti();
+  try{ window.speechSynthesis.cancel(); }catch(e){}
+  const sk=document.getElementById('lb-skip'); if(sk) sk.style.display='none';
+}
+
+/* Rolls a score up from zero. The Dice game's "✖ out" has no number in it, so
+   it is written straight in — as is anything at all under reduced motion. */
+function countUp(el,text,ms){
+  const m=/\d+/.exec(text);
+  if(!m||REDUCED_MOTION){ el.textContent=text; return; }
+  const to=+m[0],pre=text.slice(0,m.index),post=text.slice(m.index+m[0].length);
+  const t0=performance.now();
+  const step=now=>{
+    const k=Math.min(1,(now-t0)/ms),e=1-Math.pow(1-k,3);
+    el.textContent=pre+Math.round(to*e)+post;
+    if(k<1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+/* The three podium blocks are laid out empty up front — 1st in the middle, as
+   renderLeaderboard() does — and filled one at a time. Holding the layout from
+   the start is what stops the blocks jumping sideways as each one arrives. */
+function buildPodiumSlots(players){
+  const podium=document.getElementById('podium');
+  podium.innerHTML='';
+  const top3=podiumPlayers(players);
+  const order=top3.length>=3?[1,0,2]:top3.map((_,i)=>i);
+  const classes=['p1','p2','p3'];
+  order.forEach(i=>{
+    if(!top3[i]) return;
+    const el=document.createElement('div');
+    el.className='podium-place '+classes[i];
+    el.dataset.slot=i;
+    el.style.visibility='hidden';
+    el.style.animation='none';  // held until this place's beat
+    podium.appendChild(el);
   });
-  // Reveal top 5 in reverse order (5th first, 1st last)
-  // Extra suspense gap before ranks 3, 2, 1 — drumroll fills the gap
-  const delays=[1200,2600,4800,7800,12000];
-  for(let ri=0;ri<revealCount;ri++){
-    const rank=revealCount-ri; // 5,4,3,2,1
-    const p=players[rank-1];
-    const revealAt=delays[ri];
-    // Schedule drumroll so it ends right at the reveal
-    if(rank===3) setTimeout(()=>playDrumroll(0.8),Math.max(100,revealAt-800));
-    else if(rank===2) setTimeout(()=>playDrumroll(1.4),Math.max(100,revealAt-1400));
-    else if(rank===1) setTimeout(()=>playDrumroll(2.0),Math.max(100,revealAt-2000));
-    setTimeout(()=>{
-      playRevealTone(rank);
-      if(rank<=3) playCheer(rank);
-      const row=document.createElement('div');
-      row.className='lb-row reveal-pop'+(rank===1?' winner-row':'');
-      row.innerHTML='<div class="lb-rank">'+rank+'</div><div class="lb-name">'+p.name+'</div><div class="lb-score">'+lbScore(p)+'</div>';
-      list.insertBefore(row,list.firstChild);
-      if(rank===1){
-        // Build podium and play winner fanfare
-        setTimeout(()=>{
-          const top3=podiumPlayers(players),order=top3.length>=3?[1,0,2]:top3.map((_,i)=>i);
-          const medals=['🥇','🥈','🥉'],classes=['p1','p2','p3'];
-          order.forEach(i=>{ if(!top3[i]) return; const p=top3[i],el=document.createElement('div'); el.className='podium-place '+classes[i]; el.innerHTML='<div class="medal">'+medals[i]+'</div><div class="pname">'+p.name+'</div><div class="pscore">'+lbScore(p).replace(/^⭐ /,'⭐')+'</div>'; podium.appendChild(el); });
-        },400);
-        playWinnerFanfare();
-        setTimeout(()=>setLeaderboardControls('final'),3200);
-      }
-    },revealAt);
+}
+function showPodiumPlace(players,i){
+  const el=document.querySelector('#podium .podium-place[data-slot="'+i+'"]');
+  const p=podiumPlayers(players)[i];
+  if(!el||!p) return;
+  const medals=['🥇','🥈','🥉'];
+  el.innerHTML='<div class="medal">'+medals[i]+'</div><div class="pname">'+p.name+'</div><div class="pscore"></div>';
+  el.style.visibility='';
+  el.style.animation='';      // hands back to the stylesheet's podiumRise
+  countUp(el.querySelector('.pscore'),lbScore(p).replace(/^⭐ /,'⭐'),800);
+}
+
+const REVEAL_ORDINAL=['','First','Second','Third','Fourth','Fifth'];
+
+function revealLeaderboard(players){
+  endReveal();
+  players=players.filter(p=>p&&p.name);
+  const list=document.getElementById('lb-list'),title=document.getElementById('lb-title');
+  renderLeaderboard([]);          // clears the board and its stage in one place
+  setFinalBoard(true);
+  const revealCount=Math.min(REVEAL_FULL.length,players.length);
+  if(!revealCount){ setLeaderboardControls('final'); return; }
+
+  // Reduced motion drops the ceremony, never the result — and the winner still
+  // gets their sound.
+  if(REDUCED_MOTION){
+    renderLeaderboard(players);
+    setFinalBoard(true);
+    setLeaderboardControls('final');
+    playWinnerMoment();
+    return;
   }
+
+  const plan=revealBeats(revealCount);
+  title.textContent='Final scores…';
+  setLeaderboardControls(null);   // nothing to press until the ceremony is over
+  revealSkipData=players;
+  // Only the teacher gets the chip; the board itself is on a projector.
+  const skip=document.getElementById('lb-skip');
+  if(skip&&role==='teacher') revealTimer(()=>{skip.style.display='block';},500);
+  playSuspenseBed();
+  buildPodiumSlots(players);
+
+  // Ranks 6+ are context rather than news, so they fade in early and stay dim.
+  players.slice(revealCount).forEach((p,i)=>{
+    revealTimer(()=>{
+      const row=document.createElement('div');
+      row.className='lb-row dimmed dim-in';
+      row.innerHTML='<div class="lb-rank">'+(revealCount+1+i)+'</div><div class="lb-name">'+p.name+'</div><div class="lb-score">'+lbScore(p)+'</div>';
+      list.appendChild(row);
+    },600+i*70);
+  });
+
+  plan.beats.forEach(b=>{
+    const p=players[b.rank-1];
+    if(!p) return;
+    const gap=b.hush||0;
+    if(b.roll) revealTimer(()=>playDrumroll(b.roll),(b.at-gap-b.roll)*1000);
+    else if(b.riser) revealTimer(()=>playRiser(b.riser),(b.at-b.riser)*1000);
+    // The hush: cut the bed and the roll's tail so the payoff arrives out of
+    // nothing. This is why the bed has to be generation-guarded.
+    if(gap) revealTimer(()=>stopMusic(),(b.at-gap)*1000);
+    if(b.rank===1) revealTimer(()=>playWinnerMoment(),(b.at-WINNER_LEAD)*1000);
+
+    revealTimer(()=>{
+      if(b.rank===2||b.rank===3) playCheer(b.rank);
+      else if(b.rank>3) playRevealTone(b.rank);
+      const row=document.createElement('div');
+      row.className='lb-row reveal-slam'+(b.rank===1?' winner-row':'');
+      row.innerHTML='<div class="lb-rank">'+b.rank+'</div><div class="lb-name">'+p.name+'</div><div class="lb-score"></div>';
+      list.insertBefore(row,list.firstChild);
+      countUp(row.querySelector('.lb-score'),lbScore(p),900);
+      if(b.rank===1){ launchConfetti(140); revealTimer(()=>launchConfetti(90),1200); }
+      if(b.rank<=3) revealTimer(()=>showPodiumPlace(players,b.rank-1),500);
+      // Said out loud. For a learner who cannot pick a name off a board
+      // quickly, hearing it is the part that lands. The winner's waits for the
+      // fanfare so the two do not talk over each other.
+      revealTimer(()=>speakTTS(REVEAL_ORDINAL[b.rank]+' place. '+p.name,0.85),b.rank===1?1500:800);
+    },b.at*1000);
+  });
+
+  revealTimer(()=>{
+    title.textContent='🏆 Final Leaderboard';
+    setLeaderboardControls('final');
+    const sk=document.getElementById('lb-skip'); if(sk) sk.style.display='none';
+  },plan.total*1000);
+}
+
+/* The teacher's way out of a ceremony that is longer than the lesson has room
+   for. Students are told too, so nobody is left holding a suspense screen. */
+let revealSkipData=null;
+function skipReveal(){
+  endReveal();
+  stopMusic();
+  const players=revealSkipData;
+  if(!players) return;
+  document.getElementById('lb-title').textContent='🏆 Final Leaderboard';
+  renderLeaderboard(players);
+  setFinalBoard(true);
+  setLeaderboardControls('final');
+  if(roomRef) roomRef.update({revealSkipped:true});
 }
 function playAgain(){
   if(soloMode){ showScreen('screen-solo-setup'); updateSoloCountDisplay(); return; }
@@ -3824,7 +4246,8 @@ function resetRoomForNextGame(){
   // currentQuestion is cleared as well as the status: a student whose phone
   // still holds the last question must not be dragged back onto it.
   roomRef.update({status:'lobby',game:null,currentQuestion:null,questionIdx:-1,
-    revealed:false,correctAnswer:'',midLeaderboard:false,qType:selectedQType});
+    revealed:false,correctAnswer:'',midLeaderboard:false,qType:selectedQType,
+    revealStartedAt:null,revealCount:null,revealSkipped:false});
 }
 
 /* STUDENT FLOW */
@@ -3942,18 +4365,97 @@ function listenForGameState(){
       // and auto-submit an answer to a game that is already over.
       clearInterval(studentTimerInt);
       answered=true;
-      roomRef.child('players').once('value',snap2=>{
-        const players=sortPlayersForBoard(Object.values(snap2.val()||{}).filter(p=>p&&p.name));
-        document.getElementById('lb-title').textContent='🏆 Final Leaderboard';
-        renderLeaderboard(players);
-        // No "Play Again", no "Home": those are the teacher's to press, and a
-        // student who pressed them ended up on the teacher's own lobby screen.
-        setLeaderboardControls('student');
-        showScreen('screen-leaderboard');
-        stopMusic();
-      });
+      // This listener fires again on every later write to the room — the
+      // teacher's skip among them — so the reveal is started once and only the
+      // skip is allowed to interrupt it.
+      if(!studentRevealStarted){ studentRevealStarted=true; startStudentReveal(room); }
+      else if(room.revealSkipped) endStudentSuspense();
     }
   });
+}
+
+/* ── THE STUDENT'S SIDE OF THE REVEAL ──
+
+   The phone used to draw the whole final board the instant the room turned
+   "finished", so the class read the winner off their own screens fifteen
+   seconds before the projector said it. Instead it holds, and then shows this
+   learner their own placing at the same moment the projector reveals that
+   rank — scheduled off the host's server-clock stamp, so a phone that is slow,
+   reloaded, or joined late still lands in step rather than drifting.
+
+   The phone stays silent apart from one short tone at its own placing: thirty
+   devices playing drumrolls and cheers is noise, not drama. The projector is
+   what the room listens to. */
+let studentRevealStarted=false,studentBoardPlayers=null,studentMyRank=0;
+
+function ordinalLabel(n){
+  const v=n%100;
+  return n+(['th','st','nd','rd'][(v-20)%10]||['th','st','nd','rd'][v]||'th');
+}
+
+function startStudentReveal(room){
+  roomRef.child('players').once('value',snap=>{
+    const raw=snap.val()||{};
+    // Carry the key through so this phone can find itself in the ranking. The
+    // board helpers only read name/score/total/tstate, so the extra field is
+    // invisible to them.
+    const players=sortPlayersForBoard(
+      Object.keys(raw).map(k=>Object.assign({pid:k},raw[k])).filter(p=>p&&p.name));
+    studentBoardPlayers=players;
+    let myRank=0;
+    players.forEach((p,i)=>{ if(p.pid===playerId) myRank=i+1; });
+    studentMyRank=myRank;
+
+    document.getElementById('lb-title').textContent='🏆 Final Leaderboard';
+    setLeaderboardControls(null);
+    showScreen('screen-leaderboard');
+    stopMusic();
+
+    const plan=revealBeats(room.revealCount||Math.min(REVEAL_FULL.length,players.length));
+    const last=plan.beats[plan.beats.length-1];
+    // Ranks outside the one-by-one reveal are not called out on the projector,
+    // so they land just after the winner rather than at some beat of their own.
+    const beat=plan.beats.filter(b=>b.rank===myRank)[0];
+    const at=beat?beat.at:last.at+1.0;
+    // A phone that arrives late — or has no usable stamp — skips to the end
+    // rather than waiting out a ceremony that is already over.
+    const elapsed=(typeof room.revealStartedAt==='number')
+      ? (serverNow()-room.revealStartedAt)/1000 : Infinity;
+    const wait=(at-elapsed)*1000;
+
+    if(room.revealSkipped||!(wait>400)){ endStudentSuspense(); return; }
+    endReveal();
+    setLeaderboardStage('hold');
+    revealTimer(endStudentSuspense,wait);
+  });
+}
+
+/* Show this phone its placing, then the full board a couple of seconds later.
+   Reached either on time or early, when the teacher skips. */
+function endStudentSuspense(){
+  endReveal();
+  const players=studentBoardPlayers;
+  if(!players) return;
+  const me=studentMyRank?players[studentMyRank-1]:null;
+  if(me){
+    setLeaderboardStage('placing');
+    const medal=['🥇','🥈','🥉'][studentMyRank-1]||'';
+    document.getElementById('placing-ord').textContent=(medal?medal+' ':'')+ordinalLabel(studentMyRank);
+    // Their own name is the anchor on a board of names they may not read.
+    document.getElementById('placing-line').textContent=me.name;
+    document.getElementById('placing-score').textContent=lbScore(me);
+    playRevealTone(Math.min(REVEAL_FULL.length,studentMyRank));
+    revealTimer(showStudentFinalBoard,2200);
+  }else{
+    showStudentFinalBoard();
+  }
+}
+function showStudentFinalBoard(){
+  renderLeaderboard(studentBoardPlayers||[]);
+  setFinalBoard(true);
+  // No "Play Again", no "Home": those are the teacher's to press, and a
+  // student who pressed them ended up on the teacher's own lobby screen.
+  setLeaderboardControls('student');
 }
 
 /* Back to the waiting screen between rounds. The round's local state goes with
@@ -3966,6 +4468,9 @@ function returnStudentToLobby(){
   stopTargetGame();
   try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(e){}
   answered=false; myLastQIdx=-1; myScore=0; hintLevel=0; currentStudentQ=null;
+  // Arm the next game's reveal. Without this a replayed room would find the
+  // flag already set and drop the phone straight onto the board.
+  studentRevealStarted=false; studentBoardPlayers=null; studentMyRank=0;
   if(onLobby) return;   // a fresh join, or already waiting — leave the wording alone
   const msg=document.getElementById('s-wait-msg');
   msg.classList.add('in-game');
@@ -5665,7 +6170,7 @@ function sortPlayersForBoard(players){
 
 /* INIT */
 window.addEventListener('load',()=>{
-  buildBank(); loadCheerAudio(); renderSectionChips(); renderTargetChips();
+  buildBank(); renderSectionChips(); renderTargetChips();
   const params=new URLSearchParams(window.location.search);
   const urlCode=params.get('join');
   const mode=params.get('mode');
