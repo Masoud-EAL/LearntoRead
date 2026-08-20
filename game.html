@@ -4316,9 +4316,18 @@ function revealLeaderboard(players){
       if(b.rank===1){ launchConfetti(140); revealTimer(()=>launchConfetti(90),1200); }
       if(b.rank<=3) revealTimer(()=>showPodiumPlace(players,b.rank-1),500);
       // Said out loud. For a learner who cannot pick a name off a board
-      // quickly, hearing it is the part that lands. The winner's waits for the
-      // fanfare so the two do not talk over each other.
-      revealTimer(()=>speakTTS(REVEAL_ORDINAL[b.rank]+' place. '+p.name,0.85),b.rank===1?1500:800);
+      // quickly, hearing it is the part that lands.
+      //
+      // It starts as the row lands rather than a beat after it. A late start
+      // was still being read out when the next name appeared — and because
+      // speakTTS() cancels whatever is in progress, tying each announcement to
+      // its own beat also makes that overlap impossible rather than merely
+      // unlikely: the next reveal always cuts the previous name off. A comma
+      // rather than a full stop keeps the pause before the name short.
+      //
+      // The winner's waits out the boom, which would otherwise bury the one
+      // name the room most wants to hear.
+      if(b.rank<=3) revealTimer(()=>speakTTS(REVEAL_ORDINAL[b.rank]+' place, '+p.name,0.85),b.rank===1?600:0);
     },b.at*1000);
   });
 
