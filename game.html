@@ -149,11 +149,15 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .room-code-box .rc-label{font-size:.8rem;letter-spacing:2px;text-transform:uppercase;opacity:.8;margin-bottom:6px;}
 .room-code-box .rc-code{font-family:'Fredoka One',cursive;font-size:3.2rem;letter-spacing:8px;text-shadow:0 4px 12px rgba(0,0,0,.3);}
 .room-code-box .rc-url{font-size:.72rem;opacity:.65;margin-top:8px;word-break:break-all;}
-/* The code inside is a fixed 260px (generateQR), so a stretched box is a
-   white slab with a QR adrift in it — fit the box to the code instead. */
+/* The box fits the code rather than stretching around it — a wide box with a
+   small code in the middle reads as a white slab. The code itself is rendered
+   at 640px (generateQR) and sized here, so this is always a downscale. */
 #qr-wrap{display:flex;justify-content:center;align-items:center;background:white;border-radius:10px;padding:12px;margin-top:10px;width:fit-content;margin-inline:auto;}
+#qr-wrap > img,#qr-wrap > canvas{width:min(260px,64vw);height:auto;}
 .player-chips{display:flex;flex-wrap:wrap;gap:8px;min-height:44px;}
-.player-chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:6px 14px;font-size:.85rem;font-weight:700;animation:popIn .3s ease;}
+.players-hd{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--gold);margin-bottom:10px;}
+/* A name is read across a classroom, not off a phone in the hand. */
+.player-chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:7px 15px;font-size:.95rem;font-weight:700;animation:popIn .3s ease;}
 @keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
 /* The game list. Wrapping pills spent a whole row on each of 30 games,
    because a pill is as wide as its label; equal columns fit two or three to a
@@ -344,23 +348,47 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
      single scrollbar, so the actions row is always the last thing on screen
      without being positioned there — unlike .solo-start-bar, which has to
      be fixed because that screen scrolls as a whole. */
-  .lobby-grid{grid-template-columns:360px minmax(0,1fr);min-height:0;}
+  .lobby-grid{grid-template-columns:clamp(360px,30vw,560px) minmax(0,1fr);min-height:0;}
   #screen-teacher-lobby{height:var(--app-h,100dvh);overflow:hidden;}
   .lobby-col{min-height:0;}
   .lobby-grid > .lobby-col:last-child{overflow-y:auto;padding-right:4px;}
-  /* The roster takes whatever height the room code leaves and scrolls inside
-     itself. Left to grow it pushed out of the grid and sat under the Back
-     button on a 768px-tall screen; floored at two rows so it never shows a
-     single sliced chip, with the column scrolling if even that will not fit. */
+  /* The setup card takes the full column even when the games do not fill it,
+     so the two columns end on the same line instead of one stopping short. */
+  .lobby-grid > .lobby-col:last-child > .card{flex:1 0 auto;}
+  /* The code is read off the screen and typed by hand — beside a QR this size,
+     at 51px it reads as the smaller of the two ways in. */
+  #screen-teacher-lobby .rc-code{font-size:clamp(3.2rem,3.4vw,4.6rem);}
   .lobby-grid > .lobby-col:first-child{overflow-y:auto;}
-  .lobby-grid > .lobby-col:first-child > .card{flex:1;min-height:140px;display:flex;flex-direction:column;padding:16px 20px;}
-  #screen-teacher-lobby .player-chips{flex:1;max-height:none;align-content:flex-start;}
-  /* A 260px code is a quarter of a 768px classroom laptop before the roster
-     gets a row. It is a bitmap, so scaling it down costs nothing but needs
-     pixelated to keep the modules square and scannable. */
-  #screen-teacher-lobby #qr-wrap > canvas,
+  /* ── The code is the thing the class is looking at ──
+     Sizing it in px, or in vh, means guessing at the space left over once the
+     room code, the roster and the actions row have taken theirs — and the
+     guess was wrong on every screen but the one it was measured on. So the
+     panel takes the height the column has spare and the code fills it: as
+     large as the screen allows, on any screen, with no constant to keep in
+     step. Width still caps it on a narrow column, where object-fit keeps it
+     square against a white ground it cannot be told apart from. */
+  #screen-teacher-lobby .room-code-box{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;}
+  #screen-teacher-lobby #qr-wrap{flex:1 1 auto;min-height:0;}
+  /* Bounded on both axes and sized on neither: the code keeps its own square
+     ratio and shrinks to whichever of the two the column runs out of first.
+     Given a height it grows into, it stops at the 800px it was rendered at. */
   #screen-teacher-lobby #qr-wrap > img,
-  #screen-teacher-lobby #qr-wrap > table{width:min(260px,24vh)!important;height:min(260px,24vh)!important;image-rendering:pixelated;}
+  #screen-teacher-lobby #qr-wrap > canvas{width:auto;height:auto;max-width:100%;max-height:100%;}
+  /* The roster takes only what its names need, so everything it does not use
+     goes to the code. Its ceiling is whole rows, not a round number: a class
+     of thirty scrolls, and a scroller cut mid-row shows half a name — 45px
+     chips on a 53px pitch, so two rows are 98px and three are 151px. */
+  .lobby-grid > .lobby-col:first-child > .card{flex:0 0 auto;display:flex;flex-direction:column;
+    padding:16px 20px;}
+  #screen-teacher-lobby .player-chips{flex:0 0 auto;max-height:98px;align-content:flex-start;}
+  #screen-teacher-lobby .player-chip{font-size:1.15rem;padding:9px 18px;}
+  #screen-teacher-lobby .players-hd{font-size:1.2rem;}
+}
+
+/* A screen tall enough to spare the row shows three at once — the difference
+   between a glance telling you the class is here and one that needs a scroll. */
+@media (min-width:900px) and (min-height:960px){
+  #screen-teacher-lobby .player-chips{max-height:151px;}
 }
 
 /* ── Wide screens: the skills stand beside the games, as they do in practice ──
@@ -1196,7 +1224,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
            things the teacher and the class look at together, so they share a
            column. It also gives the left half something to do below the QR. -->
       <div class="card">
-        <p style="font-family:'Fredoka One',cursive;font-size:1rem;color:var(--gold);margin-bottom:10px;">👥 Players (<span id="player-count">0</span>)</p>
+        <p class="players-hd">👥 Players (<span id="player-count">0</span>)</p>
         <div class="player-chips scrollable" id="player-chips"></div>
       </div>
     </div>
@@ -3684,9 +3712,12 @@ function createRoom(){
     document.getElementById('start-btn').disabled=totalPlayers<1;
   });
 }
+/* Rendered at 800px and sized down by CSS, never up: on a classroom monitor
+   the code fills the height of its panel, and a 260px bitmap stretched to
+   twice that is a blurry code students hold their phones up to. */
 function generateQR(){
   const el=document.getElementById('qr-wrap'); el.innerHTML='';
-  new QRCode(el,{text:'https://wordlink.au/game.html?join='+roomCode,width:260,height:260,colorDark:'#000000',colorLight:'#ffffff'});
+  new QRCode(el,{text:'https://wordlink.au/game.html?join='+roomCode,width:800,height:800,colorDark:'#000000',colorLight:'#ffffff'});
 }
 function toggleMcMode(which){ setMcMode(!mcMode); }
 /* Set the mode outright rather than flipping it — choosing a skill picks the
