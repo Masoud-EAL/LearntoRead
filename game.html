@@ -188,10 +188,11 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
    when one label is long — "Letters & Sounds" takes the space it needs from
    its neighbour rather than wrapping onto a second line — and grow keeps every
    row flush to both edges. Under a third would let a third chip in. The host
-   lobby keeps plain wrapping: its panel is narrower and sits beside the room
-   code. */
+   lobby reads the same way once its panel is a column of its own rather than
+   a strip beside the room code. */
 @media (max-width:899px){
-  #screen-solo-setup .section-chip{flex:1 1 calc(44% - 3px);text-align:left;padding:9px 10px;}
+  #screen-solo-setup .section-chip,
+  #screen-teacher-lobby .section-chip{flex:1 1 calc(44% - 3px);text-align:left;padding:9px 10px;}
 }
 /* On a short screen the chip row would eat the game list, which has barely
    two rows there — scroll it sideways instead of spending two rows on it,
@@ -264,11 +265,43 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
   #screen-solo-setup > div:not(.solo-start-bar){padding-top:52px!important;}
 }
 
-/* Teacher lobby: not restructured — it is a genuinely dense screen (room
-   code, QR, player list) used by a literate adult, usually on a laptop. But
-   the category list was 443px of it, so cap it and let it scroll in place;
-   that keeps the room code and player list in view without a long scroll. */
-#screen-teacher-lobby .q-type-tabs{max-height:min(32vh,220px);overflow-y:auto;align-content:start;}
+/* ── The lobby on a phone: one page, scrolled as a whole ──
+   The list used to be capped and scrolled in place, to keep the room code and
+   the roster above it in view. On a phone that put a 220px window over
+   1564px of games — four and a half rows of thirty-four — inside a page that
+   already scrolled. Same conclusion as the practice setup: one honest scroll,
+   with Start pinned so it is never the thing you have to scroll to find. */
+#screen-teacher-lobby .q-type-tabs{align-content:start;}
+@media (max-width:899px){
+  #screen-teacher-lobby .lobby-actions{
+    position:fixed;left:0;right:0;bottom:0;z-index:50;
+    padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));
+    background:linear-gradient(to top,var(--bg) 0%,var(--bg) 62%,rgba(13,13,26,0) 100%);}
+  #screen-teacher-lobby .lobby-actions .btn-lg{font-size:1.2rem;padding:15px 38px;}
+  /* Clearance for the bar, over the inline padding on the grid. */
+  #screen-teacher-lobby > .lobby-grid{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important;}
+  /* Same reason as the practice setup: once the screen scrolls, a chip pinned
+     to the viewport hovers over whatever scrolls under it — and it leaves the
+     site, so it must not sit on top of a game pill. The music chip goes with
+     it: on this screen the list runs the full height of the page, so a pinned
+     chip lands on a game pill rather than on the header it was placed in. */
+  body:has(#screen-teacher-lobby.active) .back-btn,
+  body:has(#screen-teacher-lobby.active) .music-btn{position:absolute;}
+}
+/* "WordLink 🎮 Lobby" runs under the fixed Music chip on a phone, and the
+   room code below it is the real headline — so the wordmark stands down and
+   the column takes its clearance under the chips instead. */
+@media (max-width:600px){
+  #screen-teacher-lobby > .logo-bar{display:none;}
+  #screen-teacher-lobby > .lobby-grid{padding-top:52px!important;}
+  /* The list was one column wide, so thirty-four games became thirty-four
+     rows — thirteen pixels short of the two it is designed for. The screen
+     and the grid inside it were each paying 20px of side padding; one of them
+     is enough, and with the practice card's tighter padding the second column
+     fits. */
+  #screen-teacher-lobby{padding-left:0;padding-right:0;}
+  #screen-teacher-lobby .card{padding:14px;}
+}
 /* A grid cell is as wide as its column, so a long label wraps inside the pill
    instead of stretching it — centred, with room for the second line. */
 .q-type-tab{padding:10px 12px;border-radius:50px;font-size:.86rem;font-weight:700;border:1.5px solid rgba(255,255,255,.15);cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);text-align:center;line-height:1.25;}
@@ -328,9 +361,24 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
   #screen-teacher-lobby #qr-wrap > canvas,
   #screen-teacher-lobby #qr-wrap > img,
   #screen-teacher-lobby #qr-wrap > table{width:min(260px,24vh)!important;height:min(260px,24vh)!important;image-rendering:pixelated;}
-  /* The cap below cut the list mid-pill — 220px is four and three quarter
-     rows. With the column scrolling there is nothing left for it to solve. */
-  #screen-teacher-lobby .q-type-tabs{max-height:none;overflow:visible;}
+}
+
+/* ── Wide screens: the skills stand beside the games, as they do in practice ──
+   Above the room code's 360px there is width to spare, and the skill panel is
+   the one thing on this card that is a filter rather than a step you scroll
+   past — so it becomes a column of its own and stays put while the game list
+   runs beside it. Held back to 1200px: below that the games would be down to
+   two 152px columns, and a strip above the list reads better than a cramped
+   pair of columns. Unlike the practice card, this one has the count, the dice
+   panel, the toggle and the limits as siblings — they are wrapped in the same
+   .setup-main the practice card uses, so the split stays a two-child grid
+   instead of every sibling sizing a row of its own. */
+@media (min-width:1200px){
+  #screen-teacher-lobby .lobby-col:last-child > .card{
+    display:grid;grid-template-columns:250px minmax(0,1fr);column-gap:22px;align-items:start;}
+  #screen-teacher-lobby .card > .section-panel{margin-bottom:0;}
+  #screen-teacher-lobby .section-chips{flex-direction:column;flex-wrap:nowrap;}
+  #screen-teacher-lobby .section-chip{width:100%;text-align:left;}
 }
 
 /* TEACHER GAME */
@@ -1158,90 +1206,92 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
           <p class="step-label skill">① Choose a skill</p>
           <div class="section-chips" id="teacher-section-chips"></div>
         </div>
-        <p class="step-label game">② Choose a game</p>
-        <div class="q-type-tabs">
-          <button data-type="wp1:gap" class="q-type-tab" onclick="selectQType('wp1:gap',this)">🔡 Beginner Sound Gap</button>
-          <button data-type="wp1:word" class="q-type-tab" onclick="selectQType('wp1:word',this)">👆 Beginner Tap Word</button>
-          <button data-type="wp1:build" class="q-type-tab" onclick="selectQType('wp1:build',this)">🧱 Beginner Build Word</button>
-          <button data-type="wp2:gap" class="q-type-tab" onclick="selectQType('wp2:gap',this)">🔡 Elementary Sound Gap</button>
-          <button data-type="wp2:word" class="q-type-tab" onclick="selectQType('wp2:word',this)">👆 Elementary Tap Word</button>
-          <button data-type="wp2:build" class="q-type-tab" onclick="selectQType('wp2:build',this)">🧱 Elementary Build Word</button>
-          <button data-type="beginner" class="q-type-tab active" onclick="selectQType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
-          <button data-type="elementary" class="q-type-tab" onclick="selectQType('elementary',this)">📄 Elementary Listen and Fill Gaps</button>
-          <button data-type="questionwords" class="q-type-tab" onclick="selectQType('questionwords',this)">❓ Question Words</button>
-          <button data-type="numbers" class="q-type-tab" onclick="selectQType('numbers',this)">🔢 1–10</button>
-          <button data-type="numbers1120" class="q-type-tab" onclick="selectQType('numbers1120',this)">🔢 Numbers 11–20</button>
-          <button data-type="numbers2199" class="q-type-tab" onclick="selectQType('numbers2199',this)">🔢 Numbers 21–99</button>
-          <button data-type="days" class="q-type-tab" onclick="selectQType('days',this)">📅 Days</button>
-          <button data-type="months" class="q-type-tab" onclick="selectQType('months',this)">🗓️ Months</button>
-          <button data-type="weather" class="q-type-tab" onclick="selectQType('weather',this)">🌦️ Weather</button>
-          <button data-type="fruits" class="q-type-tab" onclick="selectQType('fruits',this)">🍎 Fruits</button>
-          <button data-type="body" class="q-type-tab" onclick="selectQType('body',this)">👤 Body</button>
-          <button data-type="clothes" class="q-type-tab" onclick="selectQType('clothes',this)">👕 Clothes</button>
-          <button data-type="spelling" class="q-type-tab" onclick="selectQType('spelling',this)">🗂️ All Spelling</button>
-          <button data-type="unscramble" class="q-type-tab" onclick="selectQType('unscramble',this)">🎧 Listen and Unscramble</button>
-          <button data-type="gramscramble" class="q-type-tab" onclick="selectQType('gramscramble',this)">🔀 Grammar Unscramble</button>
-          <button data-type="speaking" class="q-type-tab" onclick="selectQType('speaking',this)">🗣️ Speaking</button>
-          <button data-type="translate" class="q-type-tab" onclick="selectQType('translate',this)">🌐 Translate</button>
-          <button data-type="letter" class="q-type-tab" onclick="selectQType('letter',this)">🔤 Letter Names</button>
-          <button data-type="lettersound" class="q-type-tab" onclick="selectQType('lettersound',this)">🔊 First Sounds</button>
-          <button data-type="oddone" class="q-type-tab" onclick="selectQType('oddone',this)">🧩 Odd One Out</button>
-          <button data-type="signs" class="q-type-tab" onclick="selectQType('signs',this)">🚪 Signs</button>
-          <button data-type="sms" class="q-type-tab" onclick="selectQType('sms',this)">📱 Messages</button>
-          <button data-type="clock" class="q-type-tab" onclick="selectQType('clock',this)">⏰ Clock</button>
-          <button data-type="shop" class="q-type-tab" onclick="selectQType('shop',this)">🛒 Shop</button>
-          <button data-type="target" class="q-type-tab" onclick="selectQType('target',this)">🎲 Dice</button>
-          <button data-type="forms" class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
-          <button data-type="all" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">✨ All games</button>
-          <button data-type="custom" class="q-type-tab" id="teacher-custom-tab" onclick="showBankPicker('teacher',this)">📚 Custom</button>
-        </div>
-        <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="q-count-display">Loading…</div>
-        <div class="tgt-opts" id="tgt-opts-host">
-          <div>
-            <p class="step-label game">③ Target number</p>
-            <div class="tgt-chips" id="tgt-chips-host"></div>
-            <input type="number" class="game-input" id="tgt-custom-host" min="10" max="500" inputmode="numeric"
-              placeholder="Or type a number" oninput="setTargetCustom('host',this.value)"
-              style="max-width:210px;margin:10px 0 0;padding:9px 14px;font-size:.95rem;">
+        <div class="setup-main">
+          <p class="step-label game">② Choose a game</p>
+          <div class="q-type-tabs">
+            <button data-type="wp1:gap" class="q-type-tab" onclick="selectQType('wp1:gap',this)">🔡 Beginner Sound Gap</button>
+            <button data-type="wp1:word" class="q-type-tab" onclick="selectQType('wp1:word',this)">👆 Beginner Tap Word</button>
+            <button data-type="wp1:build" class="q-type-tab" onclick="selectQType('wp1:build',this)">🧱 Beginner Build Word</button>
+            <button data-type="wp2:gap" class="q-type-tab" onclick="selectQType('wp2:gap',this)">🔡 Elementary Sound Gap</button>
+            <button data-type="wp2:word" class="q-type-tab" onclick="selectQType('wp2:word',this)">👆 Elementary Tap Word</button>
+            <button data-type="wp2:build" class="q-type-tab" onclick="selectQType('wp2:build',this)">🧱 Elementary Build Word</button>
+            <button data-type="beginner" class="q-type-tab active" onclick="selectQType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
+            <button data-type="elementary" class="q-type-tab" onclick="selectQType('elementary',this)">📄 Elementary Listen and Fill Gaps</button>
+            <button data-type="questionwords" class="q-type-tab" onclick="selectQType('questionwords',this)">❓ Question Words</button>
+            <button data-type="numbers" class="q-type-tab" onclick="selectQType('numbers',this)">🔢 1–10</button>
+            <button data-type="numbers1120" class="q-type-tab" onclick="selectQType('numbers1120',this)">🔢 Numbers 11–20</button>
+            <button data-type="numbers2199" class="q-type-tab" onclick="selectQType('numbers2199',this)">🔢 Numbers 21–99</button>
+            <button data-type="days" class="q-type-tab" onclick="selectQType('days',this)">📅 Days</button>
+            <button data-type="months" class="q-type-tab" onclick="selectQType('months',this)">🗓️ Months</button>
+            <button data-type="weather" class="q-type-tab" onclick="selectQType('weather',this)">🌦️ Weather</button>
+            <button data-type="fruits" class="q-type-tab" onclick="selectQType('fruits',this)">🍎 Fruits</button>
+            <button data-type="body" class="q-type-tab" onclick="selectQType('body',this)">👤 Body</button>
+            <button data-type="clothes" class="q-type-tab" onclick="selectQType('clothes',this)">👕 Clothes</button>
+            <button data-type="spelling" class="q-type-tab" onclick="selectQType('spelling',this)">🗂️ All Spelling</button>
+            <button data-type="unscramble" class="q-type-tab" onclick="selectQType('unscramble',this)">🎧 Listen and Unscramble</button>
+            <button data-type="gramscramble" class="q-type-tab" onclick="selectQType('gramscramble',this)">🔀 Grammar Unscramble</button>
+            <button data-type="speaking" class="q-type-tab" onclick="selectQType('speaking',this)">🗣️ Speaking</button>
+            <button data-type="translate" class="q-type-tab" onclick="selectQType('translate',this)">🌐 Translate</button>
+            <button data-type="letter" class="q-type-tab" onclick="selectQType('letter',this)">🔤 Letter Names</button>
+            <button data-type="lettersound" class="q-type-tab" onclick="selectQType('lettersound',this)">🔊 First Sounds</button>
+            <button data-type="oddone" class="q-type-tab" onclick="selectQType('oddone',this)">🧩 Odd One Out</button>
+            <button data-type="signs" class="q-type-tab" onclick="selectQType('signs',this)">🚪 Signs</button>
+            <button data-type="sms" class="q-type-tab" onclick="selectQType('sms',this)">📱 Messages</button>
+            <button data-type="clock" class="q-type-tab" onclick="selectQType('clock',this)">⏰ Clock</button>
+            <button data-type="shop" class="q-type-tab" onclick="selectQType('shop',this)">🛒 Shop</button>
+            <button data-type="target" class="q-type-tab" onclick="selectQType('target',this)">🎲 Dice</button>
+            <button data-type="forms" class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
+            <button data-type="all" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">✨ All games</button>
+            <button data-type="custom" class="q-type-tab" id="teacher-custom-tab" onclick="showBankPicker('teacher',this)">📚 Custom</button>
           </div>
-          <div>
-            <p class="step-label game">④ If a player adds up wrong</p>
-            <div class="tgt-strict" id="tgt-strict-host">
-              <button type="button" data-strict="1" onclick="setTargetStrict('host',true)">They are out</button>
-              <button type="button" data-strict="0" onclick="setTargetStrict('host',false)">One more try</button>
+          <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="q-count-display">Loading…</div>
+          <div class="tgt-opts" id="tgt-opts-host">
+            <div>
+              <p class="step-label game">③ Target number</p>
+              <div class="tgt-chips" id="tgt-chips-host"></div>
+              <input type="number" class="game-input" id="tgt-custom-host" min="10" max="500" inputmode="numeric"
+                placeholder="Or type a number" oninput="setTargetCustom('host',this.value)"
+                style="max-width:210px;margin:10px 0 0;padding:9px 14px;font-size:.95rem;">
+            </div>
+            <div>
+              <p class="step-label game">④ If a player adds up wrong</p>
+              <div class="tgt-strict" id="tgt-strict-host">
+                <button type="button" data-strict="1" onclick="setTargetStrict('host',true)">They are out</button>
+                <button type="button" data-strict="0" onclick="setTargetStrict('host',false)">One more try</button>
+              </div>
+            </div>
+            <details class="tgt-help">
+              <summary>How to play</summary>
+              <ol>
+                <li>Everyone starts at the same time and rolls at their own pace.</li>
+                <li>Add the two dice to your score, and type your new score.</li>
+                <li>A wrong answer ends that player's game.</li>
+                <li>Roll again, or stop and keep your score.</li>
+                <li>Go over the target and you are out.</li>
+                <li>The closest score to the target wins — the first to get there breaks a tie.</li>
+              </ol>
+            </details>
+          </div>
+          <div class="mc-toggle-wrap on" id="host-mc-toggle" onclick="toggleMcMode('host')">
+            <div class="mc-switch"></div>
+            <div>
+              <div class="mc-toggle-txt">🔵 Multiple Choice (4 options)</div>
+              <div class="mc-toggle-sub">Players tap their answer — no typing.</div>
             </div>
           </div>
-          <details class="tgt-help">
-            <summary>How to play</summary>
-            <ol>
-              <li>Everyone starts at the same time and rolls at their own pace.</li>
-              <li>Add the two dice to your score, and type your new score.</li>
-              <li>A wrong answer ends that player's game.</li>
-              <li>Roll again, or stop and keep your score.</li>
-              <li>Go over the target and you are out.</li>
-              <li>The closest score to the target wins — the first to get there breaks a tie.</li>
-            </ol>
-          </details>
-        </div>
-        <div class="mc-toggle-wrap on" id="host-mc-toggle" onclick="toggleMcMode('host')">
-          <div class="mc-switch"></div>
-          <div>
-            <div class="mc-toggle-txt">🔵 Multiple Choice (4 options)</div>
-            <div class="mc-toggle-sub">Players tap their answer — no typing.</div>
+          <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;" id="host-limit-row">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <label style="font-size:.8rem;color:var(--muted);">Questions:</label>
+              <input type="number" class="game-input" id="q-limit" value="10" min="3" max="50"
+                style="width:70px;padding:6px 10px;font-size:.9rem;margin-bottom:0;" oninput="updateQCountDisplay()">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <label style="font-size:.8rem;color:var(--muted);">Seconds:</label>
+              <input type="number" class="game-input" id="t-limit" value="30" min="10" max="120"
+                style="width:70px;padding:6px 10px;font-size:.9rem;margin-bottom:0;">
+            </div>
           </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;" id="host-limit-row">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <label style="font-size:.8rem;color:var(--muted);">Questions:</label>
-            <input type="number" class="game-input" id="q-limit" value="10" min="3" max="50"
-              style="width:70px;padding:6px 10px;font-size:.9rem;margin-bottom:0;" oninput="updateQCountDisplay()">
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <label style="font-size:.8rem;color:var(--muted);">Seconds:</label>
-            <input type="number" class="game-input" id="t-limit" value="30" min="10" max="120"
-              style="width:70px;padding:6px 10px;font-size:.9rem;margin-bottom:0;">
-          </div>
-        </div>
+        </div><!-- /.setup-main -->
       </div>
     </div>
   </div>
