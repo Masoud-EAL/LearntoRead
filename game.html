@@ -143,12 +143,15 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 /* TEACHER LOBBY */
 #screen-teacher-lobby{padding:20px;gap:20px;}
 .lobby-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1;}
+.lobby-col{display:flex;flex-direction:column;gap:14px;}
 @media(max-width:700px){.lobby-grid{grid-template-columns:1fr;}}
 .room-code-box{text-align:center;padding:22px;background:linear-gradient(135deg,var(--accent),#c0392b);border-radius:var(--radius);}
 .room-code-box .rc-label{font-size:.8rem;letter-spacing:2px;text-transform:uppercase;opacity:.8;margin-bottom:6px;}
 .room-code-box .rc-code{font-family:'Fredoka One',cursive;font-size:3.2rem;letter-spacing:8px;text-shadow:0 4px 12px rgba(0,0,0,.3);}
 .room-code-box .rc-url{font-size:.72rem;opacity:.65;margin-top:8px;word-break:break-all;}
-#qr-wrap{display:flex;justify-content:center;align-items:center;background:white;border-radius:10px;padding:12px;margin-top:10px;}
+/* The code inside is a fixed 260px (generateQR), so a stretched box is a
+   white slab with a QR adrift in it — fit the box to the code instead. */
+#qr-wrap{display:flex;justify-content:center;align-items:center;background:white;border-radius:10px;padding:12px;margin-top:10px;width:fit-content;margin-inline:auto;}
 .player-chips{display:flex;flex-wrap:wrap;gap:8px;min-height:44px;}
 .player-chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:6px 14px;font-size:.85rem;font-weight:700;animation:popIn .3s ease;}
 @keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
@@ -296,6 +299,38 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 
   #screen-teacher-lobby .step-label.skill{font-size:1.05rem;}
   #screen-teacher-lobby .section-chip{padding:8px 12px;font-size:.92rem;}
+
+  /* ── The lobby, on the laptop it is actually run from ──
+     Two equal halves stopped being true once the skill panel, the dice
+     settings and a 34th game landed in the right one: the left half sat
+     300px empty under the QR while the right half overflowed the window and
+     pushed Start Game off the bottom of it. The left column is now only as
+     wide as the QR it exists to show, and the setup takes the rest.
+
+     The screen is pinned to the window and the setup column carries the
+     single scrollbar, so the actions row is always the last thing on screen
+     without being positioned there — unlike .solo-start-bar, which has to
+     be fixed because that screen scrolls as a whole. */
+  .lobby-grid{grid-template-columns:360px minmax(0,1fr);min-height:0;}
+  #screen-teacher-lobby{height:var(--app-h,100dvh);overflow:hidden;}
+  .lobby-col{min-height:0;}
+  .lobby-grid > .lobby-col:last-child{overflow-y:auto;padding-right:4px;}
+  /* The roster takes whatever height the room code leaves and scrolls inside
+     itself. Left to grow it pushed out of the grid and sat under the Back
+     button on a 768px-tall screen; floored at two rows so it never shows a
+     single sliced chip, with the column scrolling if even that will not fit. */
+  .lobby-grid > .lobby-col:first-child{overflow-y:auto;}
+  .lobby-grid > .lobby-col:first-child > .card{flex:1;min-height:140px;display:flex;flex-direction:column;padding:16px 20px;}
+  #screen-teacher-lobby .player-chips{flex:1;max-height:none;align-content:flex-start;}
+  /* A 260px code is a quarter of a 768px classroom laptop before the roster
+     gets a row. It is a bitmap, so scaling it down costs nothing but needs
+     pixelated to keep the modules square and scannable. */
+  #screen-teacher-lobby #qr-wrap > canvas,
+  #screen-teacher-lobby #qr-wrap > img,
+  #screen-teacher-lobby #qr-wrap > table{width:min(260px,24vh)!important;height:min(260px,24vh)!important;image-rendering:pixelated;}
+  /* The cap below cut the list mid-pill — 220px is four and three quarter
+     rows. With the column scrolling there is nothing left for it to solve. */
+  #screen-teacher-lobby .q-type-tabs{max-height:none;overflow:visible;}
 }
 
 /* TEACHER GAME */
@@ -1102,19 +1137,22 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 <div class="screen" id="screen-teacher-lobby">
   <div class="logo-bar">WordLink <span>🎮</span> Lobby</div>
   <div class="lobby-grid" style="padding:0 20px 16px;">
-    <div style="display:flex;flex-direction:column;gap:14px;">
+    <div class="lobby-col">
       <div class="room-code-box">
         <div class="rc-label">Room Code</div>
         <div class="rc-code" id="room-code-display">----</div>
         <div class="rc-url">wordlink.au/game.html</div>
         <div id="qr-wrap"></div>
       </div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:14px;">
+      <!-- The room code, the code as a QR and who has arrived are the three
+           things the teacher and the class look at together, so they share a
+           column. It also gives the left half something to do below the QR. -->
       <div class="card">
         <p style="font-family:'Fredoka One',cursive;font-size:1rem;color:var(--gold);margin-bottom:10px;">👥 Players (<span id="player-count">0</span>)</p>
         <div class="player-chips scrollable" id="player-chips"></div>
       </div>
+    </div>
+    <div class="lobby-col">
       <div class="card">
         <div class="section-panel">
           <p class="step-label skill">① Choose a skill</p>
