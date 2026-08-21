@@ -93,7 +93,16 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
    everything else — the way back, the copy-link — is deliberately quiet.
    The accent colour comes from the game's skill, set inline as --lx. */
 #screen-solo-launch .launch-col{flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;padding:20px;gap:18px;max-width:560px;margin:0 auto;width:100%;}
+  gap:18px;max-width:560px;margin:0 auto;width:100%;
+  /* The bottom padding is the pinned bar's landing space: without it the last
+     control can never be scrolled out from under Play. */
+  padding:20px 20px calc(124px + env(safe-area-inset-bottom,0px));}
+/* Centred when it fits, top-aligned when it does not. justify-content:center
+   would overflow at BOTH ends on a short screen, and the half above the top
+   cannot be scrolled back to — the skill line and the medallion would simply
+   be gone. Auto margins centre the same way but give up the top first. */
+#screen-solo-launch .launch-col > :first-child{margin-top:auto;}
+#screen-solo-launch .launch-col > :last-child{margin-bottom:auto;}
 .launch-skill{font-family:'Fredoka One',cursive;font-size:.8rem;letter-spacing:2px;
   text-transform:uppercase;color:var(--lx,var(--muted));opacity:.9;text-align:center;}
 .launch-medallion{width:116px;height:116px;flex:0 0 auto;border-radius:50%;
@@ -101,11 +110,18 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
   background:var(--card);border:2px solid rgba(255,255,255,.10);
   box-shadow:0 12px 40px var(--lx-glow,rgba(233,69,96,.25));}
 .launch-sub{color:var(--muted);font-size:1rem;line-height:1.45;text-align:center;max-width:34ch;}
-.launch-chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
-/* Read-only: they report what the link is about to start, so a link carrying
-   &mc=0&q=20 looks different from a bare one before anything is played. */
-.launch-chip{padding:6px 13px;border-radius:10px;font-size:.82rem;font-weight:700;
-  color:var(--muted);background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.10);}
+/* The settings, boxed so they read as one group of choices rather than as
+   more of the page's own furniture. Narrower than the text above it: two
+   number fields and a switch, nothing that wants width. */
+.launch-settings{width:100%;max-width:400px;background:rgba(255,255,255,.03);
+  border:1.5px solid rgba(255,255,255,.09);border-radius:14px;padding:14px;}
+.launch-settings .mc-toggle-wrap{margin:0 0 10px;}
+.launch-settings .tgt-opts{margin-bottom:10px;}
+.launch-nums{display:flex;gap:12px;}
+.launch-nums > div{flex:1;display:flex;flex-direction:column;gap:5px;}
+.launch-nums label{font-size:.78rem;color:var(--muted);font-weight:700;}
+.launch-nums input{width:100%;margin-bottom:0;padding:9px 12px;font-size:1rem;text-align:center;}
+.launch-count{font-size:.76rem;color:var(--muted);text-align:center;margin-top:8px;}
 /* The glow breathes rather than the button: a target that grows and shrinks
    under a finger is harder to hit, and this says "press me" just as clearly. */
 .launch-begin{animation:launchPulse 2.6s ease-in-out infinite;}
@@ -153,7 +169,8 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
      on a narrow screen, and the "← WordLink" chip already names the site — so
      it gives up its row and the card starts below the chips instead. */
   #screen-solo-launch > .logo-bar{display:none;}
-  #screen-solo-launch .launch-col{padding:50px 14px 8px;gap:14px;}
+  #screen-solo-launch .launch-col{
+    padding:50px 14px calc(120px + env(safe-area-inset-bottom,0px));gap:14px;}
   .launch-medallion{width:88px;height:88px;font-size:3rem;}
   .launch-sub{font-size:.88rem;line-height:1.35;}
 }
@@ -168,7 +185,8 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
    wordmark go before the title, the blurb or Begin ever do. */
 :root[data-app-h~="lt500"] #screen-solo-launch > .logo-bar,
 :root[data-app-h~="lt500"] .launch-skill{display:none;}
-:root[data-app-h~="lt500"] #screen-solo-launch .launch-col{padding:46px 14px 8px;gap:10px;}
+:root[data-app-h~="lt500"] #screen-solo-launch .launch-col{
+  padding:46px 14px calc(116px + env(safe-area-inset-bottom,0px));gap:10px;}
 :root[data-app-h~="lt500"] .launch-medallion{width:66px;height:66px;font-size:2.2rem;}
 :root[data-app-h~="lt500"] .launch-sub{font-size:.82rem;}
 :root[data-app-h~="lt500"] #screen-home{padding:0 14px 8px;gap:6px;}
@@ -283,7 +301,8 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
    have scrolled the list and chosen — which is exactly when they want it, and
    exactly when a copy moved to the top of the page would have scrolled away.
    Below the bank picker (200) and the toast (999), which must still cover it. */
-#screen-solo-setup .solo-start-bar{
+#screen-solo-setup .solo-start-bar,
+#screen-solo-launch .solo-start-bar{
   position:fixed;left:0;right:0;bottom:0;z-index:50;
   display:flex;justify-content:center;
   padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));
@@ -293,7 +312,8 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 }
 /* A shade smaller than a stock btn-lg — it is on screen the whole time, so it
    buys back a row of the list while staying a full-size adult touch target. */
-#screen-solo-setup .solo-start-bar .btn-lg{font-size:1.2rem;padding:15px 38px;}
+#screen-solo-setup .solo-start-bar .btn-lg,
+#screen-solo-launch .solo-start-bar .btn-lg{font-size:1.2rem;padding:15px 38px;}
 /* The "← WordLink" chip is pinned to the viewport, which was harmless while
    this screen could not scroll. Now that it can, a pinned chip would hover
    over the skill chips it happens to be sitting on — and it is a link off the
@@ -377,7 +397,8 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
   #screen-solo-setup .card > .section-panel{margin-bottom:0;position:sticky;top:14px;}
   #screen-solo-setup .section-chips{display:flex;flex-direction:column;flex-wrap:nowrap;}
   #screen-solo-setup .section-chip{width:100%;text-align:left;}
-  #screen-solo-setup .solo-start-bar .btn-lg{font-size:1.3rem;padding:17px 46px;}
+  #screen-solo-setup .solo-start-bar .btn-lg,
+  #screen-solo-launch .solo-start-bar .btn-lg{font-size:1.3rem;padding:17px 46px;}
 
   #screen-teacher-lobby .step-label.skill{font-size:1.05rem;}
   #screen-teacher-lobby .section-chip{padding:8px 12px;font-size:.92rem;}
@@ -1190,22 +1211,51 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="all" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">✨ All games</button>
         <button data-type="custom" class="q-type-tab" id="solo-custom-tab" onclick="showBankPicker('solo',this)">📚 Custom</button>
       </div>
-      <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="solo-count-display">Loading…</div>
-      <!-- The Dice game has no question bank, so it swaps the question
-           count, the multiple-choice toggle and the length inputs for its own
-           settings. Built once per scope; see applyTargetSetup(). -->
+      </div><!-- /.setup-main -->
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-student-home')">← Back</button>
+  </div>
+  <!-- Outside the scrolling column: Start rides at the bottom of the screen.
+       Back stays in the column, so the bar is only ever one button tall.
+       It opens the game's start page rather than the first question: the
+       settings and the shareable link live there. -->
+  <div class="solo-start-bar">
+    <button class="btn btn-gold btn-lg" onclick="goSoloStart()">▶ Start Practice</button>
+  </div>
+</div>
+
+<!-- SOLO START SCREEN — the front door to one game.
+     Every route into solo play comes through here: Start Practice from the
+     picker, and every shared link. That is deliberate — it is where the
+     learner sees what they are about to play, sets how it will run, and can
+     copy the link to it, none of which they could do when Start Practice went
+     straight to the first question. It is also the tap that unlocks audio:
+     browsers stay silent until a gesture, so a game that started by itself
+     would lose the speech on its first question.
+     Filled in by openSoloLaunch(); the emoji and the name are read back out
+     of the picker's own buttons above, so there is no second list of game
+     names to keep in step. The settings below are the picker's own controls,
+     moved here — same ids, so everything that reads them still does. -->
+<div class="screen" id="screen-solo-launch">
+  <div class="logo-bar">WordLink <span>🎮</span> Practice</div>
+  <div class="launch-col">
+    <div class="launch-skill" id="launch-skill">Practice</div>
+    <div class="launch-medallion" id="launch-emoji">🎮</div>
+    <div class="home-title" id="launch-title">Practice</div>
+    <p class="launch-sub" id="launch-sub"></p>
+    <div class="launch-settings">
       <div class="tgt-opts" id="tgt-opts-solo">
         <div>
-          <p class="step-label game">③ Target number</p>
+          <p class="step-label game">① Target number</p>
           <div class="tgt-chips" id="tgt-chips-solo"></div>
           <input type="number" class="game-input" id="tgt-custom-solo" min="10" max="500" inputmode="numeric"
             placeholder="Or type a number" oninput="setTargetCustom('solo',this.value)"
             style="max-width:210px;margin:10px 0 0;padding:9px 14px;font-size:.95rem;">
         </div>
         <div>
-          <p class="step-label game">④ If a player adds up wrong</p>
+          <p class="step-label game">② If you add up wrong</p>
           <div class="tgt-strict" id="tgt-strict-solo">
-            <button type="button" data-strict="1" onclick="setTargetStrict('solo',true)">They are out</button>
+            <button type="button" data-strict="1" onclick="setTargetStrict('solo',true)">My game ends</button>
             <button type="button" data-strict="0" onclick="setTargetStrict('solo',false)">One more try</button>
           </div>
         </div>
@@ -1228,11 +1278,19 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
           <div class="mc-toggle-sub">Listen & tap — no typing. Great for early readers.</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;" id="solo-limit-row">
-        <label style="font-size:.8rem;color:var(--muted);">Questions:</label>
-        <input type="number" class="game-input" id="solo-q-limit" value="10" min="1" max="50"
-          style="width:70px;padding:6px 10px;font-size:.9rem;margin-bottom:0;" oninput="updateSoloCountDisplay()">
+      <div class="launch-nums" id="solo-limit-row">
+        <div>
+          <label for="solo-q-limit">Questions</label>
+          <input type="number" class="game-input" id="solo-q-limit" value="10" min="1" max="50"
+            inputmode="numeric" oninput="onSoloSettingChange()">
+        </div>
+        <div>
+          <label for="solo-t-limit">Seconds each</label>
+          <input type="number" class="game-input" id="solo-t-limit" value="30" min="10" max="120"
+            inputmode="numeric" oninput="onSoloSettingChange()">
+        </div>
       </div>
+      <div class="launch-count" id="solo-count-display">Loading…</div>
       <div id="solo-lang-wrap" style="display:none;margin-top:10px;display:none;align-items:center;gap:10px;">
         <label style="font-size:.8rem;color:var(--muted);">Your language:</label>
         <select id="solo-lang-pick" class="game-input" style="width:auto;padding:6px 10px;font-size:.9rem;margin-bottom:0;" onchange="localStorage.setItem('translateLang',this.value)">
@@ -1243,41 +1301,18 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
           <option value="th">ภาษาไทย</option>
         </select>
       </div>
-      </div><!-- /.setup-main -->
     </div>
-    <div class="launch-exits">
-      <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-student-home')">← Back</button>
-      <button class="btn btn-ghost btn-sm" onclick="copySoloLink()">🔗 Copy link to this game</button>
-    </div>
-  </div>
-  <!-- Outside the scrolling column: Start rides at the bottom of the screen.
-       Back stays in the column, so the bar is only ever one button tall. -->
-  <div class="solo-start-bar">
-    <button class="btn btn-gold btn-lg" onclick="startSoloGame()">▶ Start Practice</button>
-  </div>
-</div>
-
-<!-- SOLO START SCREEN — one game, arrived at from a shared link.
-     Filled in by openSoloLaunch(); the emoji and the name are read back out of
-     the picker's own buttons above, so there is no second list of game names
-     to keep in step. Begin doubles as the tap that unlocks audio — browsers
-     stay silent until a gesture, so a link that auto-started would lose the
-     speech on its first question. -->
-<div class="screen" id="screen-solo-launch">
-  <div class="logo-bar">WordLink <span>🎮</span> Practice</div>
-  <div class="launch-col">
-    <div class="launch-skill" id="launch-skill">Practice</div>
-    <div class="launch-medallion" id="launch-emoji">🎮</div>
-    <div class="home-title" id="launch-title">Practice</div>
-    <p class="launch-sub" id="launch-sub"></p>
-    <div class="launch-chips" id="launch-chips"></div>
-    <button class="btn btn-gold btn-lg launch-begin" onclick="startSoloGame()">▶ Begin</button>
     <div class="launch-exits">
       <button class="btn btn-ghost btn-sm" onclick="showSoloSetup()">← Choose another game</button>
       <button class="btn btn-ghost btn-sm" onclick="copySoloLink()">🔗 Copy link</button>
     </div>
   </div>
-  <p class="page-foot">Free English practice for adult learners. <a href="about.html">About WordLink</a></p>
+  <!-- Pinned, like the picker's: on a short screen the settings can push the
+       page past the fold, and Play is the one thing that must never scroll
+       away. -->
+  <div class="solo-start-bar">
+    <button class="btn btn-gold btn-lg launch-begin" onclick="startSoloGame()">▶ Play Game</button>
+  </div>
 </div>
 
 <!-- TEACHER LOBBY -->
@@ -3790,7 +3825,10 @@ function generateQR(){
   const el=document.getElementById('qr-wrap'); el.innerHTML='';
   new QRCode(el,{text:'https://wordlink.au/game.html?join='+roomCode,width:800,height:800,colorDark:'#000000',colorLight:'#ffffff'});
 }
-function toggleMcMode(which){ setMcMode(!mcMode); }
+function toggleMcMode(which){
+  setMcMode(!mcMode);
+  if(which==='solo'&&soloMode) onSoloSettingChange();
+}
 /* Set the mode outright rather than flipping it — choosing a skill picks the
    mode that suits that skill's default game, which a toggle can't express. */
 function setMcMode(on){
@@ -3855,6 +3893,8 @@ function applyTargetSetup(scope){
   if(mc) mc.style.display=on?'none':'';
   const lim=document.getElementById(scope+'-limit-row');
   if(lim) lim.style.display=on?'none':'';
+  const cnt=document.getElementById(scope+'-count-display');
+  if(cnt) cnt.style.display=on?'none':'';
 }
 
 function selectQType(type,el){
@@ -4424,7 +4464,7 @@ function skipReveal(){
   if(roomRef) roomRef.update({revealSkipped:true});
 }
 function playAgain(){
-  if(soloMode){ showScreen('screen-solo-setup'); updateSoloCountDisplay(); return; }
+  if(soloMode){ if(!openSoloLaunch(soloSelectedType)) showSoloSetup(); return; }
   // Keep the class: the room goes back to the lobby it started in, with the
   // same players and their scores wiped, so nobody has to rejoin. Without this
   // the room stayed "finished" — students were left holding a dead leaderboard
@@ -4895,6 +4935,11 @@ const UNSHAREABLE_GAMES=['custom'];
 const GAME_MC_DEFAULT={unscramble:false,gramscramble:false,speaking:false,spelling:false,
   'wp1:build':false,'wp2:build':false};
 function defaultMcFor(type){ return GAME_MC_DEFAULT[type]!==false; }
+function soloSeconds(){
+  const el=document.getElementById('solo-t-limit');
+  const v=el?parseInt(el.value,10):NaN;
+  return (v>=10&&v<=120)?v:TIMER_DURATION;
+}
 function soloTabFor(type){
   return document.querySelector('#screen-solo-setup .q-type-tab[data-type="'+type+'"]');
 }
@@ -4904,7 +4949,7 @@ function soloTabFor(type){
    rather than showing an empty card. */
 function openSoloLaunch(type){
   const tab=soloTabFor(type);
-  if(!tab||UNSHAREABLE_GAMES.indexOf(type)>=0) return false;
+  if(!tab) return false;
   selectSoloType(type,tab);
   const label=(tab.textContent||'').trim();
   const sp=label.indexOf(' ');
@@ -4918,36 +4963,24 @@ function openSoloLaunch(type){
   document.getElementById('launch-title').textContent=info.name||(sp>0?label.slice(sp+1):label);
   document.getElementById('launch-sub').textContent=
     info.blurb||document.getElementById('solo-count-display').textContent;
-  renderLaunchChips(type);
+  applyTargetSetup('solo');
+  updateSoloCountDisplay();
   syncSoloUrl(type);
   showScreen('screen-solo-launch');
   return true;
 }
-/* Read-only pills: they tell the learner what the link is about to start, and
-   make a link carrying &mc=0&q=20 visibly different from a bare one. */
-function renderLaunchChips(type){
-  const wrap=document.getElementById('launch-chips');
-  if(!wrap) return;
-  let chips;
-  if(type==='target'){
-    chips=['🎯 Target '+resolveTarget('solo'),
-           targetStrict?'A wrong answer ends your game':'One more try'];
-  } else {
-    const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
-    const n=countFor(type,limit).will||limit;
-    chips=[n+' question'+(n===1?'':'s'), answerChipFor(type)];
-  }
-  wrap.innerHTML=chips.map(t=>'<span class="launch-chip">'+t+'</span>').join('');
+/* Start Practice on the picker: it opens the chosen game's start page rather
+   than the first question, so the learner sees what they picked, sets how it
+   runs, and can copy its link. */
+function goSoloStart(){
+  if(!openSoloLaunch(soloSelectedType)) showToast('Choose a game first');
+  window.scrollTo(0,0);
 }
-/* How the learner will answer. "Typing" is only true of most games: Speaking
-   is spoken and the two ordering games are tapped into place, and telling
-   someone they will be typing when they won't is worse than saying nothing. */
-function answerChipFor(type){
-  if(mcMode) return '🔵 Multiple choice';
-  if(type==='speaking') return '🎤 Say your answer';
-  if(type==='unscramble'||type==='gramscramble') return '🔀 Put the words in order';
-  if(type==='wp1:build'||type==='wp2:build') return '🧱 Build the word';
-  return '⌨️ Typing';
+/* Any settings change on the start page: the count line and the link both
+   describe what Play would do, so both follow the controls. */
+function onSoloSettingChange(){
+  updateSoloCountDisplay();
+  syncSoloUrl(soloSelectedType);
 }
 function showSoloSetup(){
   showScreen('screen-solo-setup');
@@ -4961,6 +4994,8 @@ function soloLinkParams(type){
   if(type!=='target'){
     const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
     if(limit!==10) p.set('q',limit);
+    const secs=soloSeconds();
+    if(secs!==TIMER_DURATION) p.set('t',secs);
     if(mcMode!==defaultMcFor(type)) p.set('mc',mcMode?'1':'0');
   }
   return p;
@@ -5235,8 +5270,9 @@ function showStudentQuestion(q,startedAt,dur){
   // local default (solo play, or an older host that didn't send one).
   // A spoken question plus a whole answer to build needs the same room to
   // work as a translation, so it gets the same doubled budget (see playQuestion).
-  const timerDur=dur||((q.type==='translate'||q.type==='speak')?60
-    :q.type==='shop'?SHOP_TIMER_DURATION:TIMER_DURATION);
+  const base=soloMode?soloSeconds():TIMER_DURATION;
+  const timerDur=dur||((q.type==='translate'||q.type==='speak')?base*2
+    :q.type==='shop'?Math.max(SHOP_TIMER_DURATION,base):base);
   studentSpeak(q); startStudentTimer(startedAt, timerDur);
 }
 
@@ -6609,6 +6645,8 @@ window.addEventListener('load',()=>{
     if(game&&soloTabFor(game)&&UNSHAREABLE_GAMES.indexOf(game)<0){
       const q=parseInt(params.get('q'),10);
       if(q>=1&&q<=50) document.getElementById('solo-q-limit').value=q;
+      const t=parseInt(params.get('t'),10);
+      if(t>=10&&t<=120) document.getElementById('solo-t-limit').value=t;
       const mc=params.get('mc');
       setMcMode(mc===null?defaultMcFor(game):mc==='1');
       openSoloLaunch(game);
