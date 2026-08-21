@@ -6667,8 +6667,15 @@ window.addEventListener('load',()=>{
 <script>
 if ('serviceWorker' in navigator) {
   let refreshing = false;
+  // Only reload for a genuine update to an already-running session. On a
+  // first-ever install there's no prior controller, so this page is already
+  // fresh off the network — reloading then just interrupts the learner a
+  // few seconds into their first visit for no benefit.
+  const hadController = !!navigator.serviceWorker.controller;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!refreshing) { refreshing = true; window.location.reload(); }
+    if (!hadController || refreshing) return;
+    refreshing = true;
+    window.location.reload();
   });
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }));
 }
