@@ -8,23 +8,29 @@
      Parts of the Body. The page carries its own share preview and then hands over. -->
 <title>Parts of the Body | WordLink</title>
 <meta name="description" content="Hear a part of the body and write it. Free English practice for adult learners. No sign-up.">
-<!-- Search engines should index the app, not this hop. -->
-<link rel="canonical" href="https://wordlink.au/game.html?mode=solo&amp;game=body">
+<!-- Self-referential: this short address IS the public address for
+     Parts of the Body now — it is what gets shared and what a link preview reads. A
+     canonical pointing back at the app would hand every one of these pages
+     the app's own single title and description, which is exactly the problem
+     they exist to solve. -->
+<link rel="canonical" href="https://wordlink.au/body">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="WordLink">
 <meta property="og:locale" content="en_AU">
 <meta property="og:url" content="https://wordlink.au/body">
-<meta property="og:title" content="Parts of the Body — WordLink">
+<meta property="og:title" content="Parts of the Body">
 <meta property="og:description" content="Hear a part of the body and write it. Free English practice for adult learners. No sign-up.">
 <meta property="og:image" content="https://wordlink.au/icon-512.png">
 <meta name="twitter:card" content="summary">
 
-<!-- The refresh is the fallback for a browser with JavaScript turned off; the
-     script beats it to it and uses replace() so Back returns to wherever the
-     link was shared, not to this staging post. Anything after the ? comes
-     along, so /body?q=20 still works. -->
-<meta http-equiv="refresh" content="0; url=game.html?mode=solo&amp;game=body">
+<!-- The refresh is the fallback for a browser with JavaScript turned off, and
+     it lives in <noscript> so it is the script OR the meta, never both: left
+     bare, the meta fires a second navigation on top of the script's and the
+     destination is re-parsed from scratch part-way through loading.
+     replace() so Back returns to wherever the link was shared, not to this
+     staging post. Anything after the ? comes along, so /body?q=20 works. -->
+<noscript><meta http-equiv="refresh" content="0; url=game.html?mode=solo&amp;game=body"></noscript>
 <script>
 (function(){
   var q=location.search.replace(/^\?/,'');

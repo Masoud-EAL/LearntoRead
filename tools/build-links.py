@@ -92,23 +92,29 @@ PAGE = """<!DOCTYPE html>
      {title}. The page carries its own share preview and then hands over. -->
 <title>{title} | WordLink</title>
 <meta name="description" content="{desc}">
-<!-- Search engines should index the app, not this hop. -->
-<link rel="canonical" href="{site}/{dest_url}">
+<!-- Self-referential: this short address IS the public address for
+     {title} now — it is what gets shared and what a link preview reads. A
+     canonical pointing back at the app would hand every one of these pages
+     the app's own single title and description, which is exactly the problem
+     they exist to solve. -->
+<link rel="canonical" href="{site}/{slug}">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="WordLink">
 <meta property="og:locale" content="en_AU">
 <meta property="og:url" content="{site}/{slug}">
-<meta property="og:title" content="{title} — WordLink">
+<meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
 <meta property="og:image" content="{site}/icon-512.png">
 <meta name="twitter:card" content="summary">
 
-<!-- The refresh is the fallback for a browser with JavaScript turned off; the
-     script beats it to it and uses replace() so Back returns to wherever the
-     link was shared, not to this staging post. Anything after the ? comes
-     along, so /{slug}?q=20 still works. -->
-<meta http-equiv="refresh" content="0; url={dest}">
+<!-- The refresh is the fallback for a browser with JavaScript turned off, and
+     it lives in <noscript> so it is the script OR the meta, never both: left
+     bare, the meta fires a second navigation on top of the script's and the
+     destination is re-parsed from scratch part-way through loading.
+     replace() so Back returns to wherever the link was shared, not to this
+     staging post. Anything after the ? comes along, so /{slug}?q=20 works. -->
+<noscript><meta http-equiv="refresh" content="0; url={dest}"></noscript>
 <script>
 (function(){{
   var q=location.search.replace(/^\\?/,'');
@@ -186,8 +192,11 @@ def update_sw(files):
     path = os.path.join(ROOT, 'sw.js')
     with open(path, encoding='utf-8') as f:
         js = f.read()
+    # Both forms of each: the file, and the extensionless address Pages serves
+    # it at. A shared link is opened as /clock, and an exact-URL cache match
+    # will not find that under ./clock.html.
     block = ('  // %s — the short share addresses (/clock, /speaking).\n' % MARKER
-             + ''.join("  './%s',\n" % f for f in sorted(files))
+             + ''.join("  './%s',\n  './%s',\n" % (f, f[:-5]) for f in sorted(files))
              + '  // /short links\n')
     if MARKER in js:
         js = re.sub(r'  // %s[^\n]*\n(?:.*?)  // /short links\n' % re.escape(MARKER),

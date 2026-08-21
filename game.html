@@ -5000,14 +5000,32 @@ function soloLinkParams(type){
   }
   return p;
 }
+/* Where the app is served from, read once before any replaceState moves the
+   address off game.html. */
+const APP_BASE=(function(){ try{ return new URL('.',location.href).href; }catch(e){ return '/'; } })();
+/* The address bar carries the game's own short address — wordlink.au/clock —
+   because the address bar is what gets copied and pasted, and a link back to
+   game.html resolves to one page with one title and one preview: pasted into
+   Teams, every game looked identical. Each short address is a page of its own
+   with the game's name and its own one-line description.
+   A link that changes the question count, the length or the answer mode has
+   more to say than a name can, so that keeps the /solo?game=… form. */
+function soloShareUrl(type){
+  if(UNSHAREABLE_GAMES.indexOf(type)>=0) return new URL('solo',APP_BASE);
+  const q=queryOf(type), slug=GAME_SLUG[type];
+  return (slug&&q==='game='+type) ? new URL(slug,APP_BASE) : new URL('solo?'+q,APP_BASE);
+}
 function syncSoloUrl(type){
-  try{ history.replaceState(null,'',location.pathname+'?mode=solo&'+queryOf(type)); }catch(e){}
+  try{
+    const u=soloShareUrl(type);
+    history.replaceState(null,'',u.pathname+u.search);
+  }catch(e){}
 }
 /* URLSearchParams escapes the colon in wp1:build. It round-trips either way,
    but an unescaped one is what someone reads back off a shared link. */
 function queryOf(type){ return soloLinkParams(type).toString().replace(/%3A/g,':'); }
 function clearSoloUrl(){
-  try{ history.replaceState(null,'',location.pathname); }catch(e){}
+  try{ history.replaceState(null,'',new URL('game.html',APP_BASE).pathname); }catch(e){}
 }
 /* Each game's short address — wordlink.au/clock rather than
    wordlink.au/solo?game=clock. Each slug is a small page of its own that
@@ -5024,18 +5042,9 @@ const GAME_SLUG={
   signs:'signs',sms:'messages',clock:'clock',shop:'shop',target:'dice',forms:'forms',all:'all-games',
 };
 function copySoloLink(){
-  /* Prefer the short address. It only carries the game, so a link with the
-     question count or the answer mode changed falls back to /solo?game=… ,
-     which can say all of it. A custom bank is nobody else's to open, so that
-     copies the plain picker. */
-  const type=soloSelectedType;
-  const q=queryOf(type);
-  const slug=GAME_SLUG[type];
-  const base=new URL('solo',location.href).href;
-  const url=UNSHAREABLE_GAMES.indexOf(type)>=0 ? base
-    : (slug&&q==='game='+type) ? new URL('/'+slug,location.href).href
-    : base+'?'+q;
-  copyToClipboard(url,function(ok){ if(ok) showToast('🔗 Link copied'); });
+  /* The address bar is already the shareable link; copying is copying it. */
+  copyToClipboard(soloShareUrl(soloSelectedType).href,
+    function(ok){ if(ok) showToast('🔗 Link copied'); });
 }
 /* navigator.clipboard is undefined on plain http and in older Android
    WebViews, which a fair few learners are on. */

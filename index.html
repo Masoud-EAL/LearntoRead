@@ -1973,19 +1973,32 @@ function showSection(name, btn) {
    fourth button". The URL is rewritten in place: replaceState, not pushState,
    because Back should leave the app rather than walk back through six tabs.
 ══════════════════════════════════════════ */
+/* Where the app is served from, read once before any replaceState moves the
+   address off index.html. Everything below is built against it, so the short
+   addresses are right whether the site sits at a domain root or in a
+   subdirectory. */
+const APP_BASE = (function () {
+  try { return new URL('.', window.location.href).href; } catch (e) { return '/'; }
+})();
+/* Put the section's own short address in the address bar — wordlink.au/speaking,
+   not wordlink.au/?section=speaking. It is the address bar that gets copied and
+   pasted, and the query form resolves to index.html, whose title and preview
+   describe the whole site: pasted into Teams, every section looked identical.
+   Each short address is a page of its own with its own title and preview. */
+function sectionUrlFor(name, level) {
+  const lvl = name === 'sentences'
+    ? (typeof level === 'number' ? level : currentSentenceLevel()) : null;
+  const slug = SECTION_SLUG[lvl ? name + ':' + lvl : name];
+  if (slug) return new URL(slug, APP_BASE);
+  // No short name for it — the query form still works.
+  const url = new URL(APP_BASE);
+  url.searchParams.set('section', name);
+  return url;
+}
 function syncSectionUrl(name, level) {
   try {
-    const url = new URL(window.location.href);
-    url.searchParams.set('section', name);
-    // Only Sentences has levels; carry the one showing, and drop the param
-    // everywhere else so the other five links stay short.
-    if (name === 'sentences') {
-      const lvl = typeof level === 'number' ? level : currentSentenceLevel();
-      if (lvl !== null) url.searchParams.set('level', lvl);
-    } else {
-      url.searchParams.delete('level');
-    }
-    history.replaceState(null, '', url.pathname + url.search + url.hash);
+    const url = sectionUrlFor(name, level);
+    history.replaceState(null, '', url.pathname + url.search);
   } catch (e) { /* file:// and old browsers — the app works, the link just won't update */ }
 }
 function currentSentenceLevel() {
@@ -2003,16 +2016,10 @@ const SECTION_SLUG = {
   sentences: 'sentences', 'sentences:1': 'sentences-elementary',
   speaking: 'speaking',
 };
-function prettySectionLink() {
+function copySectionLink(btn) {
   const active = document.querySelector('.section-page.active');
   const name = active ? active.id.replace(/^sec-/, '') : '';
-  const lvl = name === 'sentences' ? currentSentenceLevel() : null;
-  const slug = SECTION_SLUG[lvl ? name + ':' + lvl : name];
-  // No pretty name for it: the query link still works, so hand that over.
-  return slug ? new URL('/' + slug, window.location.href).href : window.location.href;
-}
-function copySectionLink(btn) {
-  copyToClipboard(prettySectionLink(), function(ok) {
+  copyToClipboard(sectionUrlFor(name).href, function(ok) {
     if (!ok) return;
     const note = document.getElementById('shareNote');
     btn.classList.add('copied');
@@ -4141,13 +4148,6 @@ selectFamily('wp2', 0);
     const lvl = parseInt(params.get('level'), 10);
     const lvlBtn = document.querySelectorAll('#sec-sentences .level-tab')[lvl];
     if (lvlBtn) showLevel(lvl, lvlBtn);
-  }
-  // Nothing restored means the markup's default section is showing. Name it in
-  // the address anyway, so Copy link always hands over a link that reopens
-  // exactly what is on screen.
-  if (!document.querySelector('.section-page.active[id="sec-' + section + '"]')) {
-    const active = document.querySelector('.section-page.active');
-    if (active) syncSectionUrl(active.id.replace(/^sec-/, ''));
   }
 })();
 

@@ -26,8 +26,11 @@
      wherever the link was shared, not to this staging post.
      Anything after the ? comes too: /solo?game=clock is the short, shareable
      form of a single game's start screen, and dropping the parameter here
-     would land every such link on the picker instead. -->
-<meta http-equiv="refresh" content="0; url=game.html?mode=solo">
+     would land every such link on the picker instead.
+     The meta sits in <noscript> so it is the script OR the meta, never both:
+     left bare, it fires a second navigation on top of the script's and the
+     destination is re-parsed from scratch part-way through loading. -->
+<noscript><meta http-equiv="refresh" content="0; url=game.html?mode=solo"></noscript>
 <script>
 (function(){
   var q=location.search.replace(/^\?/,'');
