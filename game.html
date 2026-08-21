@@ -4974,13 +4974,32 @@ function queryOf(type){ return soloLinkParams(type).toString().replace(/%3A/g,':
 function clearSoloUrl(){
   try{ history.replaceState(null,'',location.pathname); }catch(e){}
 }
+/* Each game's short address — wordlink.au/clock rather than
+   wordlink.au/solo?game=clock. Each slug is a small page of its own that
+   forwards here; the pages and this list both come from tools/build-links.py,
+   so keep them in step there. */
+const GAME_SLUG={
+  'wp1:gap':'beginner-sound-gap','wp1:word':'beginner-tap-word','wp1:build':'beginner-build-word',
+  'wp2:gap':'elementary-sound-gap','wp2:word':'elementary-tap-word','wp2:build':'elementary-build-word',
+  beginner:'beginner-listening',elementary:'elementary-listening',questionwords:'question-words',
+  numbers:'numbers-1-10',numbers1120:'numbers-11-20',numbers2199:'numbers-21-99',
+  days:'days',months:'months',weather:'weather',fruits:'fruits',body:'body',clothes:'clothes',
+  spelling:'spelling',unscramble:'unscramble',gramscramble:'word-order',speaking:'speaking-game',
+  translate:'translate',letter:'letter-names',lettersound:'first-sounds',oddone:'odd-one-out',
+  signs:'signs',sms:'messages',clock:'clock',shop:'shop',target:'dice',forms:'forms',all:'all-games',
+};
 function copySoloLink(){
-  /* The short form is the one worth handing to someone: /solo forwards to the
-     game with its parameters intact. A bank only this account can see has no
-     shareable link, so that copies the plain game picker instead. */
+  /* Prefer the short address. It only carries the game, so a link with the
+     question count or the answer mode changed falls back to /solo?game=… ,
+     which can say all of it. A custom bank is nobody else's to open, so that
+     copies the plain picker. */
+  const type=soloSelectedType;
+  const q=queryOf(type);
+  const slug=GAME_SLUG[type];
   const base=new URL('solo',location.href).href;
-  const url=UNSHAREABLE_GAMES.indexOf(soloSelectedType)>=0
-    ? base : base+'?'+queryOf(soloSelectedType);
+  const url=UNSHAREABLE_GAMES.indexOf(type)>=0 ? base
+    : (slug&&q==='game='+type) ? new URL('/'+slug,location.href).href
+    : base+'?'+q;
   copyToClipboard(url,function(ok){ if(ok) showToast('🔗 Link copied'); });
 }
 /* navigator.clipboard is undefined on plain http and in older Android
