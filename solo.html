@@ -23,9 +23,17 @@
 
 <!-- The refresh is the fallback for a browser with JavaScript turned off; the
      script below beats it to the punch and uses replace() so Back returns to
-     wherever the link was shared, not to this staging post. -->
+     wherever the link was shared, not to this staging post.
+     Anything after the ? comes too: /solo?game=clock is the short, shareable
+     form of a single game's start screen, and dropping the parameter here
+     would land every such link on the picker instead. -->
 <meta http-equiv="refresh" content="0; url=game.html?mode=solo">
-<script>location.replace('game.html?mode=solo');</script>
+<script>
+(function(){
+  var q=location.search.replace(/^\?/,'');
+  location.replace('game.html?mode=solo'+(q?'&'+q:''));
+})();
+</script>
 
 <link href="fonts/fonts.css" rel="stylesheet">
 <meta name="theme-color" content="#0d0d1a">

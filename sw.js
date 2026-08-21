@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v37';
+const CACHE = 'learntoread-v38';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -160,6 +160,11 @@ self.addEventListener('fetch', e => {
         caches.open(CACHE).then(c => c.put(e.request, response.clone()));
       }
       return response;
-    }).catch(() => caches.match(e.request))
+    }).catch(() =>
+      // ignoreSearch: shared links carry the view in the query string
+      // (?section=speaking, ?game=clock). The cached page is the same file, so
+      // an exact-URL match would fail offline on every link worth sharing.
+      caches.match(e.request, { ignoreSearch: true })
+    )
   );
 });

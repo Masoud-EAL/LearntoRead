@@ -86,6 +86,37 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .role-card h2{font-family:'Fredoka One',cursive;font-size:1.4rem;margin-bottom:8px;}
 .role-card p{color:var(--muted);font-size:.9rem;line-height:1.4;}
 
+/* ── The start screen for one game ──
+   Reached from a shared link (?game=clock). It is a title card, not the picker
+   with the other games hidden: for a learner at pre-level there has to be
+   exactly one obvious thing to press, so Begin is the only loud element and
+   everything else — the way back, the copy-link — is deliberately quiet.
+   The accent colour comes from the game's skill, set inline as --lx. */
+#screen-solo-launch .launch-col{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:20px;gap:18px;max-width:560px;margin:0 auto;width:100%;}
+.launch-skill{font-family:'Fredoka One',cursive;font-size:.8rem;letter-spacing:2px;
+  text-transform:uppercase;color:var(--lx,var(--muted));opacity:.9;text-align:center;}
+.launch-medallion{width:116px;height:116px;flex:0 0 auto;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:4rem;line-height:1;
+  background:var(--card);border:2px solid rgba(255,255,255,.10);
+  box-shadow:0 12px 40px var(--lx-glow,rgba(233,69,96,.25));}
+.launch-sub{color:var(--muted);font-size:1rem;line-height:1.45;text-align:center;max-width:34ch;}
+.launch-chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+/* Read-only: they report what the link is about to start, so a link carrying
+   &mc=0&q=20 looks different from a bare one before anything is played. */
+.launch-chip{padding:6px 13px;border-radius:10px;font-size:.82rem;font-weight:700;
+  color:var(--muted);background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.10);}
+/* The glow breathes rather than the button: a target that grows and shrinks
+   under a finger is harder to hit, and this says "press me" just as clearly. */
+.launch-begin{animation:launchPulse 2.6s ease-in-out infinite;}
+@keyframes launchPulse{
+  0%,100%{box-shadow:0 6px 24px rgba(245,166,35,.4);}
+  50%{box-shadow:0 6px 34px rgba(245,166,35,.75);}
+}
+/* Still motion, however gentle. */
+@media (prefers-reduced-motion:reduce){.launch-begin{animation:none;}}
+.launch-exits{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px;}
+
 /* ── The landing screens on a phone ──
    Stacked, the two choice cards plus the title, the strapline and the footer
    came to about 820px against the ~650px a phone with its URL bar showing
@@ -118,6 +149,13 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
   .role-card h2{font-size:1.15rem;margin-bottom:3px;align-self:end;}
   .role-card p{font-size:.82rem;line-height:1.3;align-self:start;}
   .page-foot{padding:8px 14px 2px;font-size:.68rem;line-height:1.35;}
+  /* The wordmark is wide enough to run under the fixed Back and Music chips
+     on a narrow screen, and the "← WordLink" chip already names the site — so
+     it gives up its row and the card starts below the chips instead. */
+  #screen-solo-launch > .logo-bar{display:none;}
+  #screen-solo-launch .launch-col{padding:50px 14px 8px;gap:14px;}
+  .launch-medallion{width:88px;height:88px;font-size:3rem;}
+  .launch-sub{font-size:.88rem;line-height:1.35;}
 }
 /* A short screen, whatever its width — a small handset, or a phone turned
    sideways, where the cards sit two abreast and the width rules above never
@@ -126,6 +164,13 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
    the same trim, applied by height instead. */
 :root[data-app-h~="lt500"] .home-sub,
 :root[data-app-h~="lt500"] .page-foot{display:none;}
+/* Same order of sacrifice on the start screen: the skill line and the
+   wordmark go before the title, the blurb or Begin ever do. */
+:root[data-app-h~="lt500"] #screen-solo-launch > .logo-bar,
+:root[data-app-h~="lt500"] .launch-skill{display:none;}
+:root[data-app-h~="lt500"] #screen-solo-launch .launch-col{padding:46px 14px 8px;gap:10px;}
+:root[data-app-h~="lt500"] .launch-medallion{width:66px;height:66px;font-size:2.2rem;}
+:root[data-app-h~="lt500"] .launch-sub{font-size:.82rem;}
 :root[data-app-h~="lt500"] #screen-home{padding:0 14px 8px;gap:6px;}
 /* The wordmark is the one thing on these screens that is not a choice, and
    the fixed "← WordLink" chip already names the site — so on a screen this
@@ -1200,13 +1245,39 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       </div>
       </div><!-- /.setup-main -->
     </div>
-    <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-student-home')">← Back</button>
+    <div class="launch-exits">
+      <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-student-home')">← Back</button>
+      <button class="btn btn-ghost btn-sm" onclick="copySoloLink()">🔗 Copy link to this game</button>
+    </div>
   </div>
   <!-- Outside the scrolling column: Start rides at the bottom of the screen.
        Back stays in the column, so the bar is only ever one button tall. -->
   <div class="solo-start-bar">
     <button class="btn btn-gold btn-lg" onclick="startSoloGame()">▶ Start Practice</button>
   </div>
+</div>
+
+<!-- SOLO START SCREEN — one game, arrived at from a shared link.
+     Filled in by openSoloLaunch(); the emoji and the name are read back out of
+     the picker's own buttons above, so there is no second list of game names
+     to keep in step. Begin doubles as the tap that unlocks audio — browsers
+     stay silent until a gesture, so a link that auto-started would lose the
+     speech on its first question. -->
+<div class="screen" id="screen-solo-launch">
+  <div class="logo-bar">WordLink <span>🎮</span> Practice</div>
+  <div class="launch-col">
+    <div class="launch-skill" id="launch-skill">Practice</div>
+    <div class="launch-medallion" id="launch-emoji">🎮</div>
+    <div class="home-title" id="launch-title">Practice</div>
+    <p class="launch-sub" id="launch-sub"></p>
+    <div class="launch-chips" id="launch-chips"></div>
+    <button class="btn btn-gold btn-lg launch-begin" onclick="startSoloGame()">▶ Begin</button>
+    <div class="launch-exits">
+      <button class="btn btn-ghost btn-sm" onclick="showSoloSetup()">← Choose another game</button>
+      <button class="btn btn-ghost btn-sm" onclick="copySoloLink()">🔗 Copy link</button>
+    </div>
+  </div>
+  <p class="page-foot">Free English practice for adult learners. <a href="about.html">About WordLink</a></p>
 </div>
 
 <!-- TEACHER LOBBY -->
@@ -3644,7 +3715,7 @@ window.addEventListener('pagehide',suspendMusic);
 window.addEventListener('pageshow',e=>{ if(e.persisted) restoreMusic(); });
 // musicOn is restored from localStorage, so the chip has to match it on load.
 if(!musicOn) document.getElementById('music-btn').textContent='🎵 Music: Off';
-function goHome(){ endHostedRoom(); stopMusic(); cleanupListeners(); soloMode=false; setClassGameLock(false); document.getElementById('music-btn').style.display=''; document.getElementById('solo-back-btn').style.display='none'; showScreen('screen-home'); playLobbyMusic(); }
+function goHome(){ endHostedRoom(); stopMusic(); cleanupListeners(); soloMode=false; clearSoloUrl(); setClassGameLock(false); document.getElementById('music-btn').style.display=''; document.getElementById('solo-back-btn').style.display='none'; showScreen('screen-home'); playLobbyMusic(); }
 function goStudentHome(){ document.getElementById('music-btn').style.display='none'; showScreen('screen-student-home'); }
 /* A student in a class game has no way out of it — leaving is the teacher's
    call. The site-wide back link is the last exit left on their phone once the
@@ -4738,6 +4809,9 @@ function renderSectionChips(){
 
 function selectSoloType(type,el){
   soloSelectedType=type;
+  // Browsing the picker rewrites the address too, so the link in the URL bar
+  // is always the game on screen and can just be copied out of it.
+  if(soloMode) syncSoloUrl(type);
   document.querySelectorAll('#screen-solo-setup .q-type-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
   const lw=document.getElementById('solo-lang-wrap');
@@ -4750,6 +4824,186 @@ function selectSoloType(type,el){
   applyTargetSetup('solo');
   updateSoloCountDisplay();
 }
+/* ══════════════ SHAREABLE GAME LINKS ══════════════
+   Every solo game has its own address — wordlink.au/solo?game=clock — and a
+   link opens on that game's own start screen rather than on the picker. A
+   learner at pre-level should not have to read thirty-five game names to reach
+   the one they were sent, and the Begin tap is also the gesture browsers
+   require before any speech or sound will play. */
+
+/* Which skill a game belongs to, and the line that says what it is. Kept to
+   one short, present-tense sentence each: the reader is an adult with little
+   literacy, so this is plain language, not simple-mindedness. Anything
+   missing here falls back to the count line, so the screen is never bare and
+   the map can grow as games are added. */
+const SKILL_ACCENT={
+  letters:    {label:'Letters & Sounds', c:'var(--teal)',   glow:'rgba(15,155,142,.30)'},
+  listening:  {label:'Listening',        c:'var(--purple)', glow:'rgba(124,77,255,.30)'},
+  reading:    {label:'Reading',          c:'var(--gold)',   glow:'rgba(245,166,35,.28)'},
+  writing:    {label:'Writing',          c:'var(--accent)', glow:'rgba(233,69,96,.28)'},
+  speaking:   {label:'Speaking',         c:'var(--green)',  glow:'rgba(0,200,83,.26)'},
+  grammar:    {label:'Grammar',          c:'var(--purple)', glow:'rgba(124,77,255,.30)'},
+  vocab:      {label:'Vocabulary',       c:'var(--green)',  glow:'rgba(0,200,83,.26)'},
+  numeracy:   {label:'Numbers',          c:'var(--gold)',   glow:'rgba(245,166,35,.28)'},
+  translation:{label:'Translation',      c:'var(--teal)',   glow:'rgba(15,155,142,.30)'},
+  everyday:   {label:'Everyday English', c:'var(--accent)', glow:'rgba(233,69,96,.28)'},
+  _:          {label:'Practice',         c:'var(--muted)',  glow:'rgba(255,255,255,.10)'},
+};
+const GAME_INFO={
+  'wp1:gap':   {skill:'letters',   blurb:'Hear the missing sound and write it.'},
+  'wp1:word':  {skill:'letters',   blurb:'Hear a word and tap it.'},
+  'wp1:build': {skill:'letters',   blurb:'Build the word from its sounds.'},
+  'wp2:gap':   {skill:'letters',   blurb:'Hear the missing sound in a longer word.'},
+  'wp2:word':  {skill:'letters',   blurb:'Hear a longer word and tap it.'},
+  'wp2:build': {skill:'letters',   blurb:'Build a longer word from its sounds.'},
+  beginner:    {skill:'listening', blurb:'Listen to a sentence and fill the gaps.'},
+  elementary:  {skill:'listening', blurb:'Listen to a longer sentence and fill the gaps.'},
+  questionwords:{skill:'grammar',  blurb:'Choose the right question word.'},
+  /* In the picker "🔢 1–10" sits under a Numbers heading; on a card of its own
+     it has to say what it is. */
+  numbers:     {skill:'numeracy',  name:'Numbers 1–10', blurb:'Hear a number from 1 to 10 and write it.'},
+  numbers1120: {skill:'numeracy',  blurb:'Hear a number from 11 to 20 and write it.'},
+  numbers2199: {skill:'numeracy',  blurb:'Hear a number from 21 to 99 and write it.'},
+  days:        {skill:'vocab',     blurb:'Hear a day of the week and write it.'},
+  months:      {skill:'vocab',     blurb:'Hear a month and write it.'},
+  weather:     {skill:'vocab',     blurb:'Hear a weather word and write it.'},
+  fruits:      {skill:'vocab',     blurb:'Hear the fruit and write its name.'},
+  body:        {skill:'vocab',     blurb:'Hear a part of the body and write it.'},
+  clothes:     {skill:'vocab',     blurb:'Hear the clothing word and write it.'},
+  spelling:    {skill:'writing',   blurb:'Spell words from every topic.'},
+  unscramble:  {skill:'listening', blurb:'Listen, then put the words in order.'},
+  gramscramble:{skill:'grammar',   blurb:'Put the words in the right order.'},
+  speaking:    {skill:'speaking',  blurb:'Say the answer out loud.'},
+  translate:   {skill:'translation',blurb:'Read it in your language, write it in English.'},
+  letter:      {skill:'letters',   blurb:'Hear a letter name and choose the letter.'},
+  lettersound: {skill:'letters',   blurb:'Hear the first sound of a word.'},
+  oddone:      {skill:'vocab',     blurb:'Find the word that does not belong.'},
+  signs:       {skill:'everyday',  blurb:'Read the signs you see around you.'},
+  sms:         {skill:'everyday',  blurb:'Read a short message and answer it.'},
+  clock:       {skill:'numeracy',  blurb:'Read the time and write it.'},
+  shop:        {skill:'numeracy',  blurb:'Count the coins and pay the right amount.'},
+  target:      {skill:'numeracy',  blurb:'Roll two dice and get closest to the target.'},
+  forms:       {skill:'everyday',  blurb:'Fill in a form with your details.'},
+  all:         {blurb:'A mix of every game.'},
+};
+/* Custom banks belong to one account and mean nothing to whoever the link is
+   sent to, so a ?game=custom link opens the picker like any other unknown id. */
+const UNSHAREABLE_GAMES=['custom'];
+/* The games that open with typing rather than four choices — the ordering
+   games are the arranging, and All Spelling is the writing bank. Same
+   reasoning as SECTION_DEFAULTS, applied to one game instead of one skill. */
+const GAME_MC_DEFAULT={unscramble:false,gramscramble:false,speaking:false,spelling:false,
+  'wp1:build':false,'wp2:build':false};
+function defaultMcFor(type){ return GAME_MC_DEFAULT[type]!==false; }
+function soloTabFor(type){
+  return document.querySelector('#screen-solo-setup .q-type-tab[data-type="'+type+'"]');
+}
+
+/* Open the start screen for one game. Returns false for a game id that isn't
+   in the picker, so a stale or mistyped link can fall back to the picker
+   rather than showing an empty card. */
+function openSoloLaunch(type){
+  const tab=soloTabFor(type);
+  if(!tab||UNSHAREABLE_GAMES.indexOf(type)>=0) return false;
+  selectSoloType(type,tab);
+  const label=(tab.textContent||'').trim();
+  const sp=label.indexOf(' ');
+  const info=GAME_INFO[type]||{};
+  const skill=SKILL_ACCENT[info.skill]||SKILL_ACCENT._;
+  const col=document.querySelector('#screen-solo-launch .launch-col');
+  col.style.setProperty('--lx',skill.c);
+  col.style.setProperty('--lx-glow',skill.glow);
+  document.getElementById('launch-skill').textContent=skill.label;
+  document.getElementById('launch-emoji').textContent=sp>0?label.slice(0,sp):'🎮';
+  document.getElementById('launch-title').textContent=info.name||(sp>0?label.slice(sp+1):label);
+  document.getElementById('launch-sub').textContent=
+    info.blurb||document.getElementById('solo-count-display').textContent;
+  renderLaunchChips(type);
+  syncSoloUrl(type);
+  showScreen('screen-solo-launch');
+  return true;
+}
+/* Read-only pills: they tell the learner what the link is about to start, and
+   make a link carrying &mc=0&q=20 visibly different from a bare one. */
+function renderLaunchChips(type){
+  const wrap=document.getElementById('launch-chips');
+  if(!wrap) return;
+  let chips;
+  if(type==='target'){
+    chips=['🎯 Target '+resolveTarget('solo'),
+           targetStrict?'A wrong answer ends your game':'One more try'];
+  } else {
+    const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
+    const n=countFor(type,limit).will||limit;
+    chips=[n+' question'+(n===1?'':'s'), answerChipFor(type)];
+  }
+  wrap.innerHTML=chips.map(t=>'<span class="launch-chip">'+t+'</span>').join('');
+}
+/* How the learner will answer. "Typing" is only true of most games: Speaking
+   is spoken and the two ordering games are tapped into place, and telling
+   someone they will be typing when they won't is worse than saying nothing. */
+function answerChipFor(type){
+  if(mcMode) return '🔵 Multiple choice';
+  if(type==='speaking') return '🎤 Say your answer';
+  if(type==='unscramble'||type==='gramscramble') return '🔀 Put the words in order';
+  if(type==='wp1:build'||type==='wp2:build') return '🧱 Build the word';
+  return '⌨️ Typing';
+}
+function showSoloSetup(){
+  showScreen('screen-solo-setup');
+  updateSoloCountDisplay();
+}
+/* The link for whatever is currently selected. Settings ride along only when
+   they differ from the game's own default, so the everyday link stays short. */
+function soloLinkParams(type){
+  const p=new URLSearchParams();
+  p.set('game',type);
+  if(type!=='target'){
+    const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
+    if(limit!==10) p.set('q',limit);
+    if(mcMode!==defaultMcFor(type)) p.set('mc',mcMode?'1':'0');
+  }
+  return p;
+}
+function syncSoloUrl(type){
+  try{ history.replaceState(null,'',location.pathname+'?mode=solo&'+queryOf(type)); }catch(e){}
+}
+/* URLSearchParams escapes the colon in wp1:build. It round-trips either way,
+   but an unescaped one is what someone reads back off a shared link. */
+function queryOf(type){ return soloLinkParams(type).toString().replace(/%3A/g,':'); }
+function clearSoloUrl(){
+  try{ history.replaceState(null,'',location.pathname); }catch(e){}
+}
+function copySoloLink(){
+  /* The short form is the one worth handing to someone: /solo forwards to the
+     game with its parameters intact. A bank only this account can see has no
+     shareable link, so that copies the plain game picker instead. */
+  const base=new URL('solo',location.href).href;
+  const url=UNSHAREABLE_GAMES.indexOf(soloSelectedType)>=0
+    ? base : base+'?'+queryOf(soloSelectedType);
+  copyToClipboard(url,function(ok){ if(ok) showToast('🔗 Link copied'); });
+}
+/* navigator.clipboard is undefined on plain http and in older Android
+   WebViews, which a fair few learners are on. */
+function copyToClipboard(text,done){
+  function fallback(){
+    try{
+      const el=document.createElement('textarea');
+      el.value=text; el.setAttribute('readonly','');
+      el.style.cssText='position:fixed;top:-1000px;opacity:0;';
+      document.body.appendChild(el); el.select();
+      const ok=document.execCommand('copy');
+      document.body.removeChild(el);
+      if(ok){ done(true); return; }
+    }catch(e){}
+    window.prompt('Copy this link:',text);
+    done(false);
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){done(true);},fallback);
+  } else { fallback(); }
+}
+
 function updateSoloCountDisplay(){
   const display=document.getElementById('solo-count-display');
   if(!display) return;
@@ -4763,6 +5017,7 @@ function updateSoloCountDisplay(){
   else display.textContent=c.avail+' available — '+c.will+' will be used';
 }
 function startSoloGame(){
+  syncSoloUrl(soloSelectedType);
   if(soloSelectedType==='target'){ roomGame=null; startSoloTarget(); return; }
   if(typeUsesTranslate(soloSelectedType)){
     localStorage.setItem('translateLang',document.getElementById('solo-lang-pick').value);
@@ -6326,7 +6581,20 @@ window.addEventListener('load',()=>{
     setTimeout(()=>document.getElementById('join-name').focus(),300);
   }
   else if(mode==='teacher'){goTeacher();}
-  else if(mode==='solo'){initSolo();}
+  else if(mode==='solo'||params.get('game')){
+    initSolo();
+    // A shared game link: apply whatever it carries, then open that game's own
+    // start screen. An unknown game id leaves the learner on the picker rather
+    // than on an empty card.
+    const game=params.get('game');
+    if(game&&soloTabFor(game)&&UNSHAREABLE_GAMES.indexOf(game)<0){
+      const q=parseInt(params.get('q'),10);
+      if(q>=1&&q<=50) document.getElementById('solo-q-limit').value=q;
+      const mc=params.get('mc');
+      setMcMode(mc===null?defaultMcFor(game):mc==='1');
+      openSoloLaunch(game);
+    }
+  }
   else{showScreen('screen-home');playLobbyMusic();}
 });
 </script>

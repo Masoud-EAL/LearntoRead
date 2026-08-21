@@ -118,6 +118,16 @@
     white-space: nowrap;
   }
   .nav-tab:hover:not(.active) { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,0.12); }
+  /* Deliberately quieter than a tab: this is for the person sharing the app,
+     not for the learner using it. */
+  .share-row { display: flex; justify-content: center; margin: 8px auto 0; }
+  .nav-share {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.82rem;
+    padding: 6px 14px; border-radius: 30px; border: 1.5px dashed var(--light);
+    background: transparent; color: var(--mid); cursor: pointer; transition: all 0.2s;
+  }
+  .nav-share:hover { border-color: var(--accent2); color: var(--accent2); }
+  .nav-share.copied { border-style: solid; border-color: var(--teal); color: var(--teal); }
   .nav-tab.sec-alphabet.active  { background: var(--teal);    color: white; border-color: var(--teal);    box-shadow: 0 4px 14px rgba(43,170,138,0.4); }
   .nav-tab.sec-sounds.active    { background: var(--accent2); color: white; border-color: var(--accent2); box-shadow: 0 4px 14px rgba(74,144,217,0.4); }
   .nav-tab.sec-words1.active    { background: var(--accent1); color: white; border-color: var(--accent1); box-shadow: 0 4px 14px rgba(244,132,95,0.4); }
@@ -1121,6 +1131,14 @@
   <button class="nav-tab sec-speaking"         onclick="showSection('speaking',this)">🗣️ Speaking</button>
 </div>
 
+<!-- Its own row, not a seventh tab: it is a way to share this section, not a
+     place to go, and sitting in the tab row it would both be mistaken for one
+     and change where the six tabs wrap. -->
+<div class="share-row">
+  <button class="nav-share" id="shareBtn" onclick="copySectionLink(this)"
+          title="Copy a link to this section">🔗 Copy link to this section</button>
+</div>
+
 <div class="voice-selector-bar" id="voiceSelectorBar">
   <span class="voice-selector-label">🎙️ Voice:</span>
   <select class="voice-select" id="voiceSelect" onchange="onVoiceSelectChange()">
@@ -1931,7 +1949,70 @@ function showSection(name, btn) {
   document.querySelectorAll('.section-page').forEach(p => p.classList.remove('active'));
   document.getElementById('sec-' + name).classList.add('active');
   localStorage.setItem('wl_section', name);
+  syncSectionUrl(name);
   if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: 'section-' + name, event: true });
+}
+
+/* ══════════════════════════════════════════
+   SHAREABLE SECTION LINKS
+   Every section has its own address — wordlink.au/?section=speaking — so a
+   teacher can send one part of the app rather than "open it and press the
+   fourth button". The URL is rewritten in place: replaceState, not pushState,
+   because Back should leave the app rather than walk back through six tabs.
+══════════════════════════════════════════ */
+function syncSectionUrl(name, level) {
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.set('section', name);
+    // Only Sentences has levels; carry the one showing, and drop the param
+    // everywhere else so the other five links stay short.
+    if (name === 'sentences') {
+      const lvl = typeof level === 'number' ? level : currentSentenceLevel();
+      if (lvl !== null) url.searchParams.set('level', lvl);
+    } else {
+      url.searchParams.delete('level');
+    }
+    history.replaceState(null, '', url.pathname + url.search + url.hash);
+  } catch (e) { /* file:// and old browsers — the app works, the link just won't update */ }
+}
+function currentSentenceLevel() {
+  const tabs = [...document.querySelectorAll('#sec-sentences .level-tab')];
+  const i = tabs.findIndex(t => t.classList.contains('active'));
+  return i >= 0 ? i : null;
+}
+function copySectionLink(btn) {
+  copyToClipboard(window.location.href, function(ok) {
+    if (!ok) return;
+    const was = btn.textContent;
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = was; btn.classList.remove('copied'); }, 2000);
+  });
+}
+/* navigator.clipboard is undefined on plain http and in older Android
+   WebViews, which a fair few learners are on. Fall back to a hidden input,
+   and to showing the address if even that is refused. */
+function copyToClipboard(text, done) {
+  function fallback() {
+    try {
+      const el = document.createElement('textarea');
+      el.value = text;
+      el.setAttribute('readonly', '');
+      el.style.cssText = 'position:fixed;top:-1000px;opacity:0;';
+      document.body.appendChild(el);
+      el.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(el);
+      if (ok) { done(true); return; }
+    } catch (e) { /* fall through to the prompt */ }
+    window.prompt('Copy this link:', text);
+    done(false);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => done(true), fallback);
+  } else {
+    fallback();
+  }
 }
 
 /* ══════════════════════════════════════════
@@ -3603,6 +3684,10 @@ function showLevel(level, btn) {
   btn.classList.add('active');
   document.querySelectorAll('.sentence-level-page').forEach(p => p.classList.remove('active'));
   document.getElementById('sent-level-' + level).classList.add('active');
+  // Keep the shareable link pointing at the level actually on screen, but only
+  // while Sentences is the section being shown.
+  const page = document.querySelector('.section-page.active');
+  if (page && page.id === 'sec-sentences') syncSectionUrl('sentences', level);
 }
 
 function buildSentences() {
@@ -4012,10 +4097,26 @@ selectFamily('wp2', 0);
     wp1: 'sec-words1', wp2: 'sec-words2',
     sentences: 'sec-sentences', speaking: 'sec-speaking',
   };
-  const section = localStorage.getItem('wl_section');
+  // A shared link wins over what this browser was last looking at: someone who
+  // was sent ?section=speaking meant Speaking, not wherever they left off.
+  const params = new URLSearchParams(window.location.search);
+  const linked = params.get('section');
+  const section = (linked && SECTION_TAB_CLASS[linked]) ? linked : localStorage.getItem('wl_section');
   if (section && SECTION_TAB_CLASS[section]) {
     const btn = document.querySelector('.nav-tab.' + SECTION_TAB_CLASS[section]);
     if (btn) showSection(section, btn);
+  }
+  if (linked === 'sentences') {
+    const lvl = parseInt(params.get('level'), 10);
+    const lvlBtn = document.querySelectorAll('#sec-sentences .level-tab')[lvl];
+    if (lvlBtn) showLevel(lvl, lvlBtn);
+  }
+  // Nothing restored means the markup's default section is showing. Name it in
+  // the address anyway, so Copy link always hands over a link that reopens
+  // exactly what is on screen.
+  if (!document.querySelector('.section-page.active[id="sec-' + section + '"]')) {
+    const active = document.querySelector('.section-page.active');
+    if (active) syncSectionUrl(active.id.replace(/^sec-/, ''));
   }
 })();
 
