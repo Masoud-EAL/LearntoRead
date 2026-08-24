@@ -2879,7 +2879,15 @@ function getQuestions(type,limit){
   }
   const pool=poolFor(type);
   shuffle(pool);
-  return pool.slice(0,limit);
+  // Hand back copies, not the bank's own objects. attachMcChoices() writes
+  // q.choices (and q.promptText) onto whatever it is given, and poolFor()
+  // returns a fresh ARRAY of the SAME questions — so a game played with
+  // multiple choice on used to stamp choices permanently onto the bank, and
+  // every one of those questions came back as multiple choice in later games
+  // with the toggle switched off. In a speaking round that also hid Submit,
+  // because a question carrying choices is rendered as a tap-to-answer round.
+  // A per-game copy keeps a game's settings inside that game.
+  return pool.slice(0,limit).map(q=>Object.assign({},q));
 }
 
 /* ── MULTIPLE-CHOICE (4-option) SUPPORT ──
@@ -2988,6 +2996,9 @@ let timerInterval=null,timerLeft=30;
 let selectedQType='beginner';
 let answered=false,revealed=false;
 let myScore=0,myLastQIdx=-1;
+/* Which round this phone is currently showing — the question's number AND the
+   moment it started, because the number alone repeats every game. */
+let myLastQSig=null;
 let answerListener=null,gameListener=null;
 const TIMER_DURATION=30;
 // Shop rounds need longer: the answer is built coin by coin, not typed once.
@@ -4535,7 +4546,7 @@ function joinGame(){
     const pidKey='wl_pid_'+code;
     playerId=localStorage.getItem(pidKey)||db.ref().push().key;
     localStorage.setItem(pidKey,playerId);
-    myScore=0; myLastQIdx=-1;
+    myScore=0; myLastQIdx=-1; myLastQSig=null;
     const meRef=roomRef.child('players/'+playerId);
     meRef.once('value',s=>{
       const prev=s.val();
@@ -4593,7 +4604,18 @@ function listenForGameState(){
       if(!TG) startStudentTarget(room);
     } else if(room.status==='playing'&&room.currentQuestion){
       const q=room.currentQuestion;
-      if(q.idx!==undefined&&q.idx!==myLastQIdx){ myLastQIdx=q.idx; answered=false; showStudentQuestion(q,room.questionStarted,room.questionDuration); }
+      // Tell one round from another by when it started as well as by its
+      // number. returnStudentToLobby() clears myLastQIdx between games, but a
+      // phone that was locked or off the network for the whole lobby never
+      // sees that pass through: Firebase hands a reconnecting listener the
+      // room as it stands now, not the states it moved through. Such a phone
+      // came back holding myLastQIdx=0 from the last game, so question 0 of
+      // the new one looked like one it had already answered — the previous
+      // game's question left on screen with a dead Submit under it. Every
+      // playQuestion() writes a fresh questionStarted, so the two rounds are
+      // never confused.
+      const qsig=q.idx+'@'+(room.questionStarted||0);
+      if(q.idx!==undefined&&qsig!==myLastQSig){ myLastQSig=qsig; myLastQIdx=q.idx; answered=false; showStudentQuestion(q,room.questionStarted,room.questionDuration); }
     }
     if(room.revealed&&room.correctAnswer){
       const onAnswer=document.getElementById('screen-student-answer').classList.contains('active');
@@ -4714,7 +4736,7 @@ function returnStudentToLobby(){
   clearInterval(studentTimerInt);
   stopTargetGame();
   try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(e){}
-  answered=false; myLastQIdx=-1; myScore=0; hintLevel=0; currentStudentQ=null;
+  answered=false; myLastQIdx=-1; myLastQSig=null; myScore=0; hintLevel=0; currentStudentQ=null;
   // Arm the next game's reveal. Without this a replayed room would find the
   // flag already set and drop the phone straight onto the board.
   studentRevealStarted=false; studentBoardPlayers=null; studentMyRank=0;
@@ -5717,15 +5739,33 @@ function tapTile(tile){
   else sendToBank(tile);
 }
 
+/* Two separate things hang off the answer area, and tying them together is
+   what broke the speaking rounds in class.
+
+   "All placed" — the bank empty — is the encouraging signal: the border goes
+   solid and a chime plays. Submit only needs an answer to send.
+
+   Gating the button on every last tile made sense while the only tile games
+   were Unscramble and Word Order, where the tiles ARE the sentence and using
+   all of them is the task. Speaking is not that game: the learner has said
+   the answer out loud and is now building it out of six or seven tiles
+   carrying capitals and full stops, and one tile left in the bank meant a
+   dead Submit and no way to hand anything in — the round just ran down to
+   "Time up!", which from the room looked like the button had been pressed
+   already. A partly built answer is an answer: it is marked wrong, not
+   swallowed. So the button wakes on the first tile placed. */
 function checkAllPlaced(){
-  const done=document.getElementById('word-bank-area').children.length===0
-           &&document.getElementById('answer-area').children.length>0;
+  const area=document.getElementById('answer-area');
+  const placed=area.children.length;
+  const done=document.getElementById('word-bank-area').children.length===0&&placed>0;
+  // .complete already tracks the all-placed state, so it doubles as the memory
+  // that keeps the chime to the moment the last tile lands.
+  const wasDone=area.classList.contains('complete');
   if(!answered){
-    const btn=document.getElementById('student-submit-btn');
-    if(done&&btn.disabled) playAllPlaced();
-    btn.disabled=!done;
+    if(done&&!wasDone) playAllPlaced();
+    document.getElementById('student-submit-btn').disabled=placed===0;
   }
-  document.getElementById('answer-area').classList.toggle('complete',done);
+  area.classList.toggle('complete',done);
 }
 
 /* ---- Pointer-based drag & drop with insertion (tiles move aside) ---- */
