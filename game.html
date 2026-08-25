@@ -2056,7 +2056,16 @@ const UNSCRAMBLE_SENTENCES=[
    place every tile, so anything past about eight tiles is a memory test
    rather than a speaking one. Answers built from digit strings (phone
    number, address, spelling a name out loud) are left out entirely —
-   they make tiles nobody can read. */
+   they make tiles nobody can read.
+
+   Every answer here is ONE sentence. The Speaking Practice list in index.html
+   models the short answer and the full sentence together — "Yes, I am. I am
+   married." — because there the two parts ARE the lesson. In tiles they are a
+   trap: the learner is handed two "I" tiles and an "am." next to an "am", and
+   telling those apart is a puzzle about full stops, not about answering the
+   question. Folded into one sentence — "Yes, I am married." — the answer says
+   the same thing in four tiles nobody can mix up. Keep it that way when
+   adding questions. */
 const SPEAKING_QA=[
   {icon:'👋',items:[
     {q:'Hello! How are you?',a:"Hi, I'm good, thank you."},
@@ -2075,7 +2084,7 @@ const SPEAKING_QA=[
     {q:'What city are you from?',a:'I am from Ho Chi Minh City.'},
     {q:'What language do you speak?',a:'I speak Vietnamese and a little English.'},
     {q:'When did you come to Australia?',a:'I came to Australia in 2022.'},
-    {q:'Do you like Australia?',a:'Yes, I do. I like Australia.'},
+    {q:'Do you like Australia?',a:'Yes, I like Australia.'},
   ]},
   {icon:'🏫',items:[
     {q:"What's your teacher's name?",a:"My teacher's name is Sarah."},
@@ -2083,7 +2092,7 @@ const SPEAKING_QA=[
     {q:'What time does your class start?',a:"My class starts at 9 o'clock."},
     {q:'What time does your class finish?',a:'My class finishes at 2:30.'},
     {q:'How do you go to class?',a:'I take the bus to class.'},
-    {q:'Do you like your class?',a:'Yes, I do. I like my class.'},
+    {q:'Do you like your class?',a:'Yes, I like my class.'},
   ]},
   {icon:'🏠',items:[
     {q:'Where do you live?',a:'I live in Springvale.'},
@@ -2091,8 +2100,8 @@ const SPEAKING_QA=[
     {q:'How many bedrooms does your house have?',a:'I live in a three-bedroom house.'},
   ]},
   {icon:'👨‍👩‍👧‍👦',items:[
-    {q:'Are you married?',a:'Yes, I am. I am married.'},
-    {q:'Do you have children?',a:'Yes, I do. I have two children.'},
+    {q:'Are you married?',a:'Yes, I am married.'},
+    {q:'Do you have children?',a:'Yes, I have two children.'},
     {q:'How many children do you have?',a:'I have one son and one daughter.'},
     {q:'How many people are there in your family?',a:'There are four people in my family.'},
     {q:'How many brothers and sisters do you have?',a:'I have one brother and one sister.'},
@@ -2102,7 +2111,7 @@ const SPEAKING_QA=[
     {q:'How old is your wife?',a:'She is 28 years old.'},
     {q:'Where is she from?',a:'She is from Vietnam too.'},
     {q:'What does she like?',a:'She likes cooking and music.'},
-    {q:'Can she drive?',a:'Yes, she can. She can drive.'},
+    {q:'Can she drive?',a:'Yes, she can drive.'},
   ]},
   {icon:'📅',items:[
     {q:'What day is today?',a:'Today is Monday.',dynamic:'day'},
@@ -2137,9 +2146,9 @@ const SPEAKING_QA=[
   ]},
   {icon:'✅',items:[
     {q:'What can you do?',a:'I can drive and cook.'},
-    {q:'Can you drive?',a:'Yes, I can. I can drive.'},
+    {q:'Can you drive?',a:'Yes, I can drive.'},
     {q:'Can you speak English?',a:'Yes, I can speak a little English.'},
-    {q:'Do you work?',a:"No, I don't. I'm a student."},
+    {q:'Do you work?',a:"No, I don't work."},
   ]},
 ];
 const SPEAKING_DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
