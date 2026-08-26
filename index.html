@@ -507,6 +507,11 @@
     padding: 0 0 40px;
   }
   .practice-overlay.active { display: block; }
+  /* Page chrome must not float over a modal, least of all on top of the
+     controls the modal needs. */
+  body.overlay-open .share-btn,
+  body.overlay-open .share-note,
+  body.overlay-open .teacher-game-btn { display: none; }
 
   .practice-header {
     background: linear-gradient(135deg, #ff7eb3, #e040a0);
@@ -1471,9 +1476,8 @@
           <button class="spell-listen-btn" id="spellingListenBtn" onclick="spellingSpeak()">
             🔊 <span id="spellingListenLbl">Hear it</span>
           </button>
-          <button class="spell-hint-btn" id="spellingHintBtn" onclick="spellingHint()"
-            aria-label="Help me">
-            <span id="spellingHintIcon">💡</span><span class="spell-hint-dots" id="spellingHintDots" aria-hidden="true"></span>
+          <button class="spell-hint-btn" id="spellingHintBtn" onclick="spellingHint()">
+            💡 Help <span class="spell-hint-dots" id="spellingHintDots" aria-hidden="true"></span>
           </button>
         </div>
         <!-- The picture and the first-language word, revealed by hint tier 2.
@@ -2196,6 +2200,35 @@ function copyToClipboard(text, done) {
 /* ══════════════════════════════════════════
    NAVIGATION MENU
 ══════════════════════════════════════════ */
+/* A practice overlay is a modal — it covers the whole page — but the page's
+   own floating buttons are pinned above it. The share button sits exactly
+   where the overlay's own Back button is, so while one was open the only
+   thing a learner could press up there was a button that does not take them
+   back; the Games pill did the same to Try again down in the corner. Both
+   step aside while an overlay is up. The menu button stays: it covers
+   nothing, and it is now a way out rather than a dead end. */
+function setOverlayOpen(on) {
+  document.body.style.overflow = on ? 'hidden' : '';
+  document.body.classList.toggle('overlay-open', !!on);
+}
+
+const OVERLAY_CLOSERS = {
+  spellingOverlay:     function () { closeSpelling(); },
+  practiceOverlay:     function () { closePractice(); },
+  conversationOverlay: function () { closeConversation(); },
+  testOverlay:         function () { closeTest(); }
+};
+
+/* Leaving by the menu has to actually leave. Choosing a section used to swap
+   the page underneath an overlay that was still covering it — the section
+   changed, the learner saw no difference, and the scroll was still locked. */
+function closeAnyOverlay() {
+  Object.keys(OVERLAY_CLOSERS).forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el && el.classList.contains('active')) OVERLAY_CLOSERS[id]();
+  });
+}
+
 function openMenu() {
   document.getElementById('menuOverlay').classList.add('active');
 }
@@ -2203,6 +2236,7 @@ function closeMenu() {
   document.getElementById('menuOverlay').classList.remove('active');
 }
 function menuGo(section, level) {
+  closeAnyOverlay();
   // Find the matching top-nav tab (its onclick references the section name).
   const btn = [...document.querySelectorAll('.top-nav .nav-tab')]
     .find(b => (b.getAttribute('onclick') || '').indexOf("'" + section + "'") >= 0);
@@ -2631,7 +2665,7 @@ function openPractice(words, label) {
     showExample();  // words: keep the listen-first example phase
   }
   document.getElementById('practiceOverlay').classList.add('active');
-  document.body.style.overflow = 'hidden';
+  setOverlayOpen(true);
 }
 
 function openPracticeForWp(wp) {
@@ -2644,7 +2678,7 @@ function openPracticeForWp(wp) {
 function closePractice() {
   pCleanup();
   document.getElementById('practiceOverlay').classList.remove('active');
-  document.body.style.overflow = '';
+  setOverlayOpen(false);
 }
 
 function pCleanup() {
@@ -2908,13 +2942,13 @@ function openConversation(items, label, isTest) {
   cvCleanup();
   cvShowQuestion();
   document.getElementById('conversationOverlay').classList.add('active');
-  document.body.style.overflow = 'hidden';
+  setOverlayOpen(true);
 }
 
 function closeConversation() {
   cvCleanup();
   document.getElementById('conversationOverlay').classList.remove('active');
-  document.body.style.overflow = '';
+  setOverlayOpen(false);
   window.speechSynthesis && window.speechSynthesis.cancel();
 }
 
@@ -3232,13 +3266,13 @@ function openTest(section) {
   tCleanup();
   testShowRecord();
   document.getElementById('testOverlay').classList.add('active');
-  document.body.style.overflow = 'hidden';
+  setOverlayOpen(true);
 }
 
 function closeTest() {
   tCleanup();
   document.getElementById('testOverlay').classList.remove('active');
-  document.body.style.overflow = '';
+  setOverlayOpen(false);
 }
 
 function tCleanup() {
@@ -4055,8 +4089,6 @@ var spStopSounds = null;
    remembered. Typing stays the default. */
 try { spMode = localStorage.getItem('wl_spellMode') === 'tiles' ? 'tiles' : 'type'; } catch (e) {}
 
-var SP_TIER_ICON = { sound: '🔊', clue: '🖼', first: '🅰', missed: '👁' };
-
 function openSpellingForWp(wp) {
   var families = wp === 'wp1' ? wp1Families : wp2Families;
   var fam = families[wpState[wp].familyIdx];
@@ -4078,14 +4110,14 @@ function openSpelling(words, label) {
   var fin = document.getElementById('spellingFinish');
   fin.style.display = 'none'; fin.classList.remove('show');
   document.getElementById('spellingOverlay').classList.add('active');
-  document.body.style.overflow = 'hidden';
+  setOverlayOpen(true);
   spLoadItem();
   setTimeout(spellingSpeak, 400);
 }
 
 function closeSpelling() {
   document.getElementById('spellingOverlay').classList.remove('active');
-  document.body.style.overflow = '';
+  setOverlayOpen(false);
   spStopHintSound();
   window.speechSynthesis && window.speechSynthesis.cancel();
 }
@@ -4137,6 +4169,7 @@ function spLoadItem() {
   inp.parentElement.className = spIsSent ? 'spell-input-wrap sent-spelling-wrap' : 'spell-input-wrap';
 
   spSetVerdict('', '');
+  document.getElementById('spellingHintBtn').style.display = spIsSent ? 'none' : '';
   document.getElementById('spellingClue').style.display = 'none';
   document.getElementById('spellingCheckBtn').disabled  = false;
   document.getElementById('spellingTryAgainBtn').style.display = 'none';
@@ -4319,12 +4352,9 @@ function spellingHint() {
 }
 
 function spUpdateHintBtn() {
-  var next = spTiers[Math.min(spTier, spTiers.length - 1)];
-  document.getElementById('spellingHintIcon').textContent = '💡' + (SP_TIER_ICON[next] || '');
   var dots = '';
   for (var i = 0; i < spTiers.length; i++) dots += (i < spTier ? '●' : '○');
   document.getElementById('spellingHintDots').textContent = dots;
-  document.getElementById('spellingHintBtn').setAttribute('aria-label', 'Help me');
 }
 
 function spStopHintSound() {

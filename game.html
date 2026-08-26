@@ -23,6 +23,13 @@
         async src="//gc.zgo.at/count.js"></script>
 <link href="fonts/fonts.css" rel="stylesheet">
 <meta name="theme-color" content="#0d0d1a">
+<!-- Added to the Home Screen, the app opens without Safari's address bar —
+     which is the only way that strip of screen comes back for a learner on a
+     phone. index.html has carried these since the start; a learner who happens
+     to be on this page when they install should get the same app. -->
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
