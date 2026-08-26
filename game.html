@@ -579,7 +579,7 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 #screen-student-answer > .form-section,
 #screen-student-answer > .unscramble-section,
 #screen-student-answer > .ans-input-wrap,
-#screen-student-answer > #translate-hint-wrap{flex:0 1 auto;min-height:0;overflow-y:auto;}
+#screen-student-answer > #hint-wrap{flex:0 1 auto;min-height:0;overflow-y:auto;}
 /* Whatever room is left over goes above Submit, so it sits at the bottom of
    the screen in the same place every round. */
 #screen-student-answer > .submit-btn{margin-top:auto;}
@@ -684,7 +684,7 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
   #screen-student-answer > .form-section,
   #screen-student-answer > .unscramble-section,
   #screen-student-answer > .ans-input-wrap,
-  #screen-student-answer > #translate-hint-wrap{flex:1 1 46%;max-width:52%;align-self:stretch;}
+  #screen-student-answer > #hint-wrap{flex:1 1 46%;max-width:52%;align-self:stretch;}
   #screen-student-answer > .submit-btn{flex:0 0 100%;max-width:420px;margin-top:2px;}
   #screen-student-answer > .submitted-msg,
   #screen-student-answer > #solo-back-btn{flex:0 0 100%;text-align:center;}
@@ -717,6 +717,57 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 .correct-answer{color:var(--green);}
 .wrong-answer{color:var(--accent);text-decoration:line-through;margin-right:8px;}
 .result-points{font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--gold);}
+/* THE TWO ALIGNED ROWS — see spell-feedback.js.
+   The answer on top, what the learner wrote underneath, one column per part
+   of the word, so "where" is carried by position rather than by a colour a
+   pre-reader has to be told the meaning of. Every state also has a badge
+   shape: filled tick right, hollow tick right-letters-wrong-marks, cross
+   wrong, plus for a part that never arrived. The classes come from the
+   shared script; the colours are this page's, because the two pages are
+   deliberately different. */
+.sf-wrap{margin:4px auto 2px;}
+.sf-rows{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:5px;}
+.sf-col{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.sf-slot{min-width:40px;height:46px;padding:0 7px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-family:'Fredoka One',cursive;font-size:1.35rem;line-height:1;border:2px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.05);color:var(--text);box-sizing:border-box;white-space:nowrap;}
+.sf-want{cursor:pointer;font-family:'Fredoka One',cursive;font-size:1.35rem;transition:transform .15s;}
+button.sf-want:hover{transform:translateY(-2px);}
+.sf-want.playing{transform:translateY(-2px) scale(1.08);filter:brightness(1.25);}
+.sf-want.sf-hidden{color:transparent;border-style:dashed;}
+.sf-got{height:38px;font-size:1.05rem;color:var(--muted);}
+.sf-badge{font-size:.8rem;line-height:1;width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;}
+.sf-mark{opacity:.45;}
+.sf-col[data-state="ok"] .sf-want{border-color:var(--green);background:rgba(0,200,83,.12);color:var(--green);}
+.sf-col[data-state="ok"] .sf-badge{background:var(--green);color:#04240f;}
+.sf-col[data-state="punct"] .sf-want{border-color:var(--green);background:rgba(0,200,83,.06);color:var(--green);}
+.sf-col[data-state="punct"] .sf-badge{background:transparent;color:var(--green);box-shadow:inset 0 0 0 2px var(--green);}
+.sf-col[data-state="wrong"] .sf-want{border-color:var(--accent);border-style:dashed;background:rgba(233,69,96,.12);color:var(--accent);}
+.sf-col[data-state="wrong"] .sf-got{border-color:rgba(233,69,96,.4);color:var(--accent);}
+.sf-col[data-state="wrong"] .sf-badge{background:var(--accent);color:#fff;}
+.sf-col[data-state="missing"] .sf-want{border-color:var(--gold);border-style:dashed;background:rgba(245,166,35,.1);color:var(--gold);}
+.sf-col[data-state="missing"] .sf-got{border-style:dashed;color:var(--muted);}
+.sf-col[data-state="missing"] .sf-badge{background:var(--gold);color:#2a1c00;}
+/* An extra letter is not part of the word, so it is not drawn in the word. */
+.sf-col-extra{align-self:flex-end;}
+.sf-col-extra .sf-want{display:none;}
+.sf-col-extra .sf-got{border-color:var(--purple);border-style:dashed;color:var(--purple);}
+.sf-col-extra .sf-badge{background:var(--purple);color:#fff;}
+.sf-gap{align-self:center;padding:0 1px;}
+.sf-gap-mark{font-size:1.3rem;color:var(--gold);font-weight:900;}
+.sf-word-mode .sf-slot{min-width:0;height:34px;font-size:.9rem;padding:0 7px;}
+.sf-word-mode .sf-want{font-size:.9rem;}
+.sf-word-mode .sf-got{height:30px;font-size:.8rem;}
+@media (max-width:600px){
+  .sf-slot{min-width:34px;height:40px;font-size:1.1rem;padding:0 5px;}
+  .sf-want{font-size:1.1rem;}
+  .sf-got{height:32px;font-size:.9rem;}
+}
+@media (prefers-reduced-motion:reduce){
+  .sf-want{transition:none;}
+  button.sf-want:hover,.sf-want.playing{transform:none;}
+}
+
 .result-rank{color:var(--muted);font-size:.9rem;}
 .result-total{font-family:'Fredoka One',cursive;font-size:1.1rem;}
 /* The three centred screens between rounds — join, waiting, result — were
@@ -1575,7 +1626,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
     <div class="s-q-text" id="s-q-text">…</div>
     <button class="s-hear-btn" id="s-hear-btn" onclick="studentSpeak()">🔊 Hear it again</button>
   </div>
-  <div id="translate-hint-wrap" style="display:none;width:100%;max-width:500px;text-align:center;">
+  <div id="hint-wrap" style="display:none;width:100%;max-width:500px;text-align:center;">
     <button class="btn btn-ghost btn-sm" id="hint-btn" onclick="showHint()">💡 Hint</button>
     <div id="hint-text" style="color:var(--gold);font-family:'Fredoka One',cursive;font-size:1rem;margin-top:6px;min-height:1.2rem;word-break:break-word;"></div>
   </div>
@@ -1628,6 +1679,10 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   <div class="logo-bar">WordLink <span>🎮</span> Game</div>
   <div class="result-icon" id="result-icon">✅</div>
   <div class="result-word" id="result-word"></div>
+  <!-- Getting a word wrong and being shown the right spelling teaches very
+       little on its own. Hearing it come apart into the sounds it is built
+       from is the part that carries over to the next word. -->
+  <button class="btn btn-ghost btn-sm" id="result-sound-btn" style="display:none;" onclick="resultSoundOut()">🔊 Hear it in parts</button>
   <div class="result-points" id="result-points"></div>
   <div class="result-total" id="result-total"></div>
   <div class="result-rank" id="result-rank"></div>
@@ -1841,6 +1896,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 
 <!-- Word families, grapheme→recording maps and voice picking, shared with index.html -->
 <script src="phonics.js"></script>
+<script src="spell-feedback.js"></script>
 <script>
 /* FIREBASE */
 const firebaseConfig={apiKey:"AIzaSyARGfXd7nArpjS87r_TOiujIy8pjHpBBoA",authDomain:"wordlink-game-d1f97.firebaseapp.com",databaseURL:"https://wordlink-game-d1f97-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"wordlink-game-d1f97",storageBucket:"wordlink-game-d1f97.firebasestorage.app",messagingSenderId:"126959375644",appId:"1:126959375644:web:f2a39eb6057426382b96d9"};
@@ -4748,12 +4804,52 @@ function showMidStudentLeaderboard(){
   });
 }
 
+/* Help that does the next thing rather than describing it, because a
+   sentence explaining the hint is the one thing this learner cannot read.
+
+   Translate keeps what it always did — the English sentence, a word at a
+   time. Spelling starts by sounding the word out chunk by chunk, then gives
+   up one chunk of it per press. Hearing the parts first matters: a learner
+   who is handed letters has been given the answer, and a learner who hears
+   "sh — o — p" has been given the way to find it. */
 function showHint(){
-  if(!currentStudentQ||currentStudentQ.type!=='translate') return;
-  const words=currentStudentQ.en.split(' ');
-  hintLevel=Math.min(hintLevel+1,words.length);
-  document.getElementById('hint-text').textContent=words.slice(0,hintLevel).join(' ')+(hintLevel<words.length?' …':'');
-  if(hintLevel>=words.length) document.getElementById('hint-btn').disabled=true;
+  const q=currentStudentQ;
+  if(!q) return;
+  if(q.type==='translate'){
+    const words=q.en.split(' ');
+    hintLevel=Math.min(hintLevel+1,words.length);
+    document.getElementById('hint-text').textContent=words.slice(0,hintLevel).join(' ')+(hintLevel<words.length?' …':'');
+    if(hintLevel>=words.length) document.getElementById('hint-btn').disabled=true;
+    return;
+  }
+  if(!isSpellingQ(q)) return;
+  const parts=hintParts(q);
+  if(hintLevel===0){ hintLevel=1; hintSoundOut(q); }
+  else hintLevel=Math.min(hintLevel+1,parts.length+1);
+  document.getElementById('hint-text').textContent=
+    parts.map((p,i)=>i<hintLevel-1?p:'_'.repeat(p.length)).join(' ');
+  document.getElementById('hint-btn').textContent=hintLevel===0?'💡 Hint':'💡 More';
+  if(hintLevel>=parts.length+1) document.getElementById('hint-btn').disabled=true;
+}
+
+/* The word broken the way it is built — "sh" is one part, not two letters —
+   falling back to single letters for anything the phoneme map has never
+   seen. */
+function hintParts(q){
+  const word=spellTidy(q.answer||'');
+  const tiles=typeof phonicsTiles==='function'?phonicsTiles(word):null;
+  return (tiles&&tiles.map(t=>t.d).join('')===word.toLowerCase())?tiles.map(t=>t.d):word.split('');
+}
+
+let hintSoundStop=null;
+function hintSoundOut(q){
+  const word=spellTidy(q.answer||'');
+  if(hintSoundStop){ hintSoundStop(); hintSoundStop=null; }
+  if(typeof canSoundOut==='function'&&canSoundOut(word,true)){
+    hintSoundStop=playWordSounds(word,{speakPart:t=>speakTTS(t,0.7),done:()=>{hintSoundStop=null;}});
+  } else {
+    speakTTS(word,0.55);
+  }
 }
 
 /* SOLO PRACTICE */
@@ -5099,6 +5195,9 @@ function showSoloResult(submittedAns,correctAns,timeLeft){
   if(currentStudentQ&&currentStudentQ.type==='translate'){
     const r=translateScore(submittedAns,correctAns,timeLeft||0);
     pts=r.pts; tier=r.tier;
+  } else if(isSpellingQ(currentStudentQ)){
+    tier=spellTier(submittedAns,correctAns);
+    pts=spellPoints(tier,timeLeft);
   } else {
     const isCorrect=normalize(submittedAns)===normalize(correctAns);
     pts=isCorrect?100+Math.max(0,Math.round((timeLeft||0)*50)):0;
@@ -5108,12 +5207,15 @@ function showSoloResult(submittedAns,correctAns,timeLeft){
   document.getElementById('result-icon').textContent=tier==='correct'?'🎉':tier==='partial'?'🌟':'😔';
   if(currentStudentQ&&currentStudentQ.type==='translate'){
     document.getElementById('result-word').innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;line-height:2;text-align:center;">'+diffHtml(submittedAns||'',correctAns)+'</div>'+(tier!=='correct'?'<div style="font-size:.78rem;color:var(--muted);margin-top:6px;">Correct: <em style="color:var(--green)">'+correctAns+'</em></div>':'');
+  } else if(isSpellingQ(currentStudentQ)){
+    renderSpellResult(document.getElementById('result-word'),submittedAns,correctAns,tier);
   } else {
     document.getElementById('result-word').innerHTML=tier==='correct'?'<span class="correct-answer">'+correctAns+'</span> ✅':'<span class="wrong-answer">'+(submittedAns||'(blank)')+'</span> → <span class="correct-answer">'+correctAns+'</span>';
     // The answer to a gap round is one sound; show the word it completes.
     if(currentStudentQ&&currentStudentQ.type==='phgap')
       document.getElementById('result-word').innerHTML+='<div style="font-size:.9rem;color:var(--muted);margin-top:6px;">'+currentStudentQ.word+'</div>';
   }
+  document.getElementById('result-sound-btn').style.display=isSpellingQ(currentStudentQ)?'':'none';
   document.getElementById('result-points').textContent=tier==='correct'?'+'+pts+' points 🎯':tier==='partial'?'+'+pts+' points 🌟 (partly correct)':'No points this round';
   document.getElementById('result-total').textContent='Your total: '+myScore+' pts';
   document.getElementById('result-rank').textContent='Question '+(soloQIdx+1)+' of '+soloQuestions.length;
@@ -5180,7 +5282,9 @@ function showStudentQuestion(q,startedAt,dur){
   document.getElementById('shop-section').style.display=isShop?'flex':'none';
   document.getElementById('form-section').style.display=isForm?'flex':'none';
   document.getElementById('mc-section').style.display=isMc?'grid':'none';
-  document.getElementById('translate-hint-wrap').style.display=isTranslate?'':'none';
+  // Spelling rounds get the hint as well: this is where a learner who cannot
+  // start is either given a way in or left staring at an empty box.
+  document.getElementById('hint-wrap').style.display=(isTranslate||isSpellingQ(q))?'':'none';
   document.getElementById('hint-text').textContent='';
   document.getElementById('hint-btn').disabled=false;
   document.getElementById('hint-btn').textContent='💡 Hint';
@@ -5844,6 +5948,9 @@ function showStudentResult(correctAnswer){
     if(currentStudentQ&&currentStudentQ.type==='translate'){
       const r=translateScore(myAnswer,correctAnswer,myData.timeLeft||0);
       pts=r.pts; tier=r.tier;
+    } else if(isSpellingQ(currentStudentQ)){
+      tier=spellTier(myAnswer,correctAnswer);
+      pts=spellPoints(tier,myData.timeLeft);
     } else {
       const isCorrect=normalize(myAnswer)===normalize(correctAnswer);
       pts=isCorrect?100+Math.max(0,Math.round((myData.timeLeft||0)*50)):0;
@@ -5853,9 +5960,12 @@ function showStudentResult(correctAnswer){
     document.getElementById('result-icon').textContent=tier==='correct'?'🎉':tier==='partial'?'🌟':'😔';
     if(currentStudentQ&&currentStudentQ.type==='translate'){
       document.getElementById('result-word').innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;line-height:2;text-align:center;">'+diffHtml(myAnswer||'',correctAnswer)+'</div>'+(tier!=='correct'?'<div style="font-size:.78rem;color:var(--muted);margin-top:6px;">Correct: <em style="color:var(--green)">'+correctAnswer+'</em></div>':'');
+    } else if(isSpellingQ(currentStudentQ)){
+      renderSpellResult(document.getElementById('result-word'),myAnswer,correctAnswer,tier);
     } else {
       document.getElementById('result-word').innerHTML=tier==='correct'?'<span class="correct-answer">'+correctAnswer+'</span> ✅':'<span class="wrong-answer">'+(myAnswer||'(blank)')+'</span> → <span class="correct-answer">'+correctAnswer+'</span>';
     }
+    document.getElementById('result-sound-btn').style.display=isSpellingQ(currentStudentQ)?'':'none';
     document.getElementById('result-points').textContent=tier==='correct'?'+'+pts+' points 🎯':tier==='partial'?'+'+pts+' points 🌟 (partly correct)':'No points this round';
     document.getElementById('result-total').textContent='Your total: '+myScore+' pts';
     roomRef.child('players').once('value',snap2=>{
@@ -6141,8 +6251,71 @@ function openEditorFromPicker(){
 
 /* UTILS */
 function normalize(s){return(s||'').toLowerCase().trim().replace(/[^a-z0-9]/g,'');}
+
+/* A round where the learner writes the word out. Everything else — tapping a
+   choice, ordering tiles, setting the clock — is a different task and keeps
+   the plain right/wrong it always had. */
+function isSpellingQ(q){
+  return !!q && (q.type==='word'||q.type==='sentence') && !(Array.isArray(q.choices)&&q.choices.length);
+}
+
+/* Three outcomes, from the shared rule both pages now use. 'almost' means
+   every letter was right and only the capitals or the marks were not: it
+   scores, on the same partly-correct tier the translate rounds already show,
+   because a learner who spelled the word correctly did not get it wrong. The
+   speed bonus is what it costs. */
+function spellTier(submitted,correct){
+  const m=spellMatch(submitted,correct);
+  return m==='exact'?'correct':m==='almost'?'partial':'wrong';
+}
+function spellPoints(tier,timeLeft){
+  if(tier==='correct') return 100+Math.max(0,Math.round((timeLeft||0)*50));
+  return tier==='partial'?100:0;
+}
+
+/* The answer and the attempt, in two aligned rows, with every part of the
+   answer speaking its own sound when tapped. */
+function renderSpellResult(el,submitted,correct,tier){
+  el.innerHTML='';
+  const box=document.createElement('div');
+  el.appendChild(box);
+  renderSpellSlots(box,alignSpelling(correct,submitted||''),{
+    speak:(u,slot)=>{
+      if(u.sound&&u.sound.w){ playPhonemeWav(u.sound.w,slot); return; }
+      slot.classList.add('playing');
+      speakTTS((u.sound&&u.sound.tts)||u.want,0.7);
+      setTimeout(()=>slot.classList.remove('playing'),900);
+    }
+  });
+  if(tier!=='correct'&&!submitted){
+    const note=document.createElement('div');
+    note.style.cssText='font-size:.78rem;color:var(--muted);margin-top:6px;';
+    note.textContent='(nothing written)';
+    el.appendChild(note);
+  }
+}
+
+/* Sound the word out chunk by chunk on the result screen. Words the phoneme
+   map does not know are simply said slowly instead of not at all. */
+let resultSoundStop=null;
+function resultSoundOut(){
+  const q=currentStudentQ;
+  if(!q) return;
+  const word=spellTidy(q.answer||q.word||'');
+  if(resultSoundStop){ resultSoundStop(); resultSoundStop=null; }
+  const slots=document.querySelectorAll('#result-word .sf-col:not(.sf-col-extra) .sf-want');
+  const light=i=>{ for(let j=0;j<slots.length;j++) slots[j].classList.toggle('playing',j===i); };
+  if(typeof canSoundOut==='function'&&canSoundOut(word,true)){
+    resultSoundStop=playWordSounds(word,{
+      onStep:i=>light(i),
+      speakPart:t=>speakTTS(t,0.7),
+      done:()=>{ light(-1); resultSoundStop=null; }
+    });
+  } else {
+    speakTTS(word,0.55);
+  }
+}
 function levenshtein(a,b){const m=a.length,n=b.length,dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);return dp[m][n];}
-function fuzzyMatch(sub,correct){const s=(sub||'').toLowerCase().replace(/[^a-z0-9 ]/g,'').trim(),c=(correct||'').toLowerCase().replace(/[^a-z0-9 ]/g,'').trim();if(s===c)return true;return levenshtein(s,c)<=Math.max(2,Math.floor(c.length/8));}
 function diffHtml(sub,correct){
   // Split into words, strip punctuation for comparison but keep originals for display
   const sw=(sub||'').replace(/[.,!?;:]/g,'').trim().split(/\s+/).filter(Boolean);

@@ -965,28 +965,152 @@
     0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-7px); }
     40%{ transform:translateX(7px); }  60%{ transform:translateX(-5px); } 80%{ transform:translateX(5px); }
   }
-  .spell-diff {
-    font-family: 'Fredoka One', cursive; font-size: 1.6rem; letter-spacing: 4px;
-    margin: 10px auto 4px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; min-height: 48px;
+  /* ── THE TWO ALIGNED ROWS ──
+     The answer on top, the attempt underneath, one column per part of the
+     word. A merged line of coloured letters cannot tell someone who is
+     still learning to read WHERE a word went wrong; a column can, because
+     the wrong part is the one with the cross under it.
+
+     Nothing is said by colour alone. The badge shape carries it too — a
+     filled tick for right, a hollow tick for right letters with the marks
+     left out, a cross for wrong, a plus for a part that never arrived. */
+  .sf-wrap { margin: 12px auto 6px; min-height: 96px; }
+  .sf-rows { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 6px; }
+  .sf-col { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .sf-slot {
+    min-width: 52px; height: 58px; padding: 0 8px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fredoka One', cursive; font-size: 1.7rem; line-height: 1;
+    border: 2.5px solid var(--light); background: white; color: var(--dark);
+    box-sizing: border-box; white-space: nowrap;
   }
-  .spell-char {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 36px; height: 44px; border-radius: 10px; font-size: 1.3rem; border: 2px solid transparent;
+  .sf-want {
+    cursor: pointer; font: inherit; font-family: 'Fredoka One', cursive; font-size: 1.7rem;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.10);
+    animation: tilePop 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+    transition: transform 0.15s;
   }
-  .spell-char.correct { background: #d4f5d4; color: #1a7a1a; border-color: #7ac97a; }
-  .spell-char.wrong   { background: #fdd;   color: #b00;    border-color: #f09090; }
-  .spell-char.missing { background: #f0f0f0; color: #999;    border-color: #ccc;    font-size: 0.9rem; }
-  .spell-char.extra   { background: #ffe0f0; color: #a0006a; border-color: #f090c0; }
-  .spell-feedback-msg {
+  button.sf-want:hover { transform: translateY(-3px); }
+  .sf-want.playing { transform: translateY(-3px) scale(1.08); filter: brightness(1.1); }
+  .sf-want.sf-hidden { color: transparent; background: #f4efe8; border-style: dashed; box-shadow: none; }
+  .sf-got { font-size: 1.4rem; height: 48px; background: #fafafa; color: var(--mid); border-color: #ece5dc; }
+  .sf-badge {
+    font-size: 0.95rem; line-height: 1; width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-weight: 900;
+  }
+  .sf-mark { opacity: 0.45; }
+
+  .sf-col[data-state="ok"]     .sf-want { border-color: #7ac97a; background: #eafaea; color: #1a7a1a; }
+  .sf-col[data-state="ok"]     .sf-badge { background: #2f9e2f; color: white; }
+  /* Hollow tick: every letter right, only the capital or the mark missing.
+     Never a cross — an adult who spelled the word correctly must not be
+     shown a failure. */
+  .sf-col[data-state="punct"]  .sf-want { border-color: #7ac97a; background: #f4fbf4; color: #1a7a1a; }
+  .sf-col[data-state="punct"]  .sf-badge { background: white; color: #2f9e2f; box-shadow: inset 0 0 0 2.5px #2f9e2f; }
+  .sf-col[data-state="wrong"]  .sf-want { border-color: #e05555; border-style: dashed; background: #fff2f2; color: #b00; }
+  .sf-col[data-state="wrong"]  .sf-got  { border-color: #f0a0a0; color: #b00; }
+  .sf-col[data-state="wrong"]  .sf-badge { background: #d33; color: white; }
+  .sf-col[data-state="missing"] .sf-want { border-color: #d8a34a; border-style: dashed; background: #fff9ee; color: #a06a10; }
+  .sf-col[data-state="missing"] .sf-got  { border-style: dashed; color: #c4b8aa; }
+  .sf-col[data-state="missing"] .sf-badge { background: #d8a34a; color: white; }
+  /* An extra letter is not part of the word, so it is not drawn in the
+     word — it sits low and detached, in the place it was typed. */
+  .sf-col-extra { align-self: flex-end; }
+  .sf-col-extra .sf-want { display: none; }
+  .sf-col-extra .sf-got { border-color: #f090c0; border-style: dashed; background: #ffe8f4; color: #a0006a; }
+  .sf-col-extra .sf-badge { background: #c0006a; color: white; }
+  .sf-gap { align-self: center; padding: 0 2px; }
+  .sf-gap-mark { font-size: 1.6rem; color: #d8a34a; font-weight: 900; }
+
+  /* Sentences hold many more units than a word does, so they get a
+     smaller slot and wrap onto as many lines as they need. */
+  .sf-word-mode .sf-slot { min-width: 0; height: 42px; font-size: 1.05rem; padding: 0 9px; }
+  .sf-word-mode .sf-want { font-size: 1.05rem; }
+  .sf-word-mode .sf-got  { height: 36px; font-size: 0.95rem; }
+  .sf-word-mode .sf-rows { gap: 4px; }
+
+  .spell-tool-row { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 12px 0 6px; flex-wrap: wrap; }
+  .spell-hint-btn {
+    font-family: 'Fredoka One', cursive; font-size: 0.9rem;
+    padding: 8px 16px; border-radius: 24px; border: none;
+    background: linear-gradient(135deg, #b48ee8, #8a5fd0); color: white; cursor: pointer;
+    box-shadow: 0 2px 0 rgba(90,40,150,0.3); transition: all 0.18s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .spell-hint-btn:hover { transform: translateY(-1px); }
+  .spell-hint-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .spell-hint-dots { letter-spacing: 2px; font-size: 0.7rem; opacity: 0.9; }
+
+  .spell-clue { text-align: center; margin: 4px 0 2px; }
+  .spell-clue-emoji { font-size: 2.8rem; line-height: 1.1; min-height: 1.1em; }
+  .spell-clue-emoji .custom-icon-emoji { height: 1em; width: 1em; }
+  .spell-clue-gloss {
+    font-family: 'Noto Sans Arabic','Noto Sans SC','Noto Sans Khmer','Noto Sans Myanmar','Noto Sans Devanagari','Noto Sans',sans-serif;
+    font-size: 1.25rem; color: var(--mid);
+  }
+
+  .spell-tilebank { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px 0 4px; min-height: 56px; }
+  .spell-bank-tile {
+    min-width: 52px; height: 56px; padding: 0 10px; border-radius: 12px; border: 2.5px solid #a0b8f0;
+    background: linear-gradient(135deg,#e8f0ff,#d0e0ff); color: var(--accent2);
+    font-family: 'Fredoka One', cursive; font-size: 1.5rem; cursor: pointer;
+    box-shadow: 0 3px 0 #7090d0; transition: transform 0.15s;
+  }
+  .spell-bank-tile:hover { transform: translateY(-3px); }
+  .spell-bank-tile.used { opacity: 0.25; pointer-events: none; }
+  .spell-tilebank.locked { pointer-events: none; }
+  .spell-mode-row { text-align: center; margin-top: 8px; }
+  .spell-mode-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.82rem;
+    padding: 7px 16px; border-radius: 24px; border: 2px solid var(--light);
+    background: white; color: var(--mid); cursor: pointer; transition: all 0.18s;
+  }
+  .spell-mode-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* The verdict is an icon first. The words beside it are a courtesy for
+     anyone who can read them, never the message itself. */
+  .spell-verdict {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
     font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
-    margin: 8px 0 4px; min-height: 24px; text-align: center;
+    margin: 10px 0 4px; min-height: 40px; text-align: center;
   }
-  .spell-feedback-msg.correct { color: #1a7a1a; }
-  .spell-feedback-msg.wrong   { color: #b00; }
-  .spell-attempts {
-    font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700;
-    color: var(--mid); margin-bottom: 6px; text-align: center;
+  .spell-verdict .v-icon { font-size: 1.9rem; line-height: 1; }
+  .spell-verdict.correct { color: #1a7a1a; }
+  .spell-verdict.almost  { color: #2f7a4a; }
+  .spell-verdict.wrong   { color: #b00; }
+  /* The hollow tick is the whole vocabulary of "almost": every letter
+     right, only the marks missing. It is a tick and not a cross on
+     purpose — someone who spelled the word correctly has not failed. */
+  .v-hollow {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 1.05em; height: 1.05em; border-radius: 50%;
+    border: 0.14em solid currentColor; font-size: 0.72em; line-height: 1;
+    vertical-align: middle;
   }
+  .fin-count { font-family: 'Fredoka One', cursive; font-size: 1.6rem; margin: 0 8px; }
+  .fin-exact  { color: #2f9e2f; }
+  .fin-almost { color: #2f7a4a; }
+  .fin-of { color: var(--mid); font-size: 1rem; }
+  .fin-note { font-size: 0.9rem; color: var(--mid); margin-top: 8px; max-width: 34ch; margin-inline: auto; }
+
+  /* Before a try, the slots only show the word's shape: how many parts it
+     has, and nothing about what they are. */
+  .sf-col[data-state="blank"] .sf-want { border-color: var(--light); background: white; color: var(--dark); }
+  .sf-col[data-state="blank"] .sf-want.sf-hidden { background: #f4efe8; border-style: dashed; }
+  .sf-col[data-state="blank"] .sf-badge { display: none; }
+  .sf-got-tap { cursor: pointer; font-family: 'Fredoka One', cursive; }
+  .sf-got-tap:hover { border-color: var(--accent2); }
+  .sf-got-empty { border-style: dashed; }
+
+  /* Reduced motion keeps every reveal — nothing here is animation-only —
+     but takes the movement out of it. */
+  @media (prefers-reduced-motion: reduce) {
+    .sf-want, .spell-bank-tile { animation: none !important; transition: none !important; }
+    button.sf-want:hover, .spell-bank-tile:hover { transform: none; }
+    .sf-want.playing { transform: none; }
+    .spell-input.shake { animation: none; }
+  }
+
   .spell-btn-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 14px; }
   .spell-check-btn {
     font-family: 'Fredoka One', cursive; font-size: 1rem;
@@ -1002,11 +1126,6 @@
     background: white; color: var(--dark); cursor: pointer; transition: all 0.18s;
   }
   .spell-secondary-btn:hover { border-color: #4a7fd4; color: #4a7fd4; }
-  .spell-answer-reveal {
-    font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: #2a4fa0;
-    background: #e8f0ff; border-radius: 14px; padding: 10px 22px;
-    margin: 10px auto 4px; display: none; text-align: center; letter-spacing: 2px;
-  }
   .spell-listen-btn {
     font-family: 'Fredoka One', cursive; font-size: 0.9rem;
     padding: 8px 18px; border-radius: 24px; border: none;
@@ -1017,7 +1136,6 @@
   .spell-listen-btn:hover { transform: translateY(-1px); }
   .spell-listen-btn.speaking { opacity: 0.6; }
   .sent-spelling-wrap .spell-input { font-size: clamp(1.05rem, 1.2vw + 0.6rem, 1.45rem); }
-  .sent-spelling-wrap .spell-diff  { font-size: clamp(1rem, 1vw + 0.6rem, 1.3rem); letter-spacing: 2px; }
 
   /* ── TRANSLATION ── */
   .word-translation {
@@ -1346,25 +1464,46 @@
     <div id="spellingPhase">
       <div class="practice-card">
         <div class="practice-word-label" id="spellingWordLabel">Listen, then type what you hear</div>
-        <div style="text-align:center; margin: 12px 0 6px;">
+        <!-- Two buttons, both of which do rather than say. Hear it plays the
+             word; the hint does whatever the next tier is, and shows how much
+             help is left as dots rather than as a sentence. -->
+        <div class="spell-tool-row">
           <button class="spell-listen-btn" id="spellingListenBtn" onclick="spellingSpeak()">
             🔊 <span id="spellingListenLbl">Hear it</span>
           </button>
+          <button class="spell-hint-btn" id="spellingHintBtn" onclick="spellingHint()"
+            aria-label="Help me">
+            <span id="spellingHintIcon">💡</span><span class="spell-hint-dots" id="spellingHintDots" aria-hidden="true"></span>
+          </button>
         </div>
+        <!-- The picture and the first-language word, revealed by hint tier 2.
+             Knowing WHICH word is being asked for is not the same as being told
+             how to spell it. -->
+        <div class="spell-clue" id="spellingClue" style="display:none">
+          <div class="spell-clue-emoji" id="spellingClueEmoji"></div>
+          <div class="spell-clue-gloss" id="spellingClueGloss"></div>
+        </div>
+        <!-- The shape of the word, and after a try, the two aligned rows.
+             This is where "where did I go wrong" is answered. -->
+        <div class="sf-wrap" id="spellingDiff"></div>
         <div class="spell-input-wrap" id="spellingInputWrap">
           <input class="spell-input" id="spellingInput" type="text" autocomplete="off"
             autocorrect="off" autocapitalize="off" spellcheck="false"
             placeholder="Type your answer here…"
             onkeydown="if(event.key==='Enter') checkSpelling()">
         </div>
-        <div class="spell-diff" id="spellingDiff"></div>
-        <div class="spell-feedback-msg" id="spellingFeedback"></div>
-        <div class="spell-attempts" id="spellingAttempts"></div>
-        <div class="spell-answer-reveal" id="spellingAnswer"></div>
+        <!-- Tap-the-letters. Ordering parts you can see is a far easier task
+             than producing them from memory on a keyboard, and for a good many
+             learners at this level it is the difference between attempting the
+             word and not. -->
+        <div class="spell-tilebank" id="spellingTileBank" style="display:none"></div>
+        <div class="spell-mode-row" id="spellingModeRow">
+          <button class="spell-mode-btn" id="spellingModeBtn" onclick="spellingToggleMode()"></button>
+        </div>
+        <div class="spell-verdict" id="spellingFeedback"></div>
         <div class="spell-btn-row">
           <button class="spell-check-btn" id="spellingCheckBtn" onclick="checkSpelling()">✔ Check</button>
           <button class="spell-secondary-btn" id="spellingTryAgainBtn" onclick="spellingTryAgain()" style="display:none">↩ Try again</button>
-          <button class="spell-secondary-btn" id="spellingShowAnswerBtn" onclick="spellingShowAnswer()" style="display:none">👁 Show answer</button>
           <button class="spell-secondary-btn" onclick="spellingNext()">Skip →</button>
         </div>
       </div>
@@ -1663,6 +1802,7 @@
 
 <!-- Word families, grapheme→recording maps and voice picking, shared with game.html -->
 <script src="phonics.js"></script>
+<script src="spell-feedback.js"></script>
 <script>
 /* ══════════════════════════════════════════
    EMOJI MAP
@@ -3894,12 +4034,28 @@ function speakSentence(text, btn) {
 /* ══════════════════════════════════════════
    SPELLING PRACTICE
 ══════════════════════════════════════════ */
-var spWords    = [];
-var spIdx      = 0;
-var spAttempts = 0;
-var spIsSent   = false;
-var spCorrect  = 0;
-var MAX_ATTEMPTS = 10;
+var spWords   = [];
+var spIdx     = 0;
+var spIsSent  = false;
+var spCorrect = 0;   // spelled and punctuated exactly
+var spAlmost  = 0;   // every letter right, marks or capitals missing
+var spUnits   = [];  // the answer broken into the parts it is built from
+var spReveal  = null;  // which of those parts the hints have shown
+var spTier    = 0;
+var spTiers   = [];
+var spLast    = null;  // the last alignment, so a hint knows what was missed
+var spMode    = 'type';
+var spPlaced  = [];
+var spStopSounds = null;
+
+/* Tapping letters into place is a different task from producing them on a
+   keyboard, and a much easier one: the parts are in front of you and the
+   job is putting them in order. Plenty of learners at this level can do
+   the first and not yet the second, so the choice is theirs and it is
+   remembered. Typing stays the default. */
+try { spMode = localStorage.getItem('wl_spellMode') === 'tiles' ? 'tiles' : 'type'; } catch (e) {}
+
+var SP_TIER_ICON = { sound: '🔊', clue: '🖼', first: '🅰', missed: '👁' };
 
 function openSpellingForWp(wp) {
   var families = wp === 'wp1' ? wp1Families : wp2Families;
@@ -3914,6 +4070,7 @@ function openSpelling(words, label) {
   spWords   = words.slice();
   spIdx     = 0;
   spCorrect = 0;
+  spAlmost  = 0;
   spIsSent  = words.some(function(w) { return w.indexOf(' ') !== -1; });
   document.getElementById('spellingTitle').textContent    = '✏️ Spelling Practice';
   document.getElementById('spellingSubtitle').textContent = label || '';
@@ -3929,41 +4086,202 @@ function openSpelling(words, label) {
 function closeSpelling() {
   document.getElementById('spellingOverlay').classList.remove('active');
   document.body.style.overflow = '';
+  spStopHintSound();
   window.speechSynthesis && window.speechSynthesis.cancel();
 }
 
+function spAnswer() { return spWords[spIdx] || ''; }
+
+/* Which kinds of help this item can offer. Hearing the parts always
+   works; a picture and a first-language word only exist for some items,
+   and an offer of help that does nothing is worse than no offer. */
+function spBuildTiers() {
+  var t = ['sound'];
+  if (spClueContent().emoji || spClueContent().gloss) t.push('clue');
+  t.push('first', 'missed');
+  return t;
+}
+
+function spClueContent() {
+  var a = spAnswer();
+  return spIsSent
+    ? { emoji: '', gloss: ts(a) }
+    : { emoji: emo(a), gloss: tw(a.toLowerCase()) };
+}
+
 function spLoadItem() {
-  spAttempts = 0;
-  var total  = spWords.length;
-  var label  = spIsSent ? 'Sentence' : 'Word';
+  spStopHintSound();
+  var total = spWords.length;
+  var label = spIsSent ? 'Sentence' : 'Word';
   document.getElementById('spellingStepCounter').textContent = label + ' ' + (spIdx + 1) + ' of ' + total;
   var pct = total > 1 ? (spIdx / (total - 1)) * 100 : 100;
   document.getElementById('spellingProgressFill').style.width = pct + '%';
   document.getElementById('spellingWordLabel').textContent = spIsSent
-    ? 'Listen, then type the sentence exactly'
-    : 'Listen, then type the word';
+    ? 'Listen, then write the sentence'
+    : 'Listen, then write the word';
+
+  // A word is built out of graphemes — "sh" is one part with one sound. A
+  // sentence is built out of words, and there are no recordings for those.
+  spUnits = spIsSent
+    ? spellTidy(spAnswer()).split(' ').map(function(w) { return { text: w, sound: null }; })
+    : spellUnitsForWord(spellTidy(spAnswer()));
+  spReveal = [];
+  spTier   = 0;
+  spTiers  = spBuildTiers();
+  spLast   = null;
+  spPlaced = spUnits.map(function() { return null; });
+
   var inp = document.getElementById('spellingInput');
   inp.value = ''; inp.disabled = false; inp.classList.remove('shake');
-  inp.placeholder = spIsSent ? 'Type the sentence here…' : 'Type the word here…';
-  document.getElementById('spellingDiff').innerHTML       = '';
-  document.getElementById('spellingFeedback').textContent = '';
-  document.getElementById('spellingFeedback').className   = 'spell-feedback-msg';
-  document.getElementById('spellingAttempts').textContent = '';
-  document.getElementById('spellingAnswer').style.display = 'none';
-  document.getElementById('spellingCheckBtn').disabled    = false;
-  document.getElementById('spellingTryAgainBtn').style.display   = 'none';
-  document.getElementById('spellingShowAnswerBtn').style.display = 'none';
+  inp.placeholder = spIsSent ? 'Write the sentence here…' : 'Write the word here…';
+  inp.parentElement.className = spIsSent ? 'spell-input-wrap sent-spelling-wrap' : 'spell-input-wrap';
+
+  spSetVerdict('', '');
+  document.getElementById('spellingClue').style.display = 'none';
+  document.getElementById('spellingCheckBtn').disabled  = false;
+  document.getElementById('spellingTryAgainBtn').style.display = 'none';
   document.getElementById('spellingListenLbl').textContent = 'Hear it';
   document.getElementById('spellingListenBtn').classList.remove('speaking');
-  inp.parentElement.className = spIsSent ? 'spell-input-wrap sent-spelling-wrap' : 'spell-input-wrap';
-  setTimeout(function() { inp.focus(); }, 100);
+  spUpdateHintBtn();
+  spApplyMode();
+}
+
+/* Tile mode only makes sense for a single word: a sentence's parts are
+   whole words, and putting those in order is the Unscramble game, not
+   this one. */
+function spApplyMode() {
+  var tiles = !spIsSent && spMode === 'tiles';
+  document.getElementById('spellingInputWrap').style.display = tiles ? 'none' : '';
+  document.getElementById('spellingTileBank').style.display  = tiles ? 'flex' : 'none';
+  document.getElementById('spellingModeRow').style.display   = spIsSent ? 'none' : '';
+  document.getElementById('spellingModeBtn').textContent     = tiles ? '⌨️ Type it instead' : '🔤 Tap the letters instead';
+  document.getElementById('spellingTileBank').classList.remove('locked');
+  if (tiles) spBuildBank();
+  else setTimeout(function() { document.getElementById('spellingInput').focus(); }, 100);
+  spRenderShape();
+}
+
+function spellingToggleMode() {
+  spMode = spMode === 'tiles' ? 'type' : 'tiles';
+  try { localStorage.setItem('wl_spellMode', spMode); } catch (e) {}
+  spPlaced = spUnits.map(function() { return null; });
+  document.getElementById('spellingInput').value = '';
+  spSetVerdict('', '');
+  spApplyMode();
+}
+
+/* The word's own parts, shuffled, plus a few from the words beside it in
+   the group. Without the extras the bank would answer the question by
+   itself — with them the learner still has to know which parts belong. */
+function spBuildBank() {
+  var own = spUnits.map(function(u) { return u.text; });
+  var pool = [];
+  spWords.forEach(function(w) {
+    if (w === spAnswer()) return;
+    spellUnitsForWord(spellTidy(w)).forEach(function(u) {
+      if (own.indexOf(u.text) === -1 && pool.indexOf(u.text) === -1) pool.push(u.text);
+    });
+  });
+  var extras = pool.sort(function() { return Math.random() - 0.5; }).slice(0, Math.min(3, Math.max(1, own.length - 1)));
+  var bank = own.concat(extras).sort(function() { return Math.random() - 0.5; });
+
+  var el = document.getElementById('spellingTileBank');
+  el.innerHTML = '';
+  bank.forEach(function(text, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'spell-bank-tile';
+    b.textContent = text;
+    b.setAttribute('aria-label', 'place ' + text);
+    b.onclick = function() { spPlace(text, b); };
+    el.appendChild(b);
+  });
+}
+
+function spPlace(text, btn) {
+  var slot = spPlaced.indexOf(null);
+  if (slot === -1) return;
+  spPlaced[slot] = text;
+  btn.classList.add('used');
+  btn.dataset.slot = String(slot);
+  spRenderShape();
+}
+
+function spUnplace(k) {
+  if (!spPlaced[k]) return;
+  spPlaced[k] = null;
+  var used = document.querySelectorAll('#spellingTileBank .spell-bank-tile.used');
+  for (var i = 0; i < used.length; i++) {
+    if (used[i].dataset.slot === String(k)) { used[i].classList.remove('used'); delete used[i].dataset.slot; break; }
+  }
+  spRenderShape();
+}
+
+function spTyped() {
+  return spMode === 'tiles' && !spIsSent
+    ? spPlaced.map(function(t) { return t || ''; }).join('')
+    : document.getElementById('spellingInput').value;
+}
+
+/* ── THE SHAPE, AND THEN THE ANSWER ────────
+   Before a try, the row shows how many parts the word has and nothing
+   else. Knowing a word has three parts is not knowing how to spell it,
+   but not knowing costs a learner a guess that has nothing to do with
+   spelling. */
+function spRenderShape() {
+  var tiles = spMode === 'tiles' && !spIsSent;
+  renderSpellSlots(document.getElementById('spellingDiff'), {
+    mode: spIsSent ? 'word' : 'chunk',
+    units: spUnits.map(function(u, k) {
+      return { want: u.text, got: tiles ? (spPlaced[k] || '') : '', state: 'blank', sound: u.sound };
+    }),
+    extras: []
+  }, {
+    reveal: spReveal,
+    showGot: tiles,
+    speak: spSpeakUnit,
+    tapGot: tiles ? spUnplace : null
+  });
+}
+
+function spRenderResult(al) {
+  // A right spelling has nothing left to hide. A wrong one shows the parts
+  // the learner already got right — they know those, and leaving them blank
+  // only makes the row harder to read — and keeps hidden the ones the hints
+  // have not reached yet. Handing over the whole answer on the first miss
+  // would leave nothing to do but copy it.
+  var reveal = spReveal;
+  if (al.outcome === 'wrong') {
+    reveal = spReveal.slice();
+    al.units.forEach(function(u, k) {
+      if ((u.state === 'ok' || u.state === 'punct') && reveal.indexOf(k) === -1) reveal.push(k);
+    });
+  } else {
+    reveal = 'all';
+  }
+  renderSpellSlots(document.getElementById('spellingDiff'), al, {
+    reveal: reveal,
+    speak: spSpeakUnit
+  });
+}
+
+/* Every part of the answer says its own sound. This is the piece that was
+   missing: a learner could always hear the whole word, never the one
+   chunk they got wrong. */
+function spSpeakUnit(u, el) {
+  spStopHintSound();
+  if (u.sound && u.sound.w) { playPhonemeWav(u.sound.w, el); return; }
+  var text = (u.sound && u.sound.tts) || u.want;
+  if (!text) return;
+  el.classList.add('playing');
+  speakRaw(text, function() { el.classList.remove('playing'); }, spIsSent ? sentenceRate : speechRate);
 }
 
 function spellingSpeak() {
   if (!window.speechSynthesis) return;
+  spStopHintSound();
   window.speechSynthesis.cancel();
-  var word = spWords[spIdx];
-  var utt  = new SpeechSynthesisUtterance(word);
+  var utt = new SpeechSynthesisUtterance(spAnswer());
   utt.rate = spIsSent ? sentenceRate : speechRate;
   utt.pitch = 1.0; utt.lang = 'en-AU';
   applyVoice(utt);
@@ -3976,90 +4294,140 @@ function spellingSpeak() {
   window.speechSynthesis.speak(utt);
 }
 
-function checkSpelling() {
-  var answer = spWords[spIdx];
-  var typed  = document.getElementById('spellingInput').value;
-  var isCorrect = spIsSent ? (typed.trim() === answer.trim()) : (typed.trim().toLowerCase() === answer.trim().toLowerCase());
-  spAttempts++;
-  renderDiff(answer, typed, spIsSent);
-  var feedback = document.getElementById('spellingFeedback');
-  var attemptsLeft = MAX_ATTEMPTS - spAttempts;
+/* ── HELP, ONE STEP AT A TIME ──────────────
+   Each press does the next thing rather than describing it, because a
+   sentence explaining the hint is the one thing this learner cannot read.
+   The dots say how much help is left. */
+function spellingHint() {
+  var tier = spTiers[Math.min(spTier, spTiers.length - 1)];
+  if (spTier < spTiers.length) spTier++;
+  spUpdateHintBtn();
 
-  if (isCorrect) {
-    spCorrect++;
-    feedback.textContent = '✅ Correct!'; feedback.className = 'spell-feedback-msg correct';
-    document.getElementById('spellingAttempts').textContent = '';
-    document.getElementById('spellingCheckBtn').disabled = true;
-    document.getElementById('spellingTryAgainBtn').style.display   = 'none';
-    document.getElementById('spellingShowAnswerBtn').style.display = 'none';
-    document.getElementById('spellingInput').disabled = true;
-    setTimeout(spellingNext, 1200);
+  if (tier === 'sound')  { spHearParts(); return; }
+  if (tier === 'clue')   { spShowClue(); return; }
+  if (tier === 'first')  { spRevealUnits([0]); return; }
+  spRevealMissed();
+}
+
+function spUpdateHintBtn() {
+  var next = spTiers[Math.min(spTier, spTiers.length - 1)];
+  document.getElementById('spellingHintIcon').textContent = '💡' + (SP_TIER_ICON[next] || '');
+  var dots = '';
+  for (var i = 0; i < spTiers.length; i++) dots += (i < spTier ? '●' : '○');
+  document.getElementById('spellingHintDots').textContent = dots;
+  document.getElementById('spellingHintBtn').setAttribute('aria-label', 'Help me');
+}
+
+function spStopHintSound() {
+  if (spStopSounds) { spStopSounds(); spStopSounds = null; }
+  document.querySelectorAll('#spellingDiff .sf-want.playing')
+    .forEach(function(el) { el.classList.remove('playing'); });
+}
+
+/* Sound the word out part by part, lighting each part as it is heard.
+   Hearing "which part" and seeing "which part" at the same moment is what
+   makes the row mean anything. A sentence has no recordings, so it is
+   simply read slowly instead. */
+function spHearParts() {
+  spStopHintSound();
+  if (spIsSent) { speakRaw(spAnswer(), null, Math.max(0.5, sentenceRate - 0.2)); return; }
+  var slots = document.querySelectorAll('#spellingDiff .sf-col:not(.sf-col-extra) .sf-want');
+  var light = function(i) {
+    for (var j = 0; j < slots.length; j++) slots[j].classList.toggle('playing', j === i);
+  };
+  spStopSounds = playWordSounds(spellTidy(spAnswer()), {
+    onStep: function(i) { light(i); },
+    speakPart: function(t) { speakRaw(t); },
+    done: function() { light(-1); spStopSounds = null; }
+  });
+}
+
+function spShowClue() {
+  var c = spClueContent();
+  var wrap  = document.getElementById('spellingClue');
+  var gloss = document.getElementById('spellingClueGloss');
+  document.getElementById('spellingClueEmoji').innerHTML = c.emoji || '';
+  gloss.textContent = c.gloss || '';
+  var lang = document.getElementById('langSelect').value;
+  if (c.gloss && lang) {
+    setTranslationLangAttrs(gloss, lang, RTL_LANGS.has(lang) ? 'rtl' : 'ltr');
+    gloss.style.fontFamily = LANG_FONT[lang] || '';
   } else {
-    var inp = document.getElementById('spellingInput');
-    inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake');
-    if (spAttempts >= MAX_ATTEMPTS) {
-      feedback.textContent = '❌ Not quite.'; feedback.className = 'spell-feedback-msg wrong';
-      document.getElementById('spellingAttempts').textContent = 'No attempts left.';
-      document.getElementById('spellingCheckBtn').disabled = true;
-      document.getElementById('spellingTryAgainBtn').style.display   = 'none';
-      document.getElementById('spellingShowAnswerBtn').style.display = '';
-      inp.disabled = true;
-    } else {
-      feedback.textContent = '❌ Not quite — try again!'; feedback.className = 'spell-feedback-msg wrong';
-      document.getElementById('spellingAttempts').textContent =
-        attemptsLeft + ' attempt' + (attemptsLeft === 1 ? '' : 's') + ' left';
-      document.getElementById('spellingTryAgainBtn').style.display   = '';
-      document.getElementById('spellingShowAnswerBtn').style.display = spAttempts >= 2 ? '' : 'none';
-    }
+    setTranslationLangAttrs(gloss, null, null);
+  }
+  wrap.style.display = '';
+}
+
+function spRevealUnits(idxs) {
+  idxs.forEach(function(k) { if (spReveal.indexOf(k) === -1) spReveal.push(k); });
+  if (spLast) spRenderResult(spLast); else spRenderShape();
+}
+
+/* After a try, show the parts that were actually missed rather than the
+   next one along — the help should land where the learner is stuck. */
+function spRevealMissed() {
+  if (spLast) {
+    var missed = [];
+    spLast.units.forEach(function(u, k) { if (u.state !== 'ok' && u.state !== 'punct') missed.push(k); });
+    if (missed.length) { spRevealUnits(missed); return; }
+  }
+  for (var k = 0; k < spUnits.length; k++) {
+    if (spReveal.indexOf(k) === -1) { spRevealUnits([k]); return; }
   }
 }
 
-function renderDiff(answer, typed, isSent) {
-  var container = document.getElementById('spellingDiff');
-  container.innerHTML = '';
-  var a = isSent ? answer : answer.toLowerCase();
-  var t = isSent ? typed  : typed.toLowerCase();
-  // LCS diff
-  var m = a.length, n = t.length;
-  var dp = [];
-  for (var i = 0; i <= m; i++) { dp[i] = []; for (var j = 0; j <= n; j++) dp[i][j] = 0; }
-  for (var i = 1; i <= m; i++)
-    for (var j = 1; j <= n; j++)
-      dp[i][j] = a[i-1] === t[j-1] ? dp[i-1][j-1] + 1 : Math.max(dp[i-1][j], dp[i][j-1]);
-  var ops = []; var i = m, j = n;
-  while (i > 0 || j > 0) {
-    if (i > 0 && j > 0 && a[i-1] === t[j-1]) { ops.unshift({type:'match', char:typed[j-1]}); i--; j--; }
-    else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) { ops.unshift({type:'insert', char:typed[j-1]}); j--; }
-    else { ops.unshift({type:'delete', char:answer[i-1]}); i--; }
+/* ── CHECKING ──────────────────────────────
+   Three outcomes, not two. See spell-feedback.js for why a right spelling
+   written without its hyphens must not be called a mistake. */
+function checkSpelling() {
+  var answer = spAnswer();
+  var typed  = spTyped();
+  var outcome = spellMatch(typed, answer);
+  var al = alignSpelling(answer, typed, { outcome: outcome, mode: spIsSent ? 'word' : 'chunk' });
+  spLast = al;
+  spRenderResult(al);
+
+  var inp = document.getElementById('spellingInput');
+  if (outcome === 'wrong') {
+    inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake');
+    spSetVerdict('wrong', '❌', 'Try again');
+    document.getElementById('spellingTryAgainBtn').style.display = '';
+    return;
   }
-  ops.forEach(function(op) {
-    var span = document.createElement('span');
-    span.className = 'spell-char';
-    if (op.type === 'match')  { span.classList.add('correct'); span.textContent = op.char; }
-    else if (op.type === 'insert') { span.classList.add('extra');   span.textContent = op.char; span.title = 'Extra letter'; }
-    else { span.classList.add('missing'); span.textContent = '_'; }
-    container.appendChild(span);
-  });
+
+  if (outcome === 'exact') { spCorrect++; spSetVerdict('correct', '✅', 'Correct'); }
+  else { spAlmost++; spSetVerdict('almost', '<span class="v-hollow">✓</span>', 'Letters right — check the marks'); }
+
+  document.getElementById('spellingTryAgainBtn').style.display = 'none';
+  document.getElementById('spellingCheckBtn').disabled = true;
+  document.getElementById('spellingTileBank').classList.add('locked');
+  inp.disabled = true;
+  setTimeout(spellingNext, outcome === 'exact' ? 1200 : 2200);
+}
+
+function spSetVerdict(cls, icon, text) {
+  var el = document.getElementById('spellingFeedback');
+  el.className = 'spell-verdict' + (cls ? ' ' + cls : '');
+  el.innerHTML = icon ? '<span class="v-icon">' + icon + '</span><span>' + (text || '') + '</span>' : '';
 }
 
 function spellingTryAgain() {
   var inp = document.getElementById('spellingInput');
   inp.disabled = false; inp.classList.remove('shake'); inp.value = '';
-  document.getElementById('spellingDiff').innerHTML       = '';
-  document.getElementById('spellingFeedback').textContent = '';
-  document.getElementById('spellingFeedback').className   = 'spell-feedback-msg';
+  spPlaced = spUnits.map(function() { return null; });
+  document.querySelectorAll('#spellingTileBank .spell-bank-tile.used')
+    .forEach(function(b) { b.classList.remove('used'); delete b.dataset.slot; });
+  // Help already given stays given; only the attempt is cleared.
+  spLast = null;
+  spSetVerdict('', '');
   document.getElementById('spellingTryAgainBtn').style.display = 'none';
   document.getElementById('spellingCheckBtn').disabled = false;
-  inp.focus();
-}
-
-function spellingShowAnswer() {
-  var el = document.getElementById('spellingAnswer');
-  el.textContent = spWords[spIdx]; el.style.display = '';
-  document.getElementById('spellingShowAnswerBtn').style.display = 'none';
+  spRenderShape();
+  if (spMode !== 'tiles' || spIsSent) inp.focus();
 }
 
 function spellingNext() {
+  spStopHintSound();
   spIdx++;
   if (spIdx >= spWords.length) { spShowFinish(); }
   else { spLoadItem(); setTimeout(spellingSpeak, 300); }
@@ -4069,9 +4437,11 @@ function spShowFinish() {
   document.getElementById('spellingPhase').style.display = 'none';
   var fin = document.getElementById('spellingFinish');
   fin.style.display = ''; fin.classList.add('show');
-  var label = spIsSent ? 'sentences' : 'words';
-  document.getElementById('spellingFinishMsg').textContent =
-    'You spelled ' + spCorrect + ' out of ' + spWords.length + ' ' + label + ' correctly. Great work!';
+  var html = '<span class="fin-count fin-exact">✅ ' + spCorrect + '</span>';
+  if (spAlmost) html += '<span class="fin-count fin-almost"><span class="v-hollow">✓</span> ' + spAlmost + '</span>';
+  html += '<span class="fin-of">of ' + spWords.length + '</span>';
+  if (spAlmost) html += '<div class="fin-note">Those ones were spelled right. Next time look at the capital letters and the marks.</div>';
+  document.getElementById('spellingFinishMsg').innerHTML = html;
 }
 
 /* ══════════════════════════════════════════

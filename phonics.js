@@ -561,6 +561,9 @@ function canSoundOut(word, allowSpoken) {
    timers, so a slow device stretches the gaps instead of overlapping.
    speakPart is the caller's text-to-speech, used only for the few tiles
    that have no recording (the -tion/-ture endings).
+   onStep(i, tile) fires as each chunk starts, so a caller showing the word
+   as tiles can light the one being sounded — hearing "which part" and
+   seeing "which part" at the same time is the whole lesson.
 ══════════════════════════════════════════ */
 function playWordSounds(word, opts) {
   opts = opts || {};
@@ -573,6 +576,7 @@ function playWordSounds(word, opts) {
     if (cancelled) return;
     if (i >= tiles.length) { done(); return; }
     const t = tiles[i++];
+    if (opts.onStep) opts.onStep(i - 1, t);
     if (!t.w) {
       // No recording for this chunk — say it, then carry on.
       if (opts.speakPart) opts.speakPart(t.tts || t.d);
