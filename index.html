@@ -4161,11 +4161,20 @@ function spApplyMode() {
   spRenderShape();
 }
 
+/* Switching how you write clears what you wrote, so it has to clear the
+   result of writing it too. Without dropping spLast the next hint would
+   redraw the abandoned attempt underneath the new empty slots, and the
+   Try again button would sit there offering to undo something that is
+   already gone. Help already given still stays given. */
 function spellingToggleMode() {
   spMode = spMode === 'tiles' ? 'type' : 'tiles';
   try { localStorage.setItem('wl_spellMode', spMode); } catch (e) {}
   spPlaced = spUnits.map(function() { return null; });
-  document.getElementById('spellingInput').value = '';
+  spLast = null;
+  var inp = document.getElementById('spellingInput');
+  inp.value = ''; inp.disabled = false; inp.classList.remove('shake');
+  document.getElementById('spellingTryAgainBtn').style.display = 'none';
+  document.getElementById('spellingCheckBtn').disabled = false;
   spSetVerdict('', '');
   spApplyMode();
 }
