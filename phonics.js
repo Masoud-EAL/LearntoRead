@@ -113,6 +113,11 @@ const WP2_TILES = {
   'that':  [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
   'these': [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'e',w:'iː as in eat.wav',t:'beginning'},{d:'s',w:'z.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'those': [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'s',w:'z.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
+  'they':  [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'ey',w:'eɪ as in bait.wav',t:'ending'}],
+  'them':  [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'m',w:'m.wav',t:'ending'}],
+  'then':  [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
+  // Same letter-by-letter split as "where" above, so only the th is orange.
+  'there': [{d:'th',w:'ð as in this.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
   // th (voiceless)
   'thin':  [{d:'th',w:'θ as in thin.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
   'think': [{d:'th',w:'θ as in thin.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'k',w:'k.wav',t:'ending'}],
@@ -122,7 +127,12 @@ const WP2_TILES = {
   'when':  [{d:'wh',w:'w.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'}],
   'what':  [{d:'wh',w:'w.wav',t:'beginning'},{d:'a',w:'ɒ as in pot.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
   'why':   [{d:'wh',w:'w.wav',t:'beginning'},{d:'y',w:'aɪ as in ice.wav',t:'ending'}],
-  'where': [{d:'wh',w:'w.wav',t:'beginning'},{d:'ere',w:null,tts:'air',t:'ending'}],
+  /* Split as wh + e + r + e, not wh + "ere". A tts chunk always draws in the
+     pattern colour, so bundling "ere" put a second orange tile next to the
+     wh and the group's own pattern stopped standing out. Letter by letter
+     the wh alone is orange, e and r are ordinary sounded tiles, and the
+     final e is silent grey like the e in "these". */
+  'where': [{d:'wh',w:'w.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'e',w:null,t:'ending'}],
   // ph
   'phone': [{d:'ph',w:'f.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'n',w:'n.wav',t:'ending'},{d:'e',w:null,t:'ending'}],
   'photo': [{d:'ph',w:'f.wav',t:'beginning'},{d:'o',w:'əʊ as in boat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'o',w:'əʊ as in boat.wav',t:'ending'}],
@@ -424,8 +434,6 @@ const wp1Families = [
   { ending:'an', words:['man','can','pan','ran','fan','van'] },
   { ending:'at', words:['cat','bat','hat','mat','rat','sat','pat'] },
   { ending:'ap', words:['cap','map','nap','tap','lap','gap'] },
-  { ending:'ag', words:['bag','tag','rag'] },
-  { ending:'am', words:['ham','jam','ram'] },
   { ending:'et', words:['pet','net','set','get','met','wet','let'] },
   { ending:'en', words:['pen','hen','ten','men','den'] },
   { ending:'ig', words:['big','dig','fig','pig','wig'] },
@@ -444,7 +452,7 @@ const wp2Families = [
   // 1. Consonant digraphs
   { cat:'Consonant pairs  (two letters, one sound)', ending:'sh', focus:['sh'], words:['ship','shop','fish','dish','shed','shell'], mode:'whole', patternHint:'<strong>sh</strong> makes one sound — like a quiet "shh". You can hear it at the start or end of a word.' },
   { cat:'Consonant pairs  (two letters, one sound)', ending:'ch', focus:['ch'], words:['chips','chat','much','rich','chair','chest'], mode:'whole', patternHint:'<strong>ch</strong> makes one sound — like in <em>chips</em>. It can come at the start or end of a word.' },
-  { cat:'Consonant pairs  (two letters, one sound)', ending:'th', focus:['th'], words:['this','that','these','those'], mode:'whole', patternHint:'This <strong>th</strong> uses your voice — put your finger on your throat and feel it buzz. Try: <em>this… that…</em>' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'th', focus:['th'], words:['this','that','these','those','they','them','then','there'], mode:'whole', patternHint:'This <strong>th</strong> uses your voice — put your finger on your throat and feel it buzz. Try: <em>this… that…</em>' },
   { cat:'Consonant pairs  (two letters, one sound)', ending:'th', focus:['th'], words:['thin','think','bath','teeth'], mode:'whole', patternHint:'This <strong>th</strong> uses only air — no voice. Put your tongue between your teeth and blow. Try: <em>thin… think…</em>' },
   { cat:'Consonant pairs  (two letters, one sound)', ending:'wh', focus:['wh'], words:['when','what','why','where'], mode:'whole', patternHint:'<strong>wh</strong> usually makes a "w" sound — like in <em>when</em> and <em>what</em>.' },
   { cat:'Consonant pairs  (two letters, one sound)', ending:'ph', focus:['ph'], words:['phone','photo','graph','elephant'], mode:'whole', patternHint:'<strong>ph</strong> makes an "f" sound — like in <em>phone</em>. It comes from Greek words.' },

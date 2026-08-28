@@ -443,7 +443,11 @@
     "decision": "تصمیم",
     "electrician": "برق‌کار",
     "furniture": "مبلمان",
-    "signature": "امضا"
+    "signature": "امضا",
+    "they": "آنها",
+    "them": "آنها را",
+    "then": "سپس",
+    "there": "آنجا"
   },
   "sentences": {
     "My name is David.": "اسم من دیوید است.",

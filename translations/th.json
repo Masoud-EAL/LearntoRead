@@ -443,7 +443,11 @@
     "decision": "การตัดสินใจ",
     "electrician": "ช่างไฟฟ้า",
     "furniture": "เฟอร์นิเจอร์",
-    "signature": "ลายเซ็น"
+    "signature": "ลายเซ็น",
+    "they": "พวกเขา",
+    "them": "พวกเขา",
+    "then": "จากนั้น",
+    "there": "ที่นั่น"
   },
   "sentences": {
     "My name is David.": "ฉันชื่อเดวิด",

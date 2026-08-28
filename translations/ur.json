@@ -443,7 +443,11 @@
     "decision": "فیصلہ",
     "electrician": "الیکٹریشن",
     "furniture": "فرنیچر",
-    "signature": "دستخط"
+    "signature": "دستخط",
+    "they": "وہ",
+    "them": "ان کو",
+    "then": "پھر",
+    "there": "وہاں"
   },
   "sentences": {
     "My name is David.": "میرا نام ڈیوڈ ہے۔",

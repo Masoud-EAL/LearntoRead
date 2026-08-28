@@ -443,7 +443,11 @@
     "decision": "ဆုံးဖြတ်ချက်",
     "electrician": "လျှပ်စစ်ပညာရှင်",
     "furniture": "ပရိဘောဂ",
-    "signature": "လက်မှတ်"
+    "signature": "လက်မှတ်",
+    "they": "သူတို့",
+    "them": "သူတို့ကို",
+    "then": "ထို့နောက်",
+    "there": "ထိုနေရာ"
   },
   "sentences": {
     "My name is David.": "ကျွန်ုပ်၏နာမည် ဒေးဗစ် ဖြစ်သည်။",

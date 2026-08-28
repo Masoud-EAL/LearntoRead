@@ -443,7 +443,11 @@
     "decision": "决定",
     "electrician": "电工",
     "furniture": "家具",
-    "signature": "签名"
+    "signature": "签名",
+    "they": "他们",
+    "them": "他们",
+    "then": "然后",
+    "there": "那里"
   },
   "sentences": {
     "My name is David.": "我叫大卫。",

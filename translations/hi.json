@@ -443,7 +443,11 @@
     "decision": "निर्णय",
     "electrician": "बिजली मिस्त्री",
     "furniture": "फर्नीचर",
-    "signature": "हस्ताक्षर"
+    "signature": "हस्ताक्षर",
+    "they": "वे",
+    "them": "उन्हें",
+    "then": "फिर",
+    "there": "वहाँ"
   },
   "sentences": {
     "My name is David.": "मेरा नाम डेविड है।",

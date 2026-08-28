@@ -443,7 +443,11 @@
     "decision": "قرار",
     "electrician": "كهربائي",
     "furniture": "أثاث",
-    "signature": "توقيع"
+    "signature": "توقيع",
+    "they": "هم",
+    "them": "هم / إياهم",
+    "then": "ثم",
+    "there": "هناك"
   },
   "sentences": {
     "My name is David.": "اسمي ديفيد.",

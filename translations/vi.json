@@ -443,7 +443,11 @@
     "decision": "quyết định",
     "electrician": "thợ điện",
     "furniture": "đồ nội thất",
-    "signature": "chữ ký"
+    "signature": "chữ ký",
+    "they": "họ",
+    "them": "họ",
+    "then": "sau đó",
+    "there": "ở đó"
   },
   "sentences": {
     "My name is David.": "Tên tôi là David.",
