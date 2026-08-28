@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v41';
+const CACHE = 'learntoread-v42';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -106,15 +106,36 @@ const OPTIONAL = [
   // /short links
   // Custom pictograms for words emoji can't express. Without these the
   // word activities show broken images once offline.
-  './icons/back.svg',
   './icons/bun.svg',
-  './icons/chest.svg',
   './icons/class.svg',
   './icons/fig.svg',
-  './icons/hip.svg',
-  './icons/neck.svg',
-  './icons/stomach.svg',
   './icons/wig.svg',
+  // The 24 body parts. Emoji gave several of them the same picture, so these
+  // are drawn — see tools/build-body-icons.py.
+  './icons/body-head.svg',
+  './icons/body-eye.svg',
+  './icons/body-ear.svg',
+  './icons/body-nose.svg',
+  './icons/body-mouth.svg',
+  './icons/body-tooth.svg',
+  './icons/body-tongue.svg',
+  './icons/body-neck.svg',
+  './icons/body-shoulder.svg',
+  './icons/body-arm.svg',
+  './icons/body-elbow.svg',
+  './icons/body-wrist.svg',
+  './icons/body-hand.svg',
+  './icons/body-finger.svg',
+  './icons/body-thumb.svg',
+  './icons/body-chest.svg',
+  './icons/body-stomach.svg',
+  './icons/body-back.svg',
+  './icons/body-hip.svg',
+  './icons/body-leg.svg',
+  './icons/body-knee.svg',
+  './icons/body-ankle.svg',
+  './icons/body-foot.svg',
+  './icons/body-toe.svg',
   // Signs and notices
   './icons/sign-no-smoking.svg',
   './icons/sign-no-parking.svg',

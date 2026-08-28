@@ -961,6 +961,13 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .mc-choice:active{transform:scale(.96);}
 .mc-choice .mc-pic{font-size:3.2rem;line-height:1;}
 .mc-choice .mc-pic .custom-icon-emoji{height:1em;width:1em;}
+/* A row of choices is sized as one. Body pictures are bigger than an emoji
+   everywhere else, but odd-one-out puts three from one group beside one from
+   another, and the odd size would point at the odd word before the learner had
+   looked at any of them. So they match the emoji here, and only stretch when
+   every choice in the row is a body part and there is nothing to give away. */
+.mc-choice .mc-pic .body-pic{height:1em;width:1em;}
+.mc-section.all-body .mc-choice .mc-pic .body-pic{height:1.7em;width:1.7em;}
 .mc-choice .mc-label{font-size:1.3rem;word-break:break-word;text-align:center;}
 .mc-choice.mc-text .mc-label{font-size:1.65rem;}
 .mc-choice.mc-sentence .mc-label{font-size:1.2rem;line-height:1.4;font-family:'Nunito',sans-serif;font-weight:700;}
@@ -973,6 +980,8 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .t-opt{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:8px 10px;background:var(--card);border:2px solid rgba(255,255,255,.12);border-radius:12px;color:var(--text);font-family:'Fredoka One',cursive;text-align:center;}
 .t-opt .t-opt-pic{font-size:1.9rem;line-height:1;}
 .t-opt .t-opt-pic .custom-icon-emoji{height:1em;width:1em;}
+.t-opt .t-opt-pic .body-pic{height:1em;width:1em;}
+.t-options.all-body .t-opt .t-opt-pic .body-pic{height:1.8em;width:1.8em;}
 .t-opt .t-opt-label{font-size:1rem;word-break:break-word;}
 .t-opt.t-opt-sentence{font-family:'Nunito',sans-serif;font-weight:700;font-size:1.05rem;line-height:1.35;}
 .t-opt.t-correct{border-color:var(--green);background:rgba(0,200,83,.18);}
@@ -1066,6 +1075,11 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .q-emoji-big{font-size:2.8rem;line-height:1;min-height:1em;text-align:center;margin-bottom:4px;}
 .custom-icon-emoji{height:1em;width:1em;vertical-align:middle;display:inline-block;object-fit:contain;}
 .q-emoji-big .custom-icon-emoji{height:1em;width:1em;}
+/* Body parts run bigger than an emoji: each is a whole limb with a red arrow
+   marking the part being asked for, and at emoji size the arrow disappears.
+   Sized in em so the viewport-height clamps on the question screens still
+   apply — a fixed pixel height would overflow a short phone in landscape. */
+.body-pic{height:2.4em;width:2.4em;vertical-align:middle;display:inline-block;object-fit:contain;}
 
 /* ── Dice ──
    Two surfaces share this block: the learner's board (#screen-target-play) and
@@ -3060,6 +3074,15 @@ let soloMode=false,soloQuestions=[],soloQIdx=0,soloSelectedType='beginner';
 let hintLevel=0;
 let mcMode=true;
 
+/* The 24 body parts are drawn pictures, not emoji. Emoji give shoulder, arm and
+   elbow the same flexed bicep, and foot, ankle and toe the same foot, so the
+   picture could not tell a learner which of the three words was being asked.
+   Built by tools/build-body-icons.py — see there before editing icons/body-*. */
+function bodyPic(w){ return '<img src="icons/body-'+w+'.svg" class="body-pic" alt="'+w+'">'; }
+/* True when every choice in a round is a body part, which is what lets them be
+   drawn larger — see the .all-body rules. */
+function allBodyPics(pics){ return pics.length>0&&pics.every(p=>p&&p.indexOf('class="body-pic"')>=0); }
+
 const EMOJI={
   /* Clothes and accessories. Australian English: jumper, not sweater;
      thongs are the footwear. */
@@ -3086,7 +3109,8 @@ const EMOJI={
   'shop':'🏪','class':'<img src="icons/class.svg" class="custom-icon-emoji" alt="class">',
   'bag':'👜','bath':'🛁','bed':'🛏️','bell':'🔔','bin':'🗑️','book':'📚','box':'📦','brush':'🪥','clock':'🕐','dish':'🍽️','door':'🚪','fan':'🪭','jar':'🫙','lamp':'💡','map':'🗺️','mat':'🟫','mop':'🧹','mug':'☕','net':'🥅','pen':'🖊️','phone':'📱','photo':'📷','pin':'📍','pot':'🪴','rope':'🪢','rug':'🧶','shell':'🐚','soap':'🧼','spoon':'🥄','tin':'🥫','watch':'⌚','wig':'<img src="icons/wig.svg" class="custom-icon-emoji" alt="wig">',
   'cap':'🧢','coat':'🧥','dress':'👗','hat':'🎩','tie':'👔',
-  'ear':'👂','feet':'🦶','foot':'🦶','leg':'🦵','lip':'👄','mouth':'👄','teeth':'🦷','thumb':'👍','toe':'🦶',
+  'ear':bodyPic('ear'),'feet':bodyPic('foot'),'foot':bodyPic('foot'),'leg':bodyPic('leg'),
+  'lip':'👄','mouth':bodyPic('mouth'),'teeth':bodyPic('tooth'),'thumb':bodyPic('thumb'),'toe':bodyPic('toe'),
   'cry':'😢','dig':'⛏️','drop':'💧','fly':'🪰','hop':'🦘','hug':'🤗','run':'🏃','sleep':'😴','spin':'🌀','stop':'🛑','read':'📖','write':'✍️','play':'🎮','work':'💼','look':'👀',
   'ball':'⚽','game':'🎮','pool':'🏊','toy':'🧸',
   'boat':'⛵','bridge':'🌉','coin':'🪙','drum':'🥁','flag':'🚩','gate':'🚧','gem':'💎','glue':'🧴','key':'🔑','lock':'🔒','mail':'📬','rock':'🪨','saw':'🪚','shed':'🏚️','star':'⭐','stick':'🪵',
@@ -3095,7 +3119,8 @@ const EMOJI={
   'rice':'🍚','kite':'🪁','five':'5️⃣','six':'6️⃣','nine':'9️⃣','ten':'🔟',
   'one':'1️⃣','two':'2️⃣','three':'3️⃣','four':'4️⃣','seven':'7️⃣','eight':'8️⃣',
   'orange':'🍊','grape':'🍇','mango':'🥭','peach':'🍑','plum':'🍑','pear':'🍐','lemon':'🍋','cherry':'🍒','strawberry':'🍓','watermelon':'🍉','pineapple':'🍍','coconut':'🥥','kiwi':'🥝','banana':'🍌',
-  'head':'🗣️','eye':'👁️','nose':'👃','tongue':'👅','tooth':'🦷','neck':'<img src="icons/neck.svg" class="custom-icon-emoji" alt="neck">','shoulder':'💪','arm':'💪','elbow':'💪','wrist':'⌚','hand':'✋','finger':'☝️','chest':'<img src="icons/chest.svg" class="custom-icon-emoji" alt="chest">','stomach':'<img src="icons/stomach.svg" class="custom-icon-emoji" alt="stomach">','back':'<img src="icons/back.svg" class="custom-icon-emoji" alt="back">','hip':'<img src="icons/hip.svg" class="custom-icon-emoji" alt="hip">','knee':'🦵','ankle':'🦶',
+  'head':bodyPic('head'),'eye':bodyPic('eye'),'nose':bodyPic('nose'),'tongue':bodyPic('tongue'),'tooth':bodyPic('tooth'),'neck':bodyPic('neck'),'shoulder':bodyPic('shoulder'),'arm':bodyPic('arm'),'elbow':bodyPic('elbow'),
+  'wrist':bodyPic('wrist'),'hand':bodyPic('hand'),'finger':bodyPic('finger'),'chest':bodyPic('chest'),'stomach':bodyPic('stomach'),'back':bodyPic('back'),'hip':bodyPic('hip'),'knee':bodyPic('knee'),'ankle':bodyPic('ankle'),
   'sunny':'☀️','cloudy':'☁️','rainy':'🌧️','windy':'💨','snowy':'❄️','stormy':'⛈️','foggy':'🌫️','warm':'🌤️','humid':'💧',
   'Monday':'📅','Tuesday':'📅','Wednesday':'📅','Thursday':'📅','Friday':'📅','Saturday':'🎉','Sunday':'☀️'
 };
@@ -4088,6 +4113,7 @@ function renderTeacherOptions(q,showCorrect){
   // phonics rounds opt out rather than relying on emoji coverage by accident.
   const usePics=!q.textOnly&&emojis.every(e=>e)&&!hasDup;
   const isSentence=choices.some(w=>!emo(w)&&/\s/.test(w));
+  box.classList.toggle('all-body',usePics&&allBodyPics(emojis));
   box.style.gridTemplateColumns=isSentence?'1fr':'repeat(2,1fr)';
   choices.forEach(word=>{
     const pic=emo(word);
@@ -5406,6 +5432,7 @@ function renderMcChoices(q){
   // A picture beside "cat" hands over the answer without any decoding, so
   // phonics rounds opt out rather than relying on emoji coverage by accident.
   const usePics=!q.textOnly&&emojis.every(e=>e)&&!hasDup;
+  box.classList.toggle('all-body',usePics&&allBodyPics(emojis));
   q.choices.forEach(word=>{
     const pic=emo(word);
     const btn=document.createElement('button');
