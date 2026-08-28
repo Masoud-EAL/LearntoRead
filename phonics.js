@@ -102,7 +102,7 @@ const WP2_TILES = {
   'shed':  [{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'}],
   'shell': [{d:'sh',w:'ʃ as in she.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'ll',w:'l.wav',t:'ending'}],
   // ch
-  'chip':  [{d:'ch',w:'tʃ as in chair.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'}],
+  'chips': [{d:'ch',w:'tʃ as in chair.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'p',w:'p.wav',t:'ending'},{d:'s',w:'s.wav',t:'ending'}],
   'chat':  [{d:'ch',w:'tʃ as in chair.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'t',w:'t.wav',t:'ending'}],
   'much':  [{d:'m',w:'m.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'ch',w:'tʃ as in chair.wav',t:'ending'}],
   'rich':  [{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ch',w:'tʃ as in chair.wav',t:'ending'}],
@@ -414,7 +414,7 @@ const wp1Families = [
 const wp2Families = [
   // 1. Consonant digraphs
   { cat:'Consonant pairs  (two letters, one sound)', ending:'sh', focus:['sh'], words:['ship','shop','fish','dish','shed','shell'], mode:'whole', patternHint:'<strong>sh</strong> makes one sound — like a quiet "shh". You can hear it at the start or end of a word.' },
-  { cat:'Consonant pairs  (two letters, one sound)', ending:'ch', focus:['ch'], words:['chip','chat','much','rich','chop','chest'], mode:'whole', patternHint:'<strong>ch</strong> makes one sound — like in <em>chip</em>. It can come at the start or end of a word.' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'ch', focus:['ch'], words:['chips','chat','much','rich','chop','chest'], mode:'whole', patternHint:'<strong>ch</strong> makes one sound — like in <em>chips</em>. It can come at the start or end of a word.' },
   { cat:'Consonant pairs  (two letters, one sound)', ending:'th', focus:['th'], words:['this','that','these','those'], mode:'whole', patternHint:'This <strong>th</strong> uses your voice — put your finger on your throat and feel it buzz. Try: <em>this… that…</em>' },
   { cat:'Consonant pairs  (two letters, one sound)', ending:'th', focus:['th'], words:['thin','think','bath','teeth'], mode:'whole', patternHint:'This <strong>th</strong> uses only air — no voice. Put your tongue between your teeth and blow. Try: <em>thin… think…</em>' },
   { cat:'Consonant pairs  (two letters, one sound)', ending:'wh', focus:['wh'], words:['when','what','why','where'], mode:'whole', patternHint:'<strong>wh</strong> usually makes a "w" sound — like in <em>when</em> and <em>what</em>.' },
