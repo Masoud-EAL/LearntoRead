@@ -440,8 +440,13 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
      large as the screen allows, on any screen, with no constant to keep in
      step. Width still caps it on a narrow column, where object-fit keeps it
      square against a white ground it cannot be told apart from. */
-  #screen-teacher-lobby .room-code-box{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;}
-  #screen-teacher-lobby #qr-wrap{flex:1 1 auto;min-height:0;}
+  #screen-teacher-lobby .room-code-box{flex:1 1 0;display:flex;flex-direction:column;}
+  /* ...but not below a floor. A phone held up two rows back has to resolve
+     the modules off the monitor, and under about 200px on a classroom screen
+     it cannot. The panel keeps that much whatever is left over, and the
+     column scrolls before the code gives any of it up — a code that has to
+     be walked up to is not a way into the game. */
+  #screen-teacher-lobby #qr-wrap{flex:1 1 0;min-height:224px;}
   /* Bounded on both axes and sized on neither: the code keeps its own square
      ratio and shrinks to whichever of the two the column runs out of first.
      Given a height it grows into, it stops at the 800px it was rendered at. */
@@ -462,6 +467,42 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
    between a glance telling you the class is here and one that needs a scroll. */
 @media (min-width:900px) and (min-height:960px){
   #screen-teacher-lobby .player-chips{max-height:151px;}
+}
+
+/* ── A short window: everything else stands down for the code ──
+   Every other thing in this screen has a height of its own — the wordmark,
+   the room code, the roster, the actions row — and the code was the only one
+   that flexed, so it paid for all of them. On a 1366×768 monitor with a
+   browser and a taskbar over it that left the code 79px, and on a 1280×720
+   one, 34px: a grey square the class photographs and nothing happens.
+
+   So under 860px of window each of them gives up what it can spare — the
+   wordmark most of its type, the code its largest steps, the roster its
+   second row, the buttons their padding — and what comes back goes to the
+   one thing on this screen a class has to read from the back of the room.
+   None of it is missed: the wordmark names a screen the teacher opened
+   deliberately, and the roster is empty at the moment the code matters. */
+@media (min-width:900px) and (max-height:860px){
+  #screen-teacher-lobby{padding:10px 20px;}
+  /* The chips are pinned to the corners, so the wordmark can shrink into the
+     gap between them rather than give up the row and its clearance with it. */
+  #screen-teacher-lobby > .logo-bar{padding:4px 20px 2px;font-size:1.15rem;}
+  #screen-teacher-lobby .lobby-col{gap:10px;}
+  #screen-teacher-lobby .lobby-actions{padding:4px 0;}
+  #screen-teacher-lobby .lobby-actions .btn-lg{font-size:1.2rem;padding:12px 36px;}
+  #screen-teacher-lobby .room-code-box{padding:12px 16px;}
+  #screen-teacher-lobby .rc-label{font-size:.72rem;letter-spacing:1.5px;margin-bottom:2px;}
+  /* Four characters at 35px still cross a classroom, and every step the code
+     comes down is a step the square goes up — so this is the one to spend. */
+  #screen-teacher-lobby .rc-code{font-size:clamp(2.2rem,2.6vw,3rem);letter-spacing:6px;line-height:1.1;}
+  #screen-teacher-lobby .rc-url{margin-top:4px;}
+  #screen-teacher-lobby #qr-wrap{padding:8px;margin-top:8px;}
+  /* One row of names. A class that has arrived is read off the count beside
+     the heading; the names are how the teacher spots who has not. */
+  .lobby-grid > .lobby-col:first-child > .card{flex:0 1 auto;padding:11px 16px;}
+  #screen-teacher-lobby .players-hd{font-size:1.05rem;margin-bottom:7px;}
+  #screen-teacher-lobby .player-chips{max-height:45px;min-height:36px;}
+  #screen-teacher-lobby .player-chip{font-size:1.05rem;padding:7px 15px;}
 }
 
 /* ── Wide screens: the skills stand beside the games, as they do in practice ──
