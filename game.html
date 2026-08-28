@@ -221,9 +221,40 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .room-code-box .rc-url{font-size:.72rem;opacity:.65;margin-top:8px;word-break:break-all;}
 /* The box fits the code rather than stretching around it — a wide box with a
    small code in the middle reads as a white slab. The code itself is rendered
-   at 640px (generateQR) and sized here, so this is always a downscale. */
-#qr-wrap{display:flex;justify-content:center;align-items:center;background:white;border-radius:10px;padding:12px;margin-top:10px;width:fit-content;margin-inline:auto;}
+   at 800px (generateQR) and sized here, so this is always a downscale. */
+#qr-wrap{display:flex;justify-content:center;align-items:center;background:white;border-radius:10px;padding:12px;margin-top:10px;width:fit-content;margin-inline:auto;position:relative;cursor:zoom-in;}
 #qr-wrap > img,#qr-wrap > canvas{width:min(260px,64vw);height:auto;}
+#qr-wrap:focus-visible{outline:3px solid var(--gold);outline-offset:3px;}
+/* Nothing about a QR says it can be pressed, so one mark says it. It hangs
+   off the corner rather than sitting in it: the library draws the code to the
+   edge of the white, with no quiet zone to spare, and a badge over the
+   bottom-right corner is a badge over live modules. */
+.qr-zoom{position:absolute;right:-11px;bottom:-11px;width:30px;height:30px;
+  display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:var(--card);box-shadow:0 0 0 2px rgba(255,255,255,.28),0 2px 8px rgba(0,0,0,.35);
+  color:#fff;font-size:.9rem;line-height:1;pointer-events:none;}
+#qr-wrap:hover .qr-zoom,#qr-wrap:focus-visible .qr-zoom{background:var(--accent);}
+
+/* ── The code, the size of the room ──
+   The lobby gives it every pixel the column has, and a long classroom can
+   still be longer than that. This is the way out of that: the screen holds
+   the code and the four characters under it and nothing else, at whichever
+   of the two axes runs out first. Sized off --vh rather than vh, like every
+   other full-height thing here, so a phone's address bar is not counted in. */
+.qr-big{position:fixed;inset:0;z-index:300;background:rgba(6,6,16,.94);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(8px,2vh,20px);padding:16px;cursor:zoom-out;}
+.qr-big-code{font-family:'Fredoka One',cursive;color:#fff;line-height:1;
+  font-size:clamp(1.8rem,calc(var(--vh,1vh) * 8),4.6rem);letter-spacing:.14em;}
+.qr-big-panel{background:#fff;border-radius:14px;padding:clamp(8px,1.6vh,18px);
+  width:min(92vw,calc(var(--vh,1vh) * 74));}
+.qr-big-panel > img,.qr-big-panel > canvas{display:block;width:100%;height:auto;}
+.qr-big-url{color:rgba(255,255,255,.72);letter-spacing:1px;
+  font-size:clamp(.85rem,calc(var(--vh,1vh) * 2.4),1.5rem);}
+.qr-big-close{position:absolute;top:14px;right:14px;width:46px;height:46px;border-radius:50%;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;
+  font-size:1.2rem;cursor:pointer;}
+.qr-big-close:hover{background:var(--accent);border-color:var(--accent);}
 .player-chips{display:flex;flex-wrap:wrap;gap:8px;min-height:44px;}
 .players-hd{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--gold);margin-bottom:10px;}
 /* A name is read across a classroom, not off a phone in the hand. */
@@ -1423,7 +1454,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <div class="rc-label">Room Code</div>
         <div class="rc-code" id="room-code-display">----</div>
         <div class="rc-url">wordlink.au/game.html</div>
-        <div id="qr-wrap"></div>
+        <!-- The panel makes the code as large as the column allows; a room can
+             still be longer than that, so the code is also a button, and what
+             it opens is the whole screen. -->
+        <div id="qr-wrap" role="button" tabindex="0" aria-label="Show the room code full screen"
+             onclick="openBigQR()"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openBigQR();}"></div>
       </div>
       <!-- The room code, the code as a QR and who has arrived are the three
            things the teacher and the class look at together, so they share a
@@ -1914,6 +1950,18 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       <button class="btn btn-gold" onclick="addCustomQuestion()">➕ Add Question</button>
     </div>
   </div>
+</div>
+
+<!-- ── THE ROOM CODE, FULL SCREEN ──
+     A lobby the class scans from their seats, with nothing else on it. A
+     click anywhere closes it, and so does Escape: the teacher's next move is
+     to start the game, and the way back must not be something to look for. -->
+<div class="qr-big" id="qr-big" style="display:none;" role="dialog" aria-modal="true"
+     aria-label="Room code, full screen" onclick="closeBigQR()">
+  <div class="qr-big-code" id="qr-big-code">----</div>
+  <div class="qr-big-panel" id="qr-big-panel"></div>
+  <div class="qr-big-url">wordlink.au/game.html</div>
+  <button type="button" class="qr-big-close" id="qr-big-close" aria-label="Close">✕</button>
 </div>
 
 <!-- BANK PICKER MODAL -->
@@ -3794,6 +3842,8 @@ function showScreen(id){
   // A final reveal is a queue of timed sound and speech. Walking away from the
   // board has to take it with you, or the cheers land over the next screen.
   if(id!=='screen-leaderboard') endReveal();
+  // Nothing under a full-screen room code survives leaving the lobby.
+  closeBigQR();
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   startScreenMusic(id);
@@ -3922,13 +3972,46 @@ function createRoom(){
     document.getElementById('start-btn').disabled=totalPlayers<1;
   });
 }
+/* One address, drawn twice — in the lobby panel and, when the teacher asks
+   for it, over the whole screen. */
+function joinURL(){ return 'https://wordlink.au/game.html?join='+roomCode; }
+function drawQR(el,px){
+  el.innerHTML='';
+  new QRCode(el,{text:joinURL(),width:px,height:px,colorDark:'#000000',colorLight:'#ffffff'});
+}
 /* Rendered at 800px and sized down by CSS, never up: on a classroom monitor
    the code fills the height of its panel, and a 260px bitmap stretched to
    twice that is a blurry code students hold their phones up to. */
 function generateQR(){
-  const el=document.getElementById('qr-wrap'); el.innerHTML='';
-  new QRCode(el,{text:'https://wordlink.au/game.html?join='+roomCode,width:800,height:800,colorDark:'#000000',colorLight:'#ffffff'});
+  const el=document.getElementById('qr-wrap');
+  drawQR(el,800);
+  // The library owns the panel's contents, so the badge that marks it as a
+  // button goes back on after every redraw rather than living in the markup.
+  const zoom=document.createElement('span');
+  zoom.className='qr-zoom'; zoom.setAttribute('aria-hidden','true'); zoom.textContent='\u2922';
+  el.appendChild(zoom);
 }
+
+/* ── The code over the whole screen ──
+   Drawn at 1400px so it is a downscale on every monitor a class is likely to
+   be looking at, and re-drawn on each open so it can never be showing a room
+   that has since been closed. Anything closes it: the teacher's next move is
+   to start the game, and hunting for a way out in front of a class is not it. */
+function openBigQR(){
+  if(!roomCode) return;
+  document.getElementById('qr-big-code').textContent=roomCode;
+  drawQR(document.getElementById('qr-big-panel'),1400);
+  document.getElementById('qr-big').style.display='flex';
+  document.getElementById('qr-big-close').focus();
+}
+function closeBigQR(){
+  const ov=document.getElementById('qr-big');
+  if(ov.style.display==='none') return;
+  ov.style.display='none';
+  const wrap=document.getElementById('qr-wrap');
+  if(wrap) wrap.focus();
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeBigQR(); });
 function toggleMcMode(which){
   setMcMode(!mcMode);
   if(which==='solo'&&soloMode) onSoloSettingChange();
