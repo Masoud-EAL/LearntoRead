@@ -383,6 +383,35 @@ const WP2_TILES = {
   'culture':    [{d:'c',w:'k.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'ture',w:null,tts:'chur',t:'ending'}],
   'mixture':    [{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'x',w:'ks.wav',t:'beginning'},{d:'ture',w:null,tts:'chur',t:'ending'}],
   'capture':    [{d:'c',w:'k.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'p',w:'p.wav',t:'beginning'},{d:'ture',w:null,tts:'chur',t:'ending'}],
+
+  /* ── WORDS SWAPPED IN FOR EVERYDAY FREQUENCY ──────────
+     Each one keeps its group's pattern and decodes from the recordings we
+     already have. 'air' is the one new tts ending: there is no /eə/ wav, so
+     it falls back to speech the same way -tion and -ture already do. */
+  // ch
+  'chair':       [{d:'ch',w:'tʃ as in chair.wav',t:'beginning'},{d:'air',w:null,tts:'air',t:'ending'}],
+  // oy
+  'joy':         [{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
+  // au — the gh in daughter is silent, so it plays nothing by design
+  'daughter':    [{d:'d',w:'d.wav',t:'beginning'},{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'gh',w:null,t:'beginning'},{d:'t',w:'t.wav',t:'ending'},{d:'er',w:'ɜː as in work.wav',t:'ending'}],
+  'sauce':       [{d:'s',w:'s.wav',t:'beginning'},{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'ce',w:'s.wav',t:'ending'}],
+  'laundry':     [{d:'l',w:'l.wav',t:'beginning'},{d:'au',w:'ɔː as in storm.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'d',w:'d.wav',t:'ending'},{d:'r',w:'r.wav',t:'ending'},{d:'y',w:'ɪ as in bit.wav',t:'ending'}],
+  // ff
+  'stuff':       [{d:'s',w:'s.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'ending'},{d:'ff',w:'f.wav',t:'ending'}],
+  // tion
+  'direction':   [{d:'d',w:'d.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'c',w:'k.wav',t:'beginning'},{d:'tion',w:null,tts:'shen',t:'ending'}],
+  'education':   [{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'du',w:'dʒ as in jar.wav',t:'beginning'},{d:'c',w:'k.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'tion',w:null,tts:'shen',t:'ending'}],
+  'information': [{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'f',w:'f.wav',t:'beginning'},{d:'or',w:'ɜː as in work.wav',t:'beginning'},{d:'m',w:'m.wav',t:'beginning'},{d:'a',w:'eɪ as in bait.wav',t:'beginning'},{d:'tion',w:null,tts:'shen',t:'ending'}],
+  // sion
+  'permission':  [{d:'p',w:'p.wav',t:'beginning'},{d:'er',w:'ɜː as in work.wav',t:'beginning'},{d:'m',w:'m.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ssion',w:null,tts:'shen',t:'ending'}],
+  'discussion':  [{d:'d',w:'d.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'s',w:'s.wav',t:'beginning'},{d:'c',w:'k.wav',t:'beginning'},{d:'u',w:'ʌ as in but.wav',t:'beginning'},{d:'ssion',w:null,tts:'shen',t:'ending'}],
+  'television':  [{d:'t',w:'t.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'e',w:'ɪ as in bit.wav',t:'beginning'},{d:'v',w:'v.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'sion',w:null,tts:'zhen',t:'ending'}],
+  'decision':    [{d:'d',w:'d.wav',t:'beginning'},{d:'e',w:'ɪ as in bit.wav',t:'beginning'},{d:'c',w:'s.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'sion',w:null,tts:'zhen',t:'ending'}],
+  // cian
+  'electrician': [{d:'e',w:'ɪ as in bit.wav',t:'beginning'},{d:'l',w:'l.wav',t:'beginning'},{d:'e',w:'e as in bet.wav',t:'beginning'},{d:'c',w:'k.wav',t:'beginning'},{d:'t',w:'t.wav',t:'beginning'},{d:'r',w:'r.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'cian',w:null,tts:'shen',t:'ending'}],
+  // ture
+  'furniture':   [{d:'f',w:'f.wav',t:'beginning'},{d:'ur',w:'ɜː as in work.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'ture',w:null,tts:'chur',t:'ending'}],
+  'signature':   [{d:'s',w:'s.wav',t:'beginning'},{d:'i',w:'ɪ as in bit.wav',t:'beginning'},{d:'g',w:'g.wav',t:'beginning'},{d:'n',w:'n.wav',t:'beginning'},{d:'a',w:'æ as in bat.wav',t:'beginning'},{d:'ture',w:null,tts:'chur',t:'ending'}],
 };
 function getWp2Tiles(word) {
   return WP2_TILES[word] || null;
@@ -392,19 +421,19 @@ function getWp2Tiles(word) {
    DATA — WORD PRONUNCIATION 1
 ══════════════════════════════════════════ */
 const wp1Families = [
-  { ending:'an', words:['man','can','pan','ran','fan','tan','van'] },
+  { ending:'an', words:['man','can','pan','ran','fan','van'] },
   { ending:'at', words:['cat','bat','hat','mat','rat','sat','pat'] },
   { ending:'ap', words:['cap','map','nap','tap','lap','gap'] },
-  { ending:'ag', words:['bag','tag','rag','wag','lag'] },
-  { ending:'am', words:['ham','jam','ram','dam','yam'] },
-  { ending:'et', words:['pet','net','set','bet','met','wet'] },
+  { ending:'ag', words:['bag','tag','rag'] },
+  { ending:'am', words:['ham','jam','ram'] },
+  { ending:'et', words:['pet','net','set','get','met','wet','let'] },
   { ending:'en', words:['pen','hen','ten','men','den'] },
   { ending:'ig', words:['big','dig','fig','pig','wig'] },
-  { ending:'in', words:['pin','bin','fin','tin','win'] },
+  { ending:'in', words:['pin','bin','tin','win'] },
   { ending:'ip', words:['lip','dip','hip','sip','tip','zip'] },
-  { ending:'op', words:['hop','mop','top','pop','cop'] },
-  { ending:'ot', words:['hot','pot','dot','lot','not'] },
-  { ending:'ug', words:['bug','dug','hug','mug','rug'] },
+  { ending:'op', words:['hop','mop','top','pop'] },
+  { ending:'ot', words:['hot','pot','dot','lot','not','got'] },
+  { ending:'ug', words:['bug','jug','hug','mug','rug'] },
   { ending:'un', words:['sun','fun','run','bun','gun'] },
 ];
 
@@ -414,7 +443,7 @@ const wp1Families = [
 const wp2Families = [
   // 1. Consonant digraphs
   { cat:'Consonant pairs  (two letters, one sound)', ending:'sh', focus:['sh'], words:['ship','shop','fish','dish','shed','shell'], mode:'whole', patternHint:'<strong>sh</strong> makes one sound — like a quiet "shh". You can hear it at the start or end of a word.' },
-  { cat:'Consonant pairs  (two letters, one sound)', ending:'ch', focus:['ch'], words:['chips','chat','much','rich','chop','chest'], mode:'whole', patternHint:'<strong>ch</strong> makes one sound — like in <em>chips</em>. It can come at the start or end of a word.' },
+  { cat:'Consonant pairs  (two letters, one sound)', ending:'ch', focus:['ch'], words:['chips','chat','much','rich','chair','chest'], mode:'whole', patternHint:'<strong>ch</strong> makes one sound — like in <em>chips</em>. It can come at the start or end of a word.' },
   { cat:'Consonant pairs  (two letters, one sound)', ending:'th', focus:['th'], words:['this','that','these','those'], mode:'whole', patternHint:'This <strong>th</strong> uses your voice — put your finger on your throat and feel it buzz. Try: <em>this… that…</em>' },
   { cat:'Consonant pairs  (two letters, one sound)', ending:'th', focus:['th'], words:['thin','think','bath','teeth'], mode:'whole', patternHint:'This <strong>th</strong> uses only air — no voice. Put your tongue between your teeth and blow. Try: <em>thin… think…</em>' },
   { cat:'Consonant pairs  (two letters, one sound)', ending:'wh', focus:['wh'], words:['when','what','why','where'], mode:'whole', patternHint:'<strong>wh</strong> usually makes a "w" sound — like in <em>when</em> and <em>what</em>.' },
@@ -435,8 +464,8 @@ const wp2Families = [
   { cat:'Vowel pairs — other sounds', ending:'ou', focus:['ou'], words:['could','would','should','your','four','pour'], mode:'whole', patternHint:'<strong>ou</strong> here makes different sounds — "ood" in <em>could</em>, "or" in <em>four</em>. Listen carefully to each word.' },
   { cat:'Vowel pairs — other sounds', ending:'ow', focus:['ow'], words:['cow','now','snow','low'], mode:'whole', patternHint:'<strong>ow</strong> can sound like "ow" in <em>cow</em>, or "oh" in <em>snow</em>. Both are common.' },
   { cat:'Vowel pairs — other sounds', ending:'oi', focus:['oi'], words:['coin','join','boil','soil'], mode:'whole', patternHint:'<strong>oi</strong> makes an "oy" sound — like in <em>coin</em>.' },
-  { cat:'Vowel pairs — other sounds', ending:'oy', focus:['oy'], words:['boy','toy','enjoy','annoy'], mode:'whole', patternHint:'<strong>oy</strong> makes the same sound as <strong>oi</strong> — like in <em>boy</em>.' },
-  { cat:'Vowel pairs — other sounds', ending:'au', focus:['au'], words:['author','August','auto','haul'], mode:'whole', patternHint:'<strong>au</strong> makes an "aw" sound — like in <em>author</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'oy', focus:['oy'], words:['boy','toy','enjoy','joy'], mode:'whole', patternHint:'<strong>oy</strong> makes the same sound as <strong>oi</strong> — like in <em>boy</em>.' },
+  { cat:'Vowel pairs — other sounds', ending:'au', focus:['au'], words:['daughter','August','sauce','laundry'], mode:'whole', patternHint:'<strong>au</strong> makes an "aw" sound — like in <em>sauce</em>.' },
   { cat:'Vowel pairs — other sounds', ending:'aw', focus:['aw'], words:['saw','law','paw','draw'], mode:'whole', patternHint:'<strong>aw</strong> makes the same sound as <strong>au</strong> — like in <em>saw</em>.' },
   // 3. Silent e
   { cat:'Silent "e"  (the e at the end changes the vowel sound)', ending:'ake', focus:['e'], words:['cake','make','take','lake'], mode:'whole' },
@@ -463,18 +492,18 @@ const wp2Families = [
   // 5. Common endings
   { cat:'Common endings', ending:'ck',  focus:['ck'],  words:['back','duck','pick','rock'],      mode:'whole', patternHint:'<strong>ck</strong> makes a "k" sound. The two letters work as one.' },
   { cat:'Common endings', ending:'ll',  focus:['ll'],  words:['ball','bell','fill','doll'],      mode:'whole', patternHint:'<strong>ll</strong> makes a single "l" sound.' },
-  { cat:'Common endings', ending:'ff',  focus:['ff'],  words:['off','puff','cliff','staff'],     mode:'whole', patternHint:'<strong>ff</strong> makes a single "f" sound.' },
+  { cat:'Common endings', ending:'ff',  focus:['ff'],  words:['off','puff','stuff','staff'],     mode:'whole', patternHint:'<strong>ff</strong> makes a single "f" sound.' },
   { cat:'Common endings', ending:'ss',  focus:['ss'],  words:['miss','pass','dress'],      mode:'whole', patternHint:'<strong>ss</strong> makes a single "s" sound.' },
-  { cat:'Common endings', ending:'zz',  focus:['zz'],  words:['buzz','jazz','fizz','fuzz'],      mode:'whole', patternHint:'<strong>zz</strong> makes a single "z" sound.' },
+  { cat:'Common endings', ending:'zz',  focus:['zz'],  words:['buzz','fizz','fuzz'],      mode:'whole', patternHint:'<strong>zz</strong> makes a single "z" sound.' },
   { cat:'Common endings', ending:'tch', focus:['tch'], words:['catch','match','watch','pitch'],  mode:'whole', patternHint:'<strong>tch</strong> makes a "ch" sound — like in <em>catch</em>. It always comes after a short vowel.' },
   { cat:'Common endings', ending:'dge', focus:['dge'], words:['bridge','edge','badge','judge'],  mode:'whole', patternHint:'<strong>dge</strong> makes a "j" sound — like in <em>bridge</em>. It always comes after a short vowel.' },
   { cat:'Common endings', ending:'ed',  focus:['ed'],  words:['jumped','played','looked','helped'], mode:'whole', patternHint:'<strong>ed</strong> at the end can sound like "d" (played), "t" (looked), or "id" (wanted).' },
   { cat:'Common endings', ending:'ing', focus:['i','ng'], words:['going','playing','looking','eating'], mode:'whole', patternHint:'<strong>ing</strong> is added to verbs to show something is happening now.' },
   // 6. Word endings — sounds like "shun" / "cher"
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'tion',  focus:['tion'],  words:['nation','station','action','mention','motion','section'], mode:'whole', patternHint:'<strong>tion</strong> sounds like "shun" — like in <em>nation</em>. It is one of the most common word endings in English.' },
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'sion',  focus:['sion','ssion'],  words:['mission','session','passion','tension','vision','division'], mode:'whole', patternHint:'<strong>sion</strong> can sound like "shun" (mission) or "zhun" (vision). Listen carefully to each word.' },
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'cian',  focus:['cian'],  words:['musician','magician','technician','politician','physician'], mode:'whole', patternHint:'<strong>cian</strong> sounds like "shun" — like in <em>musician</em>. It usually refers to a person with a skill.' },
-  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'ture',  focus:['ture'],  words:['picture','nature','future','culture','mixture','capture'], mode:'whole', patternHint:'<strong>ture</strong> sounds like "cher" — like in <em>picture</em>. Say it as one quick sound: "p-ik-cher".' },
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'tion',  focus:['tion'],  words:['direction','station','action','education','information','section'], mode:'whole', patternHint:'<strong>tion</strong> sounds like "shun" — like in <em>station</em>. It is one of the most common word endings in English.' },
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'sion',  focus:['sion','ssion'],  words:['permission','session','discussion','television','decision'], mode:'whole', patternHint:'<strong>sion</strong> can sound like "shun" (permission) or "zhun" (television). Listen carefully to each word.' },
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'cian',  focus:['cian'],  words:['musician','electrician','technician','politician'], mode:'whole', patternHint:'<strong>cian</strong> sounds like "shun" — like in <em>musician</em>. It usually refers to a person with a skill.' },
+  { cat:'Word endings  (-tion, -sion, -cian, -ture)', ending:'ture',  focus:['ture'],  words:['picture','nature','future','culture','furniture','signature'], mode:'whole', patternHint:'<strong>ture</strong> sounds like "cher" — like in <em>picture</em>. Say it as one quick sound: "p-ik-cher".' },
 ];
 
 /* ══════════════════════════════════════════

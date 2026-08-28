@@ -1936,7 +1936,17 @@ const EMOJI = {
   'orange':'🍊','open':'📂','order':'📋',
 
   // Money / simple concepts
-  'cent':'🪙'
+  'cent':'🪙',
+
+  /* Words swapped into the -tion/-sion/-cian/-ture and CVC groups for
+     everyday frequency. Each glyph is one no other word in this map uses —
+     two words sharing a picture is the ambiguity we are trying to remove.
+     Abstract words (get, let, got, stuff, permission, decision) stay
+     pictureless on purpose: emo() returns '' and the tile area is simply
+     empty, which reads better than a picture that means something else. */
+  'chair':'🪑','jug':'🫗','joy':'🥳','daughter':'👧','sauce':'🍅',
+  'laundry':'🧺','direction':'🧭','education':'🎓','information':'ℹ️',
+  'television':'📺','electrician':'👷','furniture':'🛋️','signature':'🖋️'
 };
 
 function emo(word) {
