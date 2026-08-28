@@ -396,10 +396,14 @@ const WP2_TILES = {
 
   /* ── WORDS SWAPPED IN FOR EVERYDAY FREQUENCY ──────────
      Each one keeps its group's pattern and decodes from the recordings we
-     already have. 'air' is the one new tts ending: there is no /eə/ wav, so
-     it falls back to speech the same way -tion and -ture already do. */
+     already have — no new audio. The only chunks without a recording are the
+     -tion/-sion/-cian/-ture endings, which use the tts fallback exactly as
+     the words already in those groups do. */
   // ch
-  'chair':       [{d:'ch',w:'tʃ as in chair.wav',t:'beginning'},{d:'air',w:null,tts:'air',t:'ending'}],
+  // ch + ai + r, not ch + "air": same reason as "where" below — a tts chunk
+  // draws in the pattern colour, so bundling "air" would put a second orange
+  // tile beside the ch and bury the pattern this group teaches.
+  'chair':       [{d:'ch',w:'tʃ as in chair.wav',t:'beginning'},{d:'ai',w:'e as in bet.wav',t:'beginning'},{d:'r',w:'r.wav',t:'ending'}],
   // oy
   'joy':         [{d:'j',w:'dʒ as in jar.wav',t:'beginning'},{d:'oy',w:'ɔɪ as in boil.wav',t:'ending'}],
   // au — the gh in daughter is silent, so it plays nothing by design

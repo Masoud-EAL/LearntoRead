@@ -3211,7 +3211,12 @@ const EMOJI={
   'head':bodyPic('head'),'eye':bodyPic('eye'),'nose':bodyPic('nose'),'tongue':bodyPic('tongue'),'tooth':bodyPic('tooth'),'neck':bodyPic('neck'),'shoulder':bodyPic('shoulder'),'arm':bodyPic('arm'),'elbow':bodyPic('elbow'),
   'wrist':bodyPic('wrist'),'hand':bodyPic('hand'),'finger':bodyPic('finger'),'chest':bodyPic('chest'),'stomach':bodyPic('stomach'),'back':bodyPic('back'),'hip':bodyPic('hip'),'knee':bodyPic('knee'),'ankle':bodyPic('ankle'),
   'sunny':'☀️','cloudy':'☁️','rainy':'🌧️','windy':'💨','snowy':'❄️','stormy':'⛈️','foggy':'🌫️','warm':'🌤️','humid':'💧',
-  'Monday':'📅','Tuesday':'📅','Wednesday':'📅','Thursday':'📅','Friday':'📅','Saturday':'🎉','Sunday':'☀️'
+  'Monday':'📅','Tuesday':'📅','Wednesday':'📅','Thursday':'📅','Friday':'📅','Saturday':'🎉','Sunday':'☀️',
+  /* Words added to the Words 1 and Words 2 groups, which the phonics rounds
+     draw from. Same glyphs as the map in index.html, so a word looks the
+     same wherever it comes up. The abstract ones in those groups (get, let,
+     got, stuff, they, them, then, there) stay pictureless in both. */
+  'chair':'🪑','jug':'🫗','joy':'🥳','daughter':'👧','sauce':'🍅','laundry':'🧺'
 };
 function emo(w){ return EMOJI[w]||EMOJI[(w||'').toLowerCase()]||''; }
 
