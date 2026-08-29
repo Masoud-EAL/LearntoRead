@@ -4262,8 +4262,13 @@ function applyTargetSetup(scope){
   if(lim) lim.style.display=on?'none':'';
   const qf=document.getElementById(scope+'-q-field');
   if(qf) qf.style.display=test?'none':'';
+  // The launch card already carries a line about the game, under its title.
+  // For a test that line IS the count — ten rounds of three — so printing the
+  // count again below the settings just said the same thing twice.
+  // (The teacher lobby has no such line, and no -count-display under this id,
+  // so its own description is left alone.)
   const cnt=document.getElementById(scope+'-count-display');
-  if(cnt) cnt.style.display=on?'none':'';
+  if(cnt) cnt.style.display=(on||test)?'none':'';
 }
 
 function selectQType(type,el){
