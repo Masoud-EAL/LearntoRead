@@ -3180,7 +3180,17 @@ function getQuestions(type,limit){
   }
   const pool=poolFor(type);
   shuffle(pool);
-  return pool.slice(0,limit);
+  // Copies, not the bank's own questions. poolFor copies the array but not what
+  // is in it, so these are the very objects buildBank made — and attachMcChoices
+  // writes its four options straight onto whatever it is handed. Played as they
+  // are, one multiple-choice game marked the bank for the rest of the session:
+  // the same words came back as a tapping game however the toggle was set, and
+  // so did every other game drawing on them, since All Spelling and the themed
+  // banks are the same objects. The ordering games left their scrambled prompt
+  // behind the same way. A game marks its own copies and leaves the bank alone.
+  // The generated banks above (odd one out, clock, shop, forms, phonics) are
+  // built fresh on every call and need none of this.
+  return pool.slice(0,limit).map(q=>Object.assign({},q));
 }
 
 /* ── MULTIPLE-CHOICE (4-option) SUPPORT ──
@@ -5883,27 +5893,16 @@ function testQuestions(step,n){
   return qs.slice(0,n);
 }
 
-/* Whether attachMcChoices would have been the one to put four options on this
-   question — the same shapes it branches on. Everything else (Signs, Messages,
-   Odd One Out, the letter banks, the phonics tap rounds, reading a clock) is
-   built with its options and is unanswerable without them. */
-function testAddedChoices(q){
-  return mcSupported(q)||q.type==='unscramble'||q.type==='gramscramble'
-       ||q.type==='speak'||q.type==='translate';
-}
-
 function testStartRound(){
   const step=testStep();
-  // Deal copies. The fixed banks hand out the same question objects every
-  // time, and attachMcChoices writes its four options onto whatever it is
-  // given — so a tap rung earlier in the ladder would leave its options
-  // attached to the very questions a later "write it" rung draws, and the
-  // ladder would quietly stop climbing. A test leaves no mark on the banks.
-  const qs=testQuestions(step,TEST_PER_ROUND).map(q=>Object.assign({},q));
+  const qs=testQuestions(step,TEST_PER_ROUND);
   if(!qs.length){ showToast('No questions available!'); quitTestGame(); return; }
-  // Only where the rung asks for it, and only ever what could be taken back.
+  // Only where the rung asks for it: a round that carries its own options
+  // (Signs, Messages, Odd One Out, the letter banks, the phonics tap rounds,
+  // reading a clock) is built with them and attachMcChoices leaves it alone.
+  // A rung that asks for none gets none — getQuestions deals copies, so no
+  // earlier tap rung can have left its options on what this one draws.
   if(step.mc) attachMcChoices(qs,step.type);
-  else qs.forEach(q=>{ if(testAddedChoices(q)) delete q.choices; });
   TEST.tally=[]; TEST.roundPts=0;
   soloQuestions=qs; soloQIdx=0;
   document.getElementById('solo-back-btn').style.display=TEST.mode==='solo'?'':'none';
