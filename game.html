@@ -644,8 +644,24 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 /* Pinned: always visible, never shrink. */
 #screen-student-answer > .student-timer,
 #screen-student-answer > .submit-btn,
-#screen-student-answer > .submitted-msg,
-#screen-student-answer > #solo-back-btn{flex:0 0 auto;}
+#screen-student-answer > .submitted-msg{flex:0 0 auto;}
+/* Leaving the game sat one gap under the last row of answers, and learners
+   reaching for the bottom-left option kept landing on it instead — a tap that
+   throws away the round. It is the one control on here that is not part of
+   answering, so it comes out of the flow and sits on the bottom edge, well
+   below the last thing worth touching.
+   Out of the flow it would otherwise be sat on by a tall answer surface — the
+   form, the word tiles — on a short screen, so the screen reserves the height
+   back as padding. Only while the exit is actually there: a class game has no
+   exit and must not pay for one, and these screens are tuned tightly enough
+   that 46px matters. */
+#screen-student-answer > #solo-back-btn{position:absolute;left:50%;
+  bottom:calc(8px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+  margin-top:0;z-index:2;white-space:nowrap;}
+/* 72 = the button (35) + its offset (8) + a gap no thumb crosses by accident
+   (29). Measured, not guessed: at 64 a sideways phone put the Submit button
+   through it. */
+#screen-student-answer.has-exit{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px));}
 /* Flexible: shrink first, then scroll within themselves. min-height:0 is what
    actually lets a flex child shrink below its content. Both take their natural
    height and shrink proportionally only when the total is too tall — neither
@@ -765,8 +781,7 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
   #screen-student-answer > .ans-input-wrap,
   #screen-student-answer > #hint-wrap{flex:1 1 46%;max-width:52%;align-self:stretch;}
   #screen-student-answer > .submit-btn{flex:0 0 100%;max-width:420px;margin-top:2px;}
-  #screen-student-answer > .submitted-msg,
-  #screen-student-answer > #solo-back-btn{flex:0 0 100%;text-align:center;}
+  #screen-student-answer > .submitted-msg{flex:0 0 100%;text-align:center;}
   /* 46, not 56: sideways the column still carries Submit and the solo Back
      link under the face, and 56 spent the difference on overflow. */
   #screen-student-answer #clock-svg{width:min(38vw,calc(var(--vh,1vh)*46),240px);height:min(38vw,calc(var(--vh,1vh)*46),240px);}
@@ -1837,7 +1852,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   </div>
   <button class="submit-btn" id="student-submit-btn" onclick="submitAnswer()">✓ Submit</button>
   <div class="submitted-msg" id="submitted-msg"></div>
-  <button class="btn btn-ghost btn-sm" id="solo-back-btn" style="display:none;margin-top:4px;" onclick="quitSoloGame()">← Back to categories</button>
+  <button class="btn btn-ghost btn-sm" id="solo-back-btn" style="display:none;" onclick="quitSoloGame()">← Back to categories</button>
 </div>
 
 <!-- STUDENT RESULT -->
@@ -4079,7 +4094,7 @@ window.addEventListener('pagehide',suspendMusic);
 window.addEventListener('pageshow',e=>{ if(e.persisted) restoreMusic(); });
 // musicOn is restored from localStorage, so the chip has to match it on load.
 if(!musicOn) document.getElementById('music-btn').textContent='🎵 Music: Off';
-function goHome(){ endHostedRoom(); stopMusic(); cleanupListeners(); soloMode=false; clearSoloUrl(); setClassGameLock(false); document.getElementById('music-btn').style.display=''; document.getElementById('solo-back-btn').style.display='none'; showScreen('screen-home'); playLobbyMusic(); }
+function goHome(){ endHostedRoom(); stopMusic(); cleanupListeners(); soloMode=false; clearSoloUrl(); setClassGameLock(false); document.getElementById('music-btn').style.display=''; setSoloExit(false); showScreen('screen-home'); playLobbyMusic(); }
 function goStudentHome(){ document.getElementById('music-btn').style.display='none'; showScreen('screen-student-home'); }
 /* A student in a class game has no way out of it — leaving is the teacher's
    call. The site-wide back link is the last exit left on their phone once the
@@ -5782,7 +5797,7 @@ function startSoloGame(){
   if(!soloQuestions.length){showToast('No questions available!');return;}
   if(mcMode) attachMcChoices(soloQuestions,soloSelectedType);
   soloQIdx=0; myScore=0;
-  document.getElementById('solo-back-btn').style.display='';
+  setSoloExit(true);
   showStudentQuestion(soloQuestions[0],serverNow());
 }
 function showSoloResult(submittedAns,correctAns,timeLeft){
@@ -5839,9 +5854,16 @@ function quitSoloGame(){
   answered=true;              // a late tick or a stray Submit is now a no-op
   try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(e){}
   soloQuestions=[]; soloQIdx=0;
-  document.getElementById('solo-back-btn').style.display='none';
+  setSoloExit(false);
   showScreen('screen-solo-setup');
   updateSoloCountDisplay();
+}
+/* Show or hide the way out of a practice run. The screen reserves the height
+   this sits in, so the two have to move together — hence one function rather
+   than a style set in six places. */
+function setSoloExit(on){
+  document.getElementById('solo-back-btn').style.display=on?'':'none';
+  document.getElementById('screen-student-answer').classList.toggle('has-exit',!!on);
 }
 function soloNextQuestion(){
   soloQIdx++;
@@ -5910,7 +5932,7 @@ function testStartRound(){
   if(step.mc) attachMcChoices(qs,step.type);
   TEST.tally=[]; TEST.roundPts=0;
   soloQuestions=qs; soloQIdx=0;
-  document.getElementById('solo-back-btn').style.display=TEST.mode==='solo'?'':'none';
+  setSoloExit(TEST.mode==='solo');
   showStudentQuestion(qs[0],serverNow());
 }
 
@@ -6013,7 +6035,7 @@ function quitTestGame(){
   const solo=TEST&&TEST.mode==='solo';
   stopTestGame();
   soloQuestions=[]; soloQIdx=0;
-  document.getElementById('solo-back-btn').style.display='none';
+  setSoloExit(false);
   if(solo){ showScreen('screen-solo-setup'); updateSoloCountDisplay(); }
 }
 
@@ -7384,7 +7406,7 @@ function newTargetGame(mode,target,strict){
 
 function startSoloTarget(){
   TG=newTargetGame('solo',resolveTarget('solo'),targetStrict);
-  document.getElementById('solo-back-btn').style.display='none';
+  setSoloExit(false);
   document.getElementById('tgt-target').textContent=TG.target;
   document.getElementById('tgt-track-label').textContent='Your score';
   document.getElementById('tgt-quit').style.display='';
