@@ -1217,6 +1217,72 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 #screen-target-play[data-state="playing"] #tgt-done{display:none;}
 .tgt-count{text-align:center;font-size:.85rem;color:var(--muted);}
 
+/* ── TEST YOURSELF ──
+   The round card is the whole point of the game being in rounds, so it is
+   built to be read at a glance and from across a table: the three dots say how
+   the round went before a single word is read, and the arrow says which way
+   the test just moved. Everything below the dots is optional reading. */
+.test-card{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;padding:10px 20px 30px;text-align:center;}
+.test-round-no{font-family:'Fredoka One',cursive;font-size:1.5rem;color:var(--gold);
+  letter-spacing:1px;}
+.test-dots{display:flex;gap:16px;font-size:2.6rem;line-height:1;margin:2px 0 4px;}
+.test-dot.ok{color:var(--green);}
+.test-dot.part{color:var(--gold);}
+.test-dot.no{color:var(--muted);opacity:.6;}
+.test-round-score{font-family:'Fredoka One',cursive;font-size:1.7rem;}
+.test-round-pts{font-size:1.05rem;font-weight:800;color:var(--gold);}
+.test-total{font-size:.9rem;color:var(--muted);}
+/* The one line that says what the test just decided. It is a statement about
+   the next three questions, not a verdict on the learner, so it names the task
+   it is moving to rather than grading the one behind. */
+.test-move{display:flex;flex-direction:column;align-items:center;gap:6px;
+  margin-top:6px;padding:14px 20px;border-radius:var(--radius);max-width:420px;
+  background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.10);}
+.test-move-lbl{font-family:'Fredoka One',cursive;font-size:1.05rem;letter-spacing:.5px;}
+.test-move-step{font-size:1rem;font-weight:700;line-height:1.35;}
+.test-move.up{border-color:rgba(0,200,83,.45);background:rgba(0,200,83,.10);}
+.test-move.up .test-move-lbl{color:var(--green);}
+.test-move.down{border-color:rgba(245,166,35,.45);background:rgba(245,166,35,.10);}
+.test-move.down .test-move-lbl{color:var(--gold);}
+.test-move.same .test-move-lbl{color:var(--muted);}
+.test-move.level{border-color:rgba(15,155,142,.55);background:rgba(15,155,142,.12);}
+.test-move.level .test-move-lbl{color:var(--teal);font-size:.8rem;letter-spacing:1.5px;
+  text-transform:uppercase;}
+.test-move.level .test-move-step{font-family:'Fredoka One',cursive;font-size:1.25rem;
+  font-weight:400;}
+.test-acts{display:none;flex-direction:column;align-items:center;gap:10px;margin-top:8px;}
+#screen-test-round[data-state="round"] .round-only,
+#screen-test-round[data-state="solo-final"] .solo-only,
+#screen-test-round[data-state="class-final"] .class-only{display:flex;}
+.test-wait{font-size:.9rem;color:var(--muted);}
+/* Short screens: the dots and the moving line are what must survive, so the
+   running total and the round's points go first. */
+:root[data-app-h~="lt620"] .test-card{gap:8px;}
+:root[data-app-h~="lt620"] .test-dots{font-size:2.1rem;gap:13px;}
+:root[data-app-h~="lt500"] .test-total{display:none;}
+:root[data-app-h~="lt500"] .test-round-pts{font-size:.9rem;}
+
+/* The teacher's scoreboard reuses the dice track's rows, so a rod means the
+   same thing on both screens: how far along this learner is. The bar fills
+   with rounds finished, not with a score — the point of the screen is seeing
+   who is still working. */
+.test-row{grid-template-columns:minmax(96px,1.1fr) 1.4fr 78px;align-items:center;}
+.test-row .nm{display:flex;flex-direction:column;gap:1px;white-space:normal;overflow:visible;}
+.test-row .who{font-size:.85rem;font-weight:700;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;}
+.test-row .rung{font-size:.68rem;font-weight:600;color:var(--muted);line-height:1.2;}
+.test-row .tot{display:flex;flex-direction:column;align-items:flex-end;gap:0;}
+.test-row .pts{font-family:'Fredoka One',cursive;font-size:1.05rem;}
+.test-row .rnd{font-size:.66rem;font-weight:700;color:var(--muted);}
+/* The dice bar's gold line marks the target you must not pass; there is no
+   such line in a test, and leaving it drawn would say there was. */
+.test-row .tgt-bar::after{display:none;}
+.test-row.done .who{color:var(--teal);}
+.test-row.done .rnd{color:var(--teal);}
+/* The banner carries a skill name here, not a two-digit target. */
+#test-host-skill{font-size:1.25rem;text-align:right;}
+
 /* Target-number chips in the two setup panels. */
 .tgt-opts{display:none;flex-direction:column;gap:10px;margin-bottom:10px;}
 .tgt-opts.on{display:flex;}
@@ -1353,6 +1419,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="target" class="q-type-tab" onclick="selectSoloType('target',this)">🎲 Dice</button>
         <button data-type="forms" class="q-type-tab" onclick="selectSoloType('forms',this)">📋 Forms</button>
         <button data-type="all" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">✨ All games</button>
+        <button data-type="test:*" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">🎯 Test Yourself</button>
         <button data-type="custom" class="q-type-tab" id="solo-custom-tab" onclick="showBankPicker('solo',this)">📚 Custom</button>
       </div>
       </div><!-- /.setup-main -->
@@ -1423,7 +1490,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         </div>
       </div>
       <div class="launch-nums" id="solo-limit-row">
-        <div>
+        <div id="solo-q-field">
           <label for="solo-q-limit">Questions</label>
           <input type="number" class="game-input" id="solo-q-limit" value="10" min="1" max="50"
             inputmode="numeric" oninput="onSoloSettingChange()">
@@ -1525,6 +1592,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
             <button data-type="target" class="q-type-tab" onclick="selectQType('target',this)">🎲 Dice</button>
             <button data-type="forms" class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
             <button data-type="all" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">✨ All games</button>
+        <button data-type="test:*" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">🎯 Test Yourself</button>
             <button data-type="custom" class="q-type-tab" id="teacher-custom-tab" onclick="showBankPicker('teacher',this)">📚 Custom</button>
           </div>
           <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="q-count-display">Loading…</div>
@@ -1563,7 +1631,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;" id="host-limit-row">
-            <div style="display:flex;align-items:center;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;" id="host-q-field">
               <label style="font-size:.8rem;color:var(--muted);">Questions:</label>
               <input type="number" class="game-input" id="q-limit" value="10" min="3" max="50"
                 style="width:70px;padding:6px 10px;font-size:.9rem;margin-bottom:0;" oninput="updateQCountDisplay()">
@@ -1852,6 +1920,61 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       <div class="tgt-actions">
         <button class="btn btn-ghost" onclick="goHome()">← End and go home</button>
         <button class="btn btn-gold" id="tgt-host-finish" onclick="finishTargetGame()">🏆 Show the leaderboard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TEST YOURSELF — the card between rounds, and the card at the end.
+     One screen for both, because they say the same four things: how the round
+     went, what it is worth, where that puts you, and what happens next. A
+     learner reading very little English should not have to learn a second
+     layout to reach the finish, so only the last line changes.
+     data-state picks which ending is showing: mid-test, the end of a run
+     practised alone, or the end of one sat in class, where the teacher still
+     has the scores to show. -->
+<div class="screen" id="screen-test-round" data-state="round">
+  <div class="logo-bar">WordLink <span>🎯</span> Test Yourself</div>
+  <div class="test-card">
+    <div class="test-round-no" id="test-round-no">Round 1 of 10</div>
+    <div class="test-dots" id="test-dots"></div>
+    <div class="test-round-score" id="test-round-score"></div>
+    <div class="test-round-pts" id="test-round-pts"></div>
+    <div class="test-total" id="test-total"></div>
+    <div class="test-move" id="test-move"></div>
+    <div class="test-acts round-only">
+      <button class="btn btn-teal btn-lg" onclick="testNextRound()">Next round →</button>
+    </div>
+    <div class="test-acts solo-only">
+      <button class="btn btn-gold btn-lg" id="test-practise-btn" onclick="testPractise()">▶ Practise this</button>
+      <button class="btn btn-ghost btn-sm" onclick="testAgain()">🔄 Take the test again</button>
+      <button class="btn btn-ghost btn-sm" onclick="quitTestGame()">← Choose another game</button>
+    </div>
+    <div class="test-acts class-only">
+      <div class="test-wait">Waiting for the teacher to show the scores…</div>
+    </div>
+  </div>
+</div>
+
+<!-- TEST YOURSELF — the teacher's screen.
+     A class test is not lockstep: nobody is waiting on the projector for the
+     next question, because every learner is on their own rung of their own
+     ladder. So this screen sets no questions. It is one live scoreboard —
+     how far through each learner is, what they are working on now, and what
+     they have scored — and the button that ends it. -->
+<div class="screen" id="screen-test-host">
+  <div class="tgt-wrap">
+    <div class="tgt-banner"><span class="lbl">Test Yourself</span><span class="val" id="test-host-skill">every game</span></div>
+    <div class="tgt-col card" style="padding:16px;">
+      <p class="step-label game">🎯 The class</p>
+      <div class="tgt-track scrollable" id="test-host-track" style="max-height:52vh;"></div>
+      <div class="tgt-count" id="test-host-count"></div>
+      <div class="tgt-count" style="margin-top:4px;">Everyone works at their own level, <span id="test-host-rounds">10</span> rounds each.</div>
+    </div>
+    <div class="tgt-col">
+      <div class="tgt-actions">
+        <button class="btn btn-ghost" onclick="goHome()">← End and go home</button>
+        <button class="btn btn-gold" id="test-host-finish" onclick="finishTestGame()">🏆 Show the scores</button>
       </div>
     </div>
   </div>
@@ -2507,17 +2630,23 @@ function clockSvgMarkup(h,m,cls){
 
 /* One round per rung of the ladder, alternating read-the-clock and
    set-the-clock so a game never becomes all of one thing. */
-function genClockQuestions(n){
+/* from = how far up the clock's own ladder to start. A game of eight rounds
+   walks the whole ladder, but a Test Yourself round asks for three questions
+   and would otherwise always get the three easiest — o'clock, o'clock, half
+   past — however high up the skill the learner has climbed. Defaults to 0, so
+   every other caller is unchanged. */
+function genClockQuestions(n,from){
   const out=[];
   const count=n||CLOCK_LADDER.length;
+  const base=from||0;
   for(let i=0;i<count;i++){
     // Walk the ladder, repeating the hardest rung once past the end.
-    const rung=CLOCK_LADDER[Math.min(i,CLOCK_LADDER.length-1)];
+    const rung=CLOCK_LADDER[Math.min(base+i,CLOCK_LADDER.length-1)];
     const steps=CLOCK_STEPS[rung];
     const h=1+Math.floor(Math.random()*12);
     const m=steps[Math.floor(Math.random()*steps.length)];
     const correct=fmtTime(h,m);
-    if(i%2===0){
+    if((base+i)%2===0){
       // Read the clock. Distractors are the mistakes learners actually make:
       // reading the hands the wrong way round, and slipping an hour or a step.
       const nextH=h===12?1:h+1, prevH=h===1?12:h-1;
@@ -2583,11 +2712,15 @@ function moneySpeech(text){
     (m,d,c)=>moneySpoken(parseInt(d,10)*100+(c?parseInt(c,10):0)));
 }
 
-function genShopQuestions(n){
+/* from offsets the pay/change alternation, for the same reason genClockQuestions
+   takes one: counting change is the harder half of the money unit, and a
+   three-question round starting at 0 never reaches it. Defaults to 0. */
+function genShopQuestions(n,from){
   const out=[];
+  const base=from||0;
   for(let i=0;i<(n||8);i++){
     const item=SHOP_ITEMS[Math.floor(Math.random()*SHOP_ITEMS.length)];
-    if(i%2===0){
+    if((base+i)%2===0){
       // Pay the exact amount. Prices land in the unit's 50–100 range, in 50c
       // steps so the 50c piece stays in play.
       const cents=(50+Math.floor(Math.random()*50))*100+(Math.random()<0.5?50:0);
@@ -3001,6 +3134,8 @@ function poolFor(type){
    sweep the Translate bank in, and those questions need a language chosen. */
 function typeUsesTranslate(type){
   if(type==='translate') return true;
+  const lad=ladderFor(type);
+  if(lad) return lad.some(r=>r.type==='translate');
   const s=sectionOf(type);
   return !!(s&&s.banks.indexOf('translate')>=0);
 }
@@ -3861,7 +3996,7 @@ function stopConfetti(){
 /* SCREENS */
 // Which background music belongs to a given screen.
 const LOBBY_SCREENS=['screen-home','screen-student-home','screen-solo-setup','screen-teacher-lobby','screen-student-lobby'];
-const GAME_SCREENS=['screen-teacher-game','screen-target-host'];
+const GAME_SCREENS=['screen-teacher-game','screen-target-host','screen-test-host'];
 function startScreenMusic(id){
   if(!musicOn) return;
   if(LOBBY_SCREENS.includes(id)) playLobbyMusic();
@@ -4102,14 +4237,21 @@ function resolveTarget(scope){
   return targetNumber>=10?targetNumber:50;
 }
 /* Swap the question-bank controls for the dice controls, or back again. */
+/* Which of the start-screen controls this game has any use for. The dice game
+   wants none of them and brings its own; Test Yourself sets its own length and
+   decides multiple choice rung by rung, but the time per question is still the
+   learner's — or the teacher's — to set. */
 function applyTargetSetup(scope){
-  const on=(scope==='solo'?soloSelectedType:selectedQType)==='target';
+  const type=scope==='solo'?soloSelectedType:selectedQType;
+  const on=type==='target', test=isTestType(type);
   const opts=document.getElementById('tgt-opts-'+scope);
   if(opts) opts.classList.toggle('on',on);
   const mc=document.getElementById(scope+'-mc-toggle');
-  if(mc) mc.style.display=on?'none':'';
+  if(mc) mc.style.display=(on||test)?'none':'';
   const lim=document.getElementById(scope+'-limit-row');
   if(lim) lim.style.display=on?'none':'';
+  const qf=document.getElementById(scope+'-q-field');
+  if(qf) qf.style.display=test?'none':'';
   const cnt=document.getElementById(scope+'-count-display');
   if(cnt) cnt.style.display=on?'none':'';
 }
@@ -4132,6 +4274,12 @@ function updateQCountDisplay(){
     disp.textContent='Roll two dice and add them up — get closest to the target without going over.';
     return;
   }
+  if(isTestType(selectedQType)){
+    disp.textContent='Each learner works through '+TEST_ROUNDS+' rounds of '+TEST_PER_ROUND
+      +' questions at their own level, from '+testSkillLabel(selectedQType).toLowerCase()
+      +'. Your screen shows the class as they go.';
+    return;
+  }
   const c=countFor(selectedQType,limit);
   if(selectedQType==='custom') disp.textContent=(selectedBankName?'"'+selectedBankName+'" — ':'')+c.avail+' questions available — '+c.will+' will be used';
   else disp.textContent=c.avail+' available — '+c.will+' will be used';
@@ -4141,6 +4289,9 @@ function startGame(){
   // Dice is self-paced and has no questions, so it takes over
   // here rather than going round the question loop.
   if(selectedQType==='target'){ roomGame='target'; startTargetGame(); return; }
+  // Test Yourself is self-paced too: the room says go once, then every learner
+  // works through their own rounds at their own level.
+  if(isTestType(selectedQType)){ roomGame='test'; startTestClass(); return; }
   roomGame=null;
   const limit=parseInt(document.getElementById('q-limit').value)||10;
   teacherTimerDuration=Math.max(10,Math.min(120,parseInt(document.getElementById('t-limit').value)||30));
@@ -4693,7 +4844,7 @@ function playAgain(){
 /* Put a finished room back in the lobby, players and all. */
 function resetRoomForNextGame(){
   if(!roomRef||role!=='teacher') return;
-  stopTargetGame();
+  stopTargetGame(); stopTestGame();
   roomGame=null;
   currentQIdx=0;
   roomRef.child('answers').remove();
@@ -4703,6 +4854,8 @@ function resetRoomForNextGame(){
       updates['players/'+id+'/score']=0;
       updates['players/'+id+'/lastPoints']=0;
       updates['players/'+id+'/total']=0;
+      updates['players/'+id+'/round']=0;
+      updates['players/'+id+'/level']=0;
       updates['players/'+id+'/tstate']='playing';
       updates['players/'+id+'/finishedAt']=null;
     });
@@ -4809,11 +4962,15 @@ function listenForGameState(){
     // at their own pace, so this fires once and the room stops driving them.
     if(room.status==='playing'&&room.game==='target'){
       if(!TG) startStudentTarget(room);
+    } else if(room.status==='playing'&&room.game==='test'){
+      // Same shape as the dice board: this fires once, and from then on the
+      // phone deals its own rounds rather than waiting on the room.
+      if(!TEST) startStudentTest(room);
     } else if(room.status==='playing'&&room.currentQuestion){
       const q=room.currentQuestion;
       if(q.idx!==undefined&&q.idx!==myLastQIdx){ myLastQIdx=q.idx; answered=false; showStudentQuestion(q,room.questionStarted,room.questionDuration); }
     }
-    if(room.revealed&&room.correctAnswer){
+    if(room.revealed&&room.correctAnswer&&!isTestRoom()){
       const onAnswer=document.getElementById('screen-student-answer').classList.contains('active');
       const onResult=document.getElementById('screen-student-result').classList.contains('active');
       if(onAnswer&&!onResult) showStudentResult(room.correctAnswer);
@@ -4824,7 +4981,7 @@ function listenForGameState(){
     }
     if(room.status==='finished'){
       // Drop the board so a "play again" on the same room deals a fresh one.
-      stopTargetGame();
+      stopTargetGame(); stopTestGame();
       // The teacher can end a round mid-question. The countdown is an interval,
       // not part of the screen, so it would keep running under the leaderboard
       // and auto-submit an answer to a game that is already over.
@@ -4930,7 +5087,7 @@ function returnStudentToLobby(){
   if(soloMode) return;
   const onLobby=document.getElementById('screen-student-lobby').classList.contains('active');
   clearInterval(studentTimerInt);
-  stopTargetGame();
+  stopTargetGame(); stopTestGame();
   try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(e){}
   answered=false; myLastQIdx=-1; myScore=0; hintLevel=0; currentStudentQ=null;
   // Arm the next game's reveal. Without this a replayed room would find the
@@ -5042,7 +5199,7 @@ const BANK_SECTIONS=[
   {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','sms','clock','shop','forms','beginner','unscramble','gramscramble','speaking','translate']},
 ];
 /* "All" and "Custom" are not a skill — they stay visible under every chip. */
-const SECTION_ALWAYS=['all','custom'];
+const SECTION_ALWAYS=['all','custom','test'];
 const SCOPE_SEL={solo:'#screen-solo-setup',teacher:'#screen-teacher-lobby'};
 /* Choosing a skill also picks that skill's best game, so every section opens
    on something worth playing rather than on whatever was selected before.
@@ -5062,6 +5219,217 @@ const SECTION_DEFAULTS={
   everyday:     {type:'beginner',     mc:true},
 };
 
+/* ══════════════ TEST YOURSELF ══════════════
+   One adaptive game per skill. It is not a new bank — it is a route through
+   the banks the skill already has, ordered easiest to hardest, that moves up
+   or down according to how the learner is doing.
+
+   Three questions make a round; ten rounds make the test. At the end of each
+   round the learner is told how the round went and the test steps up or down
+   the ladder before dealing the next three. A perfect round climbs two rungs,
+   so someone strong reaches the top of a skill in five or six rounds rather
+   than grinding through questions they can already answer; a round they
+   cannot do drops back two, so nobody is left stuck on a rung above them.
+
+   The point is diagnostic: at the end, the rung it settled on is a plain
+   statement of what this learner can do today, and the final card offers that
+   very game to go and practise. */
+const TEST_ROUNDS=10, TEST_PER_ROUND=3;
+
+/* A rung is a game plus how it is presented. Multiple choice against typing is
+   itself a step in difficulty — the app already treats it that way (see
+   GAME_MC_DEFAULT and SECTION_DEFAULTS) — so the same bank can appear twice,
+   once to tap and once to write.
+
+   `mc` is only ever a request: rounds that carry their own options (Signs,
+   Messages, Odd One Out, Letter Names, First Sounds and the phonics tap
+   rounds) are tap games by construction and stay that way, and the tile games
+   are built, not typed. Nothing here can turn a phonics round into a spelling
+   test — "type a word you have only heard" is exactly what those banks exist
+   to avoid.
+
+   `from` starts a game part-way up its own internal ladder — see
+   genClockQuestions and genShopQuestions. Without it a three-question clock
+   round would always be o'clock and half past, however far the learner had
+   climbed.
+
+   `label` is what the learner reads on the round card and at the end. Plain,
+   present tense, adult: it has to name a real task, because it is also the
+   name of the game they are handed to go and practise.
+
+   Every bank in a skill appears somewhere in that skill's ladder. The one
+   exception is Dice in Numbers: it has no questions at all (see SPECIAL_GAMES)
+   and cannot be dealt three of, the same reason a section's All pill skips
+   it. */
+const TEST_LADDERS={
+  letters:[
+    {type:'letter',      mc:true,  label:'Hear a letter, tap it'},
+    {type:'lettersound', mc:true,  label:'Tap the picture with this sound'},
+    {type:'wp1:word',    mc:true,  label:'Hear the sounds, tap the word'},
+    {type:'wp1:gap',     mc:true,  label:'Tap the missing sound'},
+    {type:'wp1:build',   mc:false, label:'Build a short word'},
+    {type:'wp2:word',    mc:true,  label:'Longer words — tap the word'},
+    {type:'wp2:gap',     mc:true,  label:'Longer words — tap the missing sound'},
+    {type:'wp2:build',   mc:false, label:'Build a longer word'},
+    {type:'elementary',  mc:true,  label:'Listen, tap the missing word'},
+    {type:'elementary',  mc:false, label:'Listen, write the missing word'},
+  ],
+  vocab:[
+    {type:'oddone',   mc:true,  label:'Find the one that is different'},
+    {type:'fruits',   mc:true,  label:'Tap the fruit'},
+    {type:'body',     mc:true,  label:'Tap the part of the body'},
+    {type:'clothes',  mc:true,  label:'Tap the clothing word'},
+    {type:'days',     mc:true,  label:'Tap the day'},
+    {type:'months',   mc:true,  label:'Tap the month'},
+    {type:'weather',  mc:true,  label:'Tap the weather word'},
+    {type:'days',     mc:false, label:'Write the day'},
+    {type:'clothes',  mc:false, label:'Write the clothing word'},
+    {type:'weather',  mc:false, label:'Write the weather word'},
+    {type:'months',   mc:false, label:'Write the month'},
+    {type:'spelling', mc:false, label:'Spell words from every topic'},
+    {type:'translate',mc:false, label:'Read it in your language, write it in English'},
+  ],
+  listening:[
+    {type:'letter',      mc:true,  label:'Hear a letter, tap it'},
+    {type:'lettersound', mc:true,  label:'Tap the picture with this sound'},
+    {type:'wp1:word',    mc:true,  label:'Hear the sounds, tap the word'},
+    {type:'wp1:gap',     mc:true,  label:'Tap the missing sound'},
+    {type:'beginner',    mc:true,  label:'Listen, tap the missing word'},
+    {type:'wp1:build',   mc:false, label:'Build a short word'},
+    {type:'clock',       mc:false, from:0, label:"Read and set the clock — o'clock"},
+    {type:'wp2:word',    mc:true,  label:'Longer words — tap the word'},
+    {type:'wp2:gap',     mc:true,  label:'Longer words — tap the missing sound'},
+    {type:'unscramble',  mc:true,  label:'Listen, tap the sentence in order'},
+    {type:'wp2:build',   mc:false, label:'Build a longer word'},
+    {type:'beginner',    mc:false, label:'Listen, write the missing word'},
+    {type:'unscramble',  mc:false, label:'Listen, put the words in order'},
+    {type:'elementary',  mc:false, label:'Longer sentences — write the missing word'},
+    {type:'speaking',    mc:false, label:'Listen, build your answer'},
+  ],
+  speaking:[
+    {type:'questionwords',mc:true,  label:'Tap the question word'},
+    {type:'speaking',     mc:true,  label:'Listen, tap the answer'},
+    {type:'unscramble',   mc:true,  label:'Listen, tap the sentence in order'},
+    {type:'questionwords',mc:false, label:'Write the question word'},
+    {type:'unscramble',   mc:false, label:'Listen, put the words in order'},
+    {type:'speaking',     mc:false, label:'Listen, build your answer'},
+  ],
+  reading:[
+    {type:'signs',        mc:true,  label:'Read the sign'},
+    {type:'oddone',       mc:true,  label:'Find the one that is different'},
+    {type:'questionwords',mc:true,  label:'Tap the question word'},
+    {type:'sms',          mc:true,  label:'Read the message, tap the answer'},
+    {type:'beginner',     mc:true,  label:'Read the sentence, tap the missing word'},
+    {type:'gramscramble', mc:true,  label:'Tap the sentence in the right order'},
+    {type:'forms',        mc:false, label:'Put each answer in the right box'},
+    {type:'gramscramble', mc:false, label:'Put the words in the right order'},
+    {type:'beginner',     mc:false, label:'Write the missing word'},
+    {type:'elementary',   mc:false, label:'Longer sentences — write the missing word'},
+  ],
+  writing:[
+    {type:'wp1:gap',     mc:true,  label:'Tap the missing sound'},
+    {type:'numbers',     mc:true,  label:'Tap the number word'},
+    {type:'fruits',      mc:false, label:'Write the fruit'},
+    {type:'body',        mc:false, label:'Write the part of the body'},
+    {type:'wp1:build',   mc:false, label:'Build a short word'},
+    {type:'days',        mc:false, label:'Write the day'},
+    {type:'clothes',     mc:false, label:'Write the clothing word'},
+    {type:'numbers',     mc:false, label:'Write the number 1–10'},
+    {type:'weather',     mc:false, label:'Write the weather word'},
+    {type:'numbers1120', mc:false, label:'Write the number 11–20'},
+    {type:'months',      mc:false, label:'Write the month'},
+    {type:'wp2:gap',     mc:true,  label:'Longer words — tap the missing sound'},
+    {type:'forms',       mc:false, label:'Put each answer in the right box'},
+    {type:'beginner',    mc:false, label:'Write the missing word'},
+    {type:'wp2:build',   mc:false, label:'Build a longer word'},
+    {type:'numbers2199', mc:false, label:'Write the number 21–99'},
+    {type:'spelling',    mc:false, label:'Spell words from every topic'},
+    {type:'elementary',  mc:false, label:'Longer sentences — write the missing word'},
+  ],
+  grammar:[
+    {type:'questionwords',mc:true,  label:'Tap the question word'},
+    {type:'gramscramble', mc:true,  label:'Tap the sentence in the right order'},
+    {type:'unscramble',   mc:true,  label:'Listen, tap the sentence in order'},
+    {type:'questionwords',mc:false, label:'Write the question word'},
+    {type:'gramscramble', mc:false, label:'Put the words in the right order'},
+    {type:'unscramble',   mc:false, label:'Listen, put the words in order'},
+  ],
+  numeracy:[
+    {type:'numbers',     mc:true,  label:'Tap the number word'},
+    {type:'numbers1120', mc:true,  label:'Tap the number 11–20'},
+    {type:'clock',       mc:false, from:0, label:"Read and set the clock — o'clock"},
+    {type:'numbers',     mc:false, label:'Write the number 1–10'},
+    {type:'numbers2199', mc:true,  label:'Tap the number 21–99'},
+    {type:'clock',       mc:false, from:2, label:'Read and set the clock — half past'},
+    {type:'numbers1120', mc:false, label:'Write the number 11–20'},
+    {type:'shop',        mc:false, from:0, label:'Pay the right amount'},
+    {type:'clock',       mc:false, from:4, label:'Read and set the clock — quarter past and to'},
+    {type:'numbers2199', mc:false, label:'Write the number 21–99'},
+    {type:'shop',        mc:false, from:1, label:'Count your change'},
+    {type:'clock',       mc:false, from:6, label:'Read and set the clock — every five minutes'},
+  ],
+  /* One game in the skill, so the ladder is honestly two rungs: reading the
+     English and choosing it, then reading it and writing it. */
+  translation:[
+    {type:'translate', mc:true,  label:'Tap the English sentence'},
+    {type:'translate', mc:false, label:'Read it in your language, write it in English'},
+  ],
+  everyday:[
+    {type:'signs',       mc:true,  label:'Read the sign'},
+    {type:'sms',         mc:true,  label:'Read the message, tap the answer'},
+    {type:'clock',       mc:false, from:0, label:"Read and set the clock — o'clock"},
+    {type:'beginner',    mc:true,  label:'Listen, tap the missing word'},
+    {type:'shop',        mc:false, from:0, label:'Pay the right amount'},
+    {type:'clock',       mc:false, from:4, label:'Read and set the clock — quarter past and to'},
+    {type:'gramscramble',mc:true,  label:'Tap the sentence in the right order'},
+    {type:'forms',       mc:false, label:'Put each answer in the right box'},
+    {type:'unscramble',  mc:true,  label:'Listen, tap the sentence in order'},
+    {type:'translate',   mc:true,  label:'Tap the English sentence'},
+    {type:'shop',        mc:false, from:1, label:'Count your change'},
+    {type:'beginner',    mc:false, label:'Write the missing word'},
+    {type:'gramscramble',mc:false, label:'Put the words in the right order'},
+    {type:'speaking',    mc:false, label:'Listen, build your answer'},
+    {type:'translate',   mc:false, label:'Read it in your language, write it in English'},
+  ],
+  /* The whole-app placement test: one sweep across every skill rather than
+     depth in any one of them, for a learner nobody has placed yet. */
+  '*':[
+    {type:'letter',      mc:true,  label:'Hear a letter, tap it'},
+    {type:'lettersound', mc:true,  label:'Tap the picture with this sound'},
+    {type:'oddone',      mc:true,  label:'Find the one that is different'},
+    {type:'signs',       mc:true,  label:'Read the sign'},
+    {type:'numbers',     mc:true,  label:'Tap the number word'},
+    {type:'wp1:word',    mc:true,  label:'Hear the sounds, tap the word'},
+    {type:'clothes',     mc:true,  label:'Tap the clothing word'},
+    {type:'sms',         mc:true,  label:'Read the message, tap the answer'},
+    {type:'wp1:gap',     mc:true,  label:'Tap the missing sound'},
+    {type:'beginner',    mc:true,  label:'Listen, tap the missing word'},
+    {type:'clock',       mc:false, from:2, label:'Read and set the clock'},
+    {type:'questionwords',mc:true, label:'Tap the question word'},
+    {type:'wp1:build',   mc:false, label:'Build a short word'},
+    {type:'shop',        mc:false, from:1, label:'Count your change'},
+    {type:'forms',       mc:false, label:'Put each answer in the right box'},
+    {type:'wp2:gap',     mc:true,  label:'Longer words — tap the missing sound'},
+    {type:'spelling',    mc:false, label:'Spell words from every topic'},
+    {type:'elementary',  mc:false, label:'Longer sentences — write the missing word'},
+  ],
+};
+/* The test games are addressed like a section's All pill — the type string
+   carries the skill, so nothing needs hidden state. */
+function isTestType(t){ return typeof t==='string'&&t.indexOf('test:')===0; }
+function testSectionId(t){ return isTestType(t)?t.slice(5):null; }
+function ladderFor(type){ return TEST_LADDERS[testSectionId(type)]||null; }
+/* The skill's own name, for the launch card and the teacher's screen. */
+function testSkillLabel(type){
+  const sec=BANK_SECTIONS.find(x=>x.id===testSectionId(type));
+  return sec?sec.label.replace(/^\S+\s+/,''):'every game';
+}
+/* True while this device is sitting a test — the learner's own run, whether
+   they are practising alone or in a class. The teacher's screen holds a TEST
+   too, but it is watching, not answering. */
+function testActive(){ return !!(TEST&&TEST.mode!=='host'); }
+function testStepAt(ladder,level){ return ladder[Math.max(0,Math.min(level,ladder.length-1))]; }
+
 function filterBanks(scope,sectionId){
   const sec=BANK_SECTIONS.find(s=>s.id===sectionId)||BANK_SECTIONS[0];
   // Retarget the All pill before selecting, so picking "All" inside a section
@@ -5070,6 +5438,14 @@ function filterBanks(scope,sectionId){
   if(allPill){
     allPill.dataset.type=sec.banks?'all:'+sec.id:'all';
     allPill.textContent='✨ All '+(sec.banks?sec.label.replace(/^\S+\s+/,''):'games');
+  }
+  // Test Yourself is retargeted the same way: one adaptive test per skill,
+  // drawing on that skill's own games. Under "All games" it is the whole-app
+  // placement test.
+  const testPill=document.querySelector(SCOPE_SEL[scope]+' .q-type-tab[data-type^="test"]');
+  if(testPill){
+    testPill.dataset.type='test:'+sec.id;
+    testPill.textContent='🎯 Test Yourself'+(sec.banks?' — '+sec.label.replace(/^\S+\s+/,''):'');
   }
   const def=SECTION_DEFAULTS[sec.id];
   if(def){
@@ -5187,6 +5563,23 @@ const GAME_INFO={
 /* Custom banks belong to one account and mean nothing to whoever the link is
    sent to, so a ?game=custom link opens the picker like any other unknown id. */
 const UNSHAREABLE_GAMES=['custom'];
+/* What the start screen says about a game. The two retargeted pills — a
+   section's All, and its Test Yourself — are not fixed ids, so their entry is
+   worked out from the skill they are currently pointing at rather than listed
+   thirty-three more times in GAME_INFO. */
+function gameInfoFor(type){
+  const sid=isTestType(type)?testSectionId(type):null;
+  if(sid) return {skill:sid==='*'?null:sid,
+                  skillLabel:sid==='*'?'Every skill':undefined,
+                  name:'Test Yourself',
+                  blurb:TEST_ROUNDS+' rounds of '+TEST_PER_ROUND+' questions, drawn from '
+                        +(sid==='*'?'every game':'every '+testSkillLabel(type).toLowerCase()+' game')
+                        +'. It gets harder or easier as you go.'};
+  const sec=sectionOf(type);
+  if(sec) return {skill:sec.id, name:'All '+sec.label.replace(/^\S+\s+/,''),
+                  blurb:'A mix of every '+sec.label.replace(/^\S+\s+/,'').toLowerCase()+' game.'};
+  return GAME_INFO[type]||{};
+}
 /* The games that open with typing rather than four choices — the ordering
    games are the arranging, and All Spelling is the writing bank. Same
    reasoning as SECTION_DEFAULTS, applied to one game instead of one skill. */
@@ -5211,12 +5604,12 @@ function openSoloLaunch(type){
   selectSoloType(type,tab);
   const label=(tab.textContent||'').trim();
   const sp=label.indexOf(' ');
-  const info=GAME_INFO[type]||{};
+  const info=gameInfoFor(type);
   const skill=SKILL_ACCENT[info.skill]||SKILL_ACCENT._;
   const col=document.querySelector('#screen-solo-launch .launch-col');
   col.style.setProperty('--lx',skill.c);
   col.style.setProperty('--lx-glow',skill.glow);
-  document.getElementById('launch-skill').textContent=skill.label;
+  document.getElementById('launch-skill').textContent=info.skillLabel||skill.label;
   document.getElementById('launch-emoji').textContent=sp>0?label.slice(0,sp):'🎮';
   document.getElementById('launch-title').textContent=info.name||(sp>0?label.slice(sp+1):label);
   document.getElementById('launch-sub').textContent=
@@ -5249,7 +5642,12 @@ function showSoloSetup(){
 function soloLinkParams(type){
   const p=new URLSearchParams();
   p.set('game',type);
-  if(type!=='target'){
+  // The dice game and Test Yourself both set their own length and answer mode,
+  // so a link to one has only the seconds to carry.
+  if(isTestType(type)){
+    const secs=soloSeconds();
+    if(secs!==TIMER_DURATION) p.set('t',secs);
+  } else if(type!=='target'){
     const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
     if(limit!==10) p.set('q',limit);
     const secs=soloSeconds();
@@ -5298,6 +5696,10 @@ const GAME_SLUG={
   spelling:'spelling',unscramble:'unscramble',gramscramble:'word-order',speaking:'speaking-game',
   translate:'translate',letter:'letter-names',lettersound:'first-sounds',oddone:'odd-one-out',
   signs:'signs',sms:'messages',clock:'clock',shop:'shop',target:'dice',forms:'forms',all:'all-games',
+  'test:*':'test-yourself','test:letters':'test-letters','test:vocab':'test-vocabulary',
+  'test:listening':'test-listening','test:speaking':'test-speaking','test:reading':'test-reading',
+  'test:writing':'test-writing','test:grammar':'test-grammar','test:numeracy':'test-numeracy',
+  'test:translation':'test-translation','test:everyday':'test-everyday',
 };
 function copySoloLink(){
   /* The address bar is already the shareable link; copying is copying it. */
@@ -5332,6 +5734,12 @@ function updateSoloCountDisplay(){
     display.textContent='Roll two dice and add them up — get closest to the target without going over.';
     return;
   }
+  if(isTestType(soloSelectedType)){
+    display.textContent=TEST_ROUNDS+' rounds of '+TEST_PER_ROUND
+      +' questions, from '+testSkillLabel(soloSelectedType).toLowerCase()
+      +'. It gets harder or easier as you go.';
+    return;
+  }
   const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
   const c=countFor(soloSelectedType,limit);
   if(soloSelectedType==='custom') display.textContent=(selectedBankName?'"'+selectedBankName+'" — ':'')+c.avail+' questions available — '+c.will+' will be used';
@@ -5340,6 +5748,17 @@ function updateSoloCountDisplay(){
 function startSoloGame(){
   syncSoloUrl(soloSelectedType);
   if(soloSelectedType==='target'){ roomGame=null; startSoloTarget(); return; }
+  // Test Yourself runs its own rounds rather than one flat list of questions.
+  if(isTestType(soloSelectedType)){
+    if(typeUsesTranslate(soloSelectedType))
+      localStorage.setItem('translateLang',document.getElementById('solo-lang-pick').value);
+    roomGame=null;
+    TEST=newTestGame('solo',soloSelectedType);
+    TEST.secs=soloSeconds();
+    myScore=0;
+    testStartRound();
+    return;
+  }
   if(typeUsesTranslate(soloSelectedType)){
     localStorage.setItem('translateLang',document.getElementById('solo-lang-pick').value);
   }
@@ -5366,6 +5785,7 @@ function showSoloResult(submittedAns,correctAns,timeLeft){
     tier=isCorrect?'correct':'wrong';
   }
   myScore+=pts;
+  testRecord(tier,pts);
   document.getElementById('result-icon').textContent=tier==='correct'?'🎉':tier==='partial'?'🌟':'😔';
   if(currentStudentQ&&currentStudentQ.type==='translate'){
     document.getElementById('result-word').innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;line-height:2;text-align:center;">'+diffHtml(submittedAns||'',correctAns)+'</div>'+(tier!=='correct'?'<div style="font-size:.78rem;color:var(--muted);margin-top:6px;">Correct: <em style="color:var(--green)">'+correctAns+'</em></div>':'');
@@ -5380,9 +5800,15 @@ function showSoloResult(submittedAns,correctAns,timeLeft){
   document.getElementById('result-sound-btn').style.display=isSpellingQ(currentStudentQ)?'':'none';
   document.getElementById('result-points').textContent=tier==='correct'?'+'+pts+' points 🎯':tier==='partial'?'+'+pts+' points 🌟 (partly correct)':'No points this round';
   document.getElementById('result-total').textContent='Your total: '+myScore+' pts';
-  document.getElementById('result-rank').textContent='Question '+(soloQIdx+1)+' of '+soloQuestions.length;
+  // In a test the run is measured in rounds, not in a single list of
+  // questions, so both lines count within the round the learner is in.
+  document.getElementById('result-rank').textContent=testActive()
+    ?'Round '+TEST.round+' of '+TEST_ROUNDS
+    :'Question '+(soloQIdx+1)+' of '+soloQuestions.length;
   document.getElementById('solo-next-wrap').style.display='';
-  document.getElementById('solo-progress').textContent=(soloQIdx+1)+' / '+soloQuestions.length+' questions done';
+  document.getElementById('solo-progress').textContent=testActive()
+    ?(soloQIdx+1)+' / '+TEST_PER_ROUND+' in this round'
+    :(soloQIdx+1)+' / '+soloQuestions.length+' questions done';
   document.getElementById('multiplayer-wait-msg').style.display='none';
   showScreen('screen-student-result');
   if(tier==='correct'||tier==='partial') playCorrectJingle(); else playWrongJingle();
@@ -5404,6 +5830,13 @@ function quitSoloGame(){
 }
 function soloNextQuestion(){
   soloQIdx++;
+  // A test ends its round here rather than the whole run: ten of these make
+  // the test, and the score card between them is the point of the exercise.
+  if(testActive()){
+    if(soloQIdx>=soloQuestions.length) testEndRound();
+    else showStudentQuestion(soloQuestions[soloQIdx],serverNow());
+    return;
+  }
   if(soloQIdx>=soloQuestions.length){ showSoloFinal(); return; }
   showStudentQuestion(soloQuestions[soloQIdx],serverNow());
 }
@@ -5417,6 +5850,301 @@ function showSoloFinal(){
   showScreen('screen-leaderboard');
   playWinnerFanfare();
 }
+
+/* ══════════════ TEST YOURSELF — the run ══════════════
+   One state object drives all three views of a test, the way TG drives the
+   dice game: the learner practising alone, the learner sitting it in class,
+   and the teacher watching the room. A class test is self-paced — every
+   learner is on their own rung, on their own question — so the room does not
+   hand out questions the way it does for an ordinary class game. It says "go"
+   once, and after that each phone deals its own rounds and reports where it
+   has got to. The teacher's screen is one live scoreboard over the top. */
+let TEST=null;
+let testPlayersListener=null;
+
+function newTestGame(mode,type){
+  return {mode:mode, type:type, ladder:ladderFor(type)||[],
+          level:0, round:1, tally:[], roundPts:0, lastMove:0,
+          secs:TIMER_DURATION};
+}
+function testStep(){ return testStepAt(TEST.ladder,TEST.level); }
+
+/* Three questions at one rung. Clock and Shop are asked for a slice of their
+   own ladder rather than the first three rounds they would otherwise deal;
+   everything else comes through getQuestions, so the generated banks stay
+   freshly drawn and the fixed ones stay shuffled. A bank that cannot fill a
+   round in one draw is drawn again rather than dealing a short round. */
+function testQuestions(step,n){
+  const draw=()=>step.type==='clock'?genClockQuestions(n,step.from||0)
+               :step.type==='shop' ?genShopQuestions(n,step.from||0)
+               :getQuestions(step.type,n);
+  let qs=draw();
+  for(let i=0;qs.length<n&&i<4;i++) qs=qs.concat(draw());
+  return qs.slice(0,n);
+}
+
+/* Whether attachMcChoices would have been the one to put four options on this
+   question — the same shapes it branches on. Everything else (Signs, Messages,
+   Odd One Out, the letter banks, the phonics tap rounds, reading a clock) is
+   built with its options and is unanswerable without them. */
+function testAddedChoices(q){
+  return mcSupported(q)||q.type==='unscramble'||q.type==='gramscramble'
+       ||q.type==='speak'||q.type==='translate';
+}
+
+function testStartRound(){
+  const step=testStep();
+  // Deal copies. The fixed banks hand out the same question objects every
+  // time, and attachMcChoices writes its four options onto whatever it is
+  // given — so a tap rung earlier in the ladder would leave its options
+  // attached to the very questions a later "write it" rung draws, and the
+  // ladder would quietly stop climbing. A test leaves no mark on the banks.
+  const qs=testQuestions(step,TEST_PER_ROUND).map(q=>Object.assign({},q));
+  if(!qs.length){ showToast('No questions available!'); quitTestGame(); return; }
+  // Only where the rung asks for it, and only ever what could be taken back.
+  if(step.mc) attachMcChoices(qs,step.type);
+  else qs.forEach(q=>{ if(testAddedChoices(q)) delete q.choices; });
+  TEST.tally=[]; TEST.roundPts=0;
+  soloQuestions=qs; soloQIdx=0;
+  document.getElementById('solo-back-btn').style.display=TEST.mode==='solo'?'':'none';
+  showStudentQuestion(qs[0],serverNow());
+}
+
+/* Called from showSoloResult, which is the marking for both a solo run and a
+   class test — in a test the learner marks and advances themselves either way. */
+function testRecord(tier,pts){
+  if(!testActive()) return;
+  TEST.tally.push(tier);
+  TEST.roundPts+=pts;
+}
+
+/* The round is over: score it, move the ladder, and say so.
+   A round is out of three. A partly-right spelling counts as half, because it
+   is: the learner heard the word and got most of it down.
+     3 right      → up two rungs
+     2 right      → up one
+     1 right      → down one
+     none right   → down two
+   Two rungs at a time is what keeps ten rounds enough. Someone who can
+   already do a skill reaches the top of it in five or six rounds instead of
+   answering twenty questions below their level to get there, and someone on a
+   rung well over their head is back on solid ground in one round rather than
+   four. */
+function testEndRound(){
+  clearInterval(studentTimerInt);
+  const score=TEST.tally.reduce((a,t)=>a+(t==='correct'?1:t==='partial'?0.5:0),0);
+  const move=score>=2.5?2:score>=1.5?1:score>=0.5?-1:-2;
+  const before=TEST.level;
+  TEST.level=Math.max(0,Math.min(TEST.ladder.length-1,TEST.level+move));
+  // What actually happened, not what was asked for: at the bottom of a ladder
+  // a bad round cannot go anywhere, and the card must not claim it did.
+  TEST.lastMove=TEST.level-before;
+  const last=TEST.round>=TEST_ROUNDS;
+  if(TEST.mode==='class') writeTestProgress(last);
+  showTestCard(score,last);
+}
+function testNextRound(){
+  if(!TEST) return;
+  TEST.round++;
+  testStartRound();
+}
+
+/* The card between rounds, and the card at the end — the same screen, because
+   they say the same things and a learner reading very little English should
+   not have to learn a second layout to reach the finish. */
+function showTestCard(score,final){
+  stopMusic();
+  const step=testStep();
+  const scr=document.getElementById('screen-test-round');
+  scr.dataset.state=!final?'round':(TEST.mode==='class'?'class-final':'solo-final');
+  document.getElementById('test-round-no').textContent=
+    final?'Test finished':'Round '+TEST.round+' of '+TEST_ROUNDS;
+  // Three dots, one per question, in the order they were answered.
+  document.getElementById('test-dots').innerHTML=TEST.tally.map(t=>
+    '<span class="test-dot '+(t==='correct'?'ok':t==='partial'?'part':'no')+'">'
+    +(t==='correct'?'●':t==='partial'?'◐':'○')+'</span>').join('');
+  const whole=score===Math.floor(score)?String(score):score.toFixed(1);
+  document.getElementById('test-round-score').textContent=whole+' of '+TEST_PER_ROUND+' right';
+  document.getElementById('test-round-pts').textContent='+'+TEST.roundPts+' points';
+  document.getElementById('test-total').textContent='Your total: '+myScore+' pts';
+  const mv=document.getElementById('test-move');
+  if(final){
+    mv.className='test-move level';
+    mv.innerHTML='<span class="test-move-lbl">You are working at</span>'
+      +'<span class="test-move-step"></span>';
+    mv.querySelector('.test-move-step').textContent=step.label;
+  } else {
+    mv.className='test-move '+(TEST.lastMove>0?'up':TEST.lastMove<0?'down':'same');
+    mv.innerHTML='<span class="test-move-lbl"></span><span class="test-move-step"></span>';
+    mv.querySelector('.test-move-lbl').textContent=
+      TEST.lastMove>0?'↑ Harder now':TEST.lastMove<0?'↓ A bit easier':'→ Same level';
+    mv.querySelector('.test-move-step').textContent=step.label;
+  }
+  const pb=document.getElementById('test-practise-btn');
+  if(pb) pb.textContent='▶ Practise: '+step.label;
+  showScreen('screen-test-round');
+  if(final) playWinnerFanfare();
+  else if(score>=1.5) playCorrectJingle();
+}
+
+/* The end of a solo test: go and play the game it settled on. That rung is the
+   whole point of having sat the test. */
+function testPractise(){
+  if(!TEST) return;
+  const type=testStep().type;
+  stopTestGame();
+  soloMode=true;
+  if(!openSoloLaunch(type)) showSoloSetup();
+}
+function testAgain(){
+  if(!TEST) return;
+  const type=TEST.type;
+  stopTestGame();
+  if(!openSoloLaunch(type)) showSoloSetup();
+}
+function quitTestGame(){
+  clearInterval(studentTimerInt);
+  answered=true;              // a late tick or a stray Submit is now a no-op
+  try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(e){}
+  const solo=TEST&&TEST.mode==='solo';
+  stopTestGame();
+  soloQuestions=[]; soloQIdx=0;
+  document.getElementById('solo-back-btn').style.display='none';
+  if(solo){ showScreen('screen-solo-setup'); updateSoloCountDisplay(); }
+}
+
+/* ── the class room ── */
+
+/* Teacher: everyone starts together, then works at their own pace and their
+   own level. Modelled on startTargetGame, which is the app's other self-paced
+   class game. */
+function startTestClass(){
+  const secs=Math.max(10,Math.min(120,parseInt(document.getElementById('t-limit').value)||30));
+  TEST=newTestGame('host',selectedQType);
+  TEST.secs=secs;
+  roomRef.child('players').once('value',snap=>{
+    const players=snap.val()||{},updates={};
+    Object.keys(players).forEach(id=>{
+      updates['players/'+id+'/score']=0;
+      updates['players/'+id+'/lastPoints']=0;
+      updates['players/'+id+'/round']=0;
+      updates['players/'+id+'/level']=0;
+      updates['players/'+id+'/tstate']='playing';
+      updates['players/'+id+'/finishedAt']=null;
+    });
+    roomRef.update(updates);
+  });
+  // currentQuestion is cleared for the same reason the dice game clears it: a
+  // student left mid-question by a previous round must not be dragged back.
+  roomRef.update({status:'playing',game:'test',testType:selectedQType,testSecs:secs,
+    currentQuestion:null,questionIdx:-1,revealed:false,midLeaderboard:false,correctAnswer:''});
+  document.getElementById('test-host-skill').textContent=testSkillLabel(selectedQType);
+  document.getElementById('test-host-rounds').textContent=TEST_ROUNDS;
+  showScreen('screen-test-host');
+  watchTestPlayers();
+}
+
+/* Student: the room said "go". From here the phone runs its own test. */
+function startStudentTest(room){
+  const t=room.testType;
+  if(!ladderFor(t)) return;
+  TEST=newTestGame('class',t);
+  TEST.secs=room.testSecs||TIMER_DURATION;
+  stopMusic();
+  // Pick this learner's own progress back up: they may be returning from a
+  // reload part-way through, or joining a test already in flight.
+  roomRef.child('players/'+playerId).once('value',s=>{
+    if(!TEST||TEST.mode!=='class') return;
+    const p=s.val()||{};
+    myScore=p.score||0;
+    TEST.round=Math.max(1,(p.round||0)+1);
+    TEST.level=Math.max(0,Math.min(TEST.ladder.length-1,p.level||0));
+    if(p.tstate==='done'||TEST.round>TEST_ROUNDS){
+      TEST.round=TEST_ROUNDS;
+      showTestCard(0,true);
+      return;
+    }
+    testStartRound();
+  });
+}
+
+/* Publish where this learner has got to. round is the round just finished, so
+   a phone that reloads picks up at the next one; level is the rung the next
+   round will be dealt at. score is what the leaderboard sorts on, exactly as
+   in an ordinary class game. */
+function writeTestProgress(final){
+  if(!TEST||TEST.mode!=='class'||!roomRef||!playerId) return;
+  const update={score:myScore,round:TEST.round,level:TEST.level,
+                tstate:final?'done':'playing'};
+  if(final) update.finishedAt=firebase.database.ServerValue.TIMESTAMP;
+  roomRef.child('players/'+playerId).update(update);
+}
+
+/* The teacher's scoreboard. Same roster shape and the same colours as the dice
+   track, so a rod means the same thing on both screens. */
+function testRoster(players){
+  return Object.keys(players||{}).sort().map((id,i)=>{
+    const p=players[id]||{};
+    return {id:id,name:(p.name||'').trim(),round:p.round||0,level:p.level||0,
+            score:p.score||0,tstate:p.tstate||'playing',color:tgtColor(i)};
+  }).filter(p=>p.name);
+}
+function renderTestTrack(el,roster){
+  if(!el||!TEST) return;
+  el.innerHTML='';
+  roster.forEach(p=>{
+    const pct=Math.min(p.round/TEST_ROUNDS,1)*100;
+    const step=testStepAt(TEST.ladder,p.level);
+    const row=document.createElement('div');
+    row.className='tgt-row test-row'+(p.tstate==='done'?' done':'');
+    row.innerHTML='<span class="nm"><span class="who"></span><span class="rung"></span></span>'
+      +'<span class="tgt-bar"><span class="tgt-rod" style="background:'+p.color+';width:'+pct+'%"></span></span>'
+      +'<span class="tot"><span class="pts"></span><span class="rnd"></span></span>';
+    row.querySelector('.who').textContent=p.name;
+    row.querySelector('.rung').textContent=step?step.label:'';
+    row.querySelector('.pts').textContent='⭐ '+p.score;
+    row.querySelector('.rnd').textContent=p.tstate==='done'?'finished':p.round+'/'+TEST_ROUNDS;
+    el.appendChild(row);
+  });
+}
+function watchTestPlayers(){
+  if(!roomRef) return;
+  stopTestWatch();
+  testPlayersListener=roomRef.child('players').on('value',snap=>{
+    if(!TEST||TEST.mode!=='host') return;
+    const roster=testRoster(snap.val());
+    renderTestTrack(document.getElementById('test-host-track'),roster);
+    const done=roster.filter(p=>p.tstate==='done').length;
+    document.getElementById('test-host-count').textContent=
+      roster.length?(done+' of '+roster.length+' finished'):'Waiting for players…';
+    document.getElementById('test-host-finish').textContent=
+      (roster.length&&done===roster.length)?'🏆 Everyone is done — show the scores'
+                                           :'🏆 Show the scores';
+  });
+}
+function stopTestWatch(){
+  if(testPlayersListener&&roomRef) roomRef.child('players').off('value',testPlayersListener);
+  testPlayersListener=null;
+}
+function stopTestGame(){ stopTestWatch(); TEST=null; }
+
+/* Teacher: end the test. Anyone still going keeps the points they have. */
+function finishTestGame(){
+  if(!roomRef) return;
+  roomRef.child('players').once('value',snap=>{
+    const players=snap.val()||{},updates={};
+    Object.keys(players).forEach(id=>{
+      const p=players[id]||{};
+      if((p.tstate||'playing')==='done') return;
+      updates['players/'+id+'/tstate']='done';
+      updates['players/'+id+'/finishedAt']=firebase.database.ServerValue.TIMESTAMP;
+    });
+    if(Object.keys(updates).length) roomRef.update(updates);
+    showLeaderboard();
+  });
+}
+/* True while the room is running (or has just run) a Test Yourself. */
+function isTestRoom(){ return roomGame==='test'; }
 
 const GAME_RTL_LANGS=new Set(['fa','ur','ar']);
 function setQTextLang(lang){
@@ -5545,7 +6273,10 @@ function showStudentQuestion(q,startedAt,dur){
   // local default (solo play, or an older host that didn't send one).
   // A spoken question plus a whole answer to build needs the same room to
   // work as a translation, so it gets the same doubled budget (see playQuestion).
-  const base=soloMode?soloSeconds():TIMER_DURATION;
+  // A test carries its own budget — the learner's own setting when practising
+  // alone, the teacher's when sitting it in class — because in a class test
+  // nothing is broadcast per question to carry one.
+  const base=testActive()?TEST.secs:(soloMode?soloSeconds():TIMER_DURATION);
   const timerDur=dur||((q.type==='translate'||q.type==='speak')?base*2
     :q.type==='shop'?Math.max(SHOP_TIMER_DURATION,base):base);
   studentSpeak(q); startStudentTimer(startedAt, timerDur);
@@ -5926,7 +6657,9 @@ function submitAnswer(auto){
     ans=(document.getElementById('student-ans-input').value||'').trim();
   }
   document.getElementById('student-submit-btn').disabled=true;
-  if(soloMode){
+  // A test is self-paced even in a class: the phone marks the answer and moves
+  // on, rather than waiting for a host to reveal a question it never set.
+  if(soloMode||testActive()){
     showSoloResult(ans,currentStudentQ.answer,elapsed);
     return;
   }
@@ -6543,7 +7276,7 @@ function handlePlayerVisibility(){
     roomRef.child('players/'+playerId).onDisconnect().remove();
   }
 }
-function cleanupListeners(){if(roomRef)roomRef.off();clearInterval(timerInterval);clearInterval(studentTimerInt);window.speechSynthesis&&window.speechSynthesis.cancel();document.removeEventListener('visibilitychange',handlePlayerVisibility);stopTargetGame();}
+function cleanupListeners(){if(roomRef)roomRef.off();clearInterval(timerInterval);clearInterval(studentTimerInt);window.speechSynthesis&&window.speechSynthesis.cancel();document.removeEventListener('visibilitychange',handlePlayerVisibility);stopTargetGame();stopTestGame();}
 
 /* ══════════════ DICE — the board ══════════════
    Unlike every other game here there is no question, no shared countdown and
@@ -6987,6 +7720,11 @@ window.addEventListener('load',()=>{
     // start screen. An unknown game id leaves the learner on the picker rather
     // than on an empty card.
     const game=params.get('game');
+    // A section's All and its Test Yourself live on one pill each, retargeted
+    // by whichever skill chip is showing — so a link to one has to put the
+    // picker on that skill before the pill can be found at all.
+    const scoped=game&&game.match(/^(all|test):(.+)$/);
+    if(scoped) filterBanks('solo',scoped[2]);
     if(game&&soloTabFor(game)&&UNSHAREABLE_GAMES.indexOf(game)<0){
       const q=parseInt(params.get('q'),10);
       if(q>=1&&q<=50) document.getElementById('solo-q-limit').value=q;

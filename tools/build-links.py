@@ -80,6 +80,25 @@ GAMES = [
     ('all-games', 'all', 'All Games', 'A mix of every game.'),
 ]
 
+# Test Yourself: one adaptive test per skill, plus a whole-app placement test.
+# The game id carries the skill, the same way a section's All pill does.
+TEST_BLURB = ('10 rounds of 3 questions, drawn from every %s game. '
+              'It gets harder or easier as you go.')
+TESTS = [
+    ('test-yourself',   '*',           'Test Yourself', 'every'),
+    ('test-letters',    'letters',     'Test Yourself — Letters & Sounds', 'letters and sounds'),
+    ('test-vocabulary', 'vocab',       'Test Yourself — Vocabulary', 'vocabulary'),
+    ('test-listening',  'listening',   'Test Yourself — Listening', 'listening'),
+    ('test-speaking',   'speaking',    'Test Yourself — Speaking', 'speaking'),
+    ('test-reading',    'reading',     'Test Yourself — Reading', 'reading'),
+    ('test-writing',    'writing',     'Test Yourself — Writing', 'writing'),
+    ('test-grammar',    'grammar',     'Test Yourself — Grammar', 'grammar'),
+    ('test-numeracy',   'numeracy',    'Test Yourself — Numbers', 'numbers'),
+    ('test-translation','translation', 'Test Yourself — Translation', 'translation'),
+    ('test-everyday',   'everyday',    'Test Yourself — Everyday English', 'everyday English'),
+]
+GAMES += [(slug, 'test:' + sec, title, TEST_BLURB % what) for slug, sec, title, what in TESTS]
+
 TAIL = ' Free English practice for adult learners. No sign-up.'
 
 PAGE = """<!DOCTYPE html>
