@@ -1253,7 +1253,13 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
    the round went before a single word is read, and the arrow says which way
    the test just moved. Everything below the dots is optional reading. */
 .test-card{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:12px;padding:10px 20px 30px;text-align:center;}
+  gap:12px;padding:10px 20px 30px;text-align:center;min-height:0;overflow-y:auto;}
+/* Centred while it fits, and scrollable when it does not — sideways, and on a
+   narrow screen where the report lines wrap, the card is taller than the
+   window and plain `center` pushes the ends out of reach in both directions.
+   `safe` falls back to `center` where it is not understood, which is the
+   behaviour these screens have now. */
+@supports (justify-content:safe center){ .test-card{justify-content:safe center;} }
 .test-round-no{font-family:'Fredoka One',cursive;font-size:1.5rem;color:var(--gold);
   letter-spacing:1px;}
 .test-dots{display:flex;gap:16px;font-size:2.6rem;line-height:1;margin:2px 0 4px;}
@@ -1305,6 +1311,25 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   line-height:1;color:var(--gold);text-shadow:0 0 26px rgba(245,166,35,.45);}
 .test-total-lbl{font-family:'Fredoka One',cursive;font-size:1rem;letter-spacing:3px;
   text-transform:uppercase;color:var(--muted);}
+/* The two-line report. Quieter than the total above it — this is what to do
+   next, not the result — but each line names one skill, in the same words the
+   skill chips use, so a learner can find it in the picker afterwards. */
+.test-report{display:none;flex-direction:column;gap:8px;width:100%;max-width:420px;
+  margin-top:2px;}
+#screen-test-round[data-state="solo-final"] .test-report:not(:empty),
+#screen-test-round[data-state="class-final"] .test-report:not(:empty){display:flex;}
+.test-rep-row{display:flex;align-items:center;gap:10px;text-align:left;
+  padding:10px 14px;border-radius:var(--radius);
+  background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.10);}
+.test-rep-icon{font-size:1.35rem;line-height:1;flex:0 0 auto;}
+.test-rep-body{display:flex;flex-direction:column;gap:1px;min-width:0;}
+.test-rep-lbl{font-size:.7rem;font-weight:800;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);}
+.test-rep-val{font-family:'Fredoka One',cursive;font-size:1.05rem;line-height:1.25;}
+.test-rep-row.good{border-color:rgba(0,200,83,.40);background:rgba(0,200,83,.09);}
+.test-rep-row.good .test-rep-lbl{color:var(--green);}
+.test-rep-row.work{border-color:rgba(245,166,35,.40);background:rgba(245,166,35,.09);}
+.test-rep-row.work .test-rep-lbl{color:var(--gold);}
 :root[data-app-h~="lt620"] .test-cheer{font-size:2.6rem;}
 :root[data-app-h~="lt500"] .test-cheer{display:none!important;}
 #screen-test-round[data-state="round"] .round-only,
@@ -1313,7 +1338,11 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .test-wait{font-size:.9rem;color:var(--muted);}
 /* Short screens: the dots and the moving line are what must survive, so the
    running total and the round's points go first. */
-:root[data-app-h~="lt620"] .test-card{gap:8px;}
+:root[data-app-h~="lt620"] .test-card{gap:8px;padding-bottom:16px;}
+:root[data-app-h~="lt620"] .test-total-num{font-size:clamp(2.6rem,13vw,3.4rem);}
+:root[data-app-h~="lt620"] .test-move{padding:10px 16px;}
+:root[data-app-h~="lt620"] .test-rep-row{padding:8px 12px;}
+:root[data-app-h~="lt620"] .test-report{gap:6px;}
 :root[data-app-h~="lt620"] .test-dots{font-size:2.1rem;gap:13px;}
 :root[data-app-h~="lt500"] .test-total{display:none;}
 :root[data-app-h~="lt500"] .test-round-pts{font-size:.9rem;}
@@ -2001,6 +2030,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
     <div class="test-round-pts" id="test-round-pts"></div>
     <div class="test-total" id="test-total"></div>
     <div class="test-move" id="test-move"></div>
+    <div class="test-report" id="test-report"></div>
     <div class="test-acts round-only">
       <button class="btn btn-teal btn-lg" onclick="testNextRound()">Next round →</button>
     </div>
@@ -5945,7 +5975,7 @@ let testPlayersListener=null;
 function newTestGame(mode,type){
   return {mode:mode, type:type, ladder:ladderFor(type)||[],
           level:0, round:1, tally:[], roundPts:0, lastMove:0,
-          secs:TIMER_DURATION};
+          bySkill:{}, secs:TIMER_DURATION};
 }
 function testStep(){ return testStepAt(TEST.ladder,TEST.level); }
 
@@ -5985,6 +6015,60 @@ function testRecord(tier,pts){
   if(!testActive()) return;
   TEST.tally.push(tier);
   TEST.roundPts+=pts;
+  // Also keep the run's answers by skill, for the report at the end. A rung is
+  // a game, and every game belongs to one skill (GAME_INFO), so a ladder that
+  // climbs through several games crosses several skills — the whole-app test
+  // most of all. A part-right spelling is half a mistake: enough to say the
+  // skill needs work, not enough to be counted as wrong outright.
+  const sk=(GAME_INFO[testStep().type]||{}).skill;
+  if(!sk) return;
+  const b=TEST.bySkill[sk]||(TEST.bySkill[sk]={asked:0,wrong:0});
+  b.asked++;
+  if(tier==='wrong') b.wrong++;
+  else if(tier==='partial') b.wrong+=0.5;
+}
+
+/* Two lines for the end of a run: what went well, and what to work on.
+   Both name a skill rather than a game, because a game is a way of practising
+   and a skill is the thing being learned — "Numbers" is what a learner and
+   their teacher can act on; "Tap the number word" is not.
+   With one skill in the run there is nothing to compare, so it gets one line:
+   praise if it was clean, work if it was not. Claiming a learner is strong at
+   the only thing they got wrong would be worse than saying nothing. */
+const TEST_REPORT_MAX=3;
+function testReport(){
+  const rows=Object.keys(TEST.bySkill).map(function(id){
+    const b=TEST.bySkill[id];
+    return {label:(SKILL_ACCENT[id]||SKILL_ACCENT._).label,
+            asked:b.asked, wrong:b.wrong, acc:(b.asked-b.wrong)/b.asked};
+  }).filter(function(r){ return r.asked>0; });
+  if(!rows.length) return null;
+  if(rows.length===1){
+    const r=rows[0];
+    return r.wrong===0?{strong:[r.label],weak:null}:{strong:[],weak:r.label};
+  }
+  // Everything answered without a mistake, or — if nothing was clean — the one
+  // that came closest, so long as it was not simply the least bad of a bad run.
+  let strong=rows.filter(function(r){ return r.wrong===0; })
+                 .sort(function(a,b){ return b.asked-a.asked; })
+                 .slice(0,TEST_REPORT_MAX).map(function(r){ return r.label; });
+  if(!strong.length){
+    const best=rows.slice().sort(function(a,b){ return b.acc-a.acc||a.wrong-b.wrong; })[0];
+    if(best.acc>=0.5) strong=[best.label];
+  }
+  const worst=rows.slice().sort(function(a,b){ return b.wrong-a.wrong||a.acc-b.acc; })[0];
+  const weak=(worst.wrong>0&&strong.indexOf(worst.label)<0)?worst.label:null;
+  return {strong:strong, weak:weak};
+}
+function testReportRow(kind,icon,label,value){
+  const row=document.createElement('div');
+  row.className='test-rep-row '+kind;
+  row.innerHTML='<span class="test-rep-icon"></span><span class="test-rep-body">'
+    +'<span class="test-rep-lbl"></span><span class="test-rep-val"></span></span>';
+  row.querySelector('.test-rep-icon').textContent=icon;
+  row.querySelector('.test-rep-lbl').textContent=label;
+  row.querySelector('.test-rep-val').textContent=value;
+  return row;
 }
 
 /* The round is over: score it, move the ladder, and say so.
@@ -6054,6 +6138,15 @@ function showTestCard(score,final){
     mv.querySelector('.test-move-lbl').textContent=
       TEST.lastMove>0?'↑ Harder now':TEST.lastMove<0?'↓ A bit easier':'→ Same level';
     mv.querySelector('.test-move-step').textContent=step.label;
+  }
+  const rbox=document.getElementById('test-report');
+  rbox.innerHTML='';
+  const rep=final?testReport():null;
+  if(rep){
+    if(rep.strong.length)
+      rbox.appendChild(testReportRow('good','💪','Strong in',rep.strong.join(', ')));
+    if(rep.weak)
+      rbox.appendChild(testReportRow('work','📌','Need practice in',rep.weak));
   }
   showScreen('screen-test-round');
   if(final) playWinnerFanfare();
