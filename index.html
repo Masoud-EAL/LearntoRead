@@ -84,6 +84,35 @@
      gesture but leaves pinch-zoom alone, which a learner with low vision may
      genuinely need, and unlike user-scalable=no iOS Safari honours it. */
   html, body { touch-action: manipulation; }
+  /* touch-action is not inherited, and the older Android WebViews a fair few
+     learners are on do not walk up to <body> for it. Naming the elements that
+     get tapped is the only way the rule actually reaches them there. */
+  button, a, select, input, .alpha-card, .tappable, [onclick] { touch-action: manipulation; }
+
+  /* ── A TAP MUST LOOK LIKE IT LANDED ──
+     Every control on this page said "I have been pressed" with :hover alone,
+     and :hover never fires on a phone. So a button that was working perfectly
+     looked identical before and after the tap — and a learner who sees nothing
+     happen taps it again, and again. That is the whole of the "I have to tap
+     it a few times" complaint for taps that were in fact registering.
+
+     These are the same states in press form. They are plain CSS, so they
+     answer a tap from the first paint — including during the second or two at
+     the start when the page is drawn but its script has not run yet, which is
+     exactly when a learner is most likely to be tapping into silence.
+     transition-duration:0s makes the press instant; the release still eases
+     back out through each element's own transition. */
+  button, a, select, .alpha-card, .tappable, [onclick] {
+    -webkit-tap-highlight-color: rgba(74,144,217,0.18);
+  }
+  .nav-tab:active, .level-tab:active, .menu-item:active, .menu-dots-btn:active,
+  .share-btn:active, .menu-back:active, .alpha-card:active, .tappable:active,
+  .teacher-game-btn:active, .wp-nav-btn:not(:disabled):active,
+  .practice-back:active, .spell-bank-tile:active {
+    transform: scale(0.96);
+    filter: brightness(0.94);
+    transition-duration: 0s;
+  }
 
   body {
     font-family: 'Nunito', sans-serif;
@@ -483,12 +512,17 @@
   @media (max-width:480px) {
     header { padding:18px 20px 6px; }
     .top-nav { gap:6px; margin-top:10px; }
-    .nav-tab { font-size:0.85rem; padding:6px 14px; }
+    /* The narrow-screen sizes shrank these to 32px tall. Trimming the text was
+       right — six section names have to fit — but the target underneath it
+       does not have to shrink with the label, and at 32px it was being missed.
+       The padding keeps the pills their old width; min-height buys the rest of
+       the thumb back without another row of chrome. */
+    .nav-tab { font-size:0.85rem; padding:6px 14px; min-height:44px; }
     .tile { width:58px; height:68px; font-size:2.1rem; }
     .alpha-grid { grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); }
     .alpha-letter { font-size:2rem; }
     .letter-block-letter { font-size:2.4rem; }
-    .level-tab { font-size:0.85rem; padding:8px 16px; }
+    .level-tab { font-size:0.85rem; padding:8px 16px; min-height:44px; }
   }
 
   /* ════════════════════════════════
@@ -1173,15 +1207,26 @@
   .lang-select:focus { border-color: var(--accent2); }
 
   /* ── TEACHER GAME BUTTON ── */
+  /* An inline <a> ignores min-height and its vertical padding does not grow
+     the line box, so this pill measured 32px tall — under the 44px a thumb
+     needs, and it sat 18px off the bottom of the screen, inside the strip
+     both iOS and Android gesture navigation claim for themselves. A tap that
+     lands there is eaten by the system, not by the page, which is why it so
+     often took two. inline-flex makes the padding count, and the extra height
+     plus the raised offset lifts the whole target clear of that strip. */
   .teacher-game-btn {
-    position: fixed; bottom: 18px; right: 18px; z-index: 200;
+    position: fixed; bottom: 26px; right: 18px; z-index: 200;
+    display: inline-flex; align-items: center; min-height: 44px;
     background: rgba(30,20,60,0.82); color: #a090cc;
     border: 1px solid rgba(160,140,220,0.25); border-radius: 50px;
-    padding: 7px 16px; font-size: 0.75rem; font-weight: 700;
+    padding: 7px 18px; font-size: 0.85rem; font-weight: 700;
     cursor: pointer; text-decoration: none; letter-spacing: 0.3px;
     backdrop-filter: blur(8px); transition: all 0.2s; opacity: 0.7;
   }
   .teacher-game-btn:hover { opacity: 1; background: rgba(50,30,100,0.92); color: #c8b8ff; border-color: rgba(160,140,220,0.5); }
+  /* On a phone the pill never gets a hover, so the press is the only chance it
+     has to acknowledge the tap. */
+  .teacher-game-btn:active { opacity: 1; background: rgba(50,30,100,0.92); color: #c8b8ff; }
 
   /* ── MENU (three-dots navigation) ── */
   .menu-dots-btn {

@@ -49,6 +49,22 @@ html,body{touch-action:manipulation;}
    out from the ancestor chain, so this is belt and braces for the elements
    that get tapped fastest. */
 button,.coin,.mc-choice,.q-type-tab,.form-slot,.role-card,a,input,select{touch-action:manipulation;}
+/* ── A TAP MUST LOOK LIKE IT LANDED ──
+   Most controls here announced a press with :hover, which never fires on a
+   phone, so on the device nearly every learner is holding they looked exactly
+   the same before and after the tap. Seeing nothing happen, a learner taps
+   again — which is the whole of the "I have to tap it a few times" complaint
+   for taps that were in fact registering. These are the same states in press
+   form, and being plain CSS they answer a tap from the first paint, before
+   this page's script has run.
+   transition-duration:0s makes the press immediate — .btn otherwise animates
+   `all` over .18s, long enough for a quick tap to end before the feedback
+   arrives. The release still eases back out. */
+button,a,.role-card,.coin,.mc-choice,.q-type-tab,.section-chip,.form-slot,.word-tile{
+  -webkit-tap-highlight-color:rgba(255,255,255,.16);}
+.btn:not(:disabled):active,.role-card:active,.section-chip:active,.q-type-tab:active,
+.music-btn:active,.back-btn:active,#lb-skip:active,.tgt-chip:active{
+  transform:scale(.95);filter:brightness(1.18);transition-duration:0s;}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;min-height:var(--app-h,100dvh);overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 20% 20%,rgba(124,77,255,.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(233,69,96,.10) 0%,transparent 60%);}
 body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(1px 1px at 15% 25%,rgba(255,255,255,.5) 0%,transparent 100%),radial-gradient(1px 1px at 75% 10%,rgba(255,255,255,.4) 0%,transparent 100%),radial-gradient(2px 2px at 40% 70%,rgba(255,255,255,.3) 0%,transparent 100%),radial-gradient(1px 1px at 90% 40%,rgba(255,255,255,.4) 0%,transparent 100%),radial-gradient(1px 1px at 5% 60%,rgba(255,255,255,.5) 0%,transparent 100%);}
@@ -61,7 +77,10 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .logo-bar span{color:var(--gold);}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:'Fredoka One',cursive;font-size:1.1rem;padding:14px 28px;border-radius:50px;border:none;cursor:pointer;transition:all .18s;text-decoration:none;letter-spacing:.5px;}
 .btn:hover{transform:translateY(-3px);filter:brightness(1.1);}
-.btn:active{transform:translateY(0);}
+/* The press state lives with the other touch feedback near the top of this
+   sheet. It used to be `transform:translateY(0)` here, which only undid the
+   hover lift — on a phone, where there is no hover to undo, it changed
+   nothing at all and the button gave no sign it had been pressed. */
 .btn-accent{background:var(--accent);color:white;box-shadow:0 6px 24px rgba(233,69,96,.4);}
 .btn-gold{background:var(--gold);color:#1a0a00;box-shadow:0 6px 24px rgba(245,166,35,.4);}
 .btn-teal{background:var(--teal);color:white;box-shadow:0 6px 24px rgba(15,155,142,.4);}
@@ -933,7 +952,10 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .editor-bank-name{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--teal);flex:1;}
 
 /* MISC */
-.music-btn,.back-btn{position:fixed;top:12px;z-index:100;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:7px 14px;font-size:.8rem;cursor:pointer;color:var(--muted);text-decoration:none;transition:all .15s;}
+/* inline-flex and the min-height are what make these 44px targets rather than
+   the 31px the padding alone gave them — an <a> is inline by default, so its
+   vertical padding never grew the box at all. */
+.music-btn,.back-btn{position:fixed;top:12px;z-index:100;display:inline-flex;align-items:center;min-height:44px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:7px 16px;font-size:.85rem;cursor:pointer;color:var(--muted);text-decoration:none;transition:all .15s;}
 .music-btn:hover,.back-btn:hover{background:rgba(255,255,255,.12);color:var(--text);}
 .music-btn{right:14px;}
 .back-btn{left:14px;}
@@ -2205,14 +2227,21 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 
 <div class="toast" id="toast"></div>
 
-<!-- These four used to sit in <head>, where ~300KB of third-party JS blocked
-     the parser before anything painted — including for solo practice, which
-     never touches Firebase. They run here instead, immediately before the
-     inline script that calls firebase.initializeApp, so load order is
-     unchanged and only the blocking is gone. -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<!-- Firebase used to sit in <head>, where it blocked the parser before anything
+     painted; moving it down here stopped it blocking the *paint*, but it still
+     blocked the script below, which is the part that makes the buttons work.
+     The result was the worst of both: the home screen drew in full, looked
+     ready, and did nothing at all for as long as gstatic.com took to hand over
+     ~700KB — and if gstatic was unreachable, firebase.initializeApp threw at
+     the top of that script and every control on the page stayed dead for good.
+     Solo practice, which is most of the use of this page, never touches
+     Firebase at all.
+     `defer` takes it off the critical path entirely: it downloads alongside
+     the parse and runs after the script below, which now brings it up lazily
+     through ensureFirebase() when a room is actually created or joined. -->
+<script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="vendor/qrcode.min.js"></script>
 
 <!-- Word families, grapheme→recording maps and voice picking, shared with index.html -->
@@ -2221,23 +2250,58 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 <script>
 /* FIREBASE */
 const firebaseConfig={apiKey:"AIzaSyARGfXd7nArpjS87r_TOiujIy8pjHpBBoA",authDomain:"wordlink-game-d1f97.firebaseapp.com",databaseURL:"https://wordlink-game-d1f97-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"wordlink-game-d1f97",storageBucket:"wordlink-game-d1f97.firebasestorage.app",messagingSenderId:"126959375644",appId:"1:126959375644:web:f2a39eb6057426382b96d9"};
-firebase.initializeApp(firebaseConfig);
-const db=firebase.database();
+/* The SDK is deferred, so it has not run yet at this point and none of the
+   set-up below can happen inline. It is done on demand instead, the first time
+   something actually needs the network — which is never, for solo practice. */
+let db=null;
 
 /* AUTH — every visitor (teacher or student) signs in anonymously so Firebase
    rules can tell who created what (teacher's own question banks, room
    ownership for deletion) without any login screen. */
 let authUid=null;
-const authReady=new Promise(resolve=>{
-  firebase.auth().onAuthStateChanged(user=>{ if(user){ authUid=user.uid; resolve(user.uid); } });
-});
-firebase.auth().signInAnonymously().catch(err=>console.error('Anonymous auth failed:',err));
 
 /* SERVER TIME — .info/serverTimeOffset is kept in sync by the SDK, so
    serverNow() gives an accurate "now" even when a device's clock is wrong. */
 let serverTimeOffset=0;
-db.ref('.info/serverTimeOffset').on('value',snap=>{ serverTimeOffset=snap.val()||0; });
 function serverNow(){ return Date.now()+serverTimeOffset; }
+
+/* Deferred scripts always finish before DOMContentLoaded, so by then either
+   window.firebase is there or the download failed. */
+function domReady(){
+  return document.readyState==='loading'
+    ? new Promise(r=>document.addEventListener('DOMContentLoaded',r,{once:true}))
+    : Promise.resolve();
+}
+
+/* Brings Firebase up once, and resolves with the anonymous uid. It *rejects*
+   when the SDK could not be fetched rather than hanging, so a learner with no
+   connection is told the class game is unavailable instead of being left on a
+   screen that never fills in. Solo practice does not go through here. */
+let firebasePromise=null;
+function ensureFirebase(){
+  if(firebasePromise) return firebasePromise;
+  firebasePromise=domReady().then(()=>{
+    if(!window.firebase) throw new Error('Firebase SDK unavailable');
+    firebase.initializeApp(firebaseConfig);
+    db=firebase.database();
+    db.ref('.info/serverTimeOffset').on('value',snap=>{ serverTimeOffset=snap.val()||0; });
+    firebase.auth().signInAnonymously().catch(err=>console.error('Anonymous auth failed:',err));
+    return new Promise(resolve=>{
+      firebase.auth().onAuthStateChanged(user=>{ if(user){ authUid=user.uid; resolve(user.uid); } });
+    });
+  });
+  return firebasePromise;
+}
+
+/* Kept as the name the multiplayer paths already call, now a function: the
+   promise cannot exist before the SDK does. */
+function authReady(){ return ensureFirebase(); }
+
+/* One place to say "this needs the internet and there isn't any". */
+function onlineOnlyFailed(err){
+  console.warn('Firebase unavailable:',err);
+  showToast('No internet — class games need a connection. Practice still works.');
+}
 
 function banksRef(){ return db.ref('customBanks/'+authUid); }
 
@@ -4184,7 +4248,7 @@ function endHostedRoom(){
 }
 
 /* TEACHER FLOW */
-function goTeacher(){ role='teacher'; document.getElementById('music-btn').style.display=''; buildBank(); authReady.then(()=>{ loadCustomBanks(); createRoom(); }); }
+function goTeacher(){ role='teacher'; document.getElementById('music-btn').style.display=''; buildBank(); authReady().then(()=>{ loadCustomBanks(); createRoom(); }).catch(onlineOnlyFailed); }
 function makeCode(){ const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let r=''; for(let i=0;i<4;i++) r+=c[Math.floor(Math.random()*c.length)]; return r; }
 
 // Anyone can garbage-collect a room, but only if it's genuinely stale — the
@@ -4997,7 +5061,7 @@ function joinGame(){
   if(code.length!==4){err.textContent='Enter a 4-letter room code.';return;}
   if(!name){err.textContent='Enter your name.';return;}
   err.textContent='';
-  authReady.then(()=>db.ref('rooms/'+code).once('value',snap=>{
+  authReady().then(()=>db.ref('rooms/'+code).once('value',snap=>{
     if(!snap.exists()){err.textContent='Room not found.';return;}
     if(snap.val().status==='finished'){err.textContent='This game has already finished.';return;}
     if(snap.val().status==='ended'){err.textContent='This game has ended.';return;}
@@ -5032,7 +5096,7 @@ function joinGame(){
     setClassGameLock(true);
     showScreen('screen-student-lobby');
     listenForGameState();
-  }));
+  })).catch(()=>{ err.textContent='No internet — you need a connection to join a class game.'; });
 }
 
 function listenForGameState(){
@@ -5280,7 +5344,10 @@ function initSolo(){
   // Solo plays both the lobby loop and the game loop, so the learner keeps the
   // Music On/Off chip — hiding it left them with no way to silence it.
   document.getElementById('music-btn').style.display='';
-  buildBank(); authReady.then(()=>loadCustomBanks());
+  // Custom banks are the one part of solo that lives on the network. Its
+  // failure is not the learner's problem — the built-in games are all there,
+  // so this stays quiet and simply leaves the Custom tab empty.
+  buildBank(); authReady().then(()=>loadCustomBanks()).catch(()=>{});
   showScreen('screen-solo-setup');
   updateSoloCountDisplay();
 }
@@ -7079,7 +7146,7 @@ function loadCustomBanks(cb){
 function showEditor(){
   buildBank();
   showScreen('screen-editor');
-  authReady.then(()=>loadCustomBanks(renderEditorBankSelector));
+  authReady().then(()=>loadCustomBanks(renderEditorBankSelector)).catch(onlineOnlyFailed);
 }
 
 function renderEditorBankSelector(){
