@@ -662,6 +662,7 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
    (29). Measured, not guessed: at 64 a sideways phone put the Submit button
    through it. */
 #screen-student-answer.has-exit{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px));}
+
 /* Flexible: shrink first, then scroll within themselves. min-height:0 is what
    actually lets a flex child shrink below its content. Both take their natural
    height and shrink proportionally only when the total is too tall — neither
@@ -782,6 +783,20 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
   #screen-student-answer > #hint-wrap{flex:1 1 46%;max-width:52%;align-self:stretch;}
   #screen-student-answer > .submit-btn{flex:0 0 100%;max-width:420px;margin-top:2px;}
   #screen-student-answer > .submitted-msg{flex:0 0 100%;text-align:center;}
+  /* Sideways the rows wrap, so nothing gives way vertically: a long prompt
+     plus the hint line can push Submit to within a few pixels of the floor on
+     its own, and reserving 72px there does not squeeze the question — it puts
+     Submit through the exit. So sideways the exit only leaves the flow for the
+     rounds that have the room, which are exactly the rounds this is for: four
+     answers to tap, and a third of the screen empty underneath them. Every
+     other sideways round keeps the layout it has always had. */
+  #screen-student-answer > #solo-back-btn{position:static;transform:none;
+    flex:0 0 100%;text-align:center;margin-top:4px;}
+  #screen-student-answer.has-exit{padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));}
+  #screen-student-answer[data-qtype="mc"] > #solo-back-btn{position:absolute;left:50%;
+    transform:translateX(-50%);bottom:calc(8px + env(safe-area-inset-bottom,0px));margin-top:0;}
+  #screen-student-answer[data-qtype="mc"].has-exit{
+    padding-bottom:calc(72px + env(safe-area-inset-bottom,0px));}
   /* 46, not 56: sideways the column still carries Submit and the solo Back
      link under the face, and 56 spent the difference on overflow. */
   #screen-student-answer #clock-svg{width:min(38vw,calc(var(--vh,1vh)*46),240px);height:min(38vw,calc(var(--vh,1vh)*46),240px);}
@@ -1267,6 +1282,31 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .test-move.level .test-move-step{font-family:'Fredoka One',cursive;font-size:1.25rem;
   font-weight:400;}
 .test-acts{display:none;flex-direction:column;align-items:center;gap:10px;margin-top:8px;}
+/* ── the end of a test ──
+   Between rounds the card is about the round just played. At the end it is
+   about the run as a whole, so the same elements are re-weighted rather than
+   swapped for a second layout: the cheer appears, the total becomes the
+   headline, and the last round's own three dots stand down — on their own,
+   under a grand total and with nothing saying which round they belong to,
+   they read as the score. */
+.test-cheer{display:none;font-size:3.4rem;line-height:1;}
+#screen-test-round[data-state="solo-final"] .test-cheer,
+#screen-test-round[data-state="class-final"] .test-cheer{display:block;}
+#screen-test-round[data-state="solo-final"] .test-dots,
+#screen-test-round[data-state="class-final"] .test-dots,
+#screen-test-round[data-state="solo-final"] .test-round-score,
+#screen-test-round[data-state="class-final"] .test-round-score,
+#screen-test-round[data-state="solo-final"] .test-round-pts,
+#screen-test-round[data-state="class-final"] .test-round-pts{display:none;}
+#screen-test-round[data-state="solo-final"] .test-total,
+#screen-test-round[data-state="class-final"] .test-total{display:flex;flex-direction:column;
+  align-items:center;gap:2px;color:var(--text);margin:2px 0 4px;}
+.test-total-num{font-family:'Fredoka One',cursive;font-size:clamp(3.4rem,17vw,5rem);
+  line-height:1;color:var(--gold);text-shadow:0 0 26px rgba(245,166,35,.45);}
+.test-total-lbl{font-family:'Fredoka One',cursive;font-size:1rem;letter-spacing:3px;
+  text-transform:uppercase;color:var(--muted);}
+:root[data-app-h~="lt620"] .test-cheer{font-size:2.6rem;}
+:root[data-app-h~="lt500"] .test-cheer{display:none!important;}
 #screen-test-round[data-state="round"] .round-only,
 #screen-test-round[data-state="solo-final"] .solo-only,
 #screen-test-round[data-state="class-final"] .class-only{display:flex;}
@@ -1951,6 +1991,10 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 <div class="screen" id="screen-test-round" data-state="round">
   <div class="logo-bar">WordLink <span>🎯</span> Test Yourself</div>
   <div class="test-card">
+    <!-- Finishing ten rounds is the achievement, so this is not conditional on
+         the score. Someone who worked through thirty questions in a language
+         they are still learning has done the thing the test asked of them. -->
+    <div class="test-cheer">🎉</div>
     <div class="test-round-no" id="test-round-no">Round 1 of 10</div>
     <div class="test-dots" id="test-dots"></div>
     <div class="test-round-score" id="test-round-score"></div>
@@ -1961,8 +2005,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       <button class="btn btn-teal btn-lg" onclick="testNextRound()">Next round →</button>
     </div>
     <div class="test-acts solo-only">
-      <button class="btn btn-gold btn-lg" id="test-practise-btn" onclick="testPractise()">▶ Practise this</button>
-      <button class="btn btn-ghost btn-sm" onclick="testAgain()">🔄 Take the test again</button>
+      <button class="btn btn-gold btn-lg" onclick="testAgain()">🔄 Take the test again</button>
       <button class="btn btn-ghost btn-sm" onclick="quitTestGame()">← Choose another game</button>
     </div>
     <div class="test-acts class-only">
@@ -5992,7 +6035,13 @@ function showTestCard(score,final){
   const whole=score===Math.floor(score)?String(score):score.toFixed(1);
   document.getElementById('test-round-score').textContent=whole+' of '+TEST_PER_ROUND+' right';
   document.getElementById('test-round-pts').textContent='+'+TEST.roundPts+' points';
-  document.getElementById('test-total').textContent='Your total: '+myScore+' pts';
+  // At the end the total is the headline — the biggest thing on the screen and
+  // the thing the learner came away with. Between rounds it is a running note
+  // under the round that just finished.
+  const tot=document.getElementById('test-total');
+  if(final) tot.innerHTML='<span class="test-total-num"></span><span class="test-total-lbl">points</span>';
+  else tot.textContent='Your total: '+myScore+' pts';
+  if(final) tot.querySelector('.test-total-num').textContent=myScore;
   const mv=document.getElementById('test-move');
   if(final){
     mv.className='test-move level';
@@ -6006,22 +6055,11 @@ function showTestCard(score,final){
       TEST.lastMove>0?'↑ Harder now':TEST.lastMove<0?'↓ A bit easier':'→ Same level';
     mv.querySelector('.test-move-step').textContent=step.label;
   }
-  const pb=document.getElementById('test-practise-btn');
-  if(pb) pb.textContent='▶ Practise: '+step.label;
   showScreen('screen-test-round');
   if(final) playWinnerFanfare();
   else if(score>=1.5) playCorrectJingle();
 }
 
-/* The end of a solo test: go and play the game it settled on. That rung is the
-   whole point of having sat the test. */
-function testPractise(){
-  if(!TEST) return;
-  const type=testStep().type;
-  stopTestGame();
-  soloMode=true;
-  if(!openSoloLaunch(type)) showSoloSetup();
-}
 function testAgain(){
   if(!TEST) return;
   const type=TEST.type;
