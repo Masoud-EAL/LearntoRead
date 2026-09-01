@@ -28,3 +28,10 @@ jobs:
           path: .
       - id: deploy
         uses: actions/deploy-pages@v4
+      - name: Ping IndexNow (Bing/Yandex/Seznam) with sitemap URLs
+        run: |
+          key="66529f46ae3b827aaffc07bd282a60e42b56202bf1ea86a118c826e225ef848b"
+          urls=$(grep -oE '<loc>[^<]+</loc>' sitemap.xml | sed -E 's#</?loc>##g' | python3 -c "import json,sys; print(json.dumps(sys.stdin.read().split()))")
+          curl -s -o /dev/null -w "IndexNow response: %{http_code}\n" -X POST "https://api.indexnow.org/indexnow" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d "{\"host\":\"wordlink.au\",\"key\":\"$key\",\"keyLocation\":\"https://wordlink.au/$key.txt\",\"urlList\":$urls}"
