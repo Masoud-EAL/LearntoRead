@@ -187,11 +187,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://wordlink.au/first-sounds</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://wordlink.au/odd-one-out</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
