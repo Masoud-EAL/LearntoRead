@@ -683,6 +683,9 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
    on every other screen and the furthest point on this one from Submit.
    Fixed, but still a child of the screen, so it appears and disappears with
    it and no reserved height has to be kept in step with it.
+   That corner is clear only while the keyboard is down: with it up, iOS
+   Safari slides the page under its toolbar and this band goes behind the
+   glass. syncSoloExit takes the chip off the screen for exactly that.
    Both chips claim that corner, so while this one is up it stands in for the
    site-wide one (syncSiteBack). Going back to the categories is the exit a
    learner mid-question wants, and the site link is one tap further on.
@@ -4233,7 +4236,7 @@ function goStudentHome(){ document.getElementById('music-btn').style.display='no
 /* Two unrelated reasons to take the site-wide chip away, and one corner it
    sits in: a class game locks it, and a practice run parks its own Back
    there. Both go through here so neither can hand back the other's chip. */
-let classGameLock=false,soloExitUp=false;
+let classGameLock=false,soloExitUp=false,soloExitTyping=false;
 function syncSiteBack(){
   const b=document.querySelector('.back-btn');
   if(b) b.style.display=(classGameLock||soloExitUp)?'none':'';
@@ -6005,12 +6008,33 @@ function quitSoloGame(){
 }
 /* Show or hide the way out of a practice run. It shares its corner with the
    site-wide chip, which has to stand down while it is up, so the two move
-   together: one function rather than a style set in six places. */
+   together: one function rather than a style set in six places. A new
+   question always starts with the keyboard down. */
 function setSoloExit(on){
-  document.getElementById('solo-back-btn').style.display=on?'':'none';
   soloExitUp=!!on;
+  soloExitTyping=false;
+  syncSoloExit();
+}
+function syncSoloExit(){
+  document.getElementById('solo-back-btn').style.display=(soloExitUp&&!soloExitTyping)?'':'none';
   syncSiteBack();
 }
+/* Typing is a state of its own on iOS. Safari there does not shrink the page
+   for the keyboard, it slides the page up under a translucent toolbar, and
+   the top of the page goes under with it. Measured off the phone this was
+   reported from: about 70px of the page sat behind that bar, which is the
+   exit, the music chip and the countdown, all of them blurred and none of
+   them taking a tap, since a tap in that strip belongs to Safari. A control
+   that is on screen but dead is worse than one that is not there, so the exit
+   leaves while the keyboard is up and comes back when it closes. It also
+   means that during the one thing a learner does at the bottom of this
+   screen, typing an answer and pressing Submit, there is no exit on the
+   screen at all to catch a thumb. */
+(function(){
+  const ans=document.getElementById('student-ans-input');
+  ans.addEventListener('focus',()=>{ soloExitTyping=true; syncSoloExit(); });
+  ans.addEventListener('blur',()=>{ soloExitTyping=false; syncSoloExit(); });
+})();
 /* One exit, two kinds of run behind it. A test carries state of its own (the
    ladder, the round tally, a watcher on a class test) and quitTestGame is what
    clears it; quitSoloGame alone would leave a finished run's TEST standing and
