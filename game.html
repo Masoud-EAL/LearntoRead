@@ -63,7 +63,7 @@ button,.coin,.mc-choice,.q-type-tab,.form-slot,.role-card,a,input,select{touch-a
 button,a,.role-card,.coin,.mc-choice,.q-type-tab,.section-chip,.form-slot,.word-tile{
   -webkit-tap-highlight-color:rgba(255,255,255,.16);}
 .btn:not(:disabled):active,.role-card:active,.section-chip:active,.q-type-tab:active,
-.music-btn:active,.back-btn:active,#lb-skip:active,.tgt-chip:active{
+.music-btn:active,.back-btn:active,#solo-back-btn:active,#lb-skip:active,.tgt-chip:active{
   transform:scale(.95);filter:brightness(1.18);transition-duration:0s;}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;min-height:var(--app-h,100dvh);overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 20% 20%,rgba(124,77,255,.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(233,69,96,.10) 0%,transparent 60%);}
@@ -664,23 +664,24 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 #screen-student-answer > .student-timer,
 #screen-student-answer > .submit-btn,
 #screen-student-answer > .submitted-msg{flex:0 0 auto;}
-/* Leaving the game sat one gap under the last row of answers, and learners
-   reaching for the bottom-left option kept landing on it instead — a tap that
-   throws away the round. It is the one control on here that is not part of
-   answering, so it comes out of the flow and sits on the bottom edge, well
-   below the last thing worth touching.
-   Out of the flow it would otherwise be sat on by a tall answer surface — the
-   form, the word tiles — on a short screen, so the screen reserves the height
-   back as padding. Only while the exit is actually there: a class game has no
-   exit and must not pay for one, and these screens are tuned tightly enough
-   that 46px matters. */
-#screen-student-answer > #solo-back-btn{position:absolute;left:50%;
-  bottom:calc(8px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
-  margin-top:0;z-index:2;white-space:nowrap;}
-/* 72 = the button (35) + its offset (8) + a gap no thumb crosses by accident
-   (29). Measured, not guessed: at 64 a sideways phone put the Submit button
-   through it. */
-#screen-student-answer.has-exit{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px));}
+/* Leaving the game is the one control on this screen that is not part of
+   answering, and a tap on it throws the question away, so it must never be
+   reachable by a thumb aiming at Submit or at the last row of answers.
+   It used to sit on the bottom edge with a band of padding reserved above it.
+   Reserved height is only ever a promise: a round whose answer surface cannot
+   shrink any further overflows the column, Submit comes down into that band,
+   and the two end up on the same pixels with the exit on top. So the exit
+   leaves the bottom of the screen altogether and becomes a chip in the
+   top-left corner, the corner that already carries the site-wide exit on
+   every other screen and the furthest point on this one from Submit.
+   Fixed, but still a child of the screen, so it appears and disappears with
+   it and no reserved height has to be kept in step with it.
+   Both chips claim that corner, so while this one is up it stands in for the
+   site-wide one (syncSiteBack). Going back to the categories is the exit a
+   learner mid-question wants, and the site link is one tap further on.
+   The pill itself comes from the .music-btn/.back-btn rule further down, so
+   all three corner chips are the same object. */
+#screen-student-answer > #solo-back-btn{left:14px;white-space:nowrap;}
 
 /* Flexible: shrink first, then scroll within themselves. min-height:0 is what
    actually lets a flex child shrink below its content. Both take their natural
@@ -725,7 +726,7 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 #screen-student-answer .s-hear-btn{padding:clamp(5px,calc(var(--vh,1vh)*1.6),11px) clamp(12px,4vw,20px);font-size:clamp(.8rem,calc(var(--vh,1vh)*2.2),1.08rem);}
 /* Reserved-but-empty rows are the other half of the wasted space: on solo
    rounds this line never gets text, and its min-height plus the column gap
-   were spending ~34px above "Back to categories" on every screen. */
+   were spending ~34px on every screen. */
 #screen-student-answer > .submitted-msg:empty{display:none;}
 
 /* The short-screen tiers key off data-app-h, not `@media (max-height:…)`.
@@ -802,22 +803,11 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
   #screen-student-answer > #hint-wrap{flex:1 1 46%;max-width:52%;align-self:stretch;}
   #screen-student-answer > .submit-btn{flex:0 0 100%;max-width:420px;margin-top:2px;}
   #screen-student-answer > .submitted-msg{flex:0 0 100%;text-align:center;}
-  /* Sideways the rows wrap, so nothing gives way vertically: a long prompt
-     plus the hint line can push Submit to within a few pixels of the floor on
-     its own, and reserving 72px there does not squeeze the question — it puts
-     Submit through the exit. So sideways the exit only leaves the flow for the
-     rounds that have the room, which are exactly the rounds this is for: four
-     answers to tap, and a third of the screen empty underneath them. Every
-     other sideways round keeps the layout it has always had. */
-  #screen-student-answer > #solo-back-btn{position:static;transform:none;
-    flex:0 0 100%;text-align:center;margin-top:4px;}
-  #screen-student-answer.has-exit{padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));}
-  #screen-student-answer[data-qtype="mc"] > #solo-back-btn{position:absolute;left:50%;
-    transform:translateX(-50%);bottom:calc(8px + env(safe-area-inset-bottom,0px));margin-top:0;}
-  #screen-student-answer[data-qtype="mc"].has-exit{
-    padding-bottom:calc(72px + env(safe-area-inset-bottom,0px));}
-  /* 46, not 56: sideways the column still carries Submit and the solo Back
-     link under the face, and 56 spent the difference on overflow. */
+  /* The exit needs nothing here: sideways is where a wrapped row of answers
+     used to land on it hardest, and it now sits in the corner this layout
+     already reserves 44px of padding for.
+     46, not 56: sideways the column still carries Submit under the face, and
+     56 spent the difference on overflow. */
   #screen-student-answer #clock-svg{width:min(38vw,calc(var(--vh,1vh)*46),240px);height:min(38vw,calc(var(--vh,1vh)*46),240px);}
   #screen-student-answer .mc-section{grid-template-columns:1fr 1fr;}
   #screen-student-answer .clock-hint{display:none;}
@@ -955,8 +945,8 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 /* inline-flex and the min-height are what make these 44px targets rather than
    the 31px the padding alone gave them — an <a> is inline by default, so its
    vertical padding never grew the box at all. */
-.music-btn,.back-btn{position:fixed;top:12px;z-index:100;display:inline-flex;align-items:center;min-height:44px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:7px 16px;font-size:.85rem;cursor:pointer;color:var(--muted);text-decoration:none;transition:all .15s;}
-.music-btn:hover,.back-btn:hover{background:rgba(255,255,255,.12);color:var(--text);}
+.music-btn,.back-btn,#solo-back-btn{position:fixed;top:12px;z-index:100;display:inline-flex;align-items:center;min-height:44px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:7px 16px;font-size:.85rem;cursor:pointer;color:var(--muted);text-decoration:none;transition:all .15s;}
+.music-btn:hover,.back-btn:hover,#solo-back-btn:hover{background:rgba(255,255,255,.12);color:var(--text);}
 .music-btn{right:14px;}
 .back-btn{left:14px;}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:12px 24px;font-weight:700;font-size:.9rem;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .3s;z-index:999;white-space:nowrap;}
@@ -1943,7 +1933,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   </div>
   <button class="submit-btn" id="student-submit-btn" onclick="submitAnswer()">✓ Submit</button>
   <div class="submitted-msg" id="submitted-msg"></div>
-  <button class="btn btn-ghost btn-sm" id="solo-back-btn" style="display:none;" onclick="quitSoloGame()">← Back to categories</button>
+  <button id="solo-back-btn" style="display:none;" onclick="quitSoloRun()">← Back</button>
 </div>
 
 <!-- STUDENT RESULT -->
@@ -4233,12 +4223,20 @@ window.addEventListener('pageshow',e=>{ if(e.persisted) restoreMusic(); });
 if(!musicOn) document.getElementById('music-btn').textContent='🎵 Music: Off';
 function goHome(){ endHostedRoom(); stopMusic(); cleanupListeners(); soloMode=false; clearSoloUrl(); setClassGameLock(false); document.getElementById('music-btn').style.display=''; setSoloExit(false); showScreen('screen-home'); playLobbyMusic(); }
 function goStudentHome(){ document.getElementById('music-btn').style.display='none'; showScreen('screen-student-home'); }
+/* Two unrelated reasons to take the site-wide chip away, and one corner it
+   sits in: a class game locks it, and a practice run parks its own Back
+   there. Both go through here so neither can hand back the other's chip. */
+let classGameLock=false,soloExitUp=false;
+function syncSiteBack(){
+  const b=document.querySelector('.back-btn');
+  if(b) b.style.display=(classGameLock||soloExitUp)?'none':'';
+}
 /* A student in a class game has no way out of it — leaving is the teacher's
    call. The site-wide back link is the last exit left on their phone once the
    leaderboard's buttons are gone, so it goes with them. */
 function setClassGameLock(on){
-  const b=document.querySelector('.back-btn');
-  if(b) b.style.display=on?'none':'';
+  classGameLock=!!on;
+  syncSiteBack();
 }
 /* The teacher walking away is the end of the room. Say so on the way out, or
    every student is left waiting on a game that will never come back. */
@@ -5985,9 +5983,9 @@ function showSoloResult(submittedAns,correctAns,timeLeft){
 }
 /* Leaving a practice run mid-question has to actually end the question.
    The countdown is an interval, not part of the screen, so it kept ticking
-   after "Back to categories" swapped the screen — and when it reached zero it
-   auto-submitted and showed the result, dragging the learner out of the menu
-   and back into a game they had already left. Nothing else stops it: the run
+   after Back swapped the screen, and when it reached zero it auto-submitted
+   and showed the result, dragging the learner out of the menu and back into
+   a game they had already left. Nothing else stops it: the run
    is local, so there is no room state to leave. */
 function quitSoloGame(){
   clearInterval(studentTimerInt);
@@ -5998,12 +5996,20 @@ function quitSoloGame(){
   showScreen('screen-solo-setup');
   updateSoloCountDisplay();
 }
-/* Show or hide the way out of a practice run. The screen reserves the height
-   this sits in, so the two have to move together — hence one function rather
-   than a style set in six places. */
+/* Show or hide the way out of a practice run. It shares its corner with the
+   site-wide chip, which has to stand down while it is up, so the two move
+   together: one function rather than a style set in six places. */
 function setSoloExit(on){
   document.getElementById('solo-back-btn').style.display=on?'':'none';
-  document.getElementById('screen-student-answer').classList.toggle('has-exit',!!on);
+  soloExitUp=!!on;
+  syncSiteBack();
+}
+/* One exit, two kinds of run behind it. A test carries state of its own (the
+   ladder, the round tally, a watcher on a class test) and quitTestGame is what
+   clears it; quitSoloGame alone would leave a finished run's TEST standing and
+   the next practice question would be marked into it. */
+function quitSoloRun(){
+  if(testActive()) quitTestGame(); else quitSoloGame();
 }
 function soloNextQuestion(){
   soloQIdx++;
