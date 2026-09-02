@@ -668,12 +668,19 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
    answering, and a tap on it throws the question away, so it must never be
    reachable by a thumb aiming at Submit or at the last row of answers.
    It used to sit on the bottom edge with a band of padding reserved above it.
-   Reserved height is only ever a promise: a round whose answer surface cannot
-   shrink any further overflows the column, Submit comes down into that band,
-   and the two end up on the same pixels with the exit on top. So the exit
-   leaves the bottom of the screen altogether and becomes a chip in the
-   top-left corner, the corner that already carries the site-wide exit on
-   every other screen and the furthest point on this one from Submit.
+   Reserved height is only ever a promise. Shrink the screen box while the
+   answer surface has no give left and the column overflows, Submit comes down
+   into the reserved band, and the exit ends up underneath it holding the taps.
+   Safari on iOS is where this bites: the keyboard there does not shrink the
+   layout viewport, only the visual one, and setAppHeight sizes this screen
+   from the visual one, so opening the keyboard on a round you type into drops
+   --app-h by a couple of hundred pixels in one step. Measured on the build
+   before this one, an iPhone-sized screen with the keyboard up: 40 of
+   Submit's 42 pixels were the exit, so Submit quit the run. The collapsing
+   URL bar does the same thing more gently.
+   So the exit leaves the bottom of the screen altogether and becomes a chip
+   in the top-left corner, the corner that already carries the site-wide exit
+   on every other screen and the furthest point on this one from Submit.
    Fixed, but still a child of the screen, so it appears and disappears with
    it and no reserved height has to be kept in step with it.
    Both chips claim that corner, so while this one is up it stands in for the
