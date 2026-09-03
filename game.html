@@ -703,6 +703,7 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 #screen-student-answer > .clock-section,
 #screen-student-answer > .shop-section,
 #screen-student-answer > .form-section,
+#screen-student-answer > .adj-section,
 #screen-student-answer > .unscramble-section,
 #screen-student-answer > .ans-input-wrap,
 #screen-student-answer > #hint-wrap{flex:0 1 auto;min-height:0;overflow-y:auto;}
@@ -716,6 +717,7 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 #screen-student-answer > .mc-section{flex-shrink:0;}
 #screen-student-answer[data-qtype="shop"] > .s-q-card,
 #screen-student-answer[data-qtype="form"] > .s-q-card,
+#screen-student-answer[data-qtype="adjective"] > .s-q-card,
 #screen-student-answer[data-qtype="mc"] > .s-q-card{flex-shrink:6;}
 #screen-student-answer .coin-tray{flex-shrink:0;}
 /* An empty prompt slot must take no room — min-height on a 3.2rem font was
@@ -752,6 +754,7 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 :root[data-app-h~="lt500"] #screen-student-answer .mc-choice{min-height:44px;}
 :root[data-app-h~="lt500"] #screen-student-answer .word-tile{padding:5px 10px;font-size:.88rem;}
 :root[data-app-h~="lt500"] #screen-student-answer .form-slot{min-height:28px;}
+:root[data-app-h~="lt500"] #screen-student-answer .adj-slot{min-height:28px;}
 :root[data-app-h~="lt500"] #screen-student-answer .student-timer{font-size:1.1rem;}
 :root[data-app-h~="lt500"] #screen-student-answer .coin img{width:38px;height:38px;}
 :root[data-app-h~="lt500"] #screen-student-answer .shop-item{font-size:clamp(1.2rem,calc(var(--vh,1vh)*4.5),3.4rem);}
@@ -788,6 +791,10 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 :root[data-app-h~="lt440"] #screen-student-answer .form-label{font-size:.66rem;}
 :root[data-app-h~="lt440"] #screen-student-answer .form-section{gap:3px;}
 :root[data-app-h~="lt440"] #screen-student-answer .form-fields{gap:3px;}
+:root[data-app-h~="lt440"] #screen-student-answer .adj-slot{min-height:24px;}
+:root[data-app-h~="lt440"] #screen-student-answer .adj-noun-word{font-size:.8rem;}
+:root[data-app-h~="lt440"] #screen-student-answer .adj-section{gap:3px;}
+:root[data-app-h~="lt440"] #screen-student-answer .adj-rows{gap:3px;}
 :root[data-app-h~="lt440"] #screen-student-answer .mc-choice{min-height:38px;padding:4px 8px;font-size:.9rem;}
 :root[data-app-h~="lt440"] #screen-student-answer .s-q-card{padding:7px;}
 :root[data-app-h~="lt440"] #screen-student-answer .unscrm-label{display:none;}
@@ -808,6 +815,7 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
   #screen-student-answer > .clock-section,
   #screen-student-answer > .shop-section,
   #screen-student-answer > .form-section,
+  #screen-student-answer > .adj-section,
   #screen-student-answer > .unscramble-section,
   #screen-student-answer > .ans-input-wrap,
   #screen-student-answer > #hint-wrap{flex:1 1 46%;max-width:52%;align-self:stretch;}
@@ -1196,6 +1204,27 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   display:flex;align-items:center;padding:5px;transition:border-color .2s,border-style .2s;}
 .form-slot.filled{border-style:solid;border-color:var(--teal);}
 .form-slot.drop{border-color:var(--gold);}
+
+/* ── Adjectives ──
+   The empty slot sits BEFORE the noun on purpose: English puts the describing
+   word in front of the thing it describes, and for a learner whose first
+   language puts it after, seeing the box in that position is half the lesson.
+   Same slot styling as the form so the two widgets are one gesture. */
+.adj-section{display:none;flex-direction:column;gap:clamp(5px,1.4vh,12px);width:100%;max-width:460px;}
+.adj-rows{display:flex;flex-direction:column;gap:clamp(4px,1vh,8px);}
+.adj-row{display:flex;align-items:center;gap:9px;cursor:pointer;}
+.adj-slot{flex:0 0 44%;min-height:clamp(30px,5.8vh,46px);border:2px dashed rgba(255,255,255,.22);border-radius:10px;
+  display:flex;align-items:center;justify-content:flex-end;padding:5px;transition:border-color .2s,border-style .2s;}
+.adj-slot.filled{border-style:solid;border-color:var(--teal);}
+.adj-slot.ready{border-color:var(--gold);}
+.adj-noun{flex:1;display:flex;align-items:center;gap:8px;min-width:0;}
+.adj-pic{font-size:clamp(1.3rem,3.4vh,2rem);line-height:1;flex:0 0 auto;}
+.adj-pic .custom-icon-emoji,.adj-pic .body-pic{height:1em;width:1em;}
+.adj-noun-word{font-family:'Fredoka One',cursive;font-size:clamp(.95rem,2.4vh,1.25rem);
+  line-height:1.15;overflow:hidden;text-overflow:ellipsis;}
+/* The word waiting to be placed. An outline rather than a colour swap so the
+   tile still reads as the same word it was a moment ago. */
+.word-tile.picked{outline:3px solid var(--gold);outline-offset:2px;}
 .q-emoji-big{font-size:2.8rem;line-height:1;min-height:1em;text-align:center;margin-bottom:4px;}
 .custom-icon-emoji{height:1em;width:1em;vertical-align:middle;display:inline-block;object-fit:contain;}
 .q-emoji-big .custom-icon-emoji{height:1em;width:1em;}
@@ -1518,6 +1547,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="letter" class="q-type-tab" onclick="selectSoloType('letter',this)">🔤 Letter Names</button>
         <button data-type="lettersound" class="q-type-tab" onclick="selectSoloType('lettersound',this)">🔊 First Sounds</button>
         <button data-type="oddone" class="q-type-tab" onclick="selectSoloType('oddone',this)">🧩 Odd One Out</button>
+        <button data-type="adjectives" class="q-type-tab" onclick="selectSoloType('adjectives',this)">🎨 Adjectives</button>
         <button data-type="signs" class="q-type-tab" onclick="selectSoloType('signs',this)">🚪 Signs</button>
         <button data-type="sms" class="q-type-tab" onclick="selectSoloType('sms',this)">📱 Messages</button>
         <button data-type="clock" class="q-type-tab" onclick="selectSoloType('clock',this)">⏰ Clock</button>
@@ -1691,6 +1721,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
             <button data-type="letter" class="q-type-tab" onclick="selectQType('letter',this)">🔤 Letter Names</button>
             <button data-type="lettersound" class="q-type-tab" onclick="selectQType('lettersound',this)">🔊 First Sounds</button>
             <button data-type="oddone" class="q-type-tab" onclick="selectQType('oddone',this)">🧩 Odd One Out</button>
+            <button data-type="adjectives" class="q-type-tab" onclick="selectQType('adjectives',this)">🎨 Adjectives</button>
             <button data-type="signs" class="q-type-tab" onclick="selectQType('signs',this)">🚪 Signs</button>
             <button data-type="sms" class="q-type-tab" onclick="selectQType('sms',this)">📱 Messages</button>
             <button data-type="clock" class="q-type-tab" onclick="selectQType('clock',this)">⏰ Clock</button>
@@ -1940,6 +1971,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
     <div class="form-fields" id="form-fields"></div>
     <div class="unscrm-label">Tap an answer to put it in the next box</div>
     <div class="word-bank-area" id="form-chips"></div>
+  </div>
+  <!-- Adjectives: tap a describing word, then tap the thing it goes in front of. -->
+  <div class="adj-section" id="adj-section" style="display:none;">
+    <div class="adj-rows" id="adj-rows"></div>
+    <div class="unscrm-label">Tap a word, then tap what it goes with</div>
+    <div class="word-bank-area" id="adj-chips"></div>
   </div>
   <button class="submit-btn" id="student-submit-btn" onclick="submitAnswer()">✓ Submit</button>
   <div class="submitted-msg" id="submitted-msg"></div>
@@ -2937,6 +2974,65 @@ function genFormQuestions(n){
   }));
 }
 
+/* ── ADJECTIVES ──
+   English puts the describing word in front of the thing it describes. Dari,
+   Pashto, Arabic, Vietnamese, Khmer and Thai all put it after, so "car red"
+   is the sentence a learner arrives with and the order is the lesson — which
+   is why the empty slot sits before the noun rather than after it.
+
+   The second lesson is which adjective an Australian speaker actually reaches
+   for: a round is three phrases from one group, and within a group each
+   describing word has one obvious home. They are ordinary phrases an adult
+   meets in a week here — heavy traffic, black coffee, mobile phone — not
+   classroom examples.
+
+   The answer is the three phrases in the order the rows are shown, joined the
+   way the form rounds join theirs, so it compares as a plain string and needs
+   nothing new from the scoring. */
+const ADJECTIVE_GROUPS=[
+  {theme:'Weather',      pairs:[['hot','sun'],['cold','ice'],['white','snow']]},
+  {theme:'Bad weather',  pairs:[['heavy','rain'],['strong','wind'],['thick','fog']]},
+  {theme:'Touch it',     pairs:[['sharp','knife'],['soft','bed'],['hard','rock']]},
+  {theme:'How big',      pairs:[['tall','tree'],['deep','water'],['heavy','box']]},
+  {theme:'Shape',        pairs:[['round','ball'],['square','window'],['long','road']]},
+  {theme:'Colour',       pairs:[['yellow','lemon'],['red','apple'],['black','coffee']]},
+  {theme:'Animals',      pairs:[['big','elephant'],['small','ant'],['busy','bee']]},
+  {theme:'Around town',  pairs:[['fast','train'],['fresh','bread'],['cheap','ticket']]},
+  {theme:'Getting there',pairs:[['long','flight'],['heavy','truck'],['slow','bike']]},
+  {theme:'Going to work',pairs:[['hard','work'],['clean','air'],['heavy','traffic']]},
+  {theme:'Taste',        pairs:[['spicy','soup'],['salty','chips'],['sweet','honey']]},
+  {theme:'At the shops', pairs:[['fresh','fish'],['brown','rice'],['sweet','cake']]},
+  {theme:'In class',     pairs:[['new','book'],['sharp','pencil'],['easy','question']]},
+  {theme:'Your details', pairs:[['mobile','phone'],['new','address'],['first','name']]},
+  {theme:'Full or empty',pairs:[['full','bus'],['empty','street'],['open','door']]},
+  {theme:'Something wrong',pairs:[['broken','window'],['lost','key'],['old','photo']]},
+];
+/* Pictures for the nouns the shared EMOJI map has no entry for. Kept here
+   rather than added to EMOJI: that map is what the multiple-choice rounds draw
+   their picture options from, and a word with a picture but no bank behind it
+   has no business in it. */
+const ADJ_PICS={water:'💧',knife:'🔪',window:'🪟',road:'🛣️',
+  street:'🏘️',coffee:'☕',bread:'🍞',ticket:'🎫',soup:'🍲',
+  honey:'🍯',air:'💨',traffic:'🚦',address:'🏠',name:'🪪',
+  wind:'🌬️',fog:'🌫️',flight:'✈️',pencil:'✏️',
+  question:'❓'};
+function adjPic(w){ return emo(w)||ADJ_PICS[w]||''; }
+/* One round per group, groups in a fresh order every game. Three phrases is
+   what fits above the word bank on a phone without either half scrolling. */
+function genAdjectiveQuestions(n){
+  const pool=shuffle([...ADJECTIVE_GROUPS]);
+  return pool.slice(0,n||pool.length).map(g=>{
+    const rows=shuffle([...g.pairs]).map(p=>({adj:p[0],noun:p[1],pic:adjPic(p[1])}));
+    return {
+      type:'adjective', noListen:true,
+      rows:rows,
+      chips:shuffle(rows.map(r=>r.adj)),
+      answer:rows.map(r=>r.adj+' '+r.noun).join(' | ').toLowerCase(),
+      question:'Which word goes with each one?'
+    };
+  });
+}
+
 /* ── PRE-LITERACY PICTURE GAMES ──
    These three types are always multiple choice (they carry their own .choices)
    and need no typing — built for early readers. */
@@ -3183,7 +3279,7 @@ function genOddOneOut(count){
   return out;
 }
 
-let questionBank={'wp1:gap':[],'wp1:word':[],'wp1:build':[],'wp2:gap':[],'wp2:word':[],'wp2:build':[],beginner:[],elementary:[],questionwords:[],numbers:[],numbers1120:[],numbers2199:[],days:[],months:[],weather:[],fruits:[],body:[],clothes:[],custom:[],unscramble:[],gramscramble:[],speaking:[],translate:[],letter:[],lettersound:[],oddone:[],signs:[],sms:[],clock:[],shop:[],forms:[]};
+let questionBank={'wp1:gap':[],'wp1:word':[],'wp1:build':[],'wp2:gap':[],'wp2:word':[],'wp2:build':[],beginner:[],elementary:[],questionwords:[],numbers:[],numbers1120:[],numbers2199:[],days:[],months:[],weather:[],fruits:[],body:[],clothes:[],custom:[],unscramble:[],gramscramble:[],speaking:[],translate:[],letter:[],lettersound:[],oddone:[],signs:[],sms:[],clock:[],shop:[],forms:[],adjectives:[]};
 let customBanks={};        // { bankId: { name, questions:[] } }
 let activeBankId=null;     // bank open in editor
 let selectedBankId=null;   // bank loaded for the game
@@ -3228,6 +3324,7 @@ function buildBank(){
   questionBank.clock=genClockQuestions();
   questionBank.shop=genShopQuestions();
   questionBank.forms=genFormQuestions();
+  questionBank.adjectives=genAdjectiveQuestions();
   questionBank.sms=[];
   SMS_ITEMS.forEach(m=>{
     const bubble='<div class="sms-card"><div class="sms-from">'+m.from+'</div>'
@@ -3245,6 +3342,11 @@ function buildBank(){
    but have no pool, so the bank machinery has to step around them. */
 const SPECIAL_GAMES=['target'];
 function isSpecialGame(t){ return SPECIAL_GAMES.indexOf(t)>=0; }
+/* Games whose rounds are built on an answer surface of their own — a clock
+   face, a coin tray, a form, a row of phrases. There is nothing for the
+   multiple-choice toggle to convert, so it does not appear for them. */
+const WIDGET_GAMES=['clock','shop','forms','adjectives'];
+function isWidgetGame(t){ return WIDGET_GAMES.indexOf(t)>=0; }
 
 function poolFor(type){
   if(isSpecialGame(type)) return [];
@@ -3276,6 +3378,7 @@ function poolFor(type){
   if(type==='clock') return [...questionBank.clock];
   if(type==='shop') return [...questionBank.shop];
   if(type==='forms') return [...questionBank.forms];
+  if(type==='adjectives') return [...questionBank.adjectives];
   // "All" inside a section means all of *that section's* banks — the type
   // string carries the section ("all:numeracy") so nothing needs hidden state.
   const sec=sectionOf(type);
@@ -3315,6 +3418,9 @@ function getQuestions(type,limit){
   if(type==='clock') return genClockQuestions(limit);
   if(type==='shop')  return genShopQuestions(limit);
   if(type==='forms') return genFormQuestions(limit);
+  // Which three groups a round is drawn from is the variety here, so it is
+  // drawn fresh rather than served from the bank in the order it was built.
+  if(type==='adjectives') return genAdjectiveQuestions(limit);
   // Both word-pronunciation banks are drawn fresh so the families, the words
   // and the round shapes vary between games.
   if(isPhonicsType(type)) return genPhonicsQuestions(type,limit);
@@ -4417,7 +4523,7 @@ function applyTargetSetup(scope){
   const opts=document.getElementById('tgt-opts-'+scope);
   if(opts) opts.classList.toggle('on',on);
   const mc=document.getElementById(scope+'-mc-toggle');
-  if(mc) mc.style.display=(on||test)?'none':'';
+  if(mc) mc.style.display=(on||test||isWidgetGame(type))?'none':'';
   const lim=document.getElementById(scope+'-limit-row');
   if(lim) lim.style.display=on?'none':'';
   const qf=document.getElementById(scope+'-q-field');
@@ -4491,15 +4597,15 @@ function playQuestion(){
   document.getElementById('game-prog').textContent='Question '+(currentQIdx+1)+' of '+total;
   const isMcQ=Array.isArray(q.choices)&&q.choices.length>0;
   const noAudio=q.type==='gramscramble'||q.type==='translate'||q.type==='mc';
-  document.getElementById('q-badge').textContent=q.qword?'QUESTION WORD':q.type==='sentence'?'SENTENCE':q.type==='speak'?'SPEAKING':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='lettersound'?'FIRST SOUND':q.type==='oddone'?'ODD ONE OUT':q.type==='phgap'?'MISSING SOUND':q.type==='phword'?'DECODE':q.type==='phbuild'?'BUILD THE WORD':q.type==='mc'?'MULTIPLE CHOICE':q.type==='clockset'?'CLOCK':q.type==='shop'?'MONEY':q.type==='form'?'FORM':'WORD';
-  document.getElementById('q-hint').textContent=q.type==='speak'?(isMcQ?'Students hear the question and tap the answer':'Students hear the question and build their answer with word tiles'):q.type==='phgap'?'Students hear the sounds and tap the missing one':q.type==='phword'?'Students hear the sounds and tap the word':q.type==='phbuild'?'Students put the sounds in order to build the word':q.type==='oddone'?'Students tap the picture that is different':q.type==='clockset'?'Students drag the clock hands to this time':q.type==='shop'?'Students tap coins to make this amount':q.type==='form'?'Students put each answer in the right box':q.type==='mc'?'Students tap the correct answer':(q.type==='unscramble'||q.type==='gramscramble')?(isMcQ?(q.type==='unscramble'?'Students listen and tap the sentence in the right order':'Students tap the sentence in the right order'):'Students arrange word tiles'):q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='translate'?'Students type the English sentence':'';
+  document.getElementById('q-badge').textContent=q.qword?'QUESTION WORD':q.type==='sentence'?'SENTENCE':q.type==='speak'?'SPEAKING':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='lettersound'?'FIRST SOUND':q.type==='oddone'?'ODD ONE OUT':q.type==='phgap'?'MISSING SOUND':q.type==='phword'?'DECODE':q.type==='phbuild'?'BUILD THE WORD':q.type==='mc'?'MULTIPLE CHOICE':q.type==='clockset'?'CLOCK':q.type==='shop'?'MONEY':q.type==='form'?'FORM':q.type==='adjective'?'ADJECTIVES':'WORD';
+  document.getElementById('q-hint').textContent=q.type==='speak'?(isMcQ?'Students hear the question and tap the answer':'Students hear the question and build their answer with word tiles'):q.type==='phgap'?'Students hear the sounds and tap the missing one':q.type==='phword'?'Students hear the sounds and tap the word':q.type==='phbuild'?'Students put the sounds in order to build the word':q.type==='oddone'?'Students tap the picture that is different':q.type==='clockset'?'Students drag the clock hands to this time':q.type==='shop'?'Students tap coins to make this amount':q.type==='form'?'Students put each answer in the right box':q.type==='adjective'?'Students put each describing word in front of the right word':q.type==='mc'?'Students tap the correct answer':(q.type==='unscramble'||q.type==='gramscramble')?(isMcQ?(q.type==='unscramble'?'Students listen and tap the sentence in the right order':'Students tap the sentence in the right order'):'Students arrange word tiles'):q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='translate'?'Students type the English sentence':'';
   document.getElementById('ans-bars').innerHTML='';
   document.getElementById('reveal-btn').style.display='';
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('end-now-btn').style.display='';
   document.getElementById('q-emoji').innerHTML=q.icon||(q.type==='word'?emo(q.word):q.type==='letter'?q.letter:'');
-  document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='speak'?('🗣️ '+q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':q.type==='phgap'?('🔤 '+q.family+' — which sound is missing?'):q.type==='phword'?('🔊 '+q.family+' — students tap the word'):q.type==='phbuild'?('🔤 '+q.family+' — students build "'+q.word+'"'):(q.type==='clockset'||q.type==='shop'||q.type==='form')?q.question:'🔊 Listen and spell the word';
+  document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='speak'?('🗣️ '+q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='lettersound'?'🔊 Students hear a sound, tap the picture':q.type==='oddone'?'🧩 Students tap the one that is different':q.type==='phgap'?('🔤 '+q.family+' — which sound is missing?'):q.type==='phword'?('🔊 '+q.family+' — students tap the word'):q.type==='phbuild'?('🔤 '+q.family+' — students build "'+q.word+'"'):(q.type==='clockset'||q.type==='shop'||q.type==='form')?q.question:q.type==='adjective'?('🧠 '+q.question):'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=(noAudio||q.noListen)?'none':'';
   renderTeacherOptions(q,false);
   // Resolve this question's time budget once (translate and speaking rounds,
@@ -4526,7 +4632,7 @@ function teacherSpeak(){
   if(q.type==='lettersound'){ playSoundFile(q.soundFile); return; }
   // Form is a reading task. Returning before the button is marked playing keeps
   // it from sticking in the active state with nothing to hear.
-  if(q.type==='form') return;
+  if(q.type==='form'||q.type==='adjective') return;
   btn.classList.add('playing');
   const spokenText=q.type==='letter'?q.letter:q.type==='oddone'?'Tap the one that does not belong.':q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.type==='speak'?q.question:q.type==='clockset'?('Set the clock to '+q.words):q.type==='shop'?moneySpeech(q.question):q.word;
   const utt=new SpeechSynthesisUtterance(spokenText);
@@ -5366,12 +5472,12 @@ function initSolo(){
 const BANK_SECTIONS=[
   {id:'*',          label:'✨ All games',        banks:null},
   {id:'letters',    label:'🔤 Letters & Sounds', banks:[...PHONICS_TYPES,'letter','lettersound','elementary']},
-  {id:'vocab',      label:'📚 Vocabulary',       banks:['days','months','weather','fruits','body','clothes','spelling','oddone','translate']},
+  {id:'vocab',      label:'📚 Vocabulary',       banks:['days','months','weather','fruits','body','clothes','spelling','oddone','adjectives','translate']},
   {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','lettersound','unscramble','speaking','clock']},
   {id:'speaking',   label:'🗣️ Speaking',         banks:['speaking','questionwords','unscramble']},
-  {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary']},
+  {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','adjectives','beginner','elementary']},
   {id:'writing',    label:'✍️ Writing',          banks:['wp1:gap','wp1:build','wp2:gap','wp2:build','days','months','weather','fruits','body','clothes','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary']},
-  {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble']},
+  {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble','adjectives']},
   {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target']},
   {id:'translation',label:'🌐 Translation',      banks:['translate']},
   {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','sms','clock','shop','forms','beginner','unscramble','gramscramble','speaking','translate']},
@@ -5454,6 +5560,7 @@ const TEST_LADDERS={
   ],
   vocab:[
     {type:'oddone',   mc:true,  label:'Find the one that is different'},
+    {type:'adjectives',mc:false,label:'Put the describing word with the right one'},
     {type:'fruits',   mc:true,  label:'Tap the fruit'},
     {type:'body',     mc:true,  label:'Tap the part of the body'},
     {type:'clothes',  mc:true,  label:'Tap the clothing word'},
@@ -5499,6 +5606,7 @@ const TEST_LADDERS={
     {type:'sms',          mc:true,  label:'Read the message, tap the answer'},
     {type:'beginner',     mc:true,  label:'Read the sentence, tap the missing word'},
     {type:'gramscramble', mc:true,  label:'Tap the sentence in the right order'},
+    {type:'adjectives',   mc:false, label:'Put the describing word with the right one'},
     {type:'forms',        mc:false, label:'Put each answer in the right box'},
     {type:'gramscramble', mc:false, label:'Put the words in the right order'},
     {type:'beginner',     mc:false, label:'Write the missing word'},
@@ -5526,6 +5634,7 @@ const TEST_LADDERS={
   ],
   grammar:[
     {type:'questionwords',mc:true,  label:'Tap the question word'},
+    {type:'adjectives',   mc:false, label:'Put the describing word in front of the noun'},
     {type:'gramscramble', mc:true,  label:'Tap the sentence in the right order'},
     {type:'unscramble',   mc:true,  label:'Listen, tap the sentence in order'},
     {type:'questionwords',mc:false, label:'Write the question word'},
@@ -5730,6 +5839,7 @@ const GAME_INFO={
   letter:      {skill:'letters',   blurb:'Hear a letter name and choose the letter.'},
   lettersound: {skill:'letters',   blurb:'Hear the first sound of a word.'},
   oddone:      {skill:'vocab',     blurb:'Find the word that does not belong.'},
+  adjectives:  {skill:'vocab',     blurb:'Put the describing word in front of the right one.'},
   signs:       {skill:'everyday',  blurb:'Read the signs you see around you.'},
   sms:         {skill:'everyday',  blurb:'Read a short message and answer it.'},
   clock:       {skill:'numeracy',  blurb:'Read the time and write it.'},
@@ -5830,7 +5940,7 @@ function soloLinkParams(type){
     if(limit!==10) p.set('q',limit);
     const secs=soloSeconds();
     if(secs!==TIMER_DURATION) p.set('t',secs);
-    if(mcMode!==defaultMcFor(type)) p.set('mc',mcMode?'1':'0');
+    if(!isWidgetGame(type)&&mcMode!==defaultMcFor(type)) p.set('mc',mcMode?'1':'0');
   }
   return p;
 }
@@ -5873,6 +5983,7 @@ const GAME_SLUG={
   days:'days',months:'months',weather:'weather',fruits:'fruits',body:'body',clothes:'clothes',
   spelling:'spelling',unscramble:'unscramble',gramscramble:'word-order',speaking:'speaking-game',
   translate:'translate',letter:'letter-names',lettersound:'first-sounds',oddone:'odd-one-out',
+  adjectives:'adjectives',
   signs:'signs',sms:'messages',clock:'clock',shop:'shop',target:'dice',forms:'forms',all:'all-games',
   'test:*':'test-yourself','test:letters':'test-letters','test:vocab':'test-vocabulary',
   'test:listening':'test-listening','test:speaking':'test-speaking','test:reading':'test-reading',
@@ -6426,12 +6537,14 @@ function showStudentQuestion(q,startedAt,dur){
   // Widget rounds: each owns its own answer surface and writes the answer
   // into the hidden input, so submitAnswer() needs no branch for them.
   const isClock=q.type==='clockset', isShop=q.type==='shop', isForm=q.type==='form';
-  const isWidget=isClock||isShop||isForm;
+  const isAdj=q.type==='adjective';
+  const isWidget=isClock||isShop||isForm||isAdj;
   document.getElementById('ans-input-section').style.display=(isMc||isTile||isWidget)?'none':'';
   document.getElementById('unscramble-section').style.display=isTile?'flex':'none';
   document.getElementById('clock-section').style.display=isClock?'flex':'none';
   document.getElementById('shop-section').style.display=isShop?'flex':'none';
   document.getElementById('form-section').style.display=isForm?'flex':'none';
+  document.getElementById('adj-section').style.display=isAdj?'flex':'none';
   document.getElementById('mc-section').style.display=isMc?'grid':'none';
   // Spelling rounds get the hint as well: this is where a learner who cannot
   // start is either given a way in or left staring at an empty box.
@@ -6471,6 +6584,7 @@ function showStudentQuestion(q,startedAt,dur){
     isClock?'CLOCK — drag the hands to the right time':
     isShop?(q.mode==='change'?'MONEY — tap coins to make your change':'MONEY — tap coins to pay the right amount'):
     isForm?'FORM — put each answer in the right box':
+    isAdj?'ADJECTIVES — the describing word goes first':
     isTile?(q.type==='gramscramble'?'GRAMMAR — arrange words in order':q.type==='phbuild'?'BUILD THE WORD — put the sounds in order':q.type==='speak'?'SPEAKING — listen, then build your answer':'UNSCRAMBLE — arrange the word tiles'):
     isTranslate?'TRANSLATE — type the English sentence':
     q.type==='sentence'?'SENTENCE — type the missing word':'WORD — listen and spell it';
@@ -6529,6 +6643,7 @@ function showStudentQuestion(q,startedAt,dur){
   if(isClock) renderClockWidget();
   if(isShop)  renderShopWidget(q);
   if(isForm)  renderFormWidget(q);
+  if(isAdj)   renderAdjWidget(q);
   showScreen('screen-student-answer');
   // Use the teacher-set budget broadcast with the question; fall back to the
   // local default (solo play, or an older host that didn't send one).
@@ -6824,6 +6939,94 @@ function renderFormWidget(q){
   formApply();
 }
 
+/* ══════════════ ADJECTIVE WIDGET ══════════════
+   Tap a describing word to pick it up, tap the row it belongs in front of to
+   put it down. Tap a word already in a row to send it back.
+
+   Two taps rather than the form's one, because here it matters WHICH row the
+   word lands in — dropping into "the next empty slot" would answer the
+   question for the learner. The last word left in the bank goes down on a
+   single tap on an empty row: by then there is nothing to choose between.
+
+   Like the form widget this borrows the tile styling but not makeTile(),
+   whose pointerdown handler belongs to the unscramble drag engine. */
+let adjRows=[],adjPicked=null;
+
+function makeAdjTile(word){
+  const t=document.createElement('div');
+  t.className='word-tile bank-tile';
+  t.textContent=word; t.dataset.word=word;
+  // The row underneath is a tap target of its own, and a placed word sits
+  // inside it: without this the same tap would take the word back and the
+  // row's own handler would put one straight back down again.
+  t.addEventListener('click',e=>{ e.stopPropagation(); adjTapTile(t); });
+  return t;
+}
+/* The phrase each row currently reads as, in row order — the noun on its own
+   while the slot in front of it is still empty. */
+function adjApply(){
+  const vals=adjRows.map((r,i)=>{
+    const slot=document.getElementById('adj-slot-'+i);
+    const tile=slot&&slot.querySelector('.word-tile');
+    if(slot) slot.classList.toggle('filled',!!tile);
+    return (tile?tile.dataset.word+' ':'')+r.noun;
+  });
+  document.getElementById('student-ans-input').value=vals.join(' | ');
+}
+function adjSetPicked(tile){
+  if(adjPicked) adjPicked.classList.remove('picked');
+  adjPicked=tile||null;
+  if(adjPicked) adjPicked.classList.add('picked');
+  // The rows show they are waiting for a tap only while a word is in hand.
+  document.querySelectorAll('#adj-rows .adj-slot').forEach(sl=>
+    sl.classList.toggle('ready',!!adjPicked&&!sl.querySelector('.word-tile')));
+}
+function adjToBank(tile){
+  document.getElementById('adj-chips').appendChild(tile);
+  tile.classList.replace('ans-tile','bank-tile');
+  playTileReturn();
+}
+function adjTapTile(tile){
+  if(answered) return;
+  if(tile.parentNode&&tile.parentNode.classList.contains('adj-slot')){
+    // Taking a word back does not empty the learner's hand — whatever was
+    // picked up before is still picked up, and the freed row lights up for it.
+    adjToBank(tile); adjSetPicked(adjPicked); adjApply(); return;
+  }
+  adjSetPicked(adjPicked===tile?null:tile);
+}
+function adjTapRow(i){
+  if(answered) return;
+  const slot=document.getElementById('adj-slot-'+i);
+  if(!slot) return;
+  const there=slot.querySelector('.word-tile');
+  if(there){ adjToBank(there); if(!adjPicked){ adjSetPicked(null); adjApply(); return; } }
+  const bank=document.getElementById('adj-chips');
+  let tile=adjPicked;
+  if(!tile&&bank.children.length===1) tile=bank.children[0];
+  if(!tile){ adjSetPicked(null); adjApply(); return; }
+  slot.appendChild(tile);
+  tile.classList.replace('bank-tile','ans-tile');
+  playTileDrop();
+  adjSetPicked(null);
+  adjApply();
+}
+function renderAdjWidget(q){
+  // Firebase turns an array of rows into an object on the way to a student.
+  adjRows=Array.isArray(q.rows)?q.rows:Object.values(q.rows||{});
+  const chips=Array.isArray(q.chips)?q.chips:Object.values(q.chips||{});
+  document.getElementById('adj-rows').innerHTML=adjRows.map((r,i)=>
+    '<div class="adj-row" onclick="adjTapRow('+i+')">'
+    +'<div class="adj-slot" id="adj-slot-'+i+'"></div>'
+    +'<div class="adj-noun"><span class="adj-pic">'+(r.pic||'')+'</span>'
+    +'<span class="adj-noun-word">'+r.noun+'</span></div></div>').join('');
+  const bank=document.getElementById('adj-chips');
+  bank.innerHTML='';
+  adjPicked=null;
+  chips.forEach(w=>bank.appendChild(makeAdjTile(w)));
+  adjApply();
+}
+
 function selectMc(word,btn){
   if(answered) return;
   document.querySelectorAll('#mc-section .mc-choice').forEach(b=>b.classList.add('locked'));
@@ -6865,7 +7068,7 @@ function studentSpeak(q){
   // a pre-reader gets it at all. Form stays a reading task; the clock is the
   // listening half of the time unit, so it speaks the target as "half past seven".
   if(Q.type==='shop'){ speakTTS(moneySpeech(Q.question)); return; }
-  if(Q.type==='form') return;
+  if(Q.type==='form'||Q.type==='adjective') return;
   if(Q.type==='clockset'){ speakTTS('Set the clock to '+Q.words); return; }
   // Speaking asks the question out loud — that is the whole prompt. The answer
   // is what the learner is building, so it is never spoken here.
@@ -7992,7 +8195,7 @@ window.addEventListener('load',()=>{
       const t=parseInt(params.get('t'),10);
       if(t>=10&&t<=120) document.getElementById('solo-t-limit').value=t;
       const mc=params.get('mc');
-      setMcMode(mc===null?defaultMcFor(game):mc==='1');
+      if(!isWidgetGame(game)) setMcMode(mc===null?defaultMcFor(game):mc==='1');
       openSoloLaunch(game);
     }
   }

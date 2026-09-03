@@ -71,6 +71,7 @@ GAMES = [
     ('letter-names', 'letter', 'Letter Names', 'Hear a letter name and choose the letter.'),
     ('first-sounds', 'lettersound', 'First Sounds', 'Hear the first sound of a word.'),
     ('odd-one-out', 'oddone', 'Odd One Out', 'Find the word that does not belong.'),
+    ('adjectives', 'adjectives', 'Adjectives', 'Put the describing word in front of the right one.'),
     ('signs', 'signs', 'Signs', 'Read the signs you see around you.'),
     ('messages', 'sms', 'Messages', 'Read a short message and answer it.'),
     ('clock', 'clock', 'Clock', 'Read the time and write it.'),
