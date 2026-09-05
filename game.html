@@ -3291,6 +3291,7 @@ function genOrderQuestions(n,hi,kind){
       prompt='Smallest to biggest';
     }
     out.push({type:'unscramble', noListen:true, mute:true, label:'PUT IN ORDER — drag the tiles',
+      tileNoun:'order', tileHint:'Tap (or drag) to put them in order',
       sentence:items.join(' '),
       words:shuffle(items.slice()), question:prompt, answer:items.join(' ')});
   }
@@ -7380,7 +7381,8 @@ function gameInfoFor(type){
    games are the arranging, and All Spelling is the writing bank. Same
    reasoning as SECTION_DEFAULTS, applied to one game instead of one skill. */
 const GAME_MC_DEFAULT={unscramble:false,gramscramble:false,speaking:false,spelling:false,
-  'wp1:build':false,'wp2:build':false};
+  'wp1:build':false,'wp2:build':false,ordering:false,copyword:false,numeralwrite:false,
+  addup:false,addmoney:false,modelsentence:false,safeinfo:false};
 function defaultMcFor(type){ return GAME_MC_DEFAULT[type]!==false; }
 function soloSeconds(){
   const el=document.getElementById('solo-t-limit');
@@ -8565,6 +8567,7 @@ function showStudentQuestion(q,startedAt,dur){
   const hideHear=q.type==='gramscramble'||q.type==='translate'||q.type==='mc'||q.noListen||isForm;
   document.getElementById('s-hear-btn').style.display=hideHear?'none':'';
   document.getElementById('s-q-type').textContent=
+    q.label?q.label:
     q.qword?(isMc?'TAP THE QUESTION WORD':'LISTEN — TYPE THE QUESTION WORD'):
     q.type==='mc'?'MULTIPLE CHOICE — tap the correct answer':
     isMc?(
@@ -8603,7 +8606,7 @@ function showStudentQuestion(q,startedAt,dur){
     else if(q.type==='phword') mcPrompt='🔊 '+q.family+' — listen, then tap the word';
     else if(q.type==='gramscramble') mcPrompt='Which sentence is correct?';
     else if(q.type==='speak') mcPrompt=q.question;
-    else if(q.type==='unscramble') mcPrompt='🔊 Listen, then tap the sentence in the right order';
+    else if(q.type==='unscramble') mcPrompt=q.question||'🔊 Listen, then tap the sentence in the right order';
     else if(q.type==='translate'){
       mcLang=localStorage.getItem('translateLang')||'vi';
       mcPrompt=q.translations&&q.translations[mcLang]?q.translations[mcLang]:(q.en||q.answer);
@@ -8627,9 +8630,14 @@ function showStudentQuestion(q,startedAt,dur){
     // The same engine builds words out of sounds and sentences out of words.
     const isWord=q.type==='phbuild';
     const isAnswer=q.type==='speak';
-    document.getElementById('unscrm-label-answer').textContent=isWord?'Your word':isAnswer?'Your answer':'Your sentence';
+    // Put In Order borrows this engine to line up numbers, coins, days and
+    // months. Calling a row of coins "your sentence" is the kind of wrong
+    // word that stops a learner who is reading every word carefully.
+    document.getElementById('unscrm-label-answer').textContent=
+      q.tileNoun?('Your '+q.tileNoun):isWord?'Your word':isAnswer?'Your answer':'Your sentence';
     document.getElementById('unscrm-label-bank').textContent=
-      isWord?'Tap (or drag) the sounds to build the word'
+      q.tileHint?q.tileHint
+      :isWord?'Tap (or drag) the sounds to build the word'
       :isAnswer?'Tap (or drag) words to answer the question'
       :'Tap (or drag) words to build your sentence';
     renderUnscrambleTiles(words);
