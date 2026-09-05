@@ -3030,20 +3030,28 @@ function genShopQuestions(n,from){
 /* ── FILL THE FORM ──
    Chips of personal detail, dropped into the right labelled field. The answer
    is composed as the field order the learner produced, so it compares with a
-   plain string like every other round. */
+   plain string like every other round.
+
+   An address is not the street line on its own: written out, it is number,
+   street and suburb together, and a form with the suburb left off is a form
+   handed back. So the address chips carry the suburbs these learners actually
+   write, Noble Park and Springvale. Mai's postcode is Noble Park's own 3174,
+   so her two boxes read as one real address. */
 const FORM_CARDS=[
   { who:'Ali Hassan',
     fields:[ {label:'First name',value:'Ali'}, {label:'Family name',value:'Hassan'},
              {label:'Date of birth',value:'12 March 1990'}, {label:'Phone',value:'0412 345 678'} ] },
   { who:'Mai Nguyen',
     fields:[ {label:'First name',value:'Mai'}, {label:'Family name',value:'Nguyen'},
-             {label:'Address',value:'24 Smith St'}, {label:'Postcode',value:'3174'} ] },
+             {label:'Address',value:'24 Smith St Noble Park'},
+             {label:'Postcode',value:'3174'} ] },
   { who:'Fatima Ahmadi',
     fields:[ {label:'First name',value:'Fatima'}, {label:'Family name',value:'Ahmadi'},
              {label:'Country of birth',value:'Afghanistan'}, {label:'Phone',value:'0433 221 100'} ] },
   { who:'Chen Wei',
     fields:[ {label:'First name',value:'Chen'}, {label:'Family name',value:'Wei'},
-             {label:'Date of birth',value:'3 July 1985'}, {label:'Address',value:'8 Park Rd'} ] },
+             {label:'Date of birth',value:'3 July 1985'},
+             {label:'Address',value:'8 Park Rd Springvale'} ] },
 ];
 function genFormQuestions(n){
   const pool=shuffle([...FORM_CARDS]);
