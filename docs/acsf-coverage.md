@@ -11,8 +11,8 @@ demonstrable and assessable, which is exactly the set a game can be built agains
 Nothing in the PF column is paraphrased or inferred: it is the source text, and it
 is the same text the teacher panel prints as its evidence for each row.
 
-**Every feature in this table is now addressed by the app.** `.07` (speaking) is out
-of scope: nothing here records or judges speech. Two features about handwriting and
+**Every feature in this table is addressed by the app.** `.07` (speaking) is out of
+scope: nothing here records or judges speech. Two features about handwriting and
 legible script are also not claimed, because that is `tracing.html` and paper.
 
 ## Legend
@@ -126,8 +126,8 @@ partial: one round of one game is not the sustained performance Level 1 describe
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
 | 1 | Follows print from left to right and top to bottom | 🆕 built | Which Comes First (left to right, top to bottom) |
-| 2 | Begins to make a connection between extremely simple text, pictures and symbols | ✅ had it | First Sounds, Odd One Out |
-| 3 | Links spoken and written forms of the names and sounds of letters | ✅ had it | Letter Names + First Sounds |
+| 2 | Begins to make a connection between extremely simple text, pictures and symbols | ✅ had it | Signs, Odd One Out |
+| 3 | Links spoken and written forms of the names and sounds of letters | ✅ had it | Letter Names |
 | 4 | Recognises different forms of the same letters, e.g. upper and lower case | 🆕 built | Big and Small Letters |
 | 5 | Recognises a small bank of extremely familiar words supported by pictures | ✅ had it | Clothes / Fruit / Body |
 

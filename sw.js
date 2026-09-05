@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v42';
+const CACHE = 'learntoread-v43';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -53,8 +53,6 @@ const OPTIONAL = [
   './elementary-sound-gap',
   './elementary-tap-word.html',
   './elementary-tap-word',
-  './first-sounds.html',
-  './first-sounds',
   './forms.html',
   './forms',
   './fruits.html',

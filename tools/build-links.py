@@ -69,7 +69,6 @@ GAMES = [
     ('speaking-game', 'speaking', 'Speaking Game', 'Say the answer out loud.'),
     ('translate', 'translate', 'Translate', 'Read it in your language, write it in English.'),
     ('letter-names', 'letter', 'Letter Names', 'Hear a letter name and choose the letter.'),
-    ('first-sounds', 'lettersound', 'First Sounds', 'Hear the first sound of a word.'),
     ('odd-one-out', 'oddone', 'Odd One Out', 'Find the word that does not belong.'),
     ('signs', 'signs', 'Signs', 'Read the signs you see around you.'),
     ('messages', 'sms', 'Messages', 'Read a short message and answer it.'),
