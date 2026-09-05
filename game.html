@@ -3466,11 +3466,25 @@ function genOrdinalQuestions(n,from){
 /* ── WHERE IS IT ──
    "Shows some recognition of extremely simple relative position words
    accompanied by gestures, e.g. up, down" (.09 Stage A), and the position
-   words listed under .11: "up, down, left, right, in front, behind". */
+   words listed under .11: "up, down, left, right, in front, behind".
+
+   The walker faces the way they are going, which is the whole reason for the
+   arrow: a figure standing beside a box says nothing about front or behind,
+   it just reads as the box being to one side — and "left" and "right" are two
+   of the options, so that picture was pointing at the wrong answer. Facing
+   settles it. Where the emoji is too new to render, it falls back to a walker
+   and an arrow side by side, which still says which way they are going.
+
+   Each item asks its own question, because "where is the box" makes no sense
+   over an arrow, and the question is spoken rather than the answer: saying
+   "which one is behind?" out loud handed the round to anyone listening. */
 const POSITIONS=[
-  {w:'up',      art:'⬆️'}, {w:'down', art:'⬇️'},
-  {w:'left',    art:'⬅️'}, {w:'right',art:'➡️'},
-  {w:'in front',art:'🧍‍♂️📦'}, {w:'behind', art:'📦🧍‍♂️'},
+  {w:'up',       art:'⬆️',      q:'Which way does the arrow point?'},
+  {w:'down',     art:'⬇️',      q:'Which way does the arrow point?'},
+  {w:'left',     art:'⬅️',      q:'Which way does the arrow point?'},
+  {w:'right',    art:'➡️',      q:'Which way does the arrow point?'},
+  {w:'in front', art:'🚶‍➡️📦', q:'Where is the box?'},
+  {w:'behind',   art:'📦🚶‍➡️', q:'Where is the box?'},
 ];
 function genPositionQuestions(n){
   const out=[];
@@ -3478,14 +3492,13 @@ function genPositionQuestions(n){
     const pick=POSITIONS[randInt(0,POSITIONS.length-1)];
     const alts=shuffle(POSITIONS.filter(function(p){ return p.w!==pick.w; })).slice(0,3)
                 .map(function(p){ return p.w; });
-    out.push({type:'mc', say:'Which one is '+pick.w+'?',
-      icon:'<span style="font-size:3rem;letter-spacing:4px;">'+pick.art+'</span>',
-      question:'🔊 Which word says where it is?',
+    out.push({type:'mc', say:pick.q,
+      icon:'<span style="font-size:3rem;letter-spacing:2px;">'+pick.art+'</span>',
+      question:'🔊 '+pick.q,
       answer:pick.w, choices:shuffle([pick.w].concat(alts))});
   }
   return out;
 }
-
 
 /* ══════════════ USING A DEVICE ══════════════
    The digital literacy indicators, .12 and .13, had no source at all until
