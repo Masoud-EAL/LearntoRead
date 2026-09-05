@@ -1365,6 +1365,22 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   padding:4px 14px;border-bottom:1.5px solid rgba(255,255,255,.18);text-align:left;}
 .pricelist td{padding:6px 14px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left;}
 .pricelist td:last-child{font-family:'Fredoka One',cursive;color:var(--gold);text-align:right;}
+/* A month, as a month looks. The marked square is the whole question, so it
+   is the one thing that has to survive on a small screen. */
+.calendar{border-collapse:collapse;margin:0 auto;font-size:.82rem;}
+.calendar caption{font-family:'Fredoka One',cursive;font-size:1.05rem;color:var(--gold);
+  padding-bottom:6px;}
+.calendar th{font-size:.62rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);
+  padding:2px 0;width:30px;}
+.calendar td{padding:3px 0;text-align:center;color:var(--text);width:30px;height:26px;}
+.calendar td.cal-mark{background:var(--accent);color:#fff;border-radius:8px;
+  font-family:'Fredoka One',cursive;}
+/* A row of figures with one of them picked out: first, second, third is a
+   position in a line before it is a word. */
+.ord-row{display:flex;align-items:center;justify-content:center;gap:2px;font-size:2rem;}
+.ord-fig{opacity:.45;filter:grayscale(1);}
+.ord-fig.ord-hit{opacity:1;filter:none;transform:scale(1.25);}
+.ord-arrow{color:var(--muted);font-size:1.1rem;}
 /* ── THE TEACHER'S PANEL ──
    Not a learner screen. It is dense on purpose: whoever is reading it is
    holding an assessor analysis sheet and wants the codes, the wording and the
@@ -1623,6 +1639,10 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="ordering" class="q-type-tab" onclick="selectSoloType('ordering',this)">↕️ Put In Order</button>
         <button data-type="placevalue" class="q-type-tab" onclick="selectSoloType('placevalue',this)">🔟 Tens and Ones</button>
         <button data-type="tableread" class="q-type-tab" onclick="selectSoloType('tableread',this)">📊 Read the List</button>
+        <button data-type="digitaltime" class="q-type-tab" onclick="selectSoloType('digitaltime',this)">🕐 Digital Time</button>
+        <button data-type="calendar" class="q-type-tab" onclick="selectSoloType('calendar',this)">📆 Find the Date</button>
+        <button data-type="ordinals" class="q-type-tab" onclick="selectSoloType('ordinals',this)">🥇 First, Second, Third</button>
+        <button data-type="position" class="q-type-tab" onclick="selectSoloType('position',this)">🧭 Where Is It</button>
         <button data-type="forms" class="q-type-tab" onclick="selectSoloType('forms',this)">📋 Forms</button>
         <button data-type="all" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">✨ All games</button>
         <button data-type="test:*" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">🎯 Test Yourself</button>
@@ -1814,6 +1834,10 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
             <button data-type="ordering" class="q-type-tab" onclick="selectQType('ordering',this)">↕️ Put In Order</button>
             <button data-type="placevalue" class="q-type-tab" onclick="selectQType('placevalue',this)">🔟 Tens and Ones</button>
             <button data-type="tableread" class="q-type-tab" onclick="selectQType('tableread',this)">📊 Read the List</button>
+            <button data-type="digitaltime" class="q-type-tab" onclick="selectQType('digitaltime',this)">🕐 Digital Time</button>
+            <button data-type="calendar" class="q-type-tab" onclick="selectQType('calendar',this)">📆 Find the Date</button>
+            <button data-type="ordinals" class="q-type-tab" onclick="selectQType('ordinals',this)">🥇 First, Second, Third</button>
+            <button data-type="position" class="q-type-tab" onclick="selectQType('position',this)">🧭 Where Is It</button>
             <button data-type="forms" class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
             <button data-type="all" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">✨ All games</button>
         <button data-type="test:*" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">🎯 Test Yourself</button>
@@ -3257,6 +3281,134 @@ function genTableQuestions(n,hi){
   return out;
 }
 
+
+/* ══════════════ TIME, DATES, ORDER AND POSITION ══════════════
+   Four small banks, each answering a named feature that nothing here covered.
+
+   The time one matters most. Every mention of time in the checklist is
+   digital: "Digital time in whole hours" at Stage B, and the ACSF's own Pre
+   Level 1 and Level 1 numeracy features say "Reads digital time" both times,
+   the second adding AM/PM. The Clock game in this app is an analogue face
+   with hands to drag. That is a real skill and worth keeping, but it is not
+   the one being asked for, and it was standing in for it. */
+function fmtDigital(h,m){ return h+':'+String(m).padStart(2,'0'); }
+
+/* ── DIGITAL TIME ──
+   from 0: whole hours, no AM/PM — "Digital time in whole hours", and the
+           ACSF Pre Level 1 feature "Reads digital time (not including
+           concept of AM/PM)".
+   from 1: half and quarter hours, still no AM/PM.
+   from 2: with AM/PM — ACSF Level 1, "Reads digital time, including AM/PM". */
+function genDigitalTimeQuestions(n,from){
+  const out=[], base=from||0;
+  for(let i=0;i<(n||8);i++){
+    const step=Math.min(base+ (i%2), 2);
+    const h=randInt(1,12);
+    const m=step===0?0:[0,15,30,45][randInt(0,3)];
+    const ampm=step>=2?(Math.random()<0.5?'AM':'PM'):'';
+    const shown=fmtDigital(h,m)+(ampm?' '+ampm:'');
+    const spoken=timeWords(h,m)+(ampm?(ampm==='AM'?' in the morning':' in the afternoon'):'');
+    if(i%2===0){
+      // Hear it, tap the clock that shows it.
+      const alts=[];
+      while(alts.length<3){
+        const ah=randInt(1,12), am=step===0?0:[0,15,30,45][randInt(0,3)];
+        const ap=step>=2?(Math.random()<0.5?'AM':'PM'):'';
+        const c=fmtDigital(ah,am)+(ap?' '+ap:'');
+        if(c!==shown&&alts.indexOf(c)<0) alts.push(c);
+      }
+      out.push({type:'mc', say:spoken, question:'🔊 Which one shows this time?',
+        answer:shown.toLowerCase(), choices:shuffle([shown].concat(alts))});
+    } else {
+      // Hear it, write it. This is the half that shows the learner can put a
+      // time down in figures rather than only pick it out of four.
+      out.push({type:'typein', label:'WRITE THE TIME', say:spoken,
+        question:'🔊 Write this time in numbers',
+        placeholder:step>=2?'e.g. 7:15 PM':'e.g. 7:15', answer:shown.toLowerCase()});
+    }
+  }
+  return out;
+}
+
+/* ── FIND THE DATE ──
+   "Days of the week, months of the year and personal key dates", and the
+   ACSF Pre Level 1 activity "Marks key dates or events in a calendar". A
+   month grid, and a question about one square in it. */
+const MONTH_DAYS=[31,28,31,30,31,30,31,31,30,31,30,31];
+function genCalendarQuestions(n){
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    const mi=randInt(0,11), name=SPELL_MONTHS[mi], days=MONTH_DAYS[mi];
+    const start=randInt(0,6);            // weekday the 1st falls on
+    const date=randInt(1,days);
+    const dow=SPELL_DAYS[(start+date-1)%7];
+    let cells='';
+    for(let b=0;b<start;b++) cells+='<td></td>';
+    for(let d=1;d<=days;d++){
+      const cls=d===date?' class="cal-mark"':'';
+      cells+='<td'+cls+'>'+d+'</td>';
+      if((start+d)%7===0) cells+='</tr><tr>';
+    }
+    const grid='<table class="calendar"><caption>'+name+'</caption><tr>'
+      +SPELL_DAYS.map(function(d){ return '<th>'+d.slice(0,2)+'</th>'; }).join('')
+      +'</tr><tr>'+cells+'</tr></table>';
+    const askDay=i%2===0;
+    const correct=askDay?dow:name;
+    const alts=askDay?shuffle(SPELL_DAYS.filter(function(d){ return d!==dow; })).slice(0,3)
+                     :shuffle(SPELL_MONTHS.filter(function(m){ return m!==name; })).slice(0,3);
+    out.push({type:'mc', noListen:true, icon:grid,
+      question:askDay?('What day is '+name+' '+date+'?'):'Which month is this?',
+      answer:correct.toLowerCase(), choices:shuffle([correct].concat(alts))});
+  }
+  return out;
+}
+
+/* ── FIRST, SECOND, THIRD ──
+   "Recognise oral ordinal numbers from 1st to 3rd" (.09), and the ordinals
+   named in the .11 list of things a learner uses informal language for. */
+const ORDINALS=['first','second','third','fourth','fifth'];
+const ORD_SHORT=['1st','2nd','3rd','4th','5th'];
+const ORD_FACES=['🧍','🧍‍♀️','🧍‍♂️','🧑','👩'];
+function genOrdinalQuestions(n,from){
+  const out=[], top=(from?5:3);
+  for(let i=0;i<(n||8);i++){
+    const pos=randInt(0,top-1);
+    const row=ORD_FACES.slice(0,top).map(function(f,ix){
+      return '<span class="ord-fig'+(ix===pos?' ord-hit':'')+'">'+f+'</span>';
+    }).join('<span class="ord-arrow">›</span>');
+    const correct=ORDINALS[pos];
+    const alts=shuffle(ORDINALS.slice(0,top).filter(function(o){ return o!==correct; })).slice(0,3);
+    out.push({type:'mc', say:'Which one is '+correct+'?',
+      icon:'<div class="ord-row">'+row+'</div>',
+      question:'🔊 Which one is marked?',
+      answer:correct, choices:shuffle([correct].concat(alts))});
+  }
+  return out;
+}
+
+/* ── WHERE IS IT ──
+   "Shows some recognition of extremely simple relative position words
+   accompanied by gestures, e.g. up, down" (.09 Stage A), and the position
+   words listed under .11: "up, down, left, right, in front, behind". */
+const POSITIONS=[
+  {w:'up',      art:'⬆️'}, {w:'down', art:'⬇️'},
+  {w:'left',    art:'⬅️'}, {w:'right',art:'➡️'},
+  {w:'in front',art:'🧍‍♂️📦'}, {w:'behind', art:'📦🧍‍♂️'},
+];
+function genPositionQuestions(n){
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    const pick=POSITIONS[randInt(0,POSITIONS.length-1)];
+    const alts=shuffle(POSITIONS.filter(function(p){ return p.w!==pick.w; })).slice(0,3)
+                .map(function(p){ return p.w; });
+    out.push({type:'mc', say:'Which one is '+pick.w+'?',
+      icon:'<span style="font-size:3rem;letter-spacing:4px;">'+pick.art+'</span>',
+      question:'🔊 Which word says where it is?',
+      answer:pick.w, choices:shuffle([pick.w].concat(alts))});
+  }
+  return out;
+}
+
 /* ── FILL THE FORM ──
    Chips of personal detail, dropped into the right labelled field. The answer
    is composed as the field order the learner produced, so it compares with a
@@ -3677,6 +3829,10 @@ const GEN_BANKS={
   ordering:     function(n,f){ return genOrderQuestions(n,f?100:10); },
   placevalue:   function(n){ return genPlaceValueQuestions(n); },
   tableread:    function(n,f){ return genTableQuestions(n,f?100:10); },
+  digitaltime:  function(n,f){ return genDigitalTimeQuestions(n,f); },
+  calendar:     function(n){ return genCalendarQuestions(n); },
+  ordinals:     function(n,f){ return genOrdinalQuestions(n,f); },
+  position:     function(n){ return genPositionQuestions(n); },
 };
 function isGenBank(t){ return Object.prototype.hasOwnProperty.call(GEN_BANKS,t); }
 
@@ -5756,14 +5912,14 @@ const BANK_SECTIONS=[
   {id:'*',          label:'✨ All games',        banks:null},
   {id:'letters',    label:'🔤 Letters & Sounds', banks:[...PHONICS_TYPES,'letter','lettersound','elementary']},
   {id:'vocab',      label:'📚 Vocabulary',       banks:['days','months','weather','fruits','body','clothes','spelling','oddone','translate']},
-  {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','lettersound','unscramble','speaking','clock']},
+  {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','lettersound','unscramble','speaking','clock','digitaltime','ordinals','position']},
   {id:'speaking',   label:'🗣️ Speaking',         banks:['speaking','questionwords','unscramble']},
   {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary','tableread']},
   {id:'writing',    label:'✍️ Writing',          banks:['wp1:gap','wp1:build','wp2:gap','wp2:build','days','months','weather','fruits','body','clothes','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary','numeralwrite']},
   {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble']},
-  {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target','numbertap','numeralwrite','addup','addmoney','ordering','placevalue','tableread']},
+  {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target','numbertap','numeralwrite','addup','addmoney','ordering','placevalue','tableread','digitaltime','calendar','ordinals','position']},
   {id:'translation',label:'🌐 Translation',      banks:['translate']},
-  {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','sms','clock','shop','forms','beginner','unscramble','gramscramble','speaking','translate']},
+  {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','sms','clock','shop','forms','beginner','unscramble','gramscramble','speaking','translate','digitaltime','calendar']},
 ];
 /* "All" and "Custom" are not a skill — they stay visible under every chip. */
 const SECTION_ALWAYS=['all','custom','test'];
@@ -6428,6 +6584,13 @@ const GAME_INFO={
   ordering:    {skill:'numeracy', name:'Put In Order', blurb:'Put numbers, money, days and months in order.'},
   placevalue:  {skill:'numeracy', name:'Tens and Ones', blurb:'How many tens and how many ones.'},
   tableread:   {skill:'numeracy', name:'Read the List', blurb:'Find a price in a list.'},
+  /* Digital, not analogue: every time feature in the checklist and in the
+     ACSF itself says "reads digital time". The Clock game keeps its place as
+     a life skill, but it is no longer standing in for this one. */
+  digitaltime: {skill:'numeracy', name:'Digital Time', blurb:'Hear a time and read it in numbers.'},
+  calendar:    {skill:'numeracy', name:'Find the Date', blurb:'Find a day and a date on a calendar.'},
+  ordinals:    {skill:'numeracy', name:'First, Second, Third', blurb:'Which one is first, second or third.'},
+  position:    {skill:'numeracy', name:'Where Is It', blurb:'Up, down, left, right, in front, behind.'},
   all:         {blurb:'A mix of every game.'},
 };
 /* Custom banks belong to one account and mean nothing to whoever the link is
