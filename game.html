@@ -1358,6 +1358,13 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 #screen-test-round[data-state="solo-final"] .solo-only,
 #screen-test-round[data-state="class-final"] .class-only{display:flex;}
 .test-wait{font-size:.9rem;color:var(--muted);}
+/* A price list is the most ordinary table an adult meets, so the rounds that
+   ask you to read one show a real one rather than a sentence about one. */
+.pricelist{border-collapse:collapse;margin:0 auto;font-size:1rem;min-width:220px;}
+.pricelist th{font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);
+  padding:4px 14px;border-bottom:1.5px solid rgba(255,255,255,.18);text-align:left;}
+.pricelist td{padding:6px 14px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left;}
+.pricelist td:last-child{font-family:'Fredoka One',cursive;color:var(--gold);text-align:right;}
 /* ── THE TEACHER'S PANEL ──
    Not a learner screen. It is dense on purpose: whoever is reading it is
    holding an assessor analysis sheet and wants the codes, the wording and the
@@ -1609,6 +1616,13 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="clock" class="q-type-tab" onclick="selectSoloType('clock',this)">⏰ Clock</button>
         <button data-type="shop" class="q-type-tab" onclick="selectSoloType('shop',this)">🛒 Shop</button>
         <button data-type="target" class="q-type-tab" onclick="selectSoloType('target',this)">🎲 Dice</button>
+        <button data-type="numbertap" class="q-type-tab" onclick="selectSoloType('numbertap',this)">🔢 Tap the Number</button>
+        <button data-type="numeralwrite" class="q-type-tab" onclick="selectSoloType('numeralwrite',this)">✍️ Write the Number</button>
+        <button data-type="addup" class="q-type-tab" onclick="selectSoloType('addup',this)">➕ Add It Up</button>
+        <button data-type="addmoney" class="q-type-tab" onclick="selectSoloType('addmoney',this)">💵 Add the Money</button>
+        <button data-type="ordering" class="q-type-tab" onclick="selectSoloType('ordering',this)">↕️ Put In Order</button>
+        <button data-type="placevalue" class="q-type-tab" onclick="selectSoloType('placevalue',this)">🔟 Tens and Ones</button>
+        <button data-type="tableread" class="q-type-tab" onclick="selectSoloType('tableread',this)">📊 Read the List</button>
         <button data-type="forms" class="q-type-tab" onclick="selectSoloType('forms',this)">📋 Forms</button>
         <button data-type="all" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">✨ All games</button>
         <button data-type="test:*" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">🎯 Test Yourself</button>
@@ -1793,6 +1807,13 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
             <button data-type="clock" class="q-type-tab" onclick="selectQType('clock',this)">⏰ Clock</button>
             <button data-type="shop" class="q-type-tab" onclick="selectQType('shop',this)">🛒 Shop</button>
             <button data-type="target" class="q-type-tab" onclick="selectQType('target',this)">🎲 Dice</button>
+            <button data-type="numbertap" class="q-type-tab" onclick="selectQType('numbertap',this)">🔢 Tap the Number</button>
+            <button data-type="numeralwrite" class="q-type-tab" onclick="selectQType('numeralwrite',this)">✍️ Write the Number</button>
+            <button data-type="addup" class="q-type-tab" onclick="selectQType('addup',this)">➕ Add It Up</button>
+            <button data-type="addmoney" class="q-type-tab" onclick="selectQType('addmoney',this)">💵 Add the Money</button>
+            <button data-type="ordering" class="q-type-tab" onclick="selectQType('ordering',this)">↕️ Put In Order</button>
+            <button data-type="placevalue" class="q-type-tab" onclick="selectQType('placevalue',this)">🔟 Tens and Ones</button>
+            <button data-type="tableread" class="q-type-tab" onclick="selectQType('tableread',this)">📊 Read the List</button>
             <button data-type="forms" class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
             <button data-type="all" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">✨ All games</button>
         <button data-type="test:*" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">🎯 Test Yourself</button>
@@ -3029,6 +3050,213 @@ function genShopQuestions(n,from){
   return out;
 }
 
+
+/* ══════════════ NUMERACY: THE COUNTED SKILLS ══════════════
+   The SEE Reporting Checklist names, for .09 .10 and .11, a short list of key
+   performance features that are all countable and concrete: recognise a
+   numeral, match it to its spoken name, add two of them, put them in order,
+   find one in a list, write one down. None of them are about spelling a
+   number word, and none of them are about an analogue clock face, which is
+   what this app used to offer in their place.
+
+   Two ranges throughout, because the checklist draws its line there and not
+   anywhere else: Stage A works to 10 and to $10, Stage B works to 100 and to
+   $100. `hi` carries that split into every generator below, so a round can
+   ask the same question at either end and the answer means something
+   different about the learner. */
+const NUM_WORDS=['zero','one','two','three','four','five','six','seven','eight','nine','ten',
+  'eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
+const TENS_WORDS=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+/* Spoken form for any number this app deals in. Engines read "45" reliably,
+   but the checklist asks for a match between a numeral and its *oral name*,
+   so the name is built here rather than left to the voice to improvise. */
+function numWord(n){
+  if(n<=20) return NUM_WORDS[n];
+  const t=Math.floor(n/10), o=n%10;
+  return TENS_WORDS[t]+(o?'-'+NUM_WORDS[o]:'');
+}
+function randInt(a,b){ return a+Math.floor(Math.random()*(b-a+1)); }
+/* Four options around a target, near enough to be a real choice. Distractors
+   are the confusions that actually happen at this level: digits swapped, one
+   out, ten out. */
+function numChoices(correct,hi){
+  const c=[String(correct)], swap=String(correct).split('').reverse().join('');
+  [correct+1,correct-1,correct+10,correct-10,parseInt(swap,10)].forEach(function(v){
+    if(v>=0&&v<=hi&&c.length<4&&c.indexOf(String(v))<0) c.push(String(v));
+  });
+  while(c.length<4){ const v=randInt(0,hi); if(c.indexOf(String(v))<0) c.push(String(v)); }
+  return shuffle(c);
+}
+const NUM_BIG='font-family:\'Fredoka One\',cursive;font-size:2.6rem;color:var(--gold);line-height:1;';
+
+/* ── TAP THE NUMBER ──
+   "Matches 0 to 10 symbols with oral name" / "Matches 0 to 100 symbols with
+   oral name". Hear it, tap the numeral. Zero is in the pool on purpose: the
+   checklist says "including 0" at both stages and it is the one numeral a
+   learner can go a whole course without being shown. */
+function genNumberTapQuestions(n,hi){
+  hi=hi||10;
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    const v=randInt(0,hi);
+    out.push({type:'mc', say:numWord(v), question:'🔊 Which number is this?',
+      answer:String(v), choices:numChoices(v,hi)});
+  }
+  return out;
+}
+
+/* ── WRITE THE NUMBER ──
+   ".11 Writes: numbers from 0 to 100, value of Australian coins and notes,
+   whole dollar monetary amounts" and "Uses personally relevant and informal
+   symbolism including numbers up to 100, e.g. 25 $, +, = $25.20".
+   Digits, not words. Spelling "twenty-five" is a writing skill and is already
+   covered by the number-word banks; writing "25" is the numeracy one, and
+   until now nothing in this app asked for it. */
+function genNumeralWriteQuestions(n,hi){
+  hi=hi||10;
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    const mode=i%3;
+    if(mode===0){
+      const v=randInt(0,hi);
+      out.push({type:'typein', label:'WRITE THE NUMBER', say:numWord(v),
+        question:'🔊 Write this number', placeholder:'e.g. '+(hi>10?'25':'5'),
+        answer:String(v)});
+    } else if(mode===1){
+      const d=DENOMS.filter(function(x){ return x.c<=hi*100; });
+      const pick=d[randInt(0,d.length-1)];
+      out.push({type:'typein', label:'WRITE THE AMOUNT', noListen:true,
+        icon:'<img src="icons/money-'+pick.file+'.svg" alt="" style="height:64px;">',
+        question:'Write what this is worth', placeholder:'e.g. 2 or 0.50',
+        answer:moneyAnswer(pick.c)});
+    } else {
+      const cents=randInt(1,hi)*100+(Math.random()<0.5?50:0);
+      out.push({type:'typein', label:'WRITE THE AMOUNT', say:moneySpoken(cents),
+        question:'🔊 Write this amount of money', placeholder:'e.g. 25.50',
+        answer:moneyAnswer(cents)});
+    }
+  }
+  return out;
+}
+
+/* ── ADD IT UP ──
+   ".10 Adds two whole numbers up to a total of 10 or less" and, at Stage B,
+   "up to a total of 100 or less (with no carrying)". No carrying is not a
+   detail: it is the difference between the two stages, so the Stage B
+   generator picks digits that cannot carry rather than picking any pair
+   under 100 and hoping. */
+function genAddQuestions(n,hi,money){
+  hi=hi||10;
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    let a,b;
+    if(hi<=10){ a=randInt(1,hi-1); b=randInt(1,hi-a); }
+    else {
+      // ones that cannot carry, tens that cannot overflow
+      const ao=randInt(1,8), bo=randInt(1,9-ao);
+      const at=randInt(1,8), bt=randInt(1,9-at);
+      a=at*10+ao; b=bt*10+bo;
+    }
+    const sum=a+b;
+    if(money){
+      out.push({type:'typein', label:'ADD THE MONEY', say:'What is '+numWord(a)+' dollars plus '+numWord(b)+' dollars?',
+        question:'🔊 $'+a+' + $'+b+' = ?', placeholder:'e.g. 7', answer:String(sum)});
+    } else {
+      out.push({type:'typein', label:'ADD IT UP', say:'What is '+numWord(a)+' plus '+numWord(b)+'?',
+        question:'🔊 '+a+' + '+b+' = ?', placeholder:'e.g. 7', answer:String(sum)});
+    }
+  }
+  return out;
+}
+
+/* ── PUT IN ORDER ──
+   ".10 Orders: Australian whole dollar notes and coins AND two whole numbers"
+   at Stage A, "in increasing value ... AND three whole numbers between 1 and
+   100" and "Orders days of the week and months of the year" at Stage B.
+   Tiles, because ordering is a thing you do rather than a thing you pick: the
+   tile engine already exists for the sentence games and takes any word list. */
+function genOrderQuestions(n,hi,kind){
+  hi=hi||10;
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    const k=kind||['num','money','days','months'][i%(hi<=10?2:4)];
+    let items,prompt;
+    if(k==='days'){
+      const st=randInt(0,3); items=SPELL_DAYS.slice(st,st+3); prompt='Put the days in order';
+    } else if(k==='months'){
+      const st=randInt(0,9); items=SPELL_MONTHS.slice(st,st+3); prompt='Put the months in order';
+    } else if(k==='money'){
+      const d=shuffle(DENOMS.filter(function(x){ return x.c<=hi*100; })).slice(0,3)
+              .sort(function(a,b){ return a.c-b.c; });
+      items=d.map(function(x){ return x.label; }); prompt='Smallest to biggest';
+    } else {
+      const set={};
+      while(Object.keys(set).length<(hi<=10?2:3)) set[randInt(1,hi)]=1;
+      items=Object.keys(set).map(Number).sort(function(a,b){ return a-b; }).map(String);
+      prompt='Smallest to biggest';
+    }
+    out.push({type:'unscramble', noListen:true, mute:true, label:'PUT IN ORDER — drag the tiles',
+      sentence:items.join(' '),
+      words:shuffle(items.slice()), question:prompt, answer:items.join(' ')});
+  }
+  return out;
+}
+
+/* ── TENS AND ONES ──
+   ".10 Understands place value for ones and tens". Stage B only: there is no
+   place value to understand under 10. */
+function genPlaceValueQuestions(n){
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    const v=randInt(11,99), tens=Math.floor(v/10), ones=v%10;
+    const askTens=i%2===0;
+    const correct=String(askTens?tens:ones);
+    const c=[correct];
+    [String(askTens?ones:tens),String(v).slice(0,1),String(v).slice(1),
+     String(randInt(0,9))].forEach(function(x){ if(c.length<4&&c.indexOf(x)<0) c.push(x); });
+    while(c.length<4){ const x=String(randInt(0,9)); if(c.indexOf(x)<0) c.push(x); }
+    out.push({type:'mc', noListen:true,
+      icon:'<span style="'+NUM_BIG+'">'+v+'</span>',
+      question:'How many '+(askTens?'tens':'ones')+' in '+v+'?',
+      answer:correct, choices:shuffle(c)});
+  }
+  return out;
+}
+
+/* ── READ THE LIST ──
+   ".10 Uses knowledge of personally relevant and extremely simple lists and
+   two column tables to locate: whole numbers ... AND whole dollar monetary
+   amounts", and Reading ".04 Identifies information in a simple diagram,
+   table, map or plan". A two column price list is the most ordinary table an
+   adult meets, so that is the one this asks about. */
+const LIST_ITEMS=[['🍞','Bread'],['🥛','Milk'],['🥚','Eggs'],['🍎','Apples'],['🧀','Cheese'],
+  ['🍚','Rice'],['🫖','Tea'],['☕','Coffee'],['🍌','Bananas'],['🧴','Soap']];
+function genTableQuestions(n,hi){
+  hi=hi||10;
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    const rows=shuffle(LIST_ITEMS.slice()).slice(0,4).map(function(it){
+      // Capped well under the band's ceiling: the checklist asks for a number
+      // to be located in a list, and $98 for a loaf of bread would be the
+      // first thing an adult noticed instead.
+      return {name:it[1], emoji:it[0], cents:randInt(1,Math.min(hi,20))*100+(Math.random()<0.5?50:0)};
+    });
+    const tgt=rows[randInt(0,rows.length-1)];
+    const dearest=rows.slice().sort(function(a,b){ return b.cents-a.cents; })[0];
+    const ask=i%2===0;
+    const html='<table class="pricelist"><tr><th>Item</th><th>Price</th></tr>'
+      +rows.map(function(r){ return '<tr><td>'+r.emoji+' '+r.name+'</td><td>'+money(r.cents)+'</td></tr>'; }).join('')
+      +'</table>';
+    const correct=ask?moneyAnswer(tgt.cents):dearest.name;
+    const alts=ask?rows.filter(function(r){ return r!==tgt; }).map(function(r){ return moneyAnswer(r.cents); })
+                  :rows.filter(function(r){ return r!==dearest; }).map(function(r){ return r.name; });
+    out.push({type:'mc', noListen:true, icon:html,
+      question:ask?('How much is '+tgt.name+'?'):'Which one costs the most?',
+      answer:correct.toLowerCase(), choices:shuffle([correct].concat(alts.slice(0,3)))});
+  }
+  return out;
+}
+
 /* ── FILL THE FORM ──
    Chips of personal detail, dropped into the right labelled field. The answer
    is composed as the field order the learner produced, so it compares with a
@@ -3398,6 +3626,9 @@ function poolFor(type){
   if(type==='clock') return [...questionBank.clock];
   if(type==='shop') return [...questionBank.shop];
   if(type==='forms') return [...questionBank.forms];
+  // The newer generated banks hold no fixed list at all: they are built on
+  // demand, so a draw of them is the only pool there is.
+  if(isGenBank(type)) return GEN_BANKS[type](12,0);
   // "All" inside a section means all of *that section's* banks — the type
   // string carries the section ("all:numeracy") so nothing needs hidden state.
   const sec=sectionOf(type);
@@ -3427,16 +3658,32 @@ function sectionOf(type){
   return s&&s.banks?s:null;
 }
 
+/* ── GENERATED BANKS ──
+   Banks that are built fresh on every draw rather than held as a fixed list,
+   so the same eight clock faces or the same four prices don't come round
+   every game. Each takes (how many, how hard); `from` is the difficulty, and
+   it means whatever that bank says it means — the half of Clock or Shop being
+   dealt, or the range a numeracy round works in. A level-check band names a
+   bank and an offset and needs nothing else. */
+const GEN_BANKS={
+  oddone:       function(n){ return genOddOneOut(n); },
+  clock:        function(n,f){ return genClockQuestions(n,f); },
+  shop:         function(n,f){ return genShopQuestions(n,f); },
+  forms:        function(n){ return genFormQuestions(n); },
+  numbertap:    function(n,f){ return genNumberTapQuestions(n,f?100:10); },
+  numeralwrite: function(n,f){ return genNumeralWriteQuestions(n,f?100:10); },
+  addup:        function(n,f){ return genAddQuestions(n,f?100:10,false); },
+  addmoney:     function(n,f){ return genAddQuestions(n,f?100:10,true); },
+  ordering:     function(n,f){ return genOrderQuestions(n,f?100:10); },
+  placevalue:   function(n){ return genPlaceValueQuestions(n); },
+  tableread:    function(n,f){ return genTableQuestions(n,f?100:10); },
+};
+function isGenBank(t){ return Object.prototype.hasOwnProperty.call(GEN_BANKS,t); }
+
 function getQuestions(type,limit){
   // Dice games have no questions at all — they run their own screens.
   if(isSpecialGame(type)) return [];
-  // Build a fresh, category-balanced set each game so categories don't cluster.
-  if(type==='oddone') return genOddOneOut(limit);
-  // Clock, shop and forms are generated, not fixed lists — rebuild each game
-  // so the same times, prices and cards don't come round every time.
-  if(type==='clock') return genClockQuestions(limit);
-  if(type==='shop')  return genShopQuestions(limit);
-  if(type==='forms') return genFormQuestions(limit);
+  if(isGenBank(type)) return GEN_BANKS[type](limit,0);
   // Both word-pronunciation banks are drawn fresh so the families, the words
   // and the round shapes vary between games.
   if(isPhonicsType(type)) return genPhonicsQuestions(type,limit);
@@ -5511,10 +5758,10 @@ const BANK_SECTIONS=[
   {id:'vocab',      label:'📚 Vocabulary',       banks:['days','months','weather','fruits','body','clothes','spelling','oddone','translate']},
   {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','lettersound','unscramble','speaking','clock']},
   {id:'speaking',   label:'🗣️ Speaking',         banks:['speaking','questionwords','unscramble']},
-  {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary']},
-  {id:'writing',    label:'✍️ Writing',          banks:['wp1:gap','wp1:build','wp2:gap','wp2:build','days','months','weather','fruits','body','clothes','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary']},
+  {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary','tableread']},
+  {id:'writing',    label:'✍️ Writing',          banks:['wp1:gap','wp1:build','wp2:gap','wp2:build','days','months','weather','fruits','body','clothes','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary','numeralwrite']},
   {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble']},
-  {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target']},
+  {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target','numbertap','numeralwrite','addup','addmoney','ordering','placevalue','tableread']},
   {id:'translation',label:'🌐 Translation',      banks:['translate']},
   {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','sms','clock','shop','forms','beginner','unscramble','gramscramble','speaking','translate']},
 ];
@@ -6171,6 +6418,16 @@ const GAME_INFO={
   shop:        {skill:'numeracy',  blurb:'Count the coins and pay the right amount.'},
   target:      {skill:'numeracy',  blurb:'Roll two dice and get closest to the target.'},
   forms:       {skill:'everyday',  blurb:'Fill in a form with your details.'},
+  /* The counted numeracy skills the SEE Reporting Checklist actually names:
+     recognise a numeral, match it to its spoken name, add two, order them,
+     find one in a list, write one down. */
+  numbertap:   {skill:'numeracy', name:'Tap the Number', blurb:'Hear a number and tap it.'},
+  numeralwrite:{skill:'numeracy', name:'Write the Number', blurb:'Write numbers and money in figures.'},
+  addup:       {skill:'numeracy', name:'Add It Up', blurb:'Add two numbers together.'},
+  addmoney:    {skill:'numeracy', name:'Add the Money', blurb:'Add two amounts of money.'},
+  ordering:    {skill:'numeracy', name:'Put In Order', blurb:'Put numbers, money, days and months in order.'},
+  placevalue:  {skill:'numeracy', name:'Tens and Ones', blurb:'How many tens and how many ones.'},
+  tableread:   {skill:'numeracy', name:'Read the List', blurb:'Find a price in a list.'},
   all:         {blurb:'A mix of every game.'},
 };
 /* Custom banks belong to one account and mean nothing to whoever the link is
@@ -6609,9 +6866,8 @@ function acsfPickSteps(band,n){
    freshly drawn and the fixed ones stay shuffled. A bank that cannot fill a
    round in one draw is drawn again rather than dealing a short round. */
 function testQuestions(step,n){
-  const draw=()=>step.type==='clock'?genClockQuestions(n,step.from||0)
-               :step.type==='shop' ?genShopQuestions(n,step.from||0)
-               :getQuestions(step.type,n);
+  const draw=()=>isGenBank(step.type)?GEN_BANKS[step.type](n,step.from||0)
+                                     :getQuestions(step.type,n);
   let qs=draw();
   for(let i=0;qs.length<n&&i<4;i++) qs=qs.concat(draw());
   return qs.slice(0,n);
@@ -7383,8 +7639,9 @@ function showStudentQuestion(q,startedAt,dur){
     isClock?'CLOCK — drag the hands to the right time':
     isShop?(q.mode==='change'?'MONEY — tap coins to make your change':'MONEY — tap coins to pay the right amount'):
     isForm?'FORM — put each answer in the right box':
-    isTile?(q.type==='gramscramble'?'GRAMMAR — arrange words in order':q.type==='phbuild'?'BUILD THE WORD — put the sounds in order':q.type==='speak'?'SPEAKING — listen, then build your answer':'UNSCRAMBLE — arrange the word tiles'):
+    isTile?(q.label||(q.type==='gramscramble'?'GRAMMAR — arrange words in order':q.type==='phbuild'?'BUILD THE WORD — put the sounds in order':q.type==='speak'?'SPEAKING — listen, then build your answer':'UNSCRAMBLE — arrange the word tiles')):
     isTranslate?'TRANSLATE — type the English sentence':
+    q.type==='typein'?(q.label||'TYPE THE ANSWER'):
     q.type==='sentence'?'SENTENCE — type the missing word':'WORD — listen and spell it';
   // For a picture round, don't show the answer's own picture as the prompt.
   document.getElementById('s-q-emoji').innerHTML=q.icon||(q.type==='word'&&!isMc?emo(q.word):'');
@@ -7418,7 +7675,10 @@ function showStudentQuestion(q,startedAt,dur){
       q.type==='phbuild'?('🔊 '+q.family+' — put the sounds in order'):
       isTile?'Put the words in the correct order:':q.type==='sentence'?q.display:'🔊 Listen carefully…';
     setQTextLang(null);
-    document.getElementById('student-ans-input').placeholder='Type your answer…';
+    // A typed round can say what belongs in the box: "45.50", "7:15", your
+    // own name. On a screen this small the placeholder is most of the
+    // instruction, so it is worth more than one generic line.
+    document.getElementById('student-ans-input').placeholder=q.placeholder||'Type your answer…';
   }
   if(isMc) renderMcChoices(q);
   if(isTile){
@@ -7772,6 +8032,15 @@ function studentSpeak(q){
   const Q=currentStudentQ;
   if(!Q) return;
   if(Q.type==='gramscramble'||Q.type==='translate') return;
+  // Some rounds must never speak, because the thing that would be spoken is
+  // the answer: putting numbers in order is the obvious one.
+  if(Q.mute) return;
+  // A question can carry its own spoken line. The banks below this one each
+  // speak a different part of themselves (the word, the sentence, the money
+  // instruction), which worked while every bank was one of a known handful.
+  // The newer ones say things that are not any field the old branches know
+  // about, so they say what to speak rather than being guessed at.
+  if(Q.say){ speakTTS(Q.say); return; }
   // Question-word banks in multiple choice are a reading task — no audio would
   // give the answer away. When typing, fall through so the full question is read.
   if(Q.qword&&Array.isArray(Q.choices)&&Q.choices.length) return;
