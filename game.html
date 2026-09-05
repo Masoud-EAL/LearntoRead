@@ -1391,6 +1391,27 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .digi-dialog .dd-title{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--accent);}
 .digi-dialog .dd-body{font-size:.84rem;color:var(--muted);margin-top:3px;}
 .digi-code{font-family:'Fredoka One',cursive;font-size:2.8rem;letter-spacing:10px;color:var(--gold);}
+/* The thing being copied, big enough to read back a letter at a time without
+   losing your place, and clearly a model rather than an answer. */
+.copy-model{display:inline-block;font-family:'Fredoka One',cursive;font-size:2.1rem;
+  color:var(--teal);background:rgba(15,155,142,.10);border:1.5px dashed rgba(15,155,142,.5);
+  border-radius:12px;padding:6px 18px;letter-spacing:1px;}
+.copy-model.sm{font-size:1.25rem;letter-spacing:0;}
+.case-big{font-family:'Fredoka One',cursive;font-size:3.6rem;color:var(--gold);}
+/* A line of words with the spaces made obvious, for the round about which
+   word comes first. */
+.dir-line{display:inline-flex;flex-wrap:wrap;gap:10px;justify-content:center;
+  font-size:1.15rem;font-weight:800;}
+.dir-line span{background:rgba(255,255,255,.06);border-radius:8px;padding:3px 10px;}
+/* A notice, laid out where a notice puts things: heading up top, the details
+   under it, the price on its own. The layout is the question. */
+.notice{max-width:250px;margin:0 auto;background:#fffdf5;color:#1a1a1a;border-radius:8px;
+  padding:12px 14px;text-align:center;box-shadow:0 8px 22px rgba(0,0,0,.45);}
+.notice .nt-h{font-family:'Fredoka One',cursive;font-size:1.2rem;letter-spacing:1px;
+  border-bottom:2px solid #1a1a1a;padding-bottom:5px;margin-bottom:6px;}
+.notice .nt-l{font-size:.86rem;color:#444;}
+.notice .nt-d{font-size:.95rem;font-weight:800;margin-top:3px;}
+.notice .nt-p{font-family:'Fredoka One',cursive;font-size:1.35rem;margin-top:6px;color:#0a7d33;}
 /* ── THE TEACHER'S PANEL ──
    Not a learner screen. It is dense on purpose: whoever is reading it is
    holding an assessor analysis sheet and wants the codes, the wording and the
@@ -1658,6 +1679,13 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="prompts" class="q-type-tab" onclick="selectSoloType('prompts',this)">⚠️ Screen Messages</button>
         <button data-type="devicecare" class="q-type-tab" onclick="selectSoloType('devicecare',this)">🔋 Looking After It</button>
         <button data-type="safeinfo" class="q-type-tab" onclick="selectSoloType('safeinfo',this)">🔒 Safe or Private</button>
+        <button data-type="copyword" class="q-type-tab" onclick="selectSoloType('copyword',this)">📝 Copy It</button>
+        <button data-type="casematch" class="q-type-tab" onclick="selectSoloType('casematch',this)">🔠 Big and Small Letters</button>
+        <button data-type="direction" class="q-type-tab" onclick="selectSoloType('direction',this)">➡️ Which Comes First</button>
+        <button data-type="sightwords" class="q-type-tab" onclick="selectSoloType('sightwords',this)">👁️ Sight Words</button>
+        <button data-type="punctuation" class="q-type-tab" onclick="selectSoloType('punctuation',this)">❕ Capitals and Full Stops</button>
+        <button data-type="modelsentence" class="q-type-tab" onclick="selectSoloType('modelsentence',this)">✏️ Write a Sentence</button>
+        <button data-type="notice" class="q-type-tab" onclick="selectSoloType('notice',this)">📢 Read the Notice</button>
         <button data-type="forms" class="q-type-tab" onclick="selectSoloType('forms',this)">📋 Forms</button>
         <button data-type="all" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">✨ All games</button>
         <button data-type="test:*" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">🎯 Test Yourself</button>
@@ -1858,6 +1886,13 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
             <button data-type="prompts" class="q-type-tab" onclick="selectQType('prompts',this)">⚠️ Screen Messages</button>
             <button data-type="devicecare" class="q-type-tab" onclick="selectQType('devicecare',this)">🔋 Looking After It</button>
             <button data-type="safeinfo" class="q-type-tab" onclick="selectQType('safeinfo',this)">🔒 Safe or Private</button>
+            <button data-type="copyword" class="q-type-tab" onclick="selectQType('copyword',this)">📝 Copy It</button>
+            <button data-type="casematch" class="q-type-tab" onclick="selectQType('casematch',this)">🔠 Big and Small Letters</button>
+            <button data-type="direction" class="q-type-tab" onclick="selectQType('direction',this)">➡️ Which Comes First</button>
+            <button data-type="sightwords" class="q-type-tab" onclick="selectQType('sightwords',this)">👁️ Sight Words</button>
+            <button data-type="punctuation" class="q-type-tab" onclick="selectQType('punctuation',this)">❕ Capitals and Full Stops</button>
+            <button data-type="modelsentence" class="q-type-tab" onclick="selectQType('modelsentence',this)">✏️ Write a Sentence</button>
+            <button data-type="notice" class="q-type-tab" onclick="selectQType('notice',this)">📢 Read the Notice</button>
             <button data-type="forms" class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
             <button data-type="all" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">✨ All games</button>
         <button data-type="test:*" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">🎯 Test Yourself</button>
@@ -3586,6 +3621,205 @@ function genSafeQuestions(n,from){
   return out;
 }
 
+
+/* ══════════════ COPYING, CASE, SIGHT WORDS AND SENTENCES ══════════════
+   The writing half of the checklist is mostly the word "copies": copies
+   letters, copies first and last name, copies numbers of one or two digits,
+   copies single words left to right. Copying is the entry to writing at this
+   level and this app had none of it on screen — only tracing.html, which is
+   a different app and outside the test.
+
+   Copying on a keyboard is not copying with a pencil, and the profile says
+   so. What it does show is that the learner can hold a string of letters in
+   mind and put it down in the right order, which is what the feature is
+   about once the handwriting is set aside. */
+const COPY_WORDS=['bus','shop','milk','name','home','work','food','door','week','city',
+  'bank','card','time','help','open','stop','exit','road','rent','post'];
+
+/* ── COPY IT ──
+   from 0: single words, shown and typed.
+   from 1: a first and last name, and one or two digit numbers, which are the
+           two the checklist names specifically. */
+function genCopyQuestions(n,from){
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    const mode=from?(i%3):(i%2);
+    if(mode===0){
+      const w=COPY_WORDS[randInt(0,COPY_WORDS.length-1)];
+      out.push({type:'typein', label:'COPY THE WORD', noListen:true,
+        icon:'<span class="copy-model">'+w+'</span>',
+        question:'Type this word', placeholder:w.length+' letters', answer:w});
+    } else if(mode===1){
+      const c=FORM_CARDS[randInt(0,FORM_CARDS.length-1)];
+      out.push({type:'typein', label:'COPY THE NAME', noListen:true,
+        icon:'<span class="copy-model">'+c.who+'</span>',
+        question:'Type this name', placeholder:'First and last name', answer:c.who.toLowerCase()});
+    } else {
+      const v=randInt(1,99);
+      out.push({type:'typein', label:'COPY THE NUMBER', noListen:true,
+        icon:'<span class="copy-model">'+v+'</span>',
+        question:'Type this number', placeholder:'1 or 2 numbers', answer:String(v)});
+    }
+  }
+  return out;
+}
+
+/* ── BIG AND SMALL LETTERS ──
+   ".04 Recognises different forms of the same letters, e.g. upper and lower
+   case" and ".06 Uses upper and lower case in extremely familiar words".
+   Matching first, then writing a word with the capital in the right place. */
+const CASE_NAMES=['Ali','Fatima','Nada','Hassan','Maria','Omar','Linh','Sara'];
+function genCaseQuestions(n,from){
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    if(from&&i%2===1){
+      // A name is the word every learner has to get the capital right on.
+      const nm=CASE_NAMES[randInt(0,CASE_NAMES.length-1)];
+      out.push({type:'typein', label:'WRITE IT WITH A CAPITAL', noListen:true,
+        icon:'<span class="copy-model">'+nm.toLowerCase()+'</span>',
+        question:'Write this name with a big letter at the start',
+        placeholder:'e.g. Ali', answer:nm, matchCase:true});
+    } else {
+      const A=String.fromCharCode(65+randInt(0,25));
+      const want=Math.random()<0.5;   // show big, ask small, or the reverse
+      const shown=want?A:A.toLowerCase();
+      const correct=want?A.toLowerCase():A;
+      const alts=[];
+      while(alts.length<3){
+        const o=String.fromCharCode(65+randInt(0,25));
+        const c=want?o.toLowerCase():o;
+        if(c!==correct&&alts.indexOf(c)<0) alts.push(c);
+      }
+      out.push({type:'mc', noListen:true, textOnly:true,
+        icon:'<span class="case-big">'+shown+'</span>',
+        question:want?'Which one is the small letter?':'Which one is the big letter?',
+        answer:correct, choices:shuffle([correct].concat(alts))});
+    }
+  }
+  return out;
+}
+
+/* ── WHICH COMES FIRST ──
+   ".04 Follows print from left to right and top to bottom". Not a reading
+   task in itself, but the one every reading task rests on, and the only
+   feature in the checklist about the mechanics of where the eye goes. */
+function genDirectionQuestions(n){
+  const out=[];
+  const src=UNSCRAMBLE_SENTENCES.length?UNSCRAMBLE_SENTENCES:['I go to the shop'];
+  for(let i=0;i<(n||8);i++){
+    const words=src[randInt(0,src.length-1)].replace(/[.?!]/g,'').split(/\s+/);
+    if(words.length<3) continue;
+    const line='<span class="dir-line">'+words.map(function(w){ return '<span>'+w+'</span>'; }).join('')+'</span>';
+    const ask=i%2===0;
+    const correct=ask?words[0]:words[words.length-1];
+    const alts=shuffle(words.filter(function(w){ return w!==correct; })).slice(0,3);
+    out.push({type:'mc', noListen:true, textOnly:true, icon:line,
+      question:ask?'Which word is first?':'Which word is last?',
+      answer:correct.toLowerCase(), choices:shuffle([correct].concat(alts))});
+  }
+  return out.length?out:genDirectionQuestions(n);
+}
+
+/* ── SIGHT WORDS ──
+   ".04 Recognises a number of high frequency words/basic sight words and
+   common phrases, e.g. down, would, have, little, come, when" — the list is
+   the checklist's own, extended with the rest of the words that carry a
+   simple English sentence and cannot be sounded out reliably. */
+const SIGHT_WORDS=['down','would','have','little','come','when','the','and','you','was',
+  'they','said','with','what','from','there','were','this','that','some',
+  'here','your','then','been','which','their','into','more','than','many'];
+function genSightWordQuestions(n){
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    const w=SIGHT_WORDS[randInt(0,SIGHT_WORDS.length-1)];
+    const alts=shuffle(SIGHT_WORDS.filter(function(x){ return x!==w; })).slice(0,3);
+    out.push({type:'mc', textOnly:true, say:w, question:'🔊 Tap the word you hear',
+      answer:w, choices:shuffle([w].concat(alts))});
+  }
+  return out;
+}
+
+/* ── CAPITAL LETTERS AND FULL STOPS ──
+   ".04 Recognises some basic punctuation and understands its use in
+   meaning-making, e.g. a full stop", ".06 Uses capital letters and full
+   stops accurately in sentences adapted from a model", and at Level 1
+   ".06 Uses basic punctuation ... but this may be inconsistent". */
+function genPunctuationQuestions(n,from){
+  const out=[];
+  const src=UNSCRAMBLE_SENTENCES.length?UNSCRAMBLE_SENTENCES:['I go to the shop.'];
+  for(let i=0;i<(n||8);i++){
+    const raw=src[randInt(0,src.length-1)].replace(/[.?!]+$/,'');
+    const good=raw.charAt(0).toUpperCase()+raw.slice(1)+'.';
+    if(from&&i%2===1){
+      // Write it properly, rather than picking the one that is.
+      out.push({type:'typein', label:'ADD THE CAPITAL AND THE FULL STOP', noListen:true,
+        icon:'<span class="copy-model">'+raw.toLowerCase()+'</span>',
+        question:'Write it with a big letter and a full stop',
+        placeholder:'Start big, end with .', answer:good, matchCase:true, matchPunct:true});
+    } else {
+      const bad=[raw.toLowerCase()+'.', good.replace(/\.$/,''), raw.toLowerCase()];
+      out.push({type:'mc', noListen:true, textOnly:true,
+        question:'Which one is written correctly?',
+        answer:good.toLowerCase(), choices:shuffle([good].concat(bad.slice(0,3)))});
+    }
+  }
+  return out;
+}
+
+/* ── WRITE A SENTENCE ──
+   ".05 Writes two simple sentences adapted from a model" at Stage B, and at
+   Level 1 "Writes two short simple text types" and "Writes short texts with
+   simple structures". A model is given and one word changes: that is what
+   "adapted from a model" means, and it is a long way short of free writing,
+   which is the honest ceiling here. */
+const SENTENCE_MODELS=[
+  {model:'My name is David.',        ask:'Write it with your own name.',       stem:'My name is ',  hint:'your name'},
+  {model:'I live in Springvale.',    ask:'Write it with your own suburb.',     stem:'I live in ',   hint:'your suburb'},
+  {model:'I come from Vietnam.',     ask:'Write it with your own country.',    stem:'I come from ', hint:'your country'},
+  {model:'I have two children.',     ask:'Write it with your own number.',     stem:'I have ',      hint:'a number, then children'},
+  {model:'My class is on Monday.',   ask:'Write it with your own day.',        stem:'My class is on ', hint:'a day'},
+  {model:'I go to the shop.',        ask:'Write it with a different place.',   stem:'I go to the ', hint:'a place'},
+];
+function genSentenceQuestions(n){
+  const out=[];
+  for(let i=0;i<(n||6);i++){
+    const m=SENTENCE_MODELS[i%SENTENCE_MODELS.length];
+    out.push({type:'typein', label:'WRITE A SENTENCE', noListen:true, freeText:true,
+      icon:'<span class="copy-model sm">'+m.model+'</span>',
+      question:m.ask, placeholder:m.stem+'…', answer:m.model, stem:m.stem, hintText:m.hint});
+  }
+  return out;
+}
+
+/* ── READ THE NOTICE ──
+   ".03 Recognises some simple ways in which visual features like layout are
+   used to send a message and how this may influence interpretation". A real
+   notice, where the heading, the date and the price are in the places a
+   notice puts them, and the question is which part says what. */
+const NOTICES=[
+  {h:'ENGLISH CLASS',   l:'Room 4',        d:'Monday 9:00 am',  p:'Free'},
+  {h:'SHOP CLOSED',     l:'Back Tuesday',  d:'Monday 5 May',    p:''},
+  {h:'BUS TIMETABLE',   l:'Stop 12',       d:'Every 20 minutes',p:'$3.50'},
+  {h:'DOCTOR',          l:'Clinic Road',   d:'Friday 2:30 pm',  p:'$40.00'},
+  {h:'FOR SALE',        l:'Call 9412 3344',d:'This weekend',    p:'$25.00'},
+];
+function genNoticeQuestions(n){
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    const N=NOTICES[randInt(0,NOTICES.length-1)];
+    const html='<div class="notice"><div class="nt-h">'+N.h+'</div>'
+      +'<div class="nt-l">'+N.l+'</div><div class="nt-d">'+N.d+'</div>'
+      +(N.p?'<div class="nt-p">'+N.p+'</div>':'')+'</div>';
+    const opts=[['What is this notice about?',N.h],['When is it?',N.d]];
+    if(N.p) opts.push(['How much is it?',N.p]);
+    const pick=opts[i%opts.length];
+    const alts=[N.h,N.l,N.d,N.p].filter(function(x){ return x&&x!==pick[1]; }).slice(0,3);
+    out.push({type:'mc', noListen:true, icon:html, question:pick[0],
+      answer:pick[1].toLowerCase(), choices:shuffle([pick[1]].concat(alts))});
+  }
+  return out;
+}
+
 /* ── FILL THE FORM ──
    Chips of personal detail, dropped into the right labelled field. The answer
    is composed as the field order the learner produced, so it compares with a
@@ -4015,6 +4249,13 @@ const GEN_BANKS={
   prompts:      function(n){ return genPromptQuestions(n); },
   devicecare:   function(n){ return genDeviceCareQuestions(n); },
   safeinfo:     function(n,f){ return genSafeQuestions(n,f); },
+  copyword:     function(n,f){ return genCopyQuestions(n,f); },
+  casematch:    function(n,f){ return genCaseQuestions(n,f); },
+  direction:    function(n){ return genDirectionQuestions(n); },
+  sightwords:   function(n){ return genSightWordQuestions(n); },
+  punctuation:  function(n,f){ return genPunctuationQuestions(n,f); },
+  modelsentence:function(n){ return genSentenceQuestions(n); },
+  notice:       function(n){ return genNoticeQuestions(n); },
 };
 function isGenBank(t){ return Object.prototype.hasOwnProperty.call(GEN_BANKS,t); }
 
@@ -6092,12 +6333,12 @@ function initSolo(){
    re-grouping: each pill still appears exactly once in the list. */
 const BANK_SECTIONS=[
   {id:'*',          label:'✨ All games',        banks:null},
-  {id:'letters',    label:'🔤 Letters & Sounds', banks:[...PHONICS_TYPES,'letter','lettersound','elementary']},
+  {id:'letters',    label:'🔤 Letters & Sounds', banks:[...PHONICS_TYPES,'letter','lettersound','elementary','casematch']},
   {id:'vocab',      label:'📚 Vocabulary',       banks:['days','months','weather','fruits','body','clothes','spelling','oddone','translate']},
   {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','lettersound','unscramble','speaking','clock','digitaltime','ordinals','position']},
   {id:'speaking',   label:'🗣️ Speaking',         banks:['speaking','questionwords','unscramble']},
-  {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary','tableread']},
-  {id:'writing',    label:'✍️ Writing',          banks:['wp1:gap','wp1:build','wp2:gap','wp2:build','days','months','weather','fruits','body','clothes','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary','numeralwrite']},
+  {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary','tableread','direction','sightwords','notice']},
+  {id:'writing',    label:'✍️ Writing',          banks:['wp1:gap','wp1:build','wp2:gap','wp2:build','days','months','weather','fruits','body','clothes','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary','numeralwrite','copyword','punctuation','modelsentence']},
   {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble']},
   {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target','numbertap','numeralwrite','addup','addmoney','ordering','placevalue','tableread','digitaltime','calendar','ordinals','position']},
   {id:'translation',label:'🌐 Translation',      banks:['translate']},
@@ -6783,6 +7024,15 @@ const GAME_INFO={
   prompts:     {skill:'digital', name:'Screen Messages', blurb:'Answer a message on the screen.'},
   devicecare:  {skill:'digital', name:'Looking After It', blurb:'Battery, sound and internet.'},
   safeinfo:    {skill:'digital', name:'Safe or Private', blurb:'Copy a code, and what to keep private.'},
+  /* The writing half of the checklist is mostly the word "copies", and none
+     of it was on screen: tracing.html is a different app and outside the test. */
+  copyword:    {skill:'writing', name:'Copy It', blurb:'Copy a word, a name or a number.'},
+  casematch:   {skill:'letters', name:'Big and Small Letters', blurb:'Match big and small letters.'},
+  direction:   {skill:'reading', name:'Which Comes First', blurb:'Which word is first and which is last.'},
+  sightwords:  {skill:'reading', name:'Sight Words', blurb:'The words you see everywhere.'},
+  punctuation: {skill:'writing', name:'Capitals and Full Stops', blurb:'Start big, end with a full stop.'},
+  modelsentence:{skill:'writing',name:'Write a Sentence', blurb:'Write a sentence about you.'},
+  notice:      {skill:'reading', name:'Read the Notice', blurb:'Find what a notice tells you.'},
   all:         {blurb:'A mix of every game.'},
 };
 /* Custom banks belong to one account and mean nothing to whoever the link is
@@ -7007,6 +7257,9 @@ function showSoloResult(submittedAns,correctAns,timeLeft,timedOut){
     pts=r.pts; tier=r.tier;
   } else if(isSpellingQ(currentStudentQ)){
     tier=spellTier(submittedAns,correctAns);
+    pts=spellPoints(tier,timeLeft);
+  } else if(typeinTier(currentStudentQ,submittedAns)){
+    tier=typeinTier(currentStudentQ,submittedAns);
     pts=spellPoints(tier,timeLeft);
   } else {
     const isCorrect=normalize(submittedAns)===normalize(correctAns);
@@ -8957,6 +9210,37 @@ function normalize(s){return(s||'').toLowerCase().trim().replace(/[^a-z0-9]/g,''
 /* A round where the learner writes the word out. Everything else — tapping a
    choice, ordering tiles, setting the clock — is a different task and keeps
    the plain right/wrong it always had. */
+/* Some rounds are about the very things normalize() throws away. A capital at
+   the start of a name, a full stop at the end of a sentence: strip those and
+   the round has no answer left. And a sentence the learner adapts from a
+   model has no single right answer at all — what can be checked is that they
+   kept the model's opening and put something of their own after it.
+   Returns null for every other typed round, which then marks as it always
+   has. */
+function typeinTier(q,ans){
+  if(!q||q.type!=='typein') return null;
+  const got=(ans||'').replace(/\s+/g,' ').trim();
+  if(q.freeText){
+    const stem=(q.stem||'').replace(/\s+/g,' ').trim();
+    if(got.toLowerCase().indexOf(stem.toLowerCase())!==0)
+      return got.length>2?'partial':'wrong';
+    // The model was kept and something was added. A capital at the front and
+    // a stop at the end is the whole of what .06 asks for on top of that.
+    if(got.slice(stem.length).trim().length<2) return 'wrong';
+    return /^[A-Z]/.test(got)&&/[.!?]$/.test(got)?'correct':'partial';
+  }
+  if(q.matchCase||q.matchPunct){
+    let a=got, b=(q.answer||'').replace(/\s+/g,' ').trim();
+    if(!q.matchPunct){ a=a.replace(/[.!?,]/g,'').trim(); b=b.replace(/[.!?,]/g,'').trim(); }
+    if(a===b) return 'correct';
+    // Right words, wrong capital or missing stop, is the near miss this round
+    // exists to catch — so the comparison that decides "partial" has to
+    // ignore both, or a missing full stop reads the same as a wrong sentence.
+    const bare=function(x){ return x.toLowerCase().replace(/[.!?,]/g,'').trim(); };
+    return bare(a)===bare(b)?'partial':'wrong';
+  }
+  return null;
+}
 function isSpellingQ(q){
   return !!q && (q.type==='word'||q.type==='sentence') && !(Array.isArray(q.choices)&&q.choices.length);
 }
