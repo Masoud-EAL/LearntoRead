@@ -3376,7 +3376,13 @@ function poolFor(type){
   // string carries the section ("all:numeracy") so nothing needs hidden state.
   const sec=sectionOf(type);
   if(sec) return sec.banks.reduce((out,b)=>out.concat(poolFor(b)),[]);
-  return [...PHONICS_TYPES.reduce((a,t)=>a.concat(questionBank[t]),[]),...questionBank.beginner,...questionBank.elementary,...allSpelling,...questionBank.numbers1120,...questionBank.numbers2199,...questionBank.custom];
+  // The top "All" is every bank in the app. Asking each bank for its own pool
+  // keeps this list from drifting out of step with the games as they come and
+  // go. Anything else reaching here is not a bank (a test ladder, a stale id),
+  // and an empty pool is the honest answer: it also stops an id this function
+  // does not know from looping back in through the list below.
+  if(type!=='all') return [];
+  return ALL_BANKS.reduce((out,b)=>out.concat(poolFor(b)),[]);
 }
 /* Does this selection include translate questions? A section's "All" can
    sweep the Translate bank in, and those questions need a language chosen. */
@@ -3414,14 +3420,18 @@ function getQuestions(type,limit){
   // Both word-pronunciation banks are drawn fresh so the families, the words
   // and the round shapes vary between games.
   if(isPhonicsType(type)) return genPhonicsQuestions(type,limit);
-  // A section's "All" draws through getQuestions, not through the bank, so
-  // the generated banks (clock, shop, forms, odd one out) come out fresh
-  // instead of serving the same eight clock faces every game.
+  // An "All" draws through getQuestions, not through the bank, so the
+  // generated banks (clock, shop, forms, odd one out) come out fresh instead
+  // of serving the same eight clock faces every game. A section's All mixes
+  // that section's banks; the top All mixes every bank in the app, so each
+  // game gets an equal share of the draw rather than the phonics banks, which
+  // are the biggest by far, crowding the rest out.
   const sec=sectionOf(type);
-  if(sec){
-    // A section's "All" is a mix of questions, so the dice game sits it out —
-    // it cannot be shuffled in among rounds that share one timer and one board.
-    const mixed=sec.banks.filter(b=>!isSpecialGame(b))
+  const mixBanks=type==='all'?ALL_BANKS:sec&&sec.banks;
+  if(mixBanks){
+    // An "All" is a mix of questions, so the dice game sits it out: it cannot
+    // be shuffled in among rounds that share one timer and one board.
+    const mixed=mixBanks.filter(b=>!isSpecialGame(b))
       .reduce((out,b)=>out.concat(getQuestions(b,limit)),[]);
     shuffle(mixed);
     return mixed.slice(0,limit);
@@ -5491,6 +5501,19 @@ const BANK_SECTIONS=[
   {id:'translation',label:'🌐 Translation',      banks:['translate']},
   {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','sms','clock','shop','forms','beginner','unscramble','gramscramble','speaking','translate']},
 ];
+/* Every bank a learner can be dealt from "All games", read off the sections
+   above so a game added to a section joins the top All with it.
+
+   Three are left out on purpose. Translate needs a first language chosen on
+   the start screen, and All games must not depend on one being picked (the
+   level check leaves it out for the same reason). The dice game runs its own
+   screens and cannot be shuffled in among timed rounds. And All Spelling is
+   not a bank of its own: it is the themed word banks joined together, which
+   are all in this list already, so counting it too would deal Days and Fruits
+   twice as often as everything else. Custom is not a section, so it is added
+   by hand: a class playing a teacher's bank should meet it here too. */
+const ALL_BANKS=[...new Set(BANK_SECTIONS.reduce((out,s)=>out.concat(s.banks||[]),[])
+  .filter(b=>b!=='translate'&&b!=='spelling'&&!isSpecialGame(b)).concat('custom'))];
 /* "All" and "Custom" are not a skill — they stay visible under every chip. */
 const SECTION_ALWAYS=['all','custom','test'];
 const SCOPE_SEL={solo:'#screen-solo-setup',teacher:'#screen-teacher-lobby'};
