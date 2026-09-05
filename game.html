@@ -1686,6 +1686,9 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="punctuation" class="q-type-tab" onclick="selectSoloType('punctuation',this)">❕ Capitals and Full Stops</button>
         <button data-type="modelsentence" class="q-type-tab" onclick="selectSoloType('modelsentence',this)">✏️ Write a Sentence</button>
         <button data-type="notice" class="q-type-tab" onclick="selectSoloType('notice',this)">📢 Read the Notice</button>
+        <button data-type="greetings" class="q-type-tab" onclick="selectSoloType('greetings',this)">👋 Greetings</button>
+        <button data-type="instructions" class="q-type-tab" onclick="selectSoloType('instructions',this)">🖐️ Do What It Says</button>
+        <button data-type="mylearning" class="q-type-tab" onclick="selectSoloType('mylearning',this)">🎯 My Learning</button>
         <button data-type="forms" class="q-type-tab" onclick="selectSoloType('forms',this)">📋 Forms</button>
         <button data-type="all" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">✨ All games</button>
         <button data-type="test:*" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">🎯 Test Yourself</button>
@@ -1893,6 +1896,9 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
             <button data-type="punctuation" class="q-type-tab" onclick="selectQType('punctuation',this)">❕ Capitals and Full Stops</button>
             <button data-type="modelsentence" class="q-type-tab" onclick="selectQType('modelsentence',this)">✏️ Write a Sentence</button>
             <button data-type="notice" class="q-type-tab" onclick="selectQType('notice',this)">📢 Read the Notice</button>
+            <button data-type="greetings" class="q-type-tab" onclick="selectQType('greetings',this)">👋 Greetings</button>
+            <button data-type="instructions" class="q-type-tab" onclick="selectQType('instructions',this)">🖐️ Do What It Says</button>
+            <button data-type="mylearning" class="q-type-tab" onclick="selectQType('mylearning',this)">🎯 My Learning</button>
             <button data-type="forms" class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
             <button data-type="all" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">✨ All games</button>
         <button data-type="test:*" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">🎯 Test Yourself</button>
@@ -3314,11 +3320,17 @@ function genTableQuestions(n,hi){
   hi=hi||10;
   const out=[];
   for(let i=0;i<(n||8);i++){
-    const rows=shuffle(LIST_ITEMS.slice()).slice(0,4).map(function(it){
-      // Capped well under the band's ceiling: the checklist asks for a number
-      // to be located in a list, and $98 for a loaf of bread would be the
-      // first thing an adult noticed instead.
-      return {name:it[1], emoji:it[0], cents:randInt(1,Math.min(hi,20))*100+(Math.random()<0.5?50:0)};
+    // Prices have to differ from each other, or two options read the same and
+    // a learner tapping the "wrong" one has in fact answered correctly.
+    // Capped well under the band's ceiling too: the checklist asks for a
+    // number to be located in a list, and $98 for a loaf of bread would be
+    // the first thing an adult noticed instead.
+    const cap=Math.min(hi,20), seen={}, rows=[];
+    shuffle(LIST_ITEMS.slice()).slice(0,4).forEach(function(it){
+      let c;
+      do { c=randInt(1,cap)*100+(Math.random()<0.5?50:0); } while(seen[c]);
+      seen[c]=1;
+      rows.push({name:it[1], emoji:it[0], cents:c});
     });
     const tgt=rows[randInt(0,rows.length-1)];
     const dearest=rows.slice().sort(function(a,b){ return b.cents-a.cents; })[0];
@@ -3712,7 +3724,14 @@ function genDirectionQuestions(n){
     const line='<span class="dir-line">'+words.map(function(w){ return '<span>'+w+'</span>'; }).join('')+'</span>';
     const ask=i%2===0;
     const correct=ask?words[0]:words[words.length-1];
-    const alts=shuffle(words.filter(function(w){ return w!==correct; })).slice(0,3);
+    // A sentence can say the same word twice, and two identical options mean
+    // a learner tapping the "wrong" one has in fact answered correctly.
+    const seen={};
+    const alts=shuffle(words.filter(function(w){
+      if(w===correct||seen[w.toLowerCase()]) return false;
+      seen[w.toLowerCase()]=1; return true;
+    })).slice(0,3);
+    if(!alts.length) continue;
     out.push({type:'mc', noListen:true, textOnly:true, icon:line,
       question:ask?'Which word is first?':'Which word is last?',
       answer:correct.toLowerCase(), choices:shuffle([correct].concat(alts))});
@@ -3758,9 +3777,9 @@ function genPunctuationQuestions(n,from){
         placeholder:'Start big, end with .', answer:good, matchCase:true, matchPunct:true});
     } else {
       const bad=[raw.toLowerCase()+'.', good.replace(/\.$/,''), raw.toLowerCase()];
-      out.push({type:'mc', noListen:true, textOnly:true,
+      out.push({type:'mc', noListen:true, textOnly:true, exact:true,
         question:'Which one is written correctly?',
-        answer:good.toLowerCase(), choices:shuffle([good].concat(bad.slice(0,3)))});
+        answer:good, choices:shuffle([good].concat(bad.slice(0,3)))});
     }
   }
   return out;
@@ -3816,6 +3835,138 @@ function genNoticeQuestions(n){
     const alts=[N.h,N.l,N.d,N.p].filter(function(x){ return x&&x!==pick[1]; }).slice(0,3);
     out.push({type:'mc', noListen:true, icon:html, question:pick[0],
       answer:pick[1].toLowerCase(), choices:shuffle([pick[1]].concat(alts))});
+  }
+  return out;
+}
+
+
+/* ══════════════ LISTEN AND DO ══════════════
+   The listening checklist for .08 is almost entirely about exchanges: one
+   word greetings, courtesy phrases, short explicit questions, and short
+   familiar instructions "supported with a prompt". The sentence-gap games
+   cover the last of those obliquely, by asking for a missing word. None of
+   them cover a greeting, and a greeting is the first English an adult uses.
+
+   Every round here is heard first. The text is on the screen too, because a
+   learner who cannot yet hear it should still be able to work at it, but the
+   audio is the task. */
+const GREETINGS=[
+  {say:'Good morning.',       a:'Good morning.',   alts:['Good night.','Thank you.','Goodbye.']},
+  {say:'How are you?',        a:'I am fine, thank you.', alts:['My name is Ali.','It is Monday.','Good night.']},
+  {say:'Thank you.',          a:"You're welcome.", alts:['Good morning.','See you tomorrow.','How are you?']},
+  {say:'Goodbye. See you tomorrow.', a:'Goodbye.', alts:['Good morning.','Thank you.','Please.']},
+  {say:'What is your name?',  a:'My name is Ali.', alts:['I am fine.','It is nine o’clock.','Yes, please.']},
+  {say:'Where are you from?', a:'I am from Vietnam.', alts:['I am fine, thank you.','My name is Sara.','On Monday.']},
+  {say:'Please sit down.',    a:'Yes, thank you.', alts:['Good morning.','My name is Omar.','It is Tuesday.']},
+  {say:'Excuse me. Can you help me?', a:'Yes, of course.', alts:['Good night.','It is $5.','I am from Iraq.']},
+  {say:'How old are you?',    a:'I am forty years old.', alts:['I am from Syria.','It is Friday.','Thank you.']},
+  {say:'See you next week.',  a:'Goodbye.',        alts:['Good morning.','Please.','Yes, of course.']},
+];
+/* ── GREETINGS AND COURTESY ──
+   ".08 Understands basic one word greetings", "Understands extremely
+   familiar courtesy phrases and basic greetings, e.g. hello, good morning,
+   goodbye, thank you, please", and "Understands extremely short and highly
+   explicit questions". */
+function genGreetingQuestions(n){
+  const out=[], pool=shuffle(GREETINGS.slice());
+  for(let i=0;i<(n||8);i++){
+    const g=pool[i%pool.length];
+    out.push({type:'mc', say:g.say, question:'🔊 '+g.say,
+      answer:g.a.toLowerCase(), choices:shuffle([g.a].concat(g.alts))});
+  }
+  return out;
+}
+
+/* ── DO WHAT IT SAYS ──
+   ".08 Understands some short extremely familiar instructions supported with
+   a prompt" and "Understands extremely familiar and explicit instructions
+   supported with gestures"; and, on the digital side, ".13 Follows a single
+   step oral or pictorial instruction to activate or deactivate tool".
+   The learner hears an instruction and taps the thing it names, so following
+   it is the answer rather than a description of it. */
+const INSTRUCTIONS=[
+  {say:'Tap the book.',        a:'book',    alts:['pen','bag','chair']},
+  {say:'Tap the pen.',         a:'pen',     alts:['book','cup','door']},
+  {say:'Open the door.',       a:'door',    alts:['window','book','bag']},
+  {say:'Tap the phone.',       a:'phone',   alts:['laptop','camera','headphones']},
+  {say:'Turn the sound on.',   a:'sound on',alts:['sound off','battery','internet']},
+  {say:'Turn the sound off.',  a:'sound off',alts:['sound on','internet','settings']},
+  {say:'Turn on the internet.',a:'internet',alts:['battery','bin','camera']},
+  {say:'Charge the battery.',  a:'charger', alts:['bin','search','message']},
+  {say:'Take a photo.',        a:'camera',  alts:['headphones','keyboard','printer']},
+  {say:'Put it in the bin.',   a:'bin',     alts:['save','home','play']},
+  {say:'Tap the bag.',         a:'bag',     alts:['chair','book','cup']},
+  {say:'Tap the chair.',       a:'chair',   alts:['door','bag','window']},
+];
+/* The picture is the support the checklist asks for ("supported with a
+   prompt", "supported with gestures"); the word beside it is what makes the
+   answer a distinct thing rather than an emoji, which normalize() would
+   strip to nothing and mark every option correct. */
+const INSTRUCTION_ART={book:'📖',pen:'✏️',bag:'🎒',chair:'🪑',door:'🚪',window:'🪟',cup:'☕',
+  phone:'📱',laptop:'💻',camera:'📷',headphones:'🎧',keyboard:'⌨️',printer:'🖨️',
+  'sound on':'🔊','sound off':'🔇',internet:'📶',battery:'🔋',charger:'🔌',bin:'🗑️',
+  save:'💾',home:'🏠',play:'▶️',search:'🔍',message:'✉️',settings:'⚙️'};
+function instrChip(w){ return (INSTRUCTION_ART[w]||'')+' '+w; }
+function genInstructionQuestions(n){
+  const out=[], pool=shuffle(INSTRUCTIONS.slice());
+  for(let i=0;i<(n||8);i++){
+    const it=pool[i%pool.length];
+    out.push({type:'mc', say:it.say, question:'🔊 '+it.say, textOnly:true,
+      answer:instrChip(it.a).toLowerCase(),
+      choices:shuffle([it.a].concat(it.alts).map(instrChip))});
+  }
+  return out;
+}
+
+/* ══════════════ MY LEARNING ══════════════
+   .01 is the odd indicator out: nothing in it is a right answer. "Begins to
+   express extremely simple learning goal", "Identifies at least one personal
+   learning goal", "Demonstrates capacity to select limited learning
+   materials for a specific task", "Identifies some potential barriers to
+   learning, e.g. childcare issues" — these are things a learner says about
+   themselves, and until now the profile could only infer them from whether
+   somebody finished a run.
+
+   So this bank has no wrong answers. Every option is accepted; what is being
+   recorded is that the learner made a choice about their own learning and
+   could say which game would help. Nobody loses points for what they want to
+   learn, and the panel reports these rows as a signal to confirm rather than
+   as a result, which is what they are. */
+const GOALS=[
+  {e:'📖', t:'Read better'},   {e:'✍️', t:'Write better'},
+  {e:'🗣️', t:'Speak better'},  {e:'👂', t:'Understand people'},
+  {e:'🔢', t:'Numbers and money'}, {e:'💻', t:'Use a phone or computer'},
+  {e:'💼', t:'Get a job'},     {e:'📄', t:'Fill in forms'},
+];
+const BARRIERS=[
+  {e:'👶', t:'Child care'},    {e:'🚌', t:'Getting here'},
+  {e:'💼', t:'Work hours'},    {e:'🏥', t:'Health'},
+  {e:'⏰', t:'No time'},       {e:'🙂', t:'Nothing stops me'},
+];
+const EASYHARD=[
+  {e:'🔤', t:'Letters and sounds'}, {e:'📖', t:'Reading'},
+  {e:'✍️', t:'Writing'},            {e:'👂', t:'Listening'},
+  {e:'🔢', t:'Numbers'},            {e:'💻', t:'Using a device'},
+];
+function chipRow(list){
+  return list.map(function(x){ return x.e+' '+x.t; });
+}
+/* Every option is right. `anyAnswer` tells the marking to accept whatever
+   comes back, so a learner can never be wrong about their own goal. */
+function genMyLearningQuestions(n){
+  const out=[];
+  const asks=[
+    {q:'What do you want to learn?',   list:GOALS,    label:'YOUR GOAL'},
+    {q:'What is easy for you now?',    list:EASYHARD, label:'WHAT IS EASY'},
+    {q:'What is hard for you now?',    list:EASYHARD, label:'WHAT IS HARD'},
+    {q:'What makes it hard to come to class?', list:BARRIERS, label:'WHAT GETS IN THE WAY'},
+    {q:'Which game would help you most?', list:GOALS, label:'CHOOSE A GAME'},
+  ];
+  for(let i=0;i<(n||5);i++){
+    const a=asks[i%asks.length];
+    const opts=shuffle(chipRow(a.list)).slice(0,4);
+    out.push({type:'mc', say:a.q, question:'🔊 '+a.q, textOnly:true, anyAnswer:true,
+      answer:opts[0].toLowerCase(), choices:opts});
   }
   return out;
 }
@@ -4256,6 +4407,9 @@ const GEN_BANKS={
   punctuation:  function(n,f){ return genPunctuationQuestions(n,f); },
   modelsentence:function(n){ return genSentenceQuestions(n); },
   notice:       function(n){ return genNoticeQuestions(n); },
+  greetings:    function(n){ return genGreetingQuestions(n); },
+  instructions: function(n){ return genInstructionQuestions(n); },
+  mylearning:   function(n){ return genMyLearningQuestions(n); },
 };
 function isGenBank(t){ return Object.prototype.hasOwnProperty.call(GEN_BANKS,t); }
 
@@ -6335,14 +6489,15 @@ const BANK_SECTIONS=[
   {id:'*',          label:'✨ All games',        banks:null},
   {id:'letters',    label:'🔤 Letters & Sounds', banks:[...PHONICS_TYPES,'letter','lettersound','elementary','casematch']},
   {id:'vocab',      label:'📚 Vocabulary',       banks:['days','months','weather','fruits','body','clothes','spelling','oddone','translate']},
-  {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','lettersound','unscramble','speaking','clock','digitaltime','ordinals','position']},
-  {id:'speaking',   label:'🗣️ Speaking',         banks:['speaking','questionwords','unscramble']},
+  {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','lettersound','unscramble','speaking','clock','digitaltime','ordinals','position','greetings','instructions']},
+  {id:'speaking',   label:'🗣️ Speaking',         banks:['speaking','questionwords','unscramble','greetings']},
   {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary','tableread','direction','sightwords','notice']},
   {id:'writing',    label:'✍️ Writing',          banks:['wp1:gap','wp1:build','wp2:gap','wp2:build','days','months','weather','fruits','body','clothes','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary','numeralwrite','copyword','punctuation','modelsentence']},
   {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble']},
   {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target','numbertap','numeralwrite','addup','addmoney','ordering','placevalue','tableread','digitaltime','calendar','ordinals','position']},
   {id:'translation',label:'🌐 Translation',      banks:['translate']},
-  {id:'digital',    label:'💻 Using a device',   banks:['devices','digisymbols','prompts','devicecare','safeinfo','sms','forms']},
+  {id:'digital',    label:'💻 Using a device',   banks:['devices','digisymbols','prompts','devicecare','safeinfo','sms','forms','instructions']},
+  {id:'learning',   label:'🎯 My learning',      banks:['mylearning']},
   {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','sms','clock','shop','forms','beginner','unscramble','gramscramble','speaking','translate','digitaltime','calendar']},
 ];
 /* "All" and "Custom" are not a skill — they stay visible under every chip. */
@@ -6365,6 +6520,7 @@ const SECTION_DEFAULTS={
   translation:  {type:'translate',    mc:true},
   everyday:     {type:'beginner',     mc:true},
   digital:      {type:'devices',      mc:true},
+  learning:     {type:'mylearning',   mc:true},
 };
 
 /* ══════════════ TEST YOURSELF ══════════════
@@ -6962,6 +7118,7 @@ const SKILL_ACCENT={
   numeracy:   {label:'Numbers',          c:'var(--gold)',   glow:'rgba(245,166,35,.28)'},
   translation:{label:'Translation',      c:'var(--teal)',   glow:'rgba(15,155,142,.30)'},
   digital:    {label:'Using a device',   c:'var(--purple)', glow:'rgba(124,77,255,.30)'},
+  learning:   {label:'My learning',      c:'var(--green)',  glow:'rgba(0,200,83,.26)'},
   everyday:   {label:'Everyday English', c:'var(--accent)', glow:'rgba(233,69,96,.28)'},
   _:          {label:'Practice',         c:'var(--muted)',  glow:'rgba(255,255,255,.10)'},
 };
@@ -7033,6 +7190,11 @@ const GAME_INFO={
   punctuation: {skill:'writing', name:'Capitals and Full Stops', blurb:'Start big, end with a full stop.'},
   modelsentence:{skill:'writing',name:'Write a Sentence', blurb:'Write a sentence about you.'},
   notice:      {skill:'reading', name:'Read the Notice', blurb:'Find what a notice tells you.'},
+  greetings:   {skill:'listening', name:'Greetings', blurb:'Hear a greeting and answer it.'},
+  instructions:{skill:'listening', name:'Do What It Says', blurb:'Listen, then tap what it says.'},
+  /* No wrong answers here: it is about what the learner wants, not what they
+     know. See genMyLearningQuestions. */
+  mylearning:  {skill:'learning', name:'My Learning', blurb:'Your goal, and what would help you.'},
   all:         {blurb:'A mix of every game.'},
 };
 /* Custom banks belong to one account and mean nothing to whoever the link is
@@ -7258,6 +7420,9 @@ function showSoloResult(submittedAns,correctAns,timeLeft,timedOut){
   } else if(isSpellingQ(currentStudentQ)){
     tier=spellTier(submittedAns,correctAns);
     pts=spellPoints(tier,timeLeft);
+  } else if(isOpenQ(currentStudentQ)){
+    tier=(submittedAns||'').trim()?'correct':'wrong';
+    pts=tier==='correct'?100:0;
   } else if(typeinTier(currentStudentQ,submittedAns)){
     tier=typeinTier(currentStudentQ,submittedAns);
     pts=spellPoints(tier,timeLeft);
@@ -9217,8 +9382,13 @@ function normalize(s){return(s||'').toLowerCase().trim().replace(/[^a-z0-9]/g,''
    kept the model's opening and put something of their own after it.
    Returns null for every other typed round, which then marks as it always
    has. */
+/* A round about the learner's own goal has no wrong answer, and marking one
+   as wrong would be both untrue and unkind. */
+function isOpenQ(q){ return !!(q&&q.anyAnswer); }
 function typeinTier(q,ans){
-  if(!q||q.type!=='typein') return null;
+  // `exact` applies to tapped rounds too: the punctuation round's options are
+  // four spellings of one sentence and only one of them is written correctly.
+  if(!q||(q.type!=='typein'&&!q.exact)) return null;
   const got=(ans||'').replace(/\s+/g,' ').trim();
   if(q.freeText){
     const stem=(q.stem||'').replace(/\s+/g,' ').trim();
@@ -9228,6 +9398,12 @@ function typeinTier(q,ans){
     // a stop at the end is the whole of what .06 asks for on top of that.
     if(got.slice(stem.length).trim().length<2) return 'wrong';
     return /^[A-Z]/.test(got)&&/[.!?]$/.test(got)?'correct':'partial';
+  }
+  if(q.exact){
+    let a=got, b=(q.answer||'').replace(/\s+/g,' ').trim();
+    if(a===b) return 'correct';
+    const bare=function(x){ return x.toLowerCase().replace(/[.!?,]/g,'').trim(); };
+    return bare(a)===bare(b)?'partial':'wrong';
   }
   if(q.matchCase||q.matchPunct){
     let a=got, b=(q.answer||'').replace(/\s+/g,' ').trim();
