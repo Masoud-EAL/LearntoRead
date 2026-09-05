@@ -1381,6 +1381,16 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .ord-fig{opacity:.45;filter:grayscale(1);}
 .ord-fig.ord-hit{opacity:1;filter:none;transform:scale(1.25);}
 .ord-arrow{color:var(--muted);font-size:1.1rem;}
+/* A key as it looks on a screen, a dialog box as it appears over one, and a
+   code big enough to copy digit by digit without losing your place. */
+.digi-key{display:inline-flex;align-items:center;justify-content:center;width:74px;height:74px;
+  font-size:2.4rem;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.18);
+  border-radius:16px;}
+.digi-dialog{max-width:260px;margin:0 auto;background:var(--card);border:1.5px solid rgba(255,255,255,.22);
+  border-radius:14px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.5);text-align:left;}
+.digi-dialog .dd-title{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--accent);}
+.digi-dialog .dd-body{font-size:.84rem;color:var(--muted);margin-top:3px;}
+.digi-code{font-family:'Fredoka One',cursive;font-size:2.8rem;letter-spacing:10px;color:var(--gold);}
 /* ── THE TEACHER'S PANEL ──
    Not a learner screen. It is dense on purpose: whoever is reading it is
    holding an assessor analysis sheet and wants the codes, the wording and the
@@ -1643,6 +1653,11 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="calendar" class="q-type-tab" onclick="selectSoloType('calendar',this)">📆 Find the Date</button>
         <button data-type="ordinals" class="q-type-tab" onclick="selectSoloType('ordinals',this)">🥇 First, Second, Third</button>
         <button data-type="position" class="q-type-tab" onclick="selectSoloType('position',this)">🧭 Where Is It</button>
+        <button data-type="devices" class="q-type-tab" onclick="selectSoloType('devices',this)">💻 Devices</button>
+        <button data-type="digisymbols" class="q-type-tab" onclick="selectSoloType('digisymbols',this)">🔣 Screen Symbols</button>
+        <button data-type="prompts" class="q-type-tab" onclick="selectSoloType('prompts',this)">⚠️ Screen Messages</button>
+        <button data-type="devicecare" class="q-type-tab" onclick="selectSoloType('devicecare',this)">🔋 Looking After It</button>
+        <button data-type="safeinfo" class="q-type-tab" onclick="selectSoloType('safeinfo',this)">🔒 Safe or Private</button>
         <button data-type="forms" class="q-type-tab" onclick="selectSoloType('forms',this)">📋 Forms</button>
         <button data-type="all" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">✨ All games</button>
         <button data-type="test:*" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">🎯 Test Yourself</button>
@@ -1838,6 +1853,11 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
             <button data-type="calendar" class="q-type-tab" onclick="selectQType('calendar',this)">📆 Find the Date</button>
             <button data-type="ordinals" class="q-type-tab" onclick="selectQType('ordinals',this)">🥇 First, Second, Third</button>
             <button data-type="position" class="q-type-tab" onclick="selectQType('position',this)">🧭 Where Is It</button>
+            <button data-type="devices" class="q-type-tab" onclick="selectQType('devices',this)">💻 Devices</button>
+            <button data-type="digisymbols" class="q-type-tab" onclick="selectQType('digisymbols',this)">🔣 Screen Symbols</button>
+            <button data-type="prompts" class="q-type-tab" onclick="selectQType('prompts',this)">⚠️ Screen Messages</button>
+            <button data-type="devicecare" class="q-type-tab" onclick="selectQType('devicecare',this)">🔋 Looking After It</button>
+            <button data-type="safeinfo" class="q-type-tab" onclick="selectQType('safeinfo',this)">🔒 Safe or Private</button>
             <button data-type="forms" class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
             <button data-type="all" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">✨ All games</button>
         <button data-type="test:*" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">🎯 Test Yourself</button>
@@ -3409,6 +3429,163 @@ function genPositionQuestions(n){
   return out;
 }
 
+
+/* ══════════════ USING A DEVICE ══════════════
+   The digital literacy indicators, .12 and .13, had no source at all until
+   the SEE Reporting Checklist arrived, and no game either: the profile was
+   reading them off how the learner happened to work the app. That is fair
+   evidence for "uses a device", and no evidence at all for the rest of what
+   the checklist actually names — recognising devices and what they are for,
+   reading the symbols on a screen, answering a prompt, keeping a device
+   working, and knowing what is risky to give away.
+
+   Everything here is drawn rather than photographed, and named in the words
+   an adult would use out loud. */
+const DEVICES=[
+  {n:'phone',   e:'📱', use:'To call someone'},
+  {n:'laptop',  e:'💻', use:'To do work and write'},
+  {n:'tablet',  e:'📲', use:'To read and watch'},
+  {n:'printer', e:'🖨️', use:'To put it on paper'},
+  {n:'camera',  e:'📷', use:'To take a photo'},
+  {n:'keyboard',e:'⌨️', use:'To type'},
+  {n:'mouse',   e:'🖱️', use:'To point and click'},
+  {n:'headphones',e:'🎧',use:'To listen'},
+  {n:'charger', e:'🔌', use:'To fill the battery'},
+  {n:'wifi',    e:'📶', use:'To get on the internet'},
+];
+/* ── WHICH DEVICE / WHAT IS IT FOR ──
+   ".12 Begins to recognise there are different digital devices commonly used
+   to connect with others"; ".13 Begins to recognise extremely familiar
+   digital devices"; and at Stage B "Begins to understand the purpose of some
+   extremely familiar digital devices and software". */
+function genDeviceQuestions(n,from){
+  const out=[], purpose=!!from;
+  for(let i=0;i<(n||8);i++){
+    const d=DEVICES[randInt(0,DEVICES.length-1)];
+    if(purpose&&i%2===1){
+      const alts=shuffle(DEVICES.filter(function(x){ return x.n!==d.n; })).slice(0,3)
+                  .map(function(x){ return x.use; });
+      out.push({type:'mc', say:'What is a '+d.n+' for?',
+        icon:'<span style="font-size:3.4rem;">'+d.e+'</span>',
+        question:'🔊 What is this for?',
+        answer:d.use.toLowerCase(), choices:shuffle([d.use].concat(alts))});
+    } else {
+      const alts=shuffle(DEVICES.filter(function(x){ return x.n!==d.n; })).slice(0,3)
+                  .map(function(x){ return x.n; });
+      out.push({type:'mc', say:'Which one is the '+d.n+'?',
+        icon:'<span style="font-size:3.4rem;">'+d.e+'</span>',
+        question:'🔊 What is this called?',
+        answer:d.n, choices:shuffle([d.n].concat(alts))});
+    }
+  }
+  return out;
+}
+
+/* ── SCREEN SYMBOLS ──
+   ".13 Begins to recognise extremely familiar digital symbols". The ones on
+   every screen an adult already holds, rather than a general icon quiz. */
+const DIGI_SYMBOLS=[
+  {s:'🔍', n:'Search'},   {s:'🏠', n:'Home'},      {s:'⬅️', n:'Go back'},
+  {s:'▶️', n:'Play'},     {s:'⏸️', n:'Stop'},      {s:'🔊', n:'Sound on'},
+  {s:'🔇', n:'Sound off'},{s:'📶', n:'Internet'},  {s:'🔋', n:'Battery'},
+  {s:'⚙️', n:'Settings'}, {s:'🗑️', n:'Delete'},    {s:'💾', n:'Save'},
+  {s:'📷', n:'Camera'},   {s:'✉️', n:'Message'},   {s:'☰',  n:'Menu'},
+];
+function genSymbolQuestions(n){
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    const d=DIGI_SYMBOLS[randInt(0,DIGI_SYMBOLS.length-1)];
+    const alts=shuffle(DIGI_SYMBOLS.filter(function(x){ return x.n!==d.n; })).slice(0,3)
+                .map(function(x){ return x.n; });
+    out.push({type:'mc', say:'What does this button do?',
+      icon:'<span class="digi-key">'+d.s+'</span>',
+      question:'🔊 What does this button do?',
+      answer:d.n.toLowerCase(), choices:shuffle([d.n].concat(alts))});
+  }
+  return out;
+}
+
+/* ── MESSAGES ON THE SCREEN ──
+   ".13 Recognises and responds to a limited number of digital prompts or
+   alerts, texts and symbols". A real dialog box, and the question is what to
+   tap — which is the whole skill. */
+const PROMPTS=[
+  {t:'Battery low',        b:'10% left',                 a:'Charge it',    alts:['Delete it','Print it','Call someone']},
+  {t:'No internet',        b:'You are not connected',    a:'Turn on wifi', alts:['Charge it','Take a photo','Save the file']},
+  {t:'Delete this photo?', b:'This cannot be undone',    a:'Cancel',       alts:['Charge it','Turn it off','Print it']},
+  {t:'Storage full',       b:'No room for new photos',   a:'Delete some',  alts:['Charge it','Turn on wifi','Call someone']},
+  {t:'Update ready',       b:'Install now or later?',    a:'Later',        alts:['Delete it','Print it','Take a photo']},
+  {t:'Save changes?',      b:'You have not saved yet',   a:'Save',         alts:['Delete it','Charge it','Turn it off']},
+  {t:'Wrong password',     b:'Try again',                a:'Type it again',alts:['Charge it','Print it','Turn on wifi']},
+];
+function genPromptQuestions(n){
+  const out=[];
+  const pool=shuffle(PROMPTS.slice());
+  for(let i=0;i<(n||6);i++){
+    const p=pool[i%pool.length];
+    out.push({type:'mc', say:p.t+'. '+p.b,
+      icon:'<div class="digi-dialog"><div class="dd-title">'+p.t+'</div><div class="dd-body">'+p.b+'</div></div>',
+      question:'🔊 What should you do?',
+      answer:p.a.toLowerCase(), choices:shuffle([p.a].concat(p.alts))});
+  }
+  return out;
+}
+
+/* ── LOOKING AFTER IT ──
+   ".13 Demonstrates an extremely limited capacity to maintain digital
+   devices". Charging, volume, connection: the three things that stop a
+   device working and that a learner can fix themselves. */
+const DEVICE_CARE=[
+  {q:'The screen is black and it will not turn on. What is wrong?', a:'The battery is flat', alts:['It is too loud','The wifi is off','It is upside down']},
+  {q:'You cannot hear anything. What do you check?',                a:'The sound',           alts:['The battery','The printer','The camera']},
+  {q:'Nothing will load. What do you check?',                       a:'The internet',        alts:['The sound','The camera','The keyboard']},
+  {q:'The battery is nearly empty. What do you do?',                a:'Plug in the charger', alts:['Turn up the sound','Take a photo','Delete a photo']},
+  {q:'You are going out. How do you keep the battery?',             a:'Turn the screen off', alts:['Turn the sound up','Open more apps','Take more photos']},
+];
+function genDeviceCareQuestions(n){
+  const out=[], pool=shuffle(DEVICE_CARE.slice());
+  for(let i=0;i<(n||5);i++){
+    const c=pool[i%pool.length];
+    out.push({type:'mc', say:c.q, question:'🔊 '+c.q,
+      answer:c.a.toLowerCase(), choices:shuffle([c.a].concat(c.alts))});
+  }
+  return out;
+}
+
+/* ── SAFE OR NOT SAFE, AND THE CODE ──
+   ".12 Copies simple risk protection code" and ".12 Begins to understand
+   there are risks associated with providing information". The first is a
+   copying task with a PIN; the second is the only judgement call in the app,
+   and the answers are deliberately unambiguous at this level. */
+const SAFE_ITEMS=[
+  {t:'Your bank PIN',            safe:false}, {t:'Your first name',        safe:true},
+  {t:'Your password',            safe:false}, {t:'Your favourite colour',  safe:true},
+  {t:'Your bank card number',    safe:false}, {t:'The suburb you live in', safe:true},
+  {t:'A photo of your passport', safe:false}, {t:'Your class day',         safe:true},
+];
+function genSafeQuestions(n,from){
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    if(from&&i%2===1){
+      const it=SAFE_ITEMS[randInt(0,SAFE_ITEMS.length-1)];
+      const correct=it.safe?'Safe to share':'Keep it private';
+      out.push({type:'mc', say:'Is it safe to share this? '+it.t,
+        icon:'<span style="font-size:2.6rem;">'+(it.safe?'🙂':'🔒')+'</span>',
+        question:'🔊 '+it.t, answer:correct.toLowerCase(),
+        choices:shuffle([correct, it.safe?'Keep it private':'Safe to share'])});
+    } else {
+      // A code you copy exactly, digit for digit. The checklist calls it a
+      // risk protection code; on a phone it is the PIN, and copying one
+      // correctly is the skill.
+      const code=String(randInt(1000,9999));
+      out.push({type:'typein', label:'COPY THE CODE', noListen:true,
+        icon:'<span class="digi-code">'+code+'</span>',
+        question:'Type this code', placeholder:'4 numbers', answer:code});
+    }
+  }
+  return out;
+}
+
 /* ── FILL THE FORM ──
    Chips of personal detail, dropped into the right labelled field. The answer
    is composed as the field order the learner produced, so it compares with a
@@ -3833,6 +4010,11 @@ const GEN_BANKS={
   calendar:     function(n){ return genCalendarQuestions(n); },
   ordinals:     function(n,f){ return genOrdinalQuestions(n,f); },
   position:     function(n){ return genPositionQuestions(n); },
+  devices:      function(n,f){ return genDeviceQuestions(n,f); },
+  digisymbols:  function(n){ return genSymbolQuestions(n); },
+  prompts:      function(n){ return genPromptQuestions(n); },
+  devicecare:   function(n){ return genDeviceCareQuestions(n); },
+  safeinfo:     function(n,f){ return genSafeQuestions(n,f); },
 };
 function isGenBank(t){ return Object.prototype.hasOwnProperty.call(GEN_BANKS,t); }
 
@@ -5919,6 +6101,7 @@ const BANK_SECTIONS=[
   {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble']},
   {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target','numbertap','numeralwrite','addup','addmoney','ordering','placevalue','tableread','digitaltime','calendar','ordinals','position']},
   {id:'translation',label:'🌐 Translation',      banks:['translate']},
+  {id:'digital',    label:'💻 Using a device',   banks:['devices','digisymbols','prompts','devicecare','safeinfo','sms','forms']},
   {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','sms','clock','shop','forms','beginner','unscramble','gramscramble','speaking','translate','digitaltime','calendar']},
 ];
 /* "All" and "Custom" are not a skill — they stay visible under every chip. */
@@ -5940,6 +6123,7 @@ const SECTION_DEFAULTS={
   numeracy:     {type:'clock',        mc:true},
   translation:  {type:'translate',    mc:true},
   everyday:     {type:'beginner',     mc:true},
+  digital:      {type:'devices',      mc:true},
 };
 
 /* ══════════════ TEST YOURSELF ══════════════
@@ -6536,6 +6720,7 @@ const SKILL_ACCENT={
   vocab:      {label:'Vocabulary',       c:'var(--green)',  glow:'rgba(0,200,83,.26)'},
   numeracy:   {label:'Numbers',          c:'var(--gold)',   glow:'rgba(245,166,35,.28)'},
   translation:{label:'Translation',      c:'var(--teal)',   glow:'rgba(15,155,142,.30)'},
+  digital:    {label:'Using a device',   c:'var(--purple)', glow:'rgba(124,77,255,.30)'},
   everyday:   {label:'Everyday English', c:'var(--accent)', glow:'rgba(233,69,96,.28)'},
   _:          {label:'Practice',         c:'var(--muted)',  glow:'rgba(255,255,255,.10)'},
 };
@@ -6591,6 +6776,13 @@ const GAME_INFO={
   calendar:    {skill:'numeracy', name:'Find the Date', blurb:'Find a day and a date on a calendar.'},
   ordinals:    {skill:'numeracy', name:'First, Second, Third', blurb:'Which one is first, second or third.'},
   position:    {skill:'numeracy', name:'Where Is It', blurb:'Up, down, left, right, in front, behind.'},
+  /* The digital indicators had no game at all until now: the profile was
+     reading them off how the learner happened to work the app. */
+  devices:     {skill:'digital', name:'Devices', blurb:'Name a device and say what it is for.'},
+  digisymbols: {skill:'digital', name:'Screen Symbols', blurb:'What the buttons on a screen do.'},
+  prompts:     {skill:'digital', name:'Screen Messages', blurb:'Answer a message on the screen.'},
+  devicecare:  {skill:'digital', name:'Looking After It', blurb:'Battery, sound and internet.'},
+  safeinfo:    {skill:'digital', name:'Safe or Private', blurb:'Copy a code, and what to keep private.'},
   all:         {blurb:'A mix of every game.'},
 };
 /* Custom banks belong to one account and mean nothing to whoever the link is
