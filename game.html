@@ -1358,6 +1358,92 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 #screen-test-round[data-state="solo-final"] .solo-only,
 #screen-test-round[data-state="class-final"] .class-only{display:flex;}
 .test-wait{font-size:.9rem;color:var(--muted);}
+/* ── THE TEACHER'S PANEL ──
+   Not a learner screen. It is dense on purpose: whoever is reading it is
+   holding an assessor analysis sheet and wants the codes, the wording and the
+   working, in that order. It sits behind a button on the final card rather
+   than on it, because ".04 Reading, at least PLB" is not something to hand
+   somebody who has just finished thirty-six questions in a language they are
+   learning. */
+#screen-test-acsf{padding:66px 16px 18px;}
+.acsf-wrap{width:100%;max-width:680px;margin:0 auto;display:flex;flex-direction:column;
+  gap:12px;padding-bottom:8px;}
+.acsf-head{background:var(--card);border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--radius);padding:14px 16px;}
+.acsf-head h2{font-family:'Fredoka One',cursive;font-size:1.15rem;font-weight:400;
+  color:var(--text);margin-bottom:4px;}
+.acsf-meta{font-size:.78rem;color:var(--muted);font-weight:600;}
+/* The disclaimer is not fine print. What this produces looks like an
+   assessment and is not one, so it says so at the top, in the same size as
+   everything else. */
+.acsf-warn{margin-top:10px;padding:10px 12px;border-radius:12px;
+  background:rgba(245,166,35,.10);border:1.5px solid rgba(245,166,35,.38);
+  font-size:.8rem;line-height:1.45;color:var(--text);}
+.acsf-warn b{color:var(--gold);}
+.acsf-warn ul{margin:6px 0 0 16px;}
+.acsf-warn li{margin-top:3px;}
+.acsf-body{display:flex;flex-direction:column;gap:14px;}
+.acsf-group h3{font-family:'Fredoka One',cursive;font-size:.78rem;font-weight:400;
+  letter-spacing:2px;text-transform:uppercase;color:var(--muted);
+  padding-bottom:5px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.10);}
+.acsf-row{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);
+  border-left-width:4px;border-radius:12px;padding:11px 13px;margin-bottom:8px;}
+.acsf-row.yes{border-left-color:var(--green);}
+.acsf-row.part{border-left-color:var(--gold);}
+.acsf-row.no{border-left-color:var(--accent);}
+.acsf-row.none,.acsf-row.na{border-left-color:var(--muted);}
+.acsf-ind{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+.acsf-code{font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--teal);}
+.acsf-name{font-size:.84rem;color:var(--muted);font-weight:700;}
+.acsf-line{font-family:'Fredoka One',cursive;font-size:1.05rem;margin-top:5px;line-height:1.3;}
+.acsf-row.yes .acsf-line{color:var(--green);}
+.acsf-row.part .acsf-line{color:var(--gold);}
+.acsf-row.no .acsf-line{color:var(--accent);}
+.acsf-row.none .acsf-line,.acsf-row.na .acsf-line{color:var(--muted);}
+.acsf-sub{font-size:.76rem;color:var(--muted);line-height:1.45;margin-top:3px;}
+.acsf-flag{display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--gold);background:rgba(245,166,35,.12);
+  border:1px solid rgba(245,166,35,.35);border-radius:6px;padding:2px 6px;margin-top:6px;}
+.acsf-why{margin:7px 0 0;padding:0;list-style:none;}
+.acsf-why li{font-size:.76rem;color:var(--muted);line-height:1.5;
+  padding-left:13px;position:relative;}
+.acsf-why li::before{content:'·';position:absolute;left:3px;color:var(--teal);font-weight:900;}
+.acsf-why .lv{color:var(--text);font-weight:800;}
+/* The page scrolls, so the three things you came here to do follow you down
+   it rather than sitting under thirteen indicators. */
+.acsf-acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+  position:sticky;bottom:0;padding:10px 0 4px;background:var(--bg);
+  box-shadow:0 -10px 18px var(--bg);}
+/* Printing is how this reaches a paper sheet, so the page has to stop being a
+   dark app and become a document: no screen furniture, black on white, and a
+   core skill kept whole on one page wherever it will fit. */
+@media print{
+  /* The page has to stop being a dark app and become a document. Colour is
+     reset across the whole panel in one go rather than selector by selector:
+     half of this page's text is a token that resolves to near-white, and
+     white on white is a blank sheet that still costs paper. */
+  body{background:#fff!important;color:#000!important;}
+  body::before,body::after{display:none!important;}
+  .screen{display:none!important;}
+  #screen-test-acsf{display:block!important;position:static!important;padding:0!important;}
+  #screen-test-acsf,#screen-test-acsf *{color:#000!important;
+    text-shadow:none!important;box-shadow:none!important;}
+  #screen-test-acsf .acsf-acts,.music-btn,.back-btn,
+  .site-back,#solo-back-btn,#music-chip,#toast{display:none!important;}
+  .acsf-wrap{max-width:none;}
+  .acsf-body{overflow:visible!important;max-height:none!important;}
+  .acsf-acts{position:static!important;}
+  .acsf-head,.acsf-row,.acsf-warn,.acsf-flag{background:#fff!important;}
+  .acsf-head,.acsf-warn{border:1px solid #000!important;}
+  .acsf-row{border:1px solid #999!important;border-left:4px solid #000!important;}
+  .acsf-flag{border:1px solid #666!important;}
+  /* The greys that carry the reading order still have to differ from the
+     statements they sit under, so they come back one step lighter. */
+  #screen-test-acsf .acsf-name,#screen-test-acsf .acsf-sub,
+  #screen-test-acsf .acsf-meta,#screen-test-acsf .acsf-why li,
+  #screen-test-acsf .acsf-group h3{color:#444!important;}
+  .acsf-group,.acsf-row{break-inside:avoid;page-break-inside:avoid;}
+}
 /* Short screens: the dots and the moving line are what must survive, so the
    running total and the round's points go first. */
 :root[data-app-h~="lt620"] .test-card{gap:8px;padding-bottom:16px;}
@@ -1593,6 +1679,17 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <div>
           <div class="mc-toggle-txt">🔵 Multiple Choice (4 options)</div>
           <div class="mc-toggle-sub">Listen & tap — no typing. Great for early readers.</div>
+        </div>
+      </div>
+      <!-- Only ever on a Test Yourself card, where the Multiple Choice row
+           above is hidden: the level check decides tapping against typing step
+           by step, because which one a learner can manage is itself part of
+           what is being found out. -->
+      <div class="mc-toggle-wrap acsf-toggle" id="solo-acsf-toggle" onclick="toggleAcsfMode()">
+        <div class="mc-switch"></div>
+        <div>
+          <div class="mc-toggle-txt">🎯 Level check</div>
+          <div class="mc-toggle-sub">Covers every skill and ends with an indicative ACSF level for the teacher. Two rounds longer.</div>
         </div>
       </div>
       <div class="launch-nums" id="solo-limit-row">
@@ -1896,7 +1993,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
     <div class="s-q-type" id="s-q-type">WORD</div>
     <div id="s-q-emoji" style="font-size:3.2rem;line-height:1;margin:6px 0 10px;text-align:center;min-height:1em;"></div>
     <div class="s-q-text" id="s-q-text">…</div>
-    <button class="s-hear-btn" id="s-hear-btn" onclick="studentSpeak()">🔊 Hear it again</button>
+    <button class="s-hear-btn" id="s-hear-btn" onclick="studentReplay()">🔊 Hear it again</button>
   </div>
   <div id="hint-wrap" style="display:none;width:100%;max-width:500px;text-align:center;">
     <button class="btn btn-ghost btn-sm" id="hint-btn" onclick="showHint()">💡 Hint</button>
@@ -2058,6 +2155,11 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
     </div>
     <div class="test-acts solo-only">
       <button class="btn btn-gold btn-lg" onclick="testAgain()">🔄 Take the test again</button>
+      <!-- Quiet, and second. The learner's card is about what they did; the
+           ACSF codes behind this button are for whoever is placing them, and
+           putting them on the card itself would hand a pre-level reader a page
+           of levels they cannot read and did not ask for. -->
+      <button class="btn btn-ghost btn-sm" onclick="openAcsfPanel()">📋 For your teacher</button>
       <button class="btn btn-ghost btn-sm" onclick="quitTestGame()">← Choose another game</button>
     </div>
     <div class="test-acts class-only">
@@ -2086,6 +2188,26 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button class="btn btn-ghost" onclick="goHome()">← End and go home</button>
         <button class="btn btn-gold" id="test-host-finish" onclick="finishTestGame()">🏆 Show the scores</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- TEST YOURSELF — THE TEACHER'S PANEL.
+     The indicative ACSF profile: one row per indicator, what the run supports,
+     and the working underneath it. Reached from the final card, never shown
+     on the way there. -->
+<div class="screen" id="screen-test-acsf">
+  <div class="acsf-wrap">
+    <div class="acsf-head">
+      <h2>Indicative ACSF profile</h2>
+      <div class="acsf-meta" id="acsf-meta"></div>
+      <div class="acsf-warn" id="acsf-warn"></div>
+    </div>
+    <div class="acsf-body" id="acsf-body"></div>
+    <div class="acsf-acts">
+      <button class="btn btn-teal btn-sm" onclick="copyAcsfProfile()">📋 Copy</button>
+      <button class="btn btn-teal btn-sm" onclick="window.print()">🖨 Print</button>
+      <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-test-round')">← Back</button>
     </div>
   </div>
 </div>
@@ -4358,6 +4480,20 @@ function setMcMode(on){
   // both toggles stay visually in sync
   ['solo-mc-toggle','host-mc-toggle'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('on',mcMode);});
 }
+/* Level check: the same Test Yourself, run across the bands instead of one
+   ladder, so that the profile at the end has something to say about every
+   indicator rather than only the ones the learner's own route happened to
+   cross. Off by default, since the ordinary test is what most people want. */
+let acsfMode=false;
+function setAcsfMode(on){
+  acsfMode=!!on;
+  const e=document.getElementById('solo-acsf-toggle');
+  if(e) e.classList.toggle('on',acsfMode);
+}
+function toggleAcsfMode(){
+  setAcsfMode(!acsfMode);
+  if(soloMode) onSoloSettingChange();
+}
 
 /* ══════════════ DICE — setup ══════════════
    The target and the wrong-answer rule are shared between the solo and the
@@ -4418,6 +4554,11 @@ function applyTargetSetup(scope){
   if(opts) opts.classList.toggle('on',on);
   const mc=document.getElementById(scope+'-mc-toggle');
   if(mc) mc.style.display=(on||test)?'none':'';
+  // The level check is a Test Yourself setting and belongs to nothing else. It
+  // is solo only: a class test is self-paced across thirty phones, and a
+  // profile is something a teacher reads with one learner.
+  const ac=document.getElementById(scope+'-acsf-toggle');
+  if(ac) ac.style.display=(scope==='solo'&&test)?'':'none';
   const lim=document.getElementById(scope+'-limit-row');
   if(lim) lim.style.display=on?'none':'';
   const qf=document.getElementById(scope+'-q-field');
@@ -5309,6 +5450,7 @@ function showMidStudentLeaderboard(){
 function showHint(){
   const q=currentStudentQ;
   if(!q) return;
+  if(TEST&&TEST.ev) TEST.ev.hints++;
   if(q.type==='translate'){
     const words=q.en.split(' ');
     hintLevel=Math.min(hintLevel+1,words.length);
@@ -5592,6 +5734,299 @@ const TEST_LADDERS={
     {type:'elementary',  mc:false, label:'Longer sentences — write the missing word'},
   ],
 };
+
+/* ══════════════ LEVEL CHECK — AN INDICATIVE ACSF PROFILE ══════════════
+   Test Yourself tells a learner what they are working on. It says nothing an
+   assessor can use. The AMES/LWA Streamlined CALD IA/PTA assessor analysis
+   sheet works in ACSF indicators, .01 to .11, ticked at NYA / PLA / PLB /
+   Level 1 against named performance features, and a teacher placing a new
+   learner has to fill one in.
+
+   Level check is a second way of running the same test that ends with an
+   indicative profile against those indicators, plus the two Digital Literacy
+   Skills Framework indicators, .12 and .13.
+
+   Four things this cannot do, said here because they are said on the panel
+   too, and because it would be easy to quietly overclaim:
+
+   1. Oral Communication .07 is speaking. Nothing in this app records speech,
+      not even the Speaking game, which is built from tiles. It is reported as
+      not assessable rather than guessed at.
+   2. Writing .05 and .06 are keyboard only here. Most of the Pre Level 1
+      writing features are about handwriting: copies upper and lower case
+      letters, writes mostly on line, leaves spaces between words. A typed
+      answer shows none of that. Spelling, word choice, personal details and
+      structure are what this can see. Handwriting is tracing.html, which is
+      not part of the test.
+   3. Learning .01 and .02 are read off how the learner behaved during the
+      run, not from an interview. The real features (identifies a personal
+      learning goal, identifies a classmate as a resource) come from talking
+      to someone. These rows are labelled as a signal to confirm, not a result.
+   4. Level 1 is a ceiling, never a destination. A handful of steps support a
+      partial claim at Level 1. Nothing in here supports a full Level 1 award,
+      and the panel never prints one.
+
+   Everything the panel says is hedged for the same reason. Where the learner
+   reaches the highest level this app can show for an indicator, it says "at
+   least PLB.09" and then says what it would take to see further. */
+const ACSF_LEVELS=['NYA','PLA','PLB','L1'];
+function acsfLvlNo(l){ const i=ACSF_LEVELS.indexOf(l); return i<0?0:i; }
+
+/* The indicators, in the order the assessor sheet groups them. `ceiling` is
+   the highest level the claim map below can ever award, and `capNote` is what
+   the panel prints once a learner has reached it: the limit belongs to the
+   app, not to them. `features` quotes the performance features from the
+   assessor sheet where that sheet carries them (Learning, Writing, Oral); for
+   Reading, Numeracy and Digital the sheet gives only question mappings, so
+   those rows describe what was observed instead of quoting text this app does
+   not have. */
+const ACSF_INDICATORS={
+  '01':{skill:'Learning', name:'Actively participates in the learning process',
+        ceiling:'PLB', inferred:true,
+        capNote:'Level 1 asks about past learning, goals and barriers. That needs a conversation, not a game.',
+        features:{PLA:['Engages in learning activities that involve minimal risk taking'],
+                  PLB:['Demonstrates preparedness for learning through active participation',
+                       'Engages in learning activities that involve some risk taking',
+                       'Follows extremely simple instructions and procedures that may require prompting']}},
+  '02':{skill:'Learning', name:'Manages and applies learning strategies',
+        ceiling:'PLB', inferred:true,
+        capNote:'Level 1 asks for information seeking, such as entering a key word in a search engine. Nothing here can show that.',
+        features:{PLA:['Uses extremely familiar learning strategies, such as copying',
+                       'Requires a combination of modes to demonstrate performance'],
+                  PLB:['Practices extremely simple repetitive tasks',
+                       'Identifies a possible resource']}},
+  '03':{skill:'Reading', name:'Makes meaning from written and pictorial text',
+        ceiling:'L1',
+        capNote:'A short message is the longest connected text in this app. A full Level 1 read needs a longer text on paper.'},
+  '04':{skill:'Reading', name:'Uses strategies to interpret text',
+        ceiling:'L1',
+        capNote:'Longer word phonics is the top of the decoding ladder here.'},
+  '05':{skill:'Writing', name:'Conveys information in written form',
+        ceiling:'L1', screenOnly:true,
+        capNote:'On screen only. Handwriting, letter forms and spacing are not observed by this app.'},
+  '06':{skill:'Writing', name:'Uses vocabulary, symbols and conventions',
+        ceiling:'L1', screenOnly:true,
+        capNote:'On screen only, and no extended writing. Handwriting must be checked on paper.'},
+  '07':{skill:'Oral Communication', name:'Speaks to communicate',
+        ceiling:null,
+        capNote:'Nothing in this app records speech, including the Speaking game, which is built from tiles. Speaking has to be heard.'},
+  '08':{skill:'Oral Communication', name:'Listens and comprehends',
+        ceiling:'L1',
+        capNote:'One spoken sentence is the longest listening item here.'},
+  '09':{skill:'Numeracy', name:'Identifies mathematical information',
+        ceiling:'L1',
+        capNote:'Five minute clock times and two digit numbers are the top of what this app asks.'},
+  '10':{skill:'Numeracy', name:'Uses and applies mathematical knowledge',
+        ceiling:'L1',
+        capNote:'Counting change is the only multi step calculation in this app.'},
+  '11':{skill:'Numeracy', name:'Communicates and represents mathematics',
+        ceiling:'L1',
+        capNote:'A clock face and a handful of coins are the only representations available here.'},
+  '12':{skill:'Digital', name:'Active awareness of self as a digital user',
+        ceiling:'PLA', alwaysPartial:true,
+        capNote:'Only the form round touches digital identity. Nothing here covers passwords, safety or what to share online.'},
+  '13':{skill:'Digital', name:'Knowledge, use and application of digital skills',
+        ceiling:'PLB',
+        capNote:'No navigation, searching or file handling in this app, so Level 1 stays out of reach.'},
+};
+const ACSF_SKILL_ORDER=['Learning','Reading','Writing','Oral Communication','Numeracy','Digital'];
+/* Object.keys would hand these back as .10 .11 .12 .13 .01 .02 …: '10' looks
+   like an array index to the engine and '01' does not, so the integer-like
+   ones come first however the object was written. The sheet is read in order,
+   so the order is spelled out. */
+const ACSF_ORDER=['01','02','03','04','05','06','07','08','09','10','11','12','13'];
+
+/* What answering a rung correctly is evidence for.
+   A claim is [indicator, level, what the panel prints, partial?]. `partial`
+   marks a claim that can only ever read "working towards": the task touches
+   the level but does not carry it on its own.
+
+   Keyed by bank, because a rung is a bank plus how it is presented, and the
+   presentation matters: tapping one of four words shows recognition, typing
+   the same word shows spelling. `mc` and `typed` are only split where a bank
+   can genuinely be both, the ones attachMcChoices converts. Everything else
+   is a tile, a chip, a coin or a clock hand and has one presentation, so it
+   carries `base` alone. Clock and Shop are the exception and are worked out
+   in acsfClaimsFor: their generators alternate reading with doing, and which
+   one a step deals is what decides whether .10 and .11 are in play at all. */
+const ACSF_CLAIMS={
+  letter:      {base:[['04','PLA','Heard a letter name and found the letter'],
+                      ['08','PLA','Understood a familiar spoken item']]},
+  lettersound: {base:[['04','PLA','Matched a spoken sound to a word'],
+                      ['08','PLA','Understood a familiar spoken sound']]},
+  'wp1:word':  {base:[['04','PLB','Blended sounds to read a short word'],
+                      ['08','PLB','Followed a word said sound by sound']]},
+  'wp1:gap':   {base:[['04','PLB','Used letter and sound knowledge in a short word']],
+                typed:[['06','PLB','Wrote the missing sound in a short word']]},
+  'wp1:build': {base:[['04','PLB','Built a short word from its sounds'],
+                      ['05','PLA','Put letters together to make a word'],
+                      ['06','PLB','Used letters in the right order']]},
+  'wp2:gap':   {base:[['04','PLB','Used letter and sound knowledge in a longer word'],
+                      ['04','L1','Handled a digraph or a longer word',1]],
+                typed:[['06','PLB','Wrote the missing sound in a longer word']]},
+  'wp2:word':  {base:[['04','PLB','Read a longer word from its sounds'],
+                      ['04','L1','Handled a digraph or a longer word',1]]},
+  'wp2:build': {base:[['04','L1','Built a longer word from its sounds',1],
+                      ['06','PLB','Used letters in the right order']]},
+  oddone:      {base:[['03','PLB','Read familiar words and found the odd one']]},
+  signs:       {base:[['03','PLA','Read a familiar public sign'],
+                      ['03','PLB','Read the words that go with the sign']]},
+  sms:         {base:[['03','PLB','Read a short message and answered a question about it'],
+                      ['03','L1','Made meaning from a short connected text',1],
+                      ['13','PLB','Read a message on a device']]},
+  questionwords:{mc:[['03','PLB','Chose the right question word'],
+                     ['04','PLB','Recognised the shape of a question']],
+                 typed:[['03','PLB','Chose the right question word'],
+                        ['06','PLB','Wrote a question word']]},
+  beginner:    {mc:[['08','PLB','Understood a spoken sentence and found the missing word'],
+                    ['03','PLB','Read the words in a simple sentence']],
+                typed:[['08','PLB','Understood a spoken sentence and wrote the missing word'],
+                       ['05','PLB','Wrote a word into a sentence'],
+                       ['06','PLB','Spelled a familiar word']]},
+  elementary:  {mc:[['08','PLB','Understood a longer spoken sentence'],
+                    ['08','L1','Followed a longer sentence on a familiar topic',1],
+                    ['03','PLB','Read the words in a longer sentence']],
+                typed:[['08','L1','Followed a longer sentence on a familiar topic',1],
+                       ['05','PLB','Wrote a word into a longer sentence'],
+                       ['05','L1','Wrote into a longer sentence unaided',1],
+                       ['06','L1','Spelled a word in a longer sentence',1]]},
+  unscramble:  {base:[['08','PLB','Listened, then put the words in order'],
+                      ['06','PLB','Put words in the right order']]},
+  gramscramble:{base:[['03','PLB','Read the words and put them in order'],
+                      ['06','PLB','Put words in the right order'],
+                      ['06','L1','Built a sentence with a basic structure',1]]},
+  speaking:    {base:[['08','PLB','Understood a spoken question and built an answer']]},
+  spelling:    {mc:[['03','PLB','Read a familiar word']],
+                typed:[['05','PLB','Wrote a familiar word'],
+                       ['06','PLB','Approximated the spelling of a familiar word'],
+                       ['06','L1','Spelled words from several topics',1]]},
+  numbers:     {mc:[['09','PLA','Recognised a whole number from 1 to 10'],
+                    ['08','PLA','Understood a spoken number']],
+                typed:[['09','PLA','Recognised a whole number from 1 to 10'],
+                       ['11','PLB','Wrote a number from 1 to 10 as a word'],
+                       ['06','PLB','Spelled a number word']]},
+  numbers1120: {mc:[['09','PLB','Recognised a number from 11 to 20']],
+                typed:[['09','PLB','Recognised a number from 11 to 20'],
+                       ['11','PLB','Wrote a two digit number as a word'],
+                       ['06','PLB','Spelled a number word']]},
+  numbers2199: {mc:[['09','PLB','Recognised a number from 21 to 99']],
+                typed:[['09','PLB','Recognised a number from 21 to 99'],
+                       ['11','PLB','Wrote a two digit number as a word'],
+                       ['06','PLB','Spelled a number word']]},
+  forms:       {base:[['05','PLA','Placed personal details in the right box'],
+                      ['05','PLB','Gave limited personal details'],
+                      ['05','L1','Completed a form with basic personal details',1],
+                      ['03','PLB','Read the labels on a form'],
+                      ['12','PLA','Entered personal details on a device',1]]},
+};
+/* The themed word banks are the same task with a different topic, so they
+   share one entry rather than six copies of it. */
+['days','months','weather','fruits','body','clothes'].forEach(function(b){
+  ACSF_CLAIMS[b]={mc:[['03','PLB','Read a familiar everyday word']],
+                  typed:[['05','PLB','Wrote a familiar everyday word'],
+                         ['06','PLB','Approximated the spelling of a familiar word']]};
+});
+
+/* Clock and Shop deal reading and doing alternately (see genClockQuestions and
+   genShopQuestions: an even offset reads, an odd one does), and only the doing
+   half is evidence for .10 and .11. Reading a clock face shows you know what
+   the numbers mean; setting the hands is the only place in this app where a
+   learner represents a quantity themselves. So the offset decides the claims,
+   and the bands below pick their offsets on purpose. */
+function acsfTimeMoneyClaims(type,from){
+  const f=from||0, doing=f%2===1;
+  if(type==='clock'){
+    const hard=f>=4;           // quarter past and five minute steps
+    const out=[['09',hard?'L1':'PLB','Read a clock face',hard?1:0]];
+    if(doing){
+      out.push(['10','PLB','Set the hands to a given time']);
+      out.push(['11',hard?'L1':'PLB','Showed a time on a clock face',hard?1:0]);
+    }
+    return out;
+  }
+  if(type==='shop'){
+    const out=[['09','PLB','Recognised Australian coins and notes'],
+               ['11','PLB','Made up an amount of money with coins']];
+    if(doing){ out.push(['10','PLB','Worked out the change from a note']);
+               out.push(['10','L1','Took a price off a note and counted the change',1]); }
+    else     { out.push(['10','PLB','Added coins to reach an exact amount']); }
+    return out;
+  }
+  return [];
+}
+/* What a step is evidence for. A step is {type, mc, from}, the same shape the
+   ladders already use, so this answers for a level check band, an ordinary
+   Test Yourself rung, and the eleven skill tests alike. */
+function acsfClaimsFor(step){
+  if(!step) return [];
+  if(step.type==='clock'||step.type==='shop') return acsfTimeMoneyClaims(step.type,step.from);
+  const e=ACSF_CLAIMS[step.type];
+  if(!e) return [];
+  let out=(e.base||[]).slice();
+  if(e.mc||e.typed) out=out.concat(step.mc?(e.mc||[]):(e.typed||[]));
+  return out;
+}
+
+/* ══════════════ LEVEL CHECK — THE BANDS ══════════════
+   The ordinary Test Yourself ladder is one game per rung, which is right for
+   what it is for: it finds the hardest thing a learner can do and hands them
+   that game to practise. It is the wrong shape for an ACSF profile, because a
+   learner only ever meets six to ten of its eighteen rungs. Clock is rung ten
+   and Shop is rung thirteen, so anyone who settles low never attempts .10 or
+   .11 at all, and the profile could only ever say "not assessed" for them.
+
+   So a band is a rung with a pool instead of a single game. The ladder still
+   moves exactly as it does in the ordinary test, and the three questions of a
+   round are still three questions; they are just drawn from across the band by
+   acsfPickSteps, which takes whatever is least covered so far. Difficulty
+   comes from the band, breadth comes from the picker, and no extra questions
+   are asked of the learner.
+
+   Band 0 is the floor, and it carries a numeracy doing step on purpose
+   (clock from:1 sets the hands, shop from:0 pays an exact amount). A learner
+   who never leaves band 0 still attempts .10 and .11, and getting them wrong
+   is a real result (that is what the sheet's NYA box is for) where never
+   being asked is not.
+
+   Offsets into Clock and Shop are chosen, not incidental: odd is the doing
+   half of each. Translate is deliberately absent, since it needs a first
+   language chosen on the start screen and a level check should not depend on
+   one being picked. */
+const ACSF_ROUNDS=12;
+const ACSF_BANDS=[
+  {label:'Letters, numbers and signs', pool:[
+    {type:'letter',mc:true},{type:'lettersound',mc:true},{type:'numbers',mc:true},
+    {type:'signs',mc:true},{type:'oddone',mc:true},{type:'forms',mc:false},
+    {type:'wp1:build',mc:false},
+    {type:'clock',mc:false,from:1},{type:'shop',mc:false,from:0}]},
+  {label:'Familiar words, time and money', pool:[
+    {type:'clothes',mc:true},{type:'fruits',mc:true},{type:'wp1:word',mc:true},
+    {type:'numbers',mc:true},{type:'clock',mc:false,from:0},{type:'clock',mc:false,from:1},
+    {type:'shop',mc:false,from:0},{type:'signs',mc:true},{type:'forms',mc:false}]},
+  {label:'Sounds in words, reading a message', pool:[
+    {type:'wp1:gap',mc:true},{type:'beginner',mc:true},{type:'clock',mc:false,from:3},
+    {type:'shop',mc:false,from:0},{type:'sms',mc:true},{type:'numbers',mc:false},
+    {type:'days',mc:true},{type:'body',mc:true}]},
+  {label:'Building words, counting change', pool:[
+    {type:'wp1:build',mc:false},{type:'spelling',mc:false},{type:'questionwords',mc:true},
+    {type:'sms',mc:true},{type:'shop',mc:false,from:1},{type:'clock',mc:false,from:3},
+    {type:'unscramble',mc:false},{type:'forms',mc:false}]},
+  {label:'Writing what you hear, filling a form', pool:[
+    {type:'beginner',mc:false},{type:'forms',mc:false},{type:'spelling',mc:false},
+    {type:'wp2:gap',mc:true},{type:'numbers1120',mc:false},{type:'shop',mc:false,from:1},
+    {type:'clock',mc:false,from:5},{type:'sms',mc:true}]},
+  {label:'Longer words, longer sentences', pool:[
+    {type:'wp2:build',mc:false},{type:'elementary',mc:true},{type:'gramscramble',mc:false},
+    {type:'numbers2199',mc:false},{type:'clock',mc:false,from:5},{type:'shop',mc:false,from:1},
+    {type:'spelling',mc:false},{type:'wp2:gap',mc:false}]},
+  {label:'Writing sentences', pool:[
+    {type:'elementary',mc:false},{type:'wp2:word',mc:true},{type:'gramscramble',mc:false},
+    {type:'shop',mc:false,from:1},{type:'clock',mc:false,from:7},{type:'spelling',mc:false},
+    // A learner who climbs straight to the top passes the middle bands once
+    // and can leave with a single listening item behind them, so the top band
+    // keeps one of its own rather than resting on what it climbed past.
+    {type:'unscramble',mc:false},{type:'months',mc:false}]},
+];
 /* The test games are addressed like a section's All pill — the type string
    carries the skill, so nothing needs hidden state. */
 function isTestType(t){ return typeof t==='string'&&t.indexOf('test:')===0; }
@@ -5825,6 +6260,7 @@ function soloLinkParams(type){
   if(isTestType(type)){
     const secs=soloSeconds();
     if(secs!==TIMER_DURATION) p.set('t',secs);
+    if(acsfMode) p.set('acsf','1');
   } else if(type!=='target'){
     const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
     if(limit!==10) p.set('q',limit);
@@ -5913,9 +6349,12 @@ function updateSoloCountDisplay(){
     return;
   }
   if(isTestType(soloSelectedType)){
-    display.textContent=TEST_ROUNDS+' rounds of '+TEST_PER_ROUND
-      +' questions, from '+testSkillLabel(soloSelectedType).toLowerCase()
-      +'. It gets harder or easier as you go.';
+    display.textContent=acsfMode
+      ?ACSF_ROUNDS+' rounds of '+TEST_PER_ROUND+' questions, spread across every skill'
+        +' so that nothing is left untested. It gets harder or easier as you go.'
+      :TEST_ROUNDS+' rounds of '+TEST_PER_ROUND
+        +' questions, from '+testSkillLabel(soloSelectedType).toLowerCase()
+        +'. It gets harder or easier as you go.';
     return;
   }
   const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
@@ -5931,7 +6370,7 @@ function startSoloGame(){
     if(typeUsesTranslate(soloSelectedType))
       localStorage.setItem('translateLang',document.getElementById('solo-lang-pick').value);
     roomGame=null;
-    TEST=newTestGame('solo',soloSelectedType);
+    TEST=newTestGame('solo',soloSelectedType,acsfMode);
     TEST.secs=soloSeconds();
     myScore=0;
     testStartRound();
@@ -5948,7 +6387,7 @@ function startSoloGame(){
   setSoloExit(true);
   showStudentQuestion(soloQuestions[0],serverNow());
 }
-function showSoloResult(submittedAns,correctAns,timeLeft){
+function showSoloResult(submittedAns,correctAns,timeLeft,timedOut){
   clearInterval(studentTimerInt); stopMusic();
   let pts,tier;
   if(currentStudentQ&&currentStudentQ.type==='translate'){
@@ -5963,7 +6402,7 @@ function showSoloResult(submittedAns,correctAns,timeLeft){
     tier=isCorrect?'correct':'wrong';
   }
   myScore+=pts;
-  testRecord(tier,pts);
+  testRecord(tier,pts,timedOut);
   document.getElementById('result-icon').textContent=tier==='correct'?'🎉':tier==='partial'?'🌟':'😔';
   if(currentStudentQ&&currentStudentQ.type==='translate'){
     document.getElementById('result-word').innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;line-height:2;text-align:center;">'+diffHtml(submittedAns||'',correctAns)+'</div>'+(tier!=='correct'?'<div style="font-size:.78rem;color:var(--muted);margin-top:6px;">Correct: <em style="color:var(--green)">'+correctAns+'</em></div>':'');
@@ -5981,7 +6420,7 @@ function showSoloResult(submittedAns,correctAns,timeLeft){
   // In a test the run is measured in rounds, not in a single list of
   // questions, so both lines count within the round the learner is in.
   document.getElementById('result-rank').textContent=testActive()
-    ?'Round '+TEST.round+' of '+TEST_ROUNDS
+    ?'Round '+TEST.round+' of '+testRounds()
     :'Question '+(soloQIdx+1)+' of '+soloQuestions.length;
   document.getElementById('solo-next-wrap').style.display='';
   document.getElementById('solo-progress').textContent=testActive()
@@ -6076,12 +6515,93 @@ function showSoloFinal(){
 let TEST=null;
 let testPlayersListener=null;
 
-function newTestGame(mode,type){
-  return {mode:mode, type:type, ladder:ladderFor(type)||[],
+function newTestGame(mode,type,acsf){
+  // A level check swaps the ladder for the bands and runs two rounds longer.
+  // Everything downstream of this (the move, the round card, the class
+  // scoreboard) reads TEST.ladder and TEST.rounds and needs no branch of its
+  // own, because a band carries a label exactly as a rung does.
+  const bands=!!acsf;
+  return {mode:mode, type:type, acsf:bands,
+          ladder:bands?ACSF_BANDS:(ladderFor(type)||[]),
+          rounds:bands?ACSF_ROUNDS:TEST_ROUNDS,
           level:0, round:1, tally:[], roundPts:0, lastMove:0,
-          bySkill:{}, secs:TIMER_DURATION};
+          bySkill:{}, secs:TIMER_DURATION,
+          roundSteps:[], ev:newAcsfEvidence()};
 }
 function testStep(){ return testStepAt(TEST.ladder,TEST.level); }
+function testRounds(){ return (TEST&&TEST.rounds)||TEST_ROUNDS; }
+
+/* ── LEVEL CHECK — EVIDENCE ──
+   Everything the profile is built from. byInd is the count of what was asked
+   and how it went, per indicator per level, with the reasons kept alongside so
+   the panel can show its working rather than a bare verdict. The rest are the
+   behavioural signals: Learning .01 and .02 and the digital indicators are not
+   in any question, they are in how the learner went about the run. */
+const ACSF_MIN_EVIDENCE=3;
+function newAcsfEvidence(){
+  return {byInd:{}, used:{}, tick:0, asked:0, attempts:0, timeouts:0,
+          hints:0, replays:0, modes:{}, trend:[], finished:false};
+}
+function acsfCredit(step,tier){
+  if(!TEST||!TEST.ev) return;
+  const worth=tier==='correct'?1:tier==='partial'?0.5:0;
+  acsfClaimsFor(step).forEach(function(c){
+    const b=TEST.ev.byInd[c[0]]||(TEST.ev.byInd[c[0]]={});
+    const s=b[c[1]]||(b[c[1]]={seen:0,right:0,why:{}});
+    s.seen++; s.right+=worth;
+    const w=s.why[c[2]]||(s.why[c[2]]={n:0,ok:0,partial:!!c[3]});
+    w.n++; w.ok+=worth;
+  });
+}
+/* Note which way the learner answered, for the digital indicators. Tapping a
+   choice, typing on the on-screen keyboard, placing tiles, dragging a clock
+   hand and picking out coins are five different things to be able to do on a
+   device, and .13 is the one indicator where the how matters more than the
+   what. */
+function acsfInputMode(q){
+  if(!q) return null;
+  if(q.type==='clockset') return 'drag';
+  if(q.type==='shop') return 'coins';
+  if(q.type==='form') return 'chips';
+  if(Array.isArray(q.choices)&&q.choices.length) return 'tap';
+  if(q.type==='unscramble'||q.type==='gramscramble'||q.type==='speak'||q.type==='phbuild') return 'tiles';
+  if(q.type==='mc'||q.type==='letter'||q.type==='lettersound'||q.type==='oddone'
+     ||q.type==='phgap'||q.type==='phword') return 'tap';
+  return 'type';
+}
+function acsfNoteMode(q){
+  if(!TEST||!TEST.ev) return;
+  const m=acsfInputMode(q);
+  if(m) TEST.ev.modes[m]=(TEST.ev.modes[m]||0)+1;
+}
+
+/* ── LEVEL CHECK — THE PICKER ──
+   Three questions from across the band, taking whatever is least covered so
+   far. `need` is the biggest shortfall against ACSF_MIN_EVIDENCE among the
+   indicators a step would credit, so a step that is the only route to
+   something untouched outranks one that would deepen what is already known.
+   Ties go to whatever has waited longest, then to the pool's own order, so a
+   learner who spends the whole run on one band still sweeps it rather than
+   seeing the same three games twelve times. */
+function acsfStepKey(st){ return st.type+(st.mc?'|mc':'|w')+(st.from!=null?'|'+st.from:''); }
+function acsfNeed(st){
+  const cl=acsfClaimsFor(st);
+  let worst=0;
+  cl.forEach(function(c){
+    const b=TEST.ev.byInd[c[0]], s=b&&b[c[1]];
+    worst=Math.max(worst,ACSF_MIN_EVIDENCE-(s?s.seen:0));
+  });
+  return worst;
+}
+function acsfPickSteps(band,n){
+  const used=TEST.ev.used;
+  const ranked=band.pool.map(function(st,i){
+    return {st:st, need:acsfNeed(st), last:used[acsfStepKey(st)]||0, i:i};
+  }).sort(function(a,b){ return b.need-a.need||a.last-b.last||a.i-b.i; });
+  const out=ranked.slice(0,n).map(function(r){ return r.st; });
+  out.forEach(function(st){ used[acsfStepKey(st)]=++TEST.ev.tick; });
+  return out;
+}
 
 /* Three questions at one rung. Clock and Shop are asked for a slice of their
    own ladder rather than the first three rounds they would otherwise deal;
@@ -6099,14 +6619,30 @@ function testQuestions(step,n){
 
 function testStartRound(){
   const step=testStep();
-  const qs=testQuestions(step,TEST_PER_ROUND);
+  TEST.roundSteps=[];
+  let qs;
+  if(TEST.acsf){
+    // A band deals one question per picked step rather than three from one
+    // bank, so the options are attached per question: within a round a tap
+    // round and a typed round can sit side by side.
+    qs=[];
+    acsfPickSteps(step,TEST_PER_ROUND).forEach(function(st){
+      const q=testQuestions(st,1)[0];
+      if(!q) return;
+      if(st.mc) attachMcChoices([q],st.type);
+      qs.push(q); TEST.roundSteps.push(st);
+    });
+  } else {
+    qs=testQuestions(step,TEST_PER_ROUND);
+    // Only where the rung asks for it: a round that carries its own options
+    // (Signs, Messages, Odd One Out, the letter banks, the phonics tap rounds,
+    // reading a clock) is built with them and attachMcChoices leaves it alone.
+    // A rung that asks for none gets none — getQuestions deals copies, so no
+    // earlier tap rung can have left its options on what this one draws.
+    if(step.mc) attachMcChoices(qs,step.type);
+    qs.forEach(function(){ TEST.roundSteps.push(step); });
+  }
   if(!qs.length){ showToast('No questions available!'); quitTestGame(); return; }
-  // Only where the rung asks for it: a round that carries its own options
-  // (Signs, Messages, Odd One Out, the letter banks, the phonics tap rounds,
-  // reading a clock) is built with them and attachMcChoices leaves it alone.
-  // A rung that asks for none gets none — getQuestions deals copies, so no
-  // earlier tap rung can have left its options on what this one draws.
-  if(step.mc) attachMcChoices(qs,step.type);
   TEST.tally=[]; TEST.roundPts=0;
   soloQuestions=qs; soloQIdx=0;
   setSoloExit(TEST.mode==='solo');
@@ -6115,16 +6651,30 @@ function testStartRound(){
 
 /* Called from showSoloResult, which is the marking for both a solo run and a
    class test — in a test the learner marks and advances themselves either way. */
-function testRecord(tier,pts){
+function testRecord(tier,pts,timedOut){
   if(!testActive()) return;
   TEST.tally.push(tier);
   TEST.roundPts+=pts;
+  // Which step this particular question came from. In an ordinary round that
+  // is the rung, and every question in the round shares it; in a level check
+  // round the three questions come from three different steps of the band, so
+  // asking testStep() would credit all three to whichever the band is named
+  // after. roundSteps is filled alongside the questions for exactly this.
+  const step=TEST.roundSteps[soloQIdx]||testStep();
+  TEST.ev.asked++;
+  // Which way the answer was given: tapping, typing, tiles, a dragged clock
+  // hand, coins. Five separate things to be able to do on a device, and .13 is
+  // the one indicator where the how matters more than the what. Counted here
+  // rather than when the question appeared, because a question that timed out
+  // untouched says nothing about what the learner can work.
+  if(timedOut) TEST.ev.timeouts++; else { TEST.ev.attempts++; acsfNoteMode(currentStudentQ); }
+  acsfCredit(step,tier);
   // Also keep the run's answers by skill, for the report at the end. A rung is
   // a game, and every game belongs to one skill (GAME_INFO), so a ladder that
   // climbs through several games crosses several skills — the whole-app test
   // most of all. A part-right spelling is half a mistake: enough to say the
   // skill needs work, not enough to be counted as wrong outright.
-  const sk=(GAME_INFO[testStep().type]||{}).skill;
+  const sk=(GAME_INFO[step.type]||{}).skill;
   if(!sk) return;
   const b=TEST.bySkill[sk]||(TEST.bySkill[sk]={asked:0,wrong:0});
   b.asked++;
@@ -6175,6 +6725,366 @@ function testReportRow(kind,icon,label,value){
   return row;
 }
 
+/* ══════════════ LEVEL CHECK — THE PROFILE ══════════════
+   What the run is willing to say. Everything here is deliberately cautious,
+   because the thing being produced looks like an assessment and is not one:
+   it is thirty-six questions on a phone, marked by string comparison, with no
+   assessor in the room. A teacher can start from it. Nobody should finish
+   with it.
+
+   Three rules do most of that work:
+     - a level needs repeated evidence before it is claimed at all;
+     - a claim tagged partial in the map can only ever read "working towards",
+       however many times the learner got it right;
+     - where the learner has reached the highest level this app can show for an
+       indicator, it says "at least", and then says what it would take to see
+       further. The ceiling is the app's, not the learner's, and a report that
+       does not say so is quietly capping people. */
+function acsfVerdict(s){
+  if(!s||!s.seen) return 'none';
+  const acc=s.right/s.seen;
+  if(s.seen>=ACSF_MIN_EVIDENCE&&acc>=0.75) return 'yes';
+  if(s.seen>=2&&acc>=0.5) return 'part';
+  if(s.seen===1&&s.right>0) return 'part';
+  return 'no';
+}
+/* A level carried only by partial claims is a level the learner has been near,
+   not one they have shown. Same for an indicator this app can only ever
+   glance at, which is .12: one form round is not awareness of yourself as a
+   digital user, and pretending otherwise would be the worst row on the page. */
+function acsfLevelState(s,meta){
+  let v=acsfVerdict(s);
+  if(v==='yes'){
+    const ks=Object.keys(s.why||{});
+    if(meta.alwaysPartial||(ks.length&&ks.every(function(k){ return s.why[k].partial; }))) v='part';
+  }
+  return v;
+}
+const ACSF_STEPS=['PLA','PLB','L1'];
+function acsfLvlText(l){ return l==='L1'?'Level 1':l; }
+
+/* The behavioural indicators. Learning .01 and .02 and the digital pair are
+   not in any question, they are in how the learner went about the run, so
+   they are read off the signals rather than off the answers, and every row
+   says out loud that it is a signal to confirm rather than a result. */
+function acsfSignalRows(ev){
+  const rows={};
+  const asked=ev.asked||0, tOut=ev.timeouts||0;
+  const rate=asked?tOut/asked:0;
+  const help=(ev.hints||0)+(ev.replays||0);
+  const modes=Object.keys(ev.modes||{});
+  const modeName={tap:'Tapped an answer on screen',type:'Typed on the on-screen keyboard',
+                  tiles:'Placed tiles in order',drag:'Dragged the hands of a clock',
+                  coins:'Picked out coins and notes',chips:'Placed details into a form'};
+  rows['01']={PLA:{}, PLB:{}};
+  if(asked>0){
+    rows['01'].PLA={seen:asked, right:(ev.attempts||0),
+      why:{'Started the test and had a go at the questions':{n:asked,ok:ev.attempts||0,partial:0}}};
+    if(ev.finished){
+      const clean=rate<=0.15;
+      rows['01'].PLB={seen:asked, right:clean?asked:asked*0.5,
+        why:{'Worked through every round to the end':{n:asked,ok:asked,partial:0},
+             'Answered rather than letting the time run out':
+               {n:asked,ok:asked-tOut,partial:clean?0:1}}};
+    } else if(asked>=6){
+      rows['01'].PLB={seen:asked, right:asked*0.5,
+        why:{'Took part, but the run was not finished':{n:asked,ok:asked*0.5,partial:1}}};
+    }
+  }
+  rows['02']={PLA:{}, PLB:{}};
+  if(help>0){
+    const w={};
+    if(ev.hints) w['Used the hint to sound a word out']={n:ev.hints,ok:ev.hints,partial:0};
+    if(ev.replays) w['Asked to hear the question again']={n:ev.replays,ok:ev.replays,partial:0};
+    rows['02'].PLA={seen:Math.max(2,help), right:Math.max(2,help), why:w};
+  }
+  // Practising a repetitive task means answering it. A learner who let the
+  // clock run out on most of the run sat through it rather than practised it.
+  const engaged=asked?(ev.attempts||0)/asked:0;
+  if(asked>=12&&engaged>=0.5){
+    const solid=ev.finished&&engaged>=0.8;
+    rows['02'].PLB={seen:asked, right:solid?asked:asked*0.6,
+      why:{'Repeated the same kind of short task many times':
+             {n:asked,ok:ev.attempts||0,partial:solid?0:1},
+           'Reached for help rather than stopping':
+             {n:Math.max(1,help),ok:help,partial:1}}};
+    if(!help) delete rows['02'].PLB.why['Reached for help rather than stopping'];
+  }
+  rows['13']={PLA:{}, PLB:{}};
+  // Modes are counted on submit, not on display, so a question the learner
+  // never touched is not evidence that they can work a keyboard or a slider.
+  if((ev.attempts||0)>0){
+    rows['13'].PLA={seen:ev.attempts, right:ev.attempts,
+      why:{'Used a phone or tablet to work through a set task':{n:ev.attempts,ok:ev.attempts,partial:0}}};
+    if(modes.length>=2){
+      const w={};
+      modes.forEach(function(m){ if(modeName[m]) w[modeName[m]]={n:ev.modes[m],ok:ev.modes[m],partial:0}; });
+      if(ev.replays) w['Used the play-again control']={n:ev.replays,ok:ev.replays,partial:0};
+      const enough=modes.length>=3;
+      rows['13'].PLB={seen:enough?ACSF_MIN_EVIDENCE:2, right:enough?ACSF_MIN_EVIDENCE:1, why:w};
+    }
+  }
+  return rows;
+}
+
+/* One indicator, as the panel prints it. `state` is what happened, `line` is
+   what it is allowed to say about it. */
+function acsfRow(ind,byInd,sig){
+  const meta=ACSF_INDICATORS[ind];
+  const row={ind:ind, code:'.'+ind, skill:meta.skill, name:meta.name,
+             capNote:meta.capNote, inferred:!!meta.inferred,
+             screenOnly:!!meta.screenOnly, why:[], state:'none', line:'', sub:''};
+  if(!meta.ceiling){
+    row.state='na'; row.line='Not assessable by this app'; row.sub=meta.capNote;
+    return row;
+  }
+  const src=byInd[ind]||{};
+  const extra=(sig&&sig[ind])||{};
+  // A signal row stands in where there is no question-level evidence and adds
+  // to it where there is, so the two are summed rather than one chosen: .13
+  // has message questions in the map and five ways of working a device in the
+  // signals, and a row built from either half alone is wrong.
+  const at=function(lvl){
+    const a=src[lvl], b=extra[lvl];
+    const aOk=a&&a.seen, bOk=b&&b.seen;
+    if(!aOk&&!bOk) return null;
+    if(!bOk) return a;
+    if(!aOk) return b;
+    const why={};
+    [a,b].forEach(function(x){ Object.keys(x.why||{}).forEach(function(k){ why[k]=x.why[k]; }); });
+    return {seen:a.seen+b.seen, right:a.right+b.right, why:why};
+  };
+  let demo=null, towards=null, sawAnything=false, sawWrong=false;
+  ACSF_STEPS.forEach(function(lvl){
+    const s=at(lvl);
+    if(!s) return;
+    sawAnything=true;
+    const st=acsfLevelState(s,meta);
+    if(st==='no') sawWrong=true;
+    if(st==='yes') demo=lvl;
+    Object.keys(s.why||{}).forEach(function(k){
+      row.why.push({lvl:lvl,text:k,n:s.why[k].n,ok:s.why[k].ok,partial:!!s.why[k].partial});
+    });
+  });
+  // What the learner is reaching for next, if anything. It cannot leap over a
+  // level that was asked and came back short: getting some Level 1 items right
+  // while PLB was not shown is not "working towards Level 1", it is a learner
+  // who has not shown PLB, and printing the higher line would quietly award
+  // the lower one. A level that was never asked is silence, not a failure, so
+  // the scan passes over it: only an actual miss below stops the claim.
+  let blocked=false;
+  ACSF_STEPS.forEach(function(lvl){
+    if(towards||blocked) return;
+    if(demo&&acsfLvlNo(lvl)<=acsfLvlNo(demo)) return;
+    const s=at(lvl);
+    if(!s) return;
+    const st=acsfLevelState(s,meta);
+    if(st==='part') towards=lvl;
+    else if(st==='no') blocked=true;
+  });
+  row.level=demo; row.towards=towards;
+  row.capped=!!(demo&&demo===meta.ceiling);
+  if(demo){
+    row.state='yes';
+    // The one piece of wording the whole feature turns on. At the ceiling the
+    // honest sentence is "at least", because what stopped the climb was the
+    // app running out of things to ask.
+    row.line=(row.capped?'At least ':'')+acsfLvlText(demo)+row.code;
+    row.sub=row.capped
+      ?acsfLvlText(demo)+' is the highest this run can show for '+row.code+'. '+meta.capNote
+      :(towards?'Working towards '+acsfLvlText(towards)+row.code+'.':'');
+  } else if(towards){
+    row.state='part'; row.line='Working towards '+acsfLvlText(towards)+row.code;
+    row.sub='Some of it came through, not enough of it to say more.';
+  } else if(sawWrong||sawAnything){
+    row.state='no'; row.line='Not shown in this run (NYA'+row.code+')';
+    row.sub='It was asked. Nothing here says the learner cannot do it on another day.';
+  } else {
+    row.state='none'; row.line='Not assessed';
+    row.sub='This run never asked anything that would show it.';
+  }
+  return row;
+}
+
+/* The whole profile, grouped the way the assessor analysis sheet groups it, so
+   a teacher reading one alongside the other is reading the same order. Takes
+   the evidence rather than TEST, so a run pulled back out of storage after a
+   reload builds exactly the same page. */
+function acsfProfile(ev,isLevelCheck){
+  if(!ev) return null;
+  const sig=acsfSignalRows(ev);
+  const rows=ACSF_ORDER.map(function(ind){ return acsfRow(ind,ev.byInd||{},sig); });
+  const groups=ACSF_SKILL_ORDER.map(function(sk){
+    return {skill:sk, rows:rows.filter(function(r){ return r.skill===sk; })};
+  }).filter(function(g){ return g.rows.length; });
+  const gradeable=rows.filter(function(r){ return r.state!=='na'; });
+  return {rows:rows, groups:groups, levelCheck:!!isLevelCheck,
+          asked:ev.asked||0,
+          assessed:gradeable.filter(function(r){ return r.state!=='none'; }).length,
+          total:gradeable.length};
+}
+
+/* The same thing as text, for pasting into an assessor analysis sheet or a
+   progress assessment. Kept deliberately plain: no box drawing, no colour,
+   nothing that survives a paste badly. */
+function acsfCopyText(prof){
+  if(!prof) return '';
+  const out=['WordLink level check: indicative ACSF profile',
+    new Date().toLocaleString(),
+    prof.asked+' questions answered'+(prof.levelCheck?'':'  (ordinary Test Yourself run, not a level check)'),
+    prof.assessed+' of '+prof.total+' indicators had evidence',
+    '',
+    'INDICATIVE ONLY. This is one run on a phone or tablet, marked automatically.',
+    'It is a starting point for assessment, not an assessment.',''];
+  prof.groups.forEach(function(g){
+    out.push(g.skill.toUpperCase());
+    g.rows.forEach(function(r){
+      out.push('  '+r.code+'  '+r.name);
+      out.push('    '+r.line);
+      if(r.sub) out.push('    '+r.sub);
+      if(r.inferred) out.push('    Behavioural signal from the run. Confirm in interview.');
+      if(r.screenOnly) out.push('    On screen only. Handwriting must be checked on paper.');
+      r.why.forEach(function(w){
+        out.push('      - '+w.text+'  ('+acsfLvlText(w.lvl)+(w.partial?', partial':'')
+                 +': '+acsfNum(w.ok)+' of '+w.n+')');
+      });
+      out.push('');
+    });
+  });
+  return out.join('\n');
+}
+function acsfNum(n){ return n===Math.floor(n)?String(n):n.toFixed(1); }
+
+/* ══════════════ LEVEL CHECK — THE PANEL ══════════════
+   A finished run is gone the moment the page reloads, which was fine while the
+   only thing it produced was a score. A profile is something a teacher may
+   want to come back to with the learner sitting next to them, so the last few
+   are kept on the device. Nothing leaves it: no account, no server, the same
+   as everything else here. Wrapped the way i18n.js and tracing.html wrap it,
+   because a sandboxed frame or a private window throws on the first touch of
+   localStorage rather than returning nothing. */
+const ACSF_STORE_KEY='wl_acsf_runs', ACSF_STORE_MAX=5;
+const acsfStore=(function(){
+  let mem=null;
+  try{ localStorage.setItem('__wl_a','1'); localStorage.removeItem('__wl_a'); }
+  catch(e){ mem={}; }
+  return {
+    get:function(k){ try{ return mem?(mem[k]||null):localStorage.getItem(k); }catch(e){ return null; } },
+    set:function(k,v){ try{ if(mem) mem[k]=v; else localStorage.setItem(k,v); }catch(e){} }
+  };
+})();
+function acsfSaveRun(){
+  if(!TEST||!TEST.ev) return;
+  let runs=[];
+  try{ runs=JSON.parse(acsfStore.get(ACSF_STORE_KEY)||'[]')||[]; }catch(e){ runs=[]; }
+  runs.unshift({at:Date.now(), levelCheck:!!TEST.acsf, score:myScore,
+                label:(testStep()||{}).label||'', ev:TEST.ev});
+  acsfStore.set(ACSF_STORE_KEY,JSON.stringify(runs.slice(0,ACSF_STORE_MAX)));
+}
+function acsfLastRun(){
+  try{ return (JSON.parse(acsfStore.get(ACSF_STORE_KEY)||'[]')||[])[0]||null; }
+  catch(e){ return null; }
+}
+
+let acsfShown=null;
+function openAcsfPanel(){
+  // Straight off the run when there is one, out of storage when the page has
+  // been reloaded since. Either way the page is built from the evidence, so
+  // both routes produce the same thing.
+  const live=TEST&&TEST.ev&&TEST.ev.asked?{ev:TEST.ev, levelCheck:!!TEST.acsf,
+              at:Date.now(), score:myScore, label:(testStep()||{}).label||''}:null;
+  const run=live||acsfLastRun();
+  if(!run||!run.ev||!run.ev.asked){ showToast('Finish a test first'); return; }
+  acsfShown=acsfProfile(run.ev,run.levelCheck);
+  renderAcsfPanel(acsfShown,run);
+  showScreen('screen-test-acsf');
+}
+function acsfEl(tag,cls,text){
+  const e=document.createElement(tag);
+  if(cls) e.className=cls;
+  if(text!=null) e.textContent=text;
+  return e;
+}
+function renderAcsfPanel(prof,run){
+  document.getElementById('acsf-meta').textContent=
+    prof.asked+' questions answered  ·  '+prof.assessed+' of '+prof.total
+    +' indicators with evidence  ·  '+new Date(run.at||Date.now()).toLocaleString();
+  // The four things this cannot do, at the top rather than at the bottom. A
+  // reader who stops after the first paragraph should already have been told
+  // what they are holding.
+  const warn=document.getElementById('acsf-warn');
+  warn.innerHTML='';
+  warn.appendChild(acsfEl('div',null,''))
+      .innerHTML='<b>Indicative only.</b> One run on a phone or tablet, marked automatically. '
+        +'A starting point for assessment, not an assessment.';
+  const ul=acsfEl('ul');
+  [prof.levelCheck?null
+     :'This was an ordinary Test Yourself run, not a level check, so it only reached the indicators its own route happened to cross. Turn on Level check for a full sweep.',
+   'Oral Communication .07 is not assessable here. Nothing in this app records speech.',
+   'Writing .05 and .06 are on screen only. Handwriting, letter forms and spacing have to be checked on paper.',
+   'Learning .01 and .02 are read off how the learner went about the run, not from an interview.',
+   'Level 1 can only ever show as partial. Nothing here supports a full Level 1 award.'
+  ].forEach(function(t){ if(t) ul.appendChild(acsfEl('li',null,t)); });
+  warn.appendChild(ul);
+
+  const body=document.getElementById('acsf-body');
+  body.innerHTML='';
+  prof.groups.forEach(function(g){
+    const box=acsfEl('div','acsf-group');
+    box.appendChild(acsfEl('h3',null,g.skill));
+    g.rows.forEach(function(r){
+      const row=acsfEl('div','acsf-row '+r.state);
+      const hd=acsfEl('div','acsf-ind');
+      hd.appendChild(acsfEl('span','acsf-code',r.code));
+      hd.appendChild(acsfEl('span','acsf-name',r.name));
+      row.appendChild(hd);
+      row.appendChild(acsfEl('div','acsf-line',r.line));
+      if(r.sub) row.appendChild(acsfEl('div','acsf-sub',r.sub));
+      if(r.inferred) row.appendChild(acsfEl('span','acsf-flag','Signal from the run: confirm in interview'));
+      if(r.screenOnly) row.appendChild(acsfEl('span','acsf-flag','On screen only: check handwriting on paper'));
+      if(r.why.length){
+        const list=acsfEl('ul','acsf-why');
+        // The working, so the row can be argued with. A teacher who disagrees
+        // with a level should be able to see exactly which questions put it
+        // there and how many of them the learner got.
+        r.why.forEach(function(w){
+          const li=acsfEl('li');
+          li.appendChild(acsfEl('span','lv',acsfLvlText(w.lvl)+(w.partial?' (partial)':'')+': '));
+          li.appendChild(document.createTextNode(w.text+'  '+acsfNum(w.ok)+' of '+w.n));
+          list.appendChild(li);
+        });
+        row.appendChild(list);
+      }
+      box.appendChild(row);
+    });
+    body.appendChild(box);
+  });
+  body.scrollTop=0;
+}
+/* Plain text, for pasting into an assessor analysis sheet or a progress
+   assessment. execCommand is the fallback rather than the exception: the
+   clipboard API needs a secure context, and this app is opened from a QR code
+   on a classroom projector as often as from https. */
+function copyAcsfProfile(){
+  const txt=acsfCopyText(acsfShown);
+  if(!txt){ showToast('Nothing to copy'); return; }
+  const done=function(){ showToast('Copied'); };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done,function(){ acsfCopyFallback(txt,done); });
+  } else acsfCopyFallback(txt,done);
+}
+function acsfCopyFallback(txt,done){
+  const ta=document.createElement('textarea');
+  ta.value=txt;
+  ta.style.cssText='position:fixed;top:-1000px;left:-1000px;opacity:0;';
+  document.body.appendChild(ta);
+  ta.select();
+  let ok=false;
+  try{ ok=document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+  if(ok) done(); else showToast('Could not copy on this device');
+}
+
 /* The round is over: score it, move the ladder, and say so.
    A round is out of three. A partly-right spelling counts as half, because it
    is: the learner heard the word and got most of it down.
@@ -6196,7 +7106,9 @@ function testEndRound(){
   // What actually happened, not what was asked for: at the bottom of a ladder
   // a bad round cannot go anywhere, and the card must not claim it did.
   TEST.lastMove=TEST.level-before;
-  const last=TEST.round>=TEST_ROUNDS;
+  TEST.ev.trend.push(score);
+  const last=TEST.round>=testRounds();
+  if(last){ TEST.ev.finished=true; acsfSaveRun(); }
   if(TEST.mode==='class') writeTestProgress(last);
   showTestCard(score,last);
 }
@@ -6215,7 +7127,7 @@ function showTestCard(score,final){
   const scr=document.getElementById('screen-test-round');
   scr.dataset.state=!final?'round':(TEST.mode==='class'?'class-final':'solo-final');
   document.getElementById('test-round-no').textContent=
-    final?'Test finished':'Round '+TEST.round+' of '+TEST_ROUNDS;
+    final?'Test finished':'Round '+TEST.round+' of '+testRounds();
   // Three dots, one per question, in the order they were answered.
   document.getElementById('test-dots').innerHTML=TEST.tally.map(t=>
     '<span class="test-dot '+(t==='correct'?'ok':t==='partial'?'part':'no')+'">'
@@ -6848,6 +7760,13 @@ function speakTTS(text,rate){
 }
 
 let currentStudentQ=null;
+/* Asking to hear it again is the learner reaching for something, which is not
+   the same event as the question reading itself out when it appears. Only the
+   press counts towards Learning .02. */
+function studentReplay(){
+  if(TEST&&TEST.ev) TEST.ev.replays++;
+  studentSpeak();
+}
 function studentSpeak(q){
   currentStudentQ=q||currentStudentQ;
   const Q=currentStudentQ;
@@ -6921,7 +7840,9 @@ function submitAnswer(auto){
   // A test is self-paced even in a class: the phone marks the answer and moves
   // on, rather than waiting for a host to reveal a question it never set.
   if(soloMode||testActive()){
-    showSoloResult(ans,currentStudentQ.answer,elapsed);
+    // Whether the learner answered or let the clock run out is the whole of
+    // the risk-taking signal for Learning .01, so it travels with the answer.
+    showSoloResult(ans,currentStudentQ.answer,elapsed,!!auto);
     return;
   }
   document.getElementById('submitted-msg').textContent=auto?'⏱ Time up!':'✅ Submitted! Waiting…';
@@ -7993,6 +8914,7 @@ window.addEventListener('load',()=>{
       if(t>=10&&t<=120) document.getElementById('solo-t-limit').value=t;
       const mc=params.get('mc');
       setMcMode(mc===null?defaultMcFor(game):mc==='1');
+      setAcsfMode(params.get('acsf')==='1');
       openSoloLaunch(game);
     }
   }
