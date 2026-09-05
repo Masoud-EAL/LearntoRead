@@ -1398,6 +1398,11 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   border-radius:12px;padding:6px 18px;letter-spacing:1px;}
 .copy-model.sm{font-size:1.25rem;letter-spacing:0;}
 .case-big{font-family:'Fredoka One',cursive;font-size:3.6rem;color:var(--gold);}
+/* A written hand rather than a typed one. The same letter looks different
+   enough between the two that recognising one is not recognising the other,
+   which is why the checklist names both. */
+#mc-section.handwritten .mc-choice{font-family:'Segoe Script','Bradley Hand','Snell Roundhand',
+  'Apple Chancery',cursive;font-style:italic;}
 /* A line of words with the spaces made obvious, for the round about which
    word comes first. */
 .dir-line{display:inline-flex;flex-wrap:wrap;gap:10px;justify-content:center;
@@ -3095,15 +3100,19 @@ function moneySpeech(text){
 /* from offsets the pay/change alternation, for the same reason genClockQuestions
    takes one: counting change is the harder half of the money unit, and a
    three-question round starting at 0 never reaches it. Defaults to 0. */
-function genShopQuestions(n,from){
+function genShopQuestions(n,from,small){
   const out=[];
   const base=from||0;
   for(let i=0;i<(n||8);i++){
     const item=SHOP_ITEMS[Math.floor(Math.random()*SHOP_ITEMS.length)];
     if((base+i)%2===0){
       // Pay the exact amount. Prices land in the unit's 50–100 range, in 50c
-      // steps so the 50c piece stays in play.
-      const cents=(50+Math.floor(Math.random()*50))*100+(Math.random()<0.5?50:0);
+      // steps so the 50c piece stays in play. `small` moves the whole game
+      // under $10, which is where Stage A of the checklist lives: "monetary
+      // amounts up to $10", "coins and notes up to $10". Without it that half
+      // of the indicator could not be reached at all.
+      const cents=small?(randInt(1,9)*100+(Math.random()<0.5?50:0))
+                       :((50+Math.floor(Math.random()*50))*100+(Math.random()<0.5?50:0));
       out.push({type:'shop',mode:'pay',cents:cents,answer:moneyAnswer(cents),
         icon:'<div class="shop-item">'+item.emoji+'<span class="shop-name">'+item.name
              +'</span><span class="price-tag">'+money(cents)+'</span></div>',
@@ -3112,7 +3121,10 @@ function genShopQuestions(n,from){
       // Count the change. You don't always hand over $100 in real life, so
       // the note varies: a $20 for something small, a $50, or a $100. Each
       // price is set well below the note so the change is worth counting.
-      const notes=[
+      const notes=small?[
+        {cents:1000, file:'10d', min:150, max:850},
+        {cents:2000, file:'20d', min:300, max:1800},
+      ]:[
         {cents:2000, file:'20d',  min:300,  max:1800},
         {cents:5000, file:'50d',  min:800,  max:4200},
         {cents:10000,file:'100d', min:1500, max:8500},
@@ -4041,9 +4053,13 @@ const ODD_GROUPS={
   actions:['run','hop','cry','hug','sleep','read']
 };
 function genLetterQuestions(){
-  return LETTERS.map(L=>{
+  // Some rounds show the letters written rather than typed. The checklist
+  // asks for both — "typed print and clear, handwritten letters" — and a
+  // learner who only ever meets one face does not recognise the other.
+  return LETTERS.map((L,i)=>{
     const others=shuffle(LETTERS.filter(x=>x!==L)).slice(0,3);
-    return {type:'letter',letter:L,answer:L,choices:shuffle([L,...others])};
+    return {type:'letter',letter:L,answer:L,choices:shuffle([L,...others]),
+            handwritten:i%3===2};
   });
 }
 function genSoundQuestions(){
@@ -4383,6 +4399,8 @@ const GEN_BANKS={
   oddone:       function(n){ return genOddOneOut(n); },
   clock:        function(n,f){ return genClockQuestions(n,f); },
   shop:         function(n,f){ return genShopQuestions(n,f); },
+  // The same game under $10, for the Stage A half of .09 and .10.
+  shopsmall:    function(n,f){ return genShopQuestions(n,f,true); },
   forms:        function(n){ return genFormQuestions(n); },
   numbertap:    function(n,f){ return genNumberTapQuestions(n,f?100:10); },
   numeralwrite: function(n,f){ return genNumeralWriteQuestions(n,f?100:10); },
@@ -6765,53 +6783,53 @@ function acsfLvlNo(l){ const i=ACSF_LEVELS.indexOf(l); return i<0?0:i; }
    those rows describe what was observed instead of quoting text this app does
    not have. */
 const ACSF_INDICATORS={
-  '01':{skill:'Learning', name:'Actively participates in the learning process',
-        ceiling:'PLB', inferred:true,
-        capNote:'Level 1 asks about past learning, goals and barriers. That needs a conversation, not a game.',
+  '01':{skill:'Learning', name:'Demonstrates some awareness of self as a learner',
+        ceiling:'L1', inferred:true,
+        capNote:'The Level 1 features about past experience and barriers are a conversation. This app can only show that a goal was chosen.',
         features:{PLA:['Engages in learning activities that involve minimal risk taking'],
                   PLB:['Demonstrates preparedness for learning through active participation',
                        'Engages in learning activities that involve some risk taking',
                        'Follows extremely simple instructions and procedures that may require prompting']}},
-  '02':{skill:'Learning', name:'Manages and applies learning strategies',
+  '02':{skill:'Learning', name:'Takes first steps towards developing explicit learning strategies',
         ceiling:'PLB', inferred:true,
-        capNote:'Level 1 asks for information seeking, such as entering a key word in a search engine. Nothing here can show that.',
+        capNote:'The checklist has no Level 1 features for .02 that a game can show.',
         features:{PLA:['Uses extremely familiar learning strategies, such as copying',
                        'Requires a combination of modes to demonstrate performance'],
                   PLB:['Practices extremely simple repetitive tasks',
                        'Identifies a possible resource']}},
-  '03':{skill:'Reading', name:'Makes meaning from written and pictorial text',
+  '03':{skill:'Reading', name:'Identifies personally relevant information and ideas from texts on highly familiar topics',
         ceiling:'L1',
         capNote:'A short message is the longest connected text in this app. A full Level 1 read needs a longer text on paper.'},
-  '04':{skill:'Reading', name:'Uses strategies to interpret text',
+  '04':{skill:'Reading', name:'Uses a limited range of strategies to locate specific information and construct meaning',
         ceiling:'L1',
         capNote:'Longer word phonics is the top of the decoding ladder here.'},
-  '05':{skill:'Writing', name:'Conveys information in written form',
+  '05':{skill:'Writing', name:'Conveys a simple idea, opinion, factual information or message in writing',
         ceiling:'L1', screenOnly:true,
         capNote:'On screen only. Handwriting, letter forms and spacing are not observed by this app.'},
-  '06':{skill:'Writing', name:'Uses vocabulary, symbols and conventions',
+  '06':{skill:'Writing', name:'Displays limited vocabulary, grammatical accuracy and understanding of conventions',
         ceiling:'L1', screenOnly:true,
         capNote:'On screen only, and no extended writing. Handwriting must be checked on paper.'},
-  '07':{skill:'Oral Communication', name:'Speaks to communicate',
+  '07':{skill:'Oral Communication', name:'Gives or elicits basic information in a short, simple spoken context',
         ceiling:null,
         capNote:'Nothing in this app records speech, including the Speaking game, which is built from tiles. Speaking has to be heard.'},
-  '08':{skill:'Oral Communication', name:'Listens and comprehends',
+  '08':{skill:'Oral Communication', name:'Listens for basic information in short, simple oral texts',
         ceiling:'L1',
         capNote:'One spoken sentence is the longest listening item here.'},
-  '09':{skill:'Numeracy', name:'Identifies mathematical information',
-        ceiling:'L1',
-        capNote:'Five minute clock times and two digit numbers are the top of what this app asks.'},
-  '10':{skill:'Numeracy', name:'Uses and applies mathematical knowledge',
-        ceiling:'L1',
-        capNote:'Counting change is the only multi step calculation in this app.'},
-  '11':{skill:'Numeracy', name:'Communicates and represents mathematics',
-        ceiling:'L1',
-        capNote:'A clock face and a handful of coins are the only representations available here.'},
-  '12':{skill:'Digital', name:'Active awareness of self as a digital user',
-        ceiling:'PLA', alwaysPartial:true,
-        capNote:'Only the form round touches digital identity. Nothing here covers passwords, safety or what to share online.'},
-  '13':{skill:'Digital', name:'Knowledge, use and application of digital skills',
+  '09':{skill:'Numeracy', name:'Identifying mathematical information and meaning in activities and texts',
         ceiling:'PLB',
-        capNote:'No navigation, searching or file handling in this app, so Level 1 stays out of reach.'},
+        capNote:'The checklist numeracy tables stop at Pre Level 1 Stage B. Level 1 numeracy needs measurement, directions and data, none of which are here.'},
+  '10':{skill:'Numeracy', name:'Using and applying mathematical knowledge and problem solving processes',
+        ceiling:'PLB',
+        capNote:'The checklist numeracy tables stop at Pre Level 1 Stage B. Level 1 asks for problem solving beyond adding two numbers.'},
+  '11':{skill:'Numeracy', name:'Communicating and representing mathematics',
+        ceiling:'PLB',
+        capNote:'The checklist numeracy tables stop at Pre Level 1 Stage B.'},
+  '12':{skill:'Digital', name:'Active awareness of self as a digital user',
+        ceiling:'PLB', alwaysPartial:true,
+        capNote:'Only the form and code rounds touch digital identity, and the risk questions are kept simple.'},
+  '13':{skill:'Digital', name:'Knowledge, use and application of digital literacy skills',
+        ceiling:'PLB',
+        capNote:'No searching, no files, no moving between apps: Level 1 stays out of reach.'},
 };
 const ACSF_SKILL_ORDER=['Learning','Reading','Writing','Oral Communication','Numeracy','Digital'];
 /* Object.keys would hand these back as .10 .11 .12 .13 .01 .02 …: '10' looks
@@ -6820,134 +6838,264 @@ const ACSF_SKILL_ORDER=['Learning','Reading','Writing','Oral Communication','Num
    so the order is spelled out. */
 const ACSF_ORDER=['01','02','03','04','05','06','07','08','09','10','11','12','13'];
 
-/* What answering a rung correctly is evidence for.
-   A claim is [indicator, level, what the panel prints, partial?]. `partial`
-   marks a claim that can only ever read "working towards": the task touches
-   the level but does not carry it on its own.
+/* What answering a round correctly is evidence for.
 
-   Keyed by bank, because a rung is a bank plus how it is presented, and the
-   presentation matters: tapping one of four words shows recognition, typing
-   the same word shows spelling. `mc` and `typed` are only split where a bank
-   can genuinely be both, the ones attachMcChoices converts. Everything else
-   is a tile, a chip, a coin or a clock hand and has one presentation, so it
-   carries `base` alone. Clock and Shop are the exception and are worked out
-   in acsfClaimsFor: their generators alternate reading with doing, and which
-   one a step deals is what decides whether .10 and .11 are in play at all. */
+   A claim is [indicator, level, the performance feature it demonstrates,
+   partial?]. The third field is not a description written here: it is the key
+   ACSF performance feature, quoted from the SEE Reporting Checklist in the
+   Victorian course mapping documents, and it is what the teacher's panel
+   prints. Every game below was either already doing the thing its features
+   describe, or was built to.
+
+   `partial` marks a claim the app can only get part of the way to. Copying on
+   a keyboard is not copying with a pencil; a learner tapping their goal has
+   expressed one but not discussed it. Those rows can never read better than
+   "working towards", however many times they come back right.
+
+   Not claimed at all, and deliberately: anything about handwriting or legible
+   script (that is tracing.html, and paper), and the whole of .07, which is
+   speaking. */
 const ACSF_CLAIMS={
-  letter:      {base:[['04','PLA','Heard a letter name and found the letter'],
-                      ['08','PLA','Understood a familiar spoken item']]},
-  lettersound: {base:[['04','PLA','Matched a spoken sound to a word'],
-                      ['08','PLA','Understood a familiar spoken sound']]},
-  'wp1:word':  {base:[['04','PLB','Blended sounds to read a short word'],
-                      ['08','PLB','Followed a word said sound by sound']]},
-  'wp1:gap':   {base:[['04','PLB','Used letter and sound knowledge in a short word']],
-                typed:[['06','PLB','Wrote the missing sound in a short word']]},
-  'wp1:build': {base:[['04','PLB','Built a short word from its sounds'],
-                      ['05','PLA','Put letters together to make a word'],
-                      ['06','PLB','Used letters in the right order']]},
-  'wp2:gap':   {base:[['04','PLB','Used letter and sound knowledge in a longer word'],
-                      ['04','L1','Handled a digraph or a longer word',1]],
-                typed:[['06','PLB','Wrote the missing sound in a longer word']]},
-  'wp2:word':  {base:[['04','PLB','Read a longer word from its sounds'],
-                      ['04','L1','Handled a digraph or a longer word',1]]},
-  'wp2:build': {base:[['04','L1','Built a longer word from its sounds',1],
-                      ['06','PLB','Used letters in the right order']]},
-  oddone:      {base:[['03','PLB','Read familiar words and found the odd one']]},
-  signs:       {base:[['03','PLA','Read a familiar public sign'],
-                      ['03','PLB','Read the words that go with the sign']]},
-  sms:         {base:[['03','PLB','Read a short message and answered a question about it'],
-                      ['03','L1','Made meaning from a short connected text',1],
-                      ['13','PLB','Read a message on a device']]},
-  questionwords:{mc:[['03','PLB','Chose the right question word'],
-                     ['04','PLB','Recognised the shape of a question']],
-                 typed:[['03','PLB','Chose the right question word'],
-                        ['06','PLB','Wrote a question word']]},
-  beginner:    {mc:[['08','PLB','Understood a spoken sentence and found the missing word'],
-                    ['03','PLB','Read the words in a simple sentence']],
-                typed:[['08','PLB','Understood a spoken sentence and wrote the missing word'],
-                       ['05','PLB','Wrote a word into a sentence'],
-                       ['06','PLB','Spelled a familiar word']]},
-  elementary:  {mc:[['08','PLB','Understood a longer spoken sentence'],
-                    ['08','L1','Followed a longer sentence on a familiar topic',1],
-                    ['03','PLB','Read the words in a longer sentence']],
-                typed:[['08','L1','Followed a longer sentence on a familiar topic',1],
-                       ['05','PLB','Wrote a word into a longer sentence'],
-                       ['05','L1','Wrote into a longer sentence unaided',1],
-                       ['06','L1','Spelled a word in a longer sentence',1]]},
-  unscramble:  {base:[['08','PLB','Listened, then put the words in order'],
-                      ['06','PLB','Put words in the right order']]},
-  gramscramble:{base:[['03','PLB','Read the words and put them in order'],
-                      ['06','PLB','Put words in the right order'],
-                      ['06','L1','Built a sentence with a basic structure',1]]},
-  speaking:    {base:[['08','PLB','Understood a spoken question and built an answer']]},
-  spelling:    {mc:[['03','PLB','Read a familiar word']],
-                typed:[['05','PLB','Wrote a familiar word'],
-                       ['06','PLB','Approximated the spelling of a familiar word'],
-                       ['06','L1','Spelled words from several topics',1]]},
-  numbers:     {mc:[['09','PLA','Recognised a whole number from 1 to 10'],
-                    ['08','PLA','Understood a spoken number']],
-                typed:[['09','PLA','Recognised a whole number from 1 to 10'],
-                       ['11','PLB','Wrote a number from 1 to 10 as a word'],
-                       ['06','PLB','Spelled a number word']]},
-  numbers1120: {mc:[['09','PLB','Recognised a number from 11 to 20']],
-                typed:[['09','PLB','Recognised a number from 11 to 20'],
-                       ['11','PLB','Wrote a two digit number as a word'],
-                       ['06','PLB','Spelled a number word']]},
-  numbers2199: {mc:[['09','PLB','Recognised a number from 21 to 99']],
-                typed:[['09','PLB','Recognised a number from 21 to 99'],
-                       ['11','PLB','Wrote a two digit number as a word'],
-                       ['06','PLB','Spelled a number word']]},
-  forms:       {base:[['05','PLA','Placed personal details in the right box'],
-                      ['05','PLB','Gave limited personal details'],
-                      ['05','L1','Completed a form with basic personal details',1],
-                      ['03','PLB','Read the labels on a form'],
-                      ['12','PLA','Entered personal details on a device',1]]},
+  'mylearning':{base:[
+    ['01','PLA','Begins to express extremely simple learning goal',1],
+    ['01','PLA','Locates limited familiar learning materials and resources following simple, immediate instructions',1],
+    ['01','PLB','Identifies at least one personal learning goal',1],
+    ['01','PLB','Demonstrates capacity to select limited learning materials for a specific task',1],
+    ['01','L1','Identifies some past experiences of successful learning and some areas of need',1],
+    ['01','L1','Identifies one or two short term learning objectives with assistance',1],
+    ['01','L1','Identifies some potential barriers to learning, e.g. childcare issues',1],
+  ]},
+  'copyword':{base:[
+    ['02','PLA','Uses extremely familiar learning strategies, such as copying',1],
+    ['02','PLA','Responds to modelling by copying action',1],
+    ['05','PLA','Copies letters of the alphabet and short whole words that are clearly presented',1],
+    ['05','PLA','Copies first and last name',1],
+    ['05','PLA','Copies single words left to right and top to bottom',1],
+    ['05','PLB','Writes limited personal details though may need to copy or check some aspects',1],
+    ['06','PLA','Copies a very limited number of extremely familiar words',1],
+    ['06','PLA','Copies first and last name',1],
+    ['06','PLB','Writes full name accurately',1],
+  ]},
+  /* The phonics and ordering rounds sit in the ladder for their own sake, but
+     they answer named features too: hearing a sound and finding the letter is
+     exactly "links spoken and written forms of the names and sounds of
+     letters", and listening before arranging is a spoken exchange. */
+  'wp1:gap':{base:[
+    ['04','PLA','Links spoken and written forms of the names and sounds of letters'],
+  ]},
+  'wp2:gap':{base:[
+    ['04','PLA','Links spoken and written forms of the names and sounds of letters'],
+  ]},
+  'wp1:build':{base:[
+    ['04','PLA','Links spoken and written forms of the names and sounds of letters'],
+  ]},
+  'wp2:word':{base:[
+    ['04','PLB','Recognises spoken word and written word for extremely familiar words'],
+  ]},
+  'unscramble':{base:[
+    ['08','PLB','Understands extremely familiar social exchanges that include phrases and occasional, extremely simple sentences'],
+  ]},
+  'letter':{base:[
+    ['03','PLA','Begins to recognise typed print and clear, handwritten letters of the alphabet'],
+    ['04','PLA','Links spoken and written forms of the names and sounds of letters'],
+    ['08','PLA','Understands a very limited bank of extremely familiar words'],
+  ]},
+  'signs':{base:[
+    ['03','PLA','Begins to recognise common signs, supported by visuals, e.g. stop, go'],
+    ['04','PLB','Links extremely familiar phrases, pictures and signs'],
+    ['04','L1','Recognises common signs and symbols',1],
+  ]},
+  'forms':{base:[
+    ['03','PLA','Begins to recognise some personal details'],
+    ['04','PLB','Locates personally relevant words in an extremely familiar text'],
+  ]},
+  'sms':{base:[
+    ['03','PLB','Understands short and extremely simple text with explicit purpose and extremely familiar vocab'],
+    ['03','L1','Understands a limited range of short, highly explicit and culturally accessible texts, some of which may be ICT based, e.g. SMS texts',1],
+    ['04','PLB','Locates an extremely familiar piece of information in a short simple text'],
+    ['04','L1','Locates one or two pieces of information from a simple text',1],
+  ]},
+  'beginner':{base:[
+    ['03','PLB','Understands small bank of extremely familiar words and a very simple sentence'],
+    ['08','PLB','Understands extremely familiar social exchanges that include phrases and occasional, extremely simple sentences'],
+    ['08','L1','Understands exchanges that are short and explicit',1],
+  ]},
+  'oddone':{base:[
+    ['03','PLB','Understands that pictures and other visual cues can support meaning'],
+    ['04','L1','Uses simple processes to make links between two or more pieces of information, e.g. matching or grouping',1],
+  ]},
+  'elementary':{base:[
+    ['03','L1','Understands texts with clear consistent formats that are written in simple sentences',1],
+    ['08','L1','Identifies specific information in spoken texts relating to items, people and/or activities in the immediate environment',1],
+    ['08','L1','Comprehends basic structures and very limited verb tenses',1],
+  ]},
+  'notice':{base:[
+    ['03','L1','Recognises some simple ways in which visual features like layout are used to send a message and how this may influence interpretation, e.g. the placement of a photo or heading in a newspaper',1],
+  ]},
+  'direction':{base:[
+    ['04','PLA','Follows print from left to right and top to bottom'],
+  ]},
+  'lettersound':{base:[
+    ['04','PLA','Begins to make a connection between extremely simple text, pictures and symbols'],
+  ]},
+  'casematch':{base:[
+    ['04','PLA','Recognises different forms of the same letters, e.g. upper and lower case'],
+    ['06','PLA','Copies text, but demonstrates lack of consistency between upper and lower case'],
+    ['06','PLB','Uses upper and lower case in extremely familiar words, e.g. own name'],
+  ]},
+  'clothes':{base:[
+    ['04','PLA','Recognises a small bank of extremely familiar words supported by pictures'],
+  ]},
+  'wp1:word':{base:[
+    ['04','PLB','Recognises spoken word and written word for extremely familiar words'],
+  ]},
+  'questionwords':{base:[
+    ['04','PLB','Recognises frequently used question words, e.g. who, what'],
+    ['08','L1','Comprehends simple questions',1],
+  ]},
+  'tableread':{base:[
+    ['04','L1','Identifies information in a simple diagram, table, map or plan',1],
+    ['10','PLA','Uses knowledge of personally relevant and extremely simple lists and two column tables to locate: whole numbers up to 10 AND whole dollar monetary amounts up to $10'],
+    ['10','PLB','Uses knowledge of personally relevant and extremely simple lists and tables to locate: whole numbers up to 100 OR whole dollar monetary amounts up to $100'],
+  ]},
+  'punctuation':{base:[
+    ['04','L1','Recognises some basic punctuation and understands its use in meaning-making, e.g. a full stop',1],
+  ]},
+  'sightwords':{base:[
+    ['04','L1','Recognises a number of high frequency words/basic sight words and common phrases, e.g. down, would, have, little, come, when',1],
+  ]},
+  'numeralwrite':{base:[
+    ['05','PLA','Copies numbers of one or two digits'],
+    ['05','PLB','Writes personally relevant numbers correctly when filling in an extremely simple form, e.g. house number'],
+    ['11','PLA','Copies: numbers from 0 to 10 as number symbols value of Australian whole dollar coins and notes up to $10 whole dollar monetary amounts up to $10'],
+    ['11','PLA','Uses personally relevant and informal symbolism including numbers up to 10, e.g.: 5 $'],
+    ['11','PLB','Writes: numbers from 0 to 100 value of Australian coins and notes up to $100 whole dollar monetary amounts up to $100'],
+    ['11','PLB','Uses personally relevant and informal symbolism including numbers up to 100, e.g.: 25 $, +, = $25.20'],
+    ['13','PLA','Uses an extremely limited range of digital letters and symbols'],
+  ]},
+  'modelsentence':{base:[
+    ['05','PLB','Writes two simple sentences adapted from a model'],
+    ['05','L1','Writes two short simple text types:',1],
+    ['05','L1','Text type 1 (e.g. simple formatted text)',1],
+    ['05','L1','Text type 2 (e.g. contains simple sentences)',1],
+    ['05','L1','Writes short texts with simple structures',1],
+    ['06','PLB','Uses capital letters and full stops accurately in sentences adapted from a model'],
+    ['06','PLB','Leaves spaces between words'],
+    ['06','L1','Uses basic punctuation (e.g. capital letters and full stops), but this may be inconsistent',1],
+  ]},
+  'spelling':{base:[
+    ['06','PLA','Copies a very limited number of highly familiar words, but may have spelling inaccuracies'],
+    ['06','PLB','Writes a very limited number of extremely familiar words, which may have spelling inaccuracies'],
+    ['06','L1','Uses a small bank of individual words and phrases or word lists related to giving personal details or meeting survival needs. May be memorised or formulaic',1],
+  ]},
+  'gramscramble':{base:[
+    ['06','L1','Uses basic structures and limited verb tenses',1],
+  ]},
+  'greetings':{base:[
+    ['08','PLA','Understands extremely familiar social exchanges using single words'],
+    ['08','PLA','Understands basic one word greetings'],
+    ['08','PLB','Understands extremely familiar courtesy phrases and basic greetings, e.g. hello, good morning, goodbye, thank you, please'],
+  ]},
+  'speaking':{base:[
+    ['08','PLA','Understands extremely short and highly explicit questions'],
+    ['08','PLA','Understands some extremely familiar requests for basic information'],
+    ['08','PLB','Understands requests for limited personal information'],
+  ]},
+  'instructions':{base:[
+    ['08','PLA','Understands some short extremely familiar instructions supported with a prompt'],
+    ['08','PLB','Understands extremely familiar and explicit instructions supported with gestures'],
+    ['13','PLA','Follows a single step oral or pictorial instruction to activate or deactivate tool'],
+  ]},
+  'numbertap':{base:[
+    ['09','PLA','Shows some recognition of whole numbers up to 10 (including 0)'],
+    ['09','PLB','Whole numbers up to 100 (including 0)'],
+    ['10','PLA','Matches 0 to 10 symbols with oral name'],
+    ['10','PLB','Matches 0 to 100 symbols with oral name'],
+  ]},
+  'shopsmall':{base:[
+    ['09','PLA','Shows some recognition of whole dollar monetary amounts up to $10'],
+    ['09','PLA','Shows some recognition of whole dollar Australian coins and notes up to $10'],
+    ['10','PLA','Matches whole dollar Australian notes and coins up to $10 in monetary amount'],
+    ['10','PLA','Names Australian coins and notes up to $10'],
+  ]},
+  'position':{base:[
+    ['09','PLA','Shows some recognition of extremely simple relative position words accompanied by gestures, e.g. up, down'],
+    ['11','PLA','Uses personally relevant informal language and gestures to convey very simple numeracy-based information, e.g.: today, tomorrow, yesterday pointing and saying up and down one, two, three five dollars'],
+    ['11','PLB','Uses personally relevant informal language and gestures to convey very simple numeracy-based information, (Choose three from these example): days of the week, months, own birthday, up, down, left, right, in front, behind twenty-five first, second, third round, straight, big, small forty dollars, fifty cents'],
+  ]},
+  'shop':{base:[
+    ['09','PLB','Australian coins and notes'],
+    ['09','PLB','Monetary amounts up to $100, e.g. 50c, $24.50'],
+  ]},
+  'digitaltime':{base:[
+    ['09','PLB','Digital time in whole hours'],
+  ]},
+  'calendar':{base:[
+    ['09','PLB','Days of the week, months of the year and personal key dates'],
+  ]},
+  'ordinals':{base:[
+    ['09','PLB','Recognise oral ordinal numbers from 1st to 3rd'],
+  ]},
+  'addup':{base:[
+    ['10','PLA','Adds two whole numbers up to a total of 10 or less'],
+    ['10','PLB','Adds two whole numbers up to a total of 100 or less (with no carrying)'],
+  ]},
+  'addmoney':{base:[
+    ['10','PLA','Adds two whole dollar monetary amounts, up to a total of $10 or less'],
+    ['10','PLB','Adds two whole dollar monetary amounts, up to a total of $100 or less (with no carrying)'],
+  ]},
+  'ordering':{base:[
+    ['10','PLA','Orders: Australian whole dollar notes and coins up to $10 AND two whole numbers between 1 and 10'],
+    ['10','PLB','Orders days of the week and months of the year'],
+    ['10','PLB','Orders in increasing value: Australian whole dollar notes and coins AND three whole numbers between 1 and 100'],
+  ]},
+  'placevalue':{base:[
+    ['10','PLB','Understands place value for ones and tens'],
+  ]},
+  'devices':{base:[
+    ['12','PLA','Begins to recognise there are different digital devices commonly used to connect with others',1],
+    ['12','PLB','Begins to understand the purpose of some commonly used digital devices and software',1],
+    ['13','PLA','Begins to recognise extremely familiar digital devices'],
+    ['13','PLB','Begins to understand the purpose of some extremely familiar digital devices and software'],
+  ]},
+  'safeinfo':{base:[
+    ['12','PLA','Copies simple risk protection code',1],
+    ['12','PLB','Begins to understand there are risks associated with providing information',1],
+  ]},
+  'digisymbols':{base:[
+    ['13','PLA','Begins to recognise extremely familiar digital symbols'],
+  ]},
+  'devicecare':{base:[
+    ['13','PLB','Demonstrates an extremely limited capacity to maintain digital devices'],
+  ]},
+  'prompts':{base:[
+    ['13','PLB','Recognises and responds to a limited number of digital prompts or alerts, texts and symbols'],
+  ]},
 };
-/* The themed word banks are the same task with a different topic, so they
-   share one entry rather than six copies of it. */
-['days','months','weather','fruits','body','clothes'].forEach(function(b){
-  ACSF_CLAIMS[b]={mc:[['03','PLB','Read a familiar everyday word']],
-                  typed:[['05','PLB','Wrote a familiar everyday word'],
-                         ['06','PLB','Approximated the spelling of a familiar word']]};
-});
 
-/* Clock and Shop deal reading and doing alternately (see genClockQuestions and
-   genShopQuestions: an even offset reads, an odd one does), and only the doing
-   half is evidence for .10 and .11. Reading a clock face shows you know what
-   the numbers mean; setting the hands is the only place in this app where a
-   learner represents a quantity themselves. So the offset decides the claims,
-   and the bands below pick their offsets on purpose. */
-function acsfTimeMoneyClaims(type,from){
-  const f=from||0, doing=f%2===1;
-  if(type==='clock'){
-    const hard=f>=4;           // quarter past and five minute steps
-    const out=[['09',hard?'L1':'PLB','Read a clock face',hard?1:0]];
-    if(doing){
-      out.push(['10','PLB','Set the hands to a given time']);
-      out.push(['11',hard?'L1':'PLB','Showed a time on a clock face',hard?1:0]);
-    }
-    return out;
-  }
-  if(type==='shop'){
-    const out=[['09','PLB','Recognised Australian coins and notes'],
-               ['11','PLB','Made up an amount of money with coins']];
-    if(doing){ out.push(['10','PLB','Worked out the change from a note']);
-               out.push(['10','L1','Took a price off a note and counted the change',1]); }
-    else     { out.push(['10','PLB','Added coins to reach an exact amount']); }
-    return out;
-  }
-  return [];
-}
-/* What a step is evidence for. A step is {type, mc, from}, the same shape the
-   ladders already use, so this answers for a level check band, an ordinary
-   Test Yourself rung, and the eleven skill tests alike. */
+/* Banks whose `from` decides which range they work in, and therefore which
+   stage's feature they can be evidence for. Tap the Number at from 0 asks for
+   numbers to 10, which is the Stage A feature; at from 1 it asks to 100,
+   which is the Stage B one. Claiming both from either would say a learner
+   recognised numbers to 100 when they were only ever shown numbers to 10.
+   The banks that alternate their modes within a single draw (Copy It, Big and
+   Small Letters, Capitals and Full Stops, Safe or Private) genuinely do show
+   both halves in one round, so they are not listed here. */
+const ACSF_RANGED={numbertap:1,numeralwrite:1,addup:1,addmoney:1,ordering:1,tableread:1,devices:1};
+
+/* A step is {type, mc, from} — the shape the ladders already use — so this
+   answers for a level-check band, an ordinary Test Yourself rung, and the
+   skill tests alike. */
 function acsfClaimsFor(step){
   if(!step) return [];
-  if(step.type==='clock'||step.type==='shop') return acsfTimeMoneyClaims(step.type,step.from);
   const e=ACSF_CLAIMS[step.type];
   if(!e) return [];
   let out=(e.base||[]).slice();
   if(e.mc||e.typed) out=out.concat(step.mc?(e.mc||[]):(e.typed||[]));
+  if(ACSF_RANGED[step.type]){
+    const wide=!!(step.from);
+    out=out.filter(function(c){ return wide?(c[1]!=='PLA'):(c[1]==='PLA'); });
+  }
   return out;
 }
 
@@ -6979,37 +7127,43 @@ function acsfClaimsFor(step){
 const ACSF_ROUNDS=12;
 const ACSF_BANDS=[
   {label:'Letters, numbers and signs', pool:[
-    {type:'letter',mc:true},{type:'lettersound',mc:true},{type:'numbers',mc:true},
-    {type:'signs',mc:true},{type:'oddone',mc:true},{type:'forms',mc:false},
-    {type:'wp1:build',mc:false},
-    {type:'clock',mc:false,from:1},{type:'shop',mc:false,from:0}]},
-  {label:'Familiar words, time and money', pool:[
-    {type:'clothes',mc:true},{type:'fruits',mc:true},{type:'wp1:word',mc:true},
-    {type:'numbers',mc:true},{type:'clock',mc:false,from:0},{type:'clock',mc:false,from:1},
-    {type:'shop',mc:false,from:0},{type:'signs',mc:true},{type:'forms',mc:false}]},
-  {label:'Sounds in words, reading a message', pool:[
-    {type:'wp1:gap',mc:true},{type:'beginner',mc:true},{type:'clock',mc:false,from:3},
-    {type:'shop',mc:false,from:0},{type:'sms',mc:true},{type:'numbers',mc:false},
-    {type:'days',mc:true},{type:'body',mc:true}]},
-  {label:'Building words, counting change', pool:[
-    {type:'wp1:build',mc:false},{type:'spelling',mc:false},{type:'questionwords',mc:true},
-    {type:'sms',mc:true},{type:'shop',mc:false,from:1},{type:'clock',mc:false,from:3},
-    {type:'unscramble',mc:false},{type:'forms',mc:false}]},
-  {label:'Writing what you hear, filling a form', pool:[
+    {type:'letter',mc:true},{type:'lettersound',mc:true},{type:'numbertap',mc:true},
+    {type:'signs',mc:true},{type:'oddone',mc:true},{type:'casematch',mc:true},
+    {type:'greetings',mc:true},{type:'devices',mc:true},
+    {type:'shopsmall',mc:false,from:0},{type:'mylearning',mc:true}]},
+  {label:'Familiar words, money and devices', pool:[
+    {type:'clothes',mc:true},{type:'wp1:word',mc:true},{type:'numbertap',mc:true},
+    {type:'shopsmall',mc:false,from:0},{type:'instructions',mc:true},
+    {type:'digisymbols',mc:true},{type:'direction',mc:true},{type:'forms',mc:false},
+    {type:'position',mc:true},{type:'copyword',mc:false,from:0}]},
+  {label:'Sounds in words, copying, adding', pool:[
+    {type:'wp1:gap',mc:true},{type:'beginner',mc:true},{type:'copyword',mc:false,from:0},
+    {type:'addup',mc:false,from:0},{type:'numeralwrite',mc:false,from:0},
+    {type:'sightwords',mc:true},{type:'signs',mc:true},{type:'safeinfo',mc:false,from:0},
+    {type:'ordering',mc:false,from:0},{type:'prompts',mc:true}]},
+  {label:'Reading a message, money and order', pool:[
+    {type:'sms',mc:true},{type:'wp1:build',mc:false},{type:'addmoney',mc:false,from:0},
+    {type:'ordering',mc:false,from:0},{type:'questionwords',mc:true},
+    {type:'copyword',mc:false,from:1},{type:'devicecare',mc:true},
+    {type:'notice',mc:true},{type:'ordinals',mc:true,from:0},{type:'forms',mc:false}]},
+  {label:'Writing what you hear, forms and time', pool:[
     {type:'beginner',mc:false},{type:'forms',mc:false},{type:'spelling',mc:false},
-    {type:'wp2:gap',mc:true},{type:'numbers1120',mc:false},{type:'shop',mc:false,from:1},
-    {type:'clock',mc:false,from:5},{type:'sms',mc:true}]},
-  {label:'Longer words, longer sentences', pool:[
-    {type:'wp2:build',mc:false},{type:'elementary',mc:true},{type:'gramscramble',mc:false},
-    {type:'numbers2199',mc:false},{type:'clock',mc:false,from:5},{type:'shop',mc:false,from:1},
-    {type:'spelling',mc:false},{type:'wp2:gap',mc:false}]},
-  {label:'Writing sentences', pool:[
-    {type:'elementary',mc:false},{type:'wp2:word',mc:true},{type:'gramscramble',mc:false},
-    {type:'shop',mc:false,from:1},{type:'clock',mc:false,from:7},{type:'spelling',mc:false},
-    // A learner who climbs straight to the top passes the middle bands once
-    // and can leave with a single listening item behind them, so the top band
-    // keeps one of its own rather than resting on what it climbed past.
-    {type:'unscramble',mc:false},{type:'months',mc:false}]},
+    {type:'numeralwrite',mc:false,from:1},{type:'digitaltime',mc:true,from:0},
+    {type:'calendar',mc:true},{type:'punctuation',mc:true,from:0},
+    {type:'casematch',mc:false,from:1},{type:'tableread',mc:true,from:0},
+    {type:'safeinfo',mc:false,from:1}]},
+  {label:'Longer words, hundreds, sentences', pool:[
+    {type:'wp2:gap',mc:true},{type:'elementary',mc:true},{type:'numbertap',mc:true,from:1},
+    {type:'addup',mc:false,from:1},{type:'placevalue',mc:true},
+    {type:'modelsentence',mc:false},{type:'gramscramble',mc:false},
+    {type:'devices',mc:true,from:1},{type:'tableread',mc:true,from:1},
+    {type:'ordering',mc:false,from:1}]},
+  {label:'Writing sentences and working in hundreds', pool:[
+    {type:'elementary',mc:false},{type:'modelsentence',mc:false},
+    {type:'numeralwrite',mc:false,from:1},{type:'addmoney',mc:false,from:1},
+    {type:'punctuation',mc:false,from:1},{type:'shop',mc:false,from:1},
+    {type:'digitaltime',mc:false,from:2},{type:'unscramble',mc:false},
+    {type:'wp2:word',mc:true},{type:'sms',mc:true},{type:'forms',mc:false}]},
 ];
 /* The test games are addressed like a section's All pill — the type string
    carries the skill, so nothing needs hidden state. */
@@ -7792,67 +7946,77 @@ function acsfLevelState(s,meta){
 const ACSF_STEPS=['PLA','PLB','L1'];
 function acsfLvlText(l){ return l==='L1'?'Level 1':l; }
 
-/* The behavioural indicators. Learning .01 and .02 and the digital pair are
-   not in any question, they are in how the learner went about the run, so
-   they are read off the signals rather than off the answers, and every row
-   says out loud that it is a signal to confirm rather than a result. */
+/* The behavioural indicators. Some key performance features are not a right
+   answer to anything: they are about turning up, having a go, sticking with a
+   repetitive task, and working a device at all. Those are read off how the
+   learner went through the run rather than off what they answered, and every
+   row still names the feature it is standing on, quoted like all the others.
+
+   These rows are marked as inferred, and the panel says so on every one: a
+   run of a game is not an interview, and "demonstrates preparedness for
+   learning" is a judgement a teacher makes, not a counter. */
 function acsfSignalRows(ev){
   const rows={};
-  const asked=ev.asked||0, tOut=ev.timeouts||0;
-  const rate=asked?tOut/asked:0;
+  const asked=ev.asked||0, tOut=ev.timeouts||0, tries=ev.attempts||0;
+  const rate=asked?tOut/asked:0, engaged=asked?tries/asked:0;
   const help=(ev.hints||0)+(ev.replays||0);
   const modes=Object.keys(ev.modes||{});
   const modeName={tap:'Tapped an answer on screen',type:'Typed on the on-screen keyboard',
                   tiles:'Placed tiles in order',drag:'Dragged the hands of a clock',
                   coins:'Picked out coins and notes',chips:'Placed details into a form'};
-  rows['01']={PLA:{}, PLB:{}};
+  const put=function(ind,lvl,seen,right,why){
+    rows[ind]=rows[ind]||{}; rows[ind][lvl]={seen:seen,right:right,why:why};
+  };
+  const W=function(){ const o={};
+    for(var i=0;i<arguments.length;i+=3) o[arguments[i]]={n:arguments[i+1],ok:arguments[i+2],partial:0};
+    return o; };
+  // Same, but every line marked partial: used for the Level 1 rows, which a
+  // run can point at and never establish.
+  const P=function(){ const o=W.apply(null,arguments);
+    Object.keys(o).forEach(function(k){ o[k].partial=1; }); return o; };
   if(asked>0){
-    rows['01'].PLA={seen:asked, right:(ev.attempts||0),
-      why:{'Started the test and had a go at the questions':{n:asked,ok:ev.attempts||0,partial:0}}};
-    if(ev.finished){
-      const clean=rate<=0.15;
-      rows['01'].PLB={seen:asked, right:clean?asked:asked*0.5,
-        why:{'Worked through every round to the end':{n:asked,ok:asked,partial:0},
-             'Answered rather than letting the time run out':
-               {n:asked,ok:asked-tOut,partial:clean?0:1}}};
-    } else if(asked>=6){
-      rows['01'].PLB={seen:asked, right:asked*0.5,
-        why:{'Took part, but the run was not finished':{n:asked,ok:asked*0.5,partial:1}}};
-    }
+    put('01','PLA',asked,tries,W('Engages in learning activities that involve minimal risk taking',asked,tries,'Demonstrates preparedness for learning, e.g. need to attend class, although may be inconsistent',asked,tries));
+    put('02','PLA',asked,tries,W('Begins to participate in familiar learning environment interactions, with prompting, e.g. responds to extremely simple directions',asked,tries,'Attempts simple repetitive tasks',asked,tries));
+    put('12','PLA',Math.max(1,tries),tries,W('Demonstrates extremely limited use of digital device',Math.max(1,tries),tries));
+    put('13','PLA',Math.max(1,tries),tries,W('Begins to use digital peripherals',Math.max(1,tries),tries));
   }
-  rows['02']={PLA:{}, PLB:{}};
-  if(help>0){
-    const w={};
-    if(ev.hints) w['Used the hint to sound a word out']={n:ev.hints,ok:ev.hints,partial:0};
-    if(ev.replays) w['Asked to hear the question again']={n:ev.replays,ok:ev.replays,partial:0};
-    rows['02'].PLA={seen:Math.max(2,help), right:Math.max(2,help), why:w};
+  if(ev.finished){
+    // Answering rather than letting the clock run out is the whole of the
+    // risk-taking signal, so a run of timeouts does not clear PLB.
+    const clean=rate<=0.15;
+    // Level 1 .01 is interview territory: following a teacher's instructions
+    // and taking on new tasks are things a person sees, not things a run
+    // proves. Marked partial so the row can never read better than
+    // "working towards".
+    put('01','PLB',asked,clean?asked:asked*0.5,W('Follows extremely simple instructions and procedures that may require prompting',asked,asked,'Demonstrates preparedness for learning through active participation',asked,asked-tOut));
+    put('01','L1',asked,clean?asked:asked*0.4,P('Follows instructions provided by a supervisor, teacher/trainer, or mentor',asked,asked,'Attempts new concrete tasks/activities of one or two steps with a highly explicit purpose',asked,tries));
+  } else if(asked>=6){
+    put('01','PLB',asked,asked*0.4,W('Follows extremely simple instructions and procedures that may require prompting',asked,asked*0.4,'Demonstrates preparedness for learning through active participation',asked,tries));
   }
-  // Practising a repetitive task means answering it. A learner who let the
-  // clock run out on most of the run sat through it rather than practised it.
-  const engaged=asked?(ev.attempts||0)/asked:0;
+  // Practising a repetitive task means answering it. A learner who let most
+  // of the run time out sat through it rather than practised it.
   if(asked>=12&&engaged>=0.5){
     const solid=ev.finished&&engaged>=0.8;
-    rows['02'].PLB={seen:asked, right:solid?asked:asked*0.6,
-      why:{'Repeated the same kind of short task many times':
-             {n:asked,ok:ev.attempts||0,partial:solid?0:1},
-           'Reached for help rather than stopping':
-             {n:Math.max(1,help),ok:help,partial:1}}};
-    if(!help) delete rows['02'].PLB.why['Reached for help rather than stopping'];
+    const w=W('Practises extremely simple repetitive tasks',asked,tries,'Participates in familiar learning environment interactions but may require prompting',asked,solid?asked:asked*0.6);
+    if(help) w['Uses some limited learning strategies, e.g. developing a word list with support']={n:Math.max(1,help),ok:help,partial:1};
+    put('02','PLB',asked,solid?asked:asked*0.6,w);
   }
-  rows['13']={PLA:{}, PLB:{}};
-  // Modes are counted on submit, not on display, so a question the learner
-  // never touched is not evidence that they can work a keyboard or a slider.
-  if((ev.attempts||0)>0){
-    rows['13'].PLA={seen:ev.attempts, right:ev.attempts,
-      why:{'Used a phone or tablet to work through a set task':{n:ev.attempts,ok:ev.attempts,partial:0}}};
+  if(tries>0){
+    put('05','PLA',tries,tries,W('Checks copied letters and single words with structured support from expert/mentor',tries,tries));
+    put('12','PLB',tries,tries,W('Begins to use an extremely limited number of digital devices and software applications',tries,tries));
     if(modes.length>=2){
       const w={};
       modes.forEach(function(m){ if(modeName[m]) w[modeName[m]]={n:ev.modes[m],ok:ev.modes[m],partial:0}; });
-      if(ev.replays) w['Used the play-again control']={n:ev.replays,ok:ev.replays,partial:0};
       const enough=modes.length>=3;
-      rows['13'].PLB={seen:enough?ACSF_MIN_EVIDENCE:2, right:enough?ACSF_MIN_EVIDENCE:1, why:w};
+      w['Begins to navigate extremely simple digital screen']={n:tries,ok:tries,partial:0};
+      w['Uses an extremely limited number of digital devices and software applications']={n:tries,ok:tries,partial:0};
+      w['Demonstrates a recognition of the relationship between digital peripherals and action on screen']={n:tries,ok:tries,partial:0};
+      put('13','PLB',enough?ACSF_MIN_EVIDENCE:2,enough?ACSF_MIN_EVIDENCE:1,w);
     }
   }
+  // Re-reading and correcting is what the spelling feedback exists for, so it
+  // only counts where the learner actually saw it.
+  if((ev.hints||0)>0||(ev.replays||0)>0) put('05','L1',Math.max(2,help),help,P('Begins to check writing by re-reading and makes some corrections with guidance, e.g. capital letters and full stops',Math.max(2,help),help));
   return rows;
 }
 
@@ -8374,6 +8538,7 @@ function showStudentQuestion(q,startedAt,dur){
   document.getElementById('shop-section').style.display=isShop?'flex':'none';
   document.getElementById('form-section').style.display=isForm?'flex':'none';
   document.getElementById('mc-section').style.display=isMc?'grid':'none';
+  document.getElementById('mc-section').classList.toggle('handwritten',!!q.handwritten);
   // Spelling rounds get the hint as well: this is where a learner who cannot
   // start is either given a way in or left staring at an empty box.
   document.getElementById('hint-wrap').style.display=(isTranslate||isSpellingQ(q))?'':'none';
