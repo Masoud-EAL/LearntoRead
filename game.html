@@ -4895,6 +4895,41 @@ let answerListener=null,gameListener=null;
 const TIMER_DURATION=30;
 // Shop rounds need longer: the answer is built coin by coin, not typed once.
 const SHOP_TIMER_DURATION=60;
+/* The level check is sat by pre-level learners on a phone, so its clock starts
+   from a longer base than ordinary practice. It is a ceiling and not a
+   duration — a learner who is ready answers and moves on — so being generous
+   costs a quick learner nothing and stops a slow one being cut off. A test
+   that runs out on somebody mid-word measures how fast they can find letters
+   on a keyboard, which is not one of the indicators. */
+const ACSF_SECS=40;
+/* How long an answer takes to give, as a multiple of the base. One number for
+   every question was the wrong shape: tapping one of four pictures and typing
+   a sentence with a thumb are not the same task, and 30 seconds is roomy for
+   the first and unkind for the second. This replaces the two hand-written
+   exceptions that had already been made for translate, speaking and money. */
+function answerPace(q){
+  if(!q) return 1;
+  // Answers built a piece at a time.
+  if(q.type==='form') return 2;        // several fields, each dropped into place
+  if(q.type==='shop') return 2;        // coins tapped out one at a time
+  if(q.type==='clockset') return 1.5;  // two hands to drag
+  // Tapping one of four. Four sentences take longer to read than four words,
+  // and at this level reading is the slow part.
+  if(Array.isArray(q.choices)&&q.choices.length)
+    return q.choices.some(function(c){ return /\s/.test(String(c)); })?1.5:1;
+  if(q.type==='translate'||q.type==='speak') return 3;   // a whole sentence back
+  if(q.type==='typein'&&q.freeText) return 3;            // write a sentence
+  if(q.type==='unscramble'||q.type==='gramscramble'||q.type==='phbuild') return 2;
+  return 2;                                              // anything else typed
+}
+/* The seconds one question gets, from the base the game is running on. */
+function answerSeconds(q,base){
+  const secs=Math.round((base||TIMER_DURATION)*answerPace(q));
+  return q&&q.type==='shop'?Math.max(SHOP_TIMER_DURATION,secs):Math.max(10,Math.min(180,secs));
+}
+/* The base a game starts from. A level check is the one that is not the
+   learner's own setting to begin with. */
+function defaultSecsFor(type){ return isLevelCheck(type)?ACSF_SECS:TIMER_DURATION; }
 let totalPlayers=0;
 let soloMode=false,soloQuestions=[],soloQIdx=0,soloSelectedType='beginner';
 let hintLevel=0;
@@ -5958,8 +5993,7 @@ function playQuestion(){
   // are tapped one at a time to build an amount, get at least 60s)
   // and broadcast it so every student counts down for exactly the amount of
   // time the teacher set — not a hardcoded default.
-  currentTimerDuration=(q.type==='translate'||q.type==='speak')?teacherTimerDuration*2
-    :q.type==='shop'?Math.max(SHOP_TIMER_DURATION,teacherTimerDuration):teacherTimerDuration;
+  currentTimerDuration=answerSeconds(q,teacherTimerDuration);
   roomRef.update({currentQuestion:Object.assign({},q,{idx:currentQIdx}),questionIdx:currentQIdx,questionStarted:firebase.database.ServerValue.TIMESTAMP,questionDuration:currentTimerDuration,revealed:false,correctAnswer:'',midLeaderboard:false});
   roomRef.child('answers').remove();
   showScreen('screen-teacher-game');
@@ -7596,6 +7630,10 @@ function renderSectionChips(){
 
 function selectSoloType(type,el){
   soloSelectedType=type;
+  /* The seconds field follows the game, so a level check opens on its own
+     longer base rather than on whatever the last game was left at. */
+  const tf=document.getElementById('solo-t-limit');
+  if(tf) tf.value=defaultSecsFor(type);
   // Browsing the picker rewrites the address too, so the link in the URL bar
   // is always the game on screen and can just be copied out of it.
   if(soloMode) syncSoloUrl(type);
@@ -7798,7 +7836,9 @@ function mcAppliesTo(type){
 function soloSeconds(){
   const el=document.getElementById('solo-t-limit');
   const v=el?parseInt(el.value,10):NaN;
-  return (v>=10&&v<=120)?v:TIMER_DURATION;
+  // An empty or silly box falls back to whatever this game starts from, not
+  // to the app-wide 30, or clearing it would quietly shorten a level check.
+  return (v>=10&&v<=120)?v:defaultSecsFor(soloSelectedType);
 }
 function soloTabFor(type){
   return document.querySelector('#screen-solo-setup .q-type-tab[data-type="'+type+'"]');
@@ -7855,12 +7895,12 @@ function soloLinkParams(type){
   // so a link to one has only the seconds to carry.
   if(isTestType(type)){
     const secs=soloSeconds();
-    if(secs!==TIMER_DURATION) p.set('t',secs);
+    if(secs!==defaultSecsFor(type)) p.set('t',secs);
   } else if(type!=='target'){
     const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
     if(limit!==10) p.set('q',limit);
     const secs=soloSeconds();
-    if(secs!==TIMER_DURATION) p.set('t',secs);
+    if(secs!==defaultSecsFor(type)) p.set('t',secs);
     if(mcAppliesTo(type)&&mcMode!==defaultMcFor(type)) p.set('mc',mcMode?'1':'0');
   }
   return p;
@@ -7947,7 +7987,8 @@ function updateSoloCountDisplay(){
   if(isTestType(soloSelectedType)){
     display.textContent=isLevelCheck(soloSelectedType)
       ?ACSF_ROUNDS+' rounds of '+TEST_PER_ROUND+' questions, spread across every skill'
-        +' so that nothing is left untested. It gets harder or easier as you go.'
+        +' so that nothing is left untested. It gets harder or easier as you go. '
+        +'The seconds are for tapping an answer; writing one gets up to three times as long.'
       :TEST_ROUNDS+' rounds of '+TEST_PER_ROUND
         +' questions, from '+testSkillLabel(soloSelectedType).toLowerCase()
         +'. It gets harder or easier as you go.';
@@ -9186,8 +9227,7 @@ function showStudentQuestion(q,startedAt,dur){
   // alone, the teacher's when sitting it in class — because in a class test
   // nothing is broadcast per question to carry one.
   const base=testActive()?TEST.secs:(soloMode?soloSeconds():TIMER_DURATION);
-  const timerDur=dur||((q.type==='translate'||q.type==='speak')?base*2
-    :q.type==='shop'?Math.max(SHOP_TIMER_DURATION,base):base);
+  const timerDur=dur||answerSeconds(q,base);
   studentSpeak(q); startStudentTimer(startedAt, timerDur);
 }
 
