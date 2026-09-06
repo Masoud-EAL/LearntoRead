@@ -8673,7 +8673,18 @@ function acsfSignalRows(ev){
                   coins:'Picked out coins and notes',chips:'Placed details into a form'};
   const RUN='questions in this run', ANS='questions the learner answered',
         TYPED='rounds the learner typed in', HELP='times the learner asked for help';
-  const put=function(ind,lvl,seen,right,why){
+  /* A signal is ONE observation per feature, not one per question in the run.
+     Counting it at run scale made these rows swamp everything else: a feature
+     the learner actually failed, 0 of 2, disappeared against two signals
+     reading 35 of 35, and the indicator came out awarded on the strength of
+     the learner having answered questions at all. The 35 is still printed,
+     because it says what was watched; it is worth one observation, the same
+     as a feature with a question of its own. */
+  const put=function(ind,lvl,why,override){
+    const ks=Object.keys(why);
+    const seen=override?override[0]:ks.length;
+    const right=override?override[1]:ks.reduce(function(a,k){
+      return a+(why[k].n?why[k].ok/why[k].n:0); },0);
     rows[ind]=rows[ind]||{}; rows[ind][lvl]={seen:seen,right:right,why:why};
   };
   /* run:1 marks a line whose numbers are counted over the whole run rather
@@ -8692,18 +8703,18 @@ function acsfSignalRows(ev){
   const P=function(){ const o=W.apply(null,arguments);
     Object.keys(o).forEach(function(k){ o[k].partial=1; }); return o; };
   if(asked>0){
-    put('01','PLA',asked,tries,W(RUN,'Engages in learning activities that involve minimal risk taking',asked,tries,'Demonstrates preparedness for learning, e.g. need to attend class, although may be inconsistent',asked,tries));
-    put('02','PLA',asked,tries,W(RUN,'Begins to participate in familiar learning environment interactions, with prompting, e.g. responds to extremely simple directions',asked,tries,'Attempts simple repetitive tasks',asked,tries));
-    put('12','PLA',Math.max(1,tries),tries,W(ANS,'Demonstrates extremely limited use of digital device',Math.max(1,tries),tries));
-    put('13','PLA',Math.max(1,tries),tries,W(ANS,'Begins to use digital peripherals',Math.max(1,tries),tries));
+    put('01','PLA',W(RUN,'Engages in learning activities that involve minimal risk taking',asked,tries,'Demonstrates preparedness for learning, e.g. need to attend class, although may be inconsistent',asked,tries));
+    put('02','PLA',W(RUN,'Begins to participate in familiar learning environment interactions, with prompting, e.g. responds to extremely simple directions',asked,tries,'Attempts simple repetitive tasks',asked,tries));
+    put('12','PLA',W(ANS,'Demonstrates extremely limited use of digital device',Math.max(1,tries),tries));
+    put('13','PLA',W(ANS,'Begins to use digital peripherals',Math.max(1,tries),tries));
   }
   if(ev.finished){
     // Answering rather than letting the clock run out is the whole of the
     // risk-taking signal, so a run of timeouts does not clear PLB.
     const clean=rate<=0.15;
-    put('01','PLB',asked,clean?asked:asked*0.5,W(RUN,'Follows extremely simple instructions and procedures that may require prompting',asked,asked,'Demonstrates preparedness for learning through active participation',asked,asked-tOut));
+    put('01','PLB',W(RUN,'Follows extremely simple instructions and procedures that may require prompting',asked,asked,'Demonstrates preparedness for learning through active participation',asked,asked-tOut));
   } else if(asked>=6){
-    put('01','PLB',asked,asked*0.4,W(RUN,'Follows extremely simple instructions and procedures that may require prompting',asked,asked*0.4,'Demonstrates preparedness for learning through active participation',asked,tries));
+    put('01','PLB',W(RUN,'Follows extremely simple instructions and procedures that may require prompting',asked,asked*0.4,'Demonstrates preparedness for learning through active participation',asked,tries));
   }
   // Practising a repetitive task means answering it. A learner who let most
   // of the run time out sat through it rather than practised it.
@@ -8711,7 +8722,7 @@ function acsfSignalRows(ev){
     const solid=ev.finished&&engaged>=0.8;
     const w=W(RUN,'Practises extremely simple repetitive tasks',asked,tries,'Participates in familiar learning environment interactions but may require prompting',asked,solid?asked:asked*0.6);
     if(help) w['Uses some limited learning strategies, e.g. developing a word list with support']={n:Math.max(1,help),ok:help,partial:1,run:HELP};
-    put('02','PLB',asked,solid?asked:asked*0.6,w);
+    put('02','PLB',w);
   }
   if(tries>0){
     /* Writing .05 at Stage A is a writing feature: a learner checking letters
@@ -8725,8 +8736,8 @@ function acsfSignalRows(ev){
        .12 stays on attempts: using the app is what that feature is about, and
        a learner tapping wrong answers is still working the software. */
     const typed=(ev.modes&&ev.modes.type)||0;
-    if(typed>0) put('05','PLA',typed,typed,P(TYPED,'Checks copied letters and single words with structured support from expert/mentor',typed,typed));
-    put('12','PLB',tries,tries,W(ANS,'Begins to use an extremely limited number of digital devices and software applications',tries,tries));
+    if(typed>0) put('05','PLA',P(TYPED,'Checks copied letters and single words with structured support from expert/mentor',typed,typed));
+    put('12','PLB',W(ANS,'Begins to use an extremely limited number of digital devices and software applications',tries,tries));
     if(modes.length>=2){
       const w={};
       modes.forEach(function(m){ if(modeName[m]) w[modeName[m]]={n:ev.modes[m],ok:ev.modes[m],partial:0,run:'rounds answered that way'}; });
@@ -8734,7 +8745,7 @@ function acsfSignalRows(ev){
       w['Begins to navigate extremely simple digital screen']={n:tries,ok:tries,partial:0,run:ANS};
       w['Uses an extremely limited number of digital devices and software applications']={n:tries,ok:tries,partial:0,run:ANS};
       w['Demonstrates a recognition of the relationship between digital peripherals and action on screen']={n:tries,ok:tries,partial:0,run:ANS};
-      put('13','PLB',enough?ACSF_MIN_EVIDENCE:2,enough?ACSF_MIN_EVIDENCE:1,w);
+      put('13','PLB',w,[enough?ACSF_MIN_EVIDENCE:2,enough?ACSF_MIN_EVIDENCE:1]);
     }
   }
   // Re-reading and correcting is what the spelling feedback exists for, so it
@@ -8793,17 +8804,32 @@ function acsfRow(ind,byInd,sig){
   }
   const at=function(lvl){ return acsfEvidenceAt(ind,lvl,byInd,sig); };
   let demo=null, towards=null, sawAnything=false, sawWrong=false;
+  /* A level is only reached by climbing through the ones below it. You cannot
+     miss Stage A and be given Stage B: the higher features are described in
+     terms of the lower ones, and awarding the higher while the lower came back
+     short would be reporting a learner as further on than anything in the run
+     says they are. So the climb stops at the first level that is not shown,
+     and everything above it is evidence sitting there unawarded. A level with
+     nothing to ask at all is stepped over rather than treated as a failure —
+     silence is not a miss. */
+  let climbing=true;
   ACSF_STEPS.forEach(function(lvl){
     const s=at(lvl);
     if(s){
       sawAnything=true;
       const st=acsfLevelState(s,meta);
       if(st==='no') sawWrong=true;
-      if(st==='yes') demo=lvl;
+      if(climbing){
+        if(st==='yes') demo=lvl; else climbing=false;
+      }
       Object.keys(s.why||{}).forEach(function(k){
         row.why.push({lvl:lvl,text:k,n:s.why[k].n,ok:s.why[k].ok,
                       partial:!!s.why[k].partial,run:s.why[k].run||null});
       });
+    } else if(climbing&&acsfAllFeatures(ind,lvl).length&&acsfLvlNo(lvl)<=acsfLvlNo(meta.ceiling)){
+      // Features exist at this level and none of them was asked, so there is
+      // nothing to climb on and nothing above it can be claimed either.
+      climbing=false;
     }
     /* And the features of this indicator that the run never put in front of
        the learner. Without them a row showed one PLB line and looked like a
