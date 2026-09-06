@@ -5904,7 +5904,9 @@ function playQuestion(){
   const q=currentQuestions[currentQIdx],total=currentQuestions.length;
   document.getElementById('game-prog').textContent='Question '+(currentQIdx+1)+' of '+total;
   const isMcQ=Array.isArray(q.choices)&&q.choices.length>0;
-  const noAudio=q.type==='gramscramble'||q.type==='translate'||q.type==='mc';
+  // Same rule as the learner's screen and as teacherSpeak: there is a button
+  // when there is something behind it.
+  const noAudio=!speechFor(q);
   document.getElementById('q-badge').textContent=q.qword?'QUESTION WORD':q.type==='sentence'?'SENTENCE':q.type==='speak'?'SPEAKING':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='oddone'?'ODD ONE OUT':q.type==='phgap'?'MISSING SOUND':q.type==='phword'?'DECODE':q.type==='phbuild'?'BUILD THE WORD':q.type==='mc'?'MULTIPLE CHOICE':q.type==='clockset'?'CLOCK':q.type==='shop'?'MONEY':q.type==='form'?'FORM':'WORD';
   document.getElementById('q-hint').textContent=q.type==='speak'?(isMcQ?'Students hear the question and tap the answer':'Students hear the question and build their answer with word tiles'):q.type==='phgap'?'Students hear the sounds and tap the missing one':q.type==='phword'?'Students hear the sounds and tap the word':q.type==='phbuild'?'Students put the sounds in order to build the word':q.type==='oddone'?'Students tap the picture that is different':q.type==='clockset'?'Students drag the clock hands to this time':q.type==='shop'?'Students tap coins to make this amount':q.type==='form'?'Students put each answer in the right box':q.type==='mc'?'Students tap the correct answer':(q.type==='unscramble'||q.type==='gramscramble')?(isMcQ?(q.type==='unscramble'?'Students listen and tap the sentence in the right order':'Students tap the sentence in the right order'):'Students arrange word tiles'):q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='translate'?'Students type the English sentence':'';
   document.getElementById('ans-bars').innerHTML='';
@@ -5914,7 +5916,7 @@ function playQuestion(){
   document.getElementById('end-now-btn').style.display='';
   document.getElementById('q-emoji').innerHTML=q.icon||(q.type==='word'?emo(q.word):q.type==='letter'?q.letter:'');
   document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='speak'?('🗣️ '+q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='oddone'?'🧩 Students tap the one that is different':q.type==='phgap'?('🔤 '+q.family+' — which sound is missing?'):q.type==='phword'?('🔊 '+q.family+' — students tap the word'):q.type==='phbuild'?('🔤 '+q.family+' — students build "'+q.word+'"'):(q.type==='clockset'||q.type==='shop'||q.type==='form')?q.question:'🔊 Listen and spell the word';
-  document.getElementById('hear-btn').style.display=(noAudio||q.noListen)?'none':'';
+  document.getElementById('hear-btn').style.display=noAudio?'none':'';
   renderTeacherOptions(q,false);
   // Resolve this question's time budget once (translate and speaking rounds,
   // which ask for a whole sentence back, get double; shop rounds, where coins
@@ -5934,14 +5936,11 @@ function playQuestion(){
 
 function teacherSpeak(){
   const q=currentQuestions[currentQIdx],btn=document.getElementById('hear-btn');
-  if(q.type==='gramscramble'||q.type==='translate'||q.type==='mc') return;
-  // Question-word banks in multiple choice are read-and-pick: no audio.
-  if(q.qword&&Array.isArray(q.choices)&&q.choices.length) return;
-  // Form is a reading task. Returning before the button is marked playing keeps
-  // it from sticking in the active state with nothing to hear.
-  if(q.type==='form') return;
+  // Returning before the button is marked playing keeps it from sticking in the
+  // active state with nothing to hear.
+  const spokenText=speechFor(q);
+  if(!spokenText) return;
   btn.classList.add('playing');
-  const spokenText=q.type==='letter'?q.letter:q.type==='oddone'?'Tap the one that does not belong.':q.type==='sentence'?q.sentence.replace('___',q.blank):q.type==='unscramble'?q.sentence:q.type==='speak'?q.question:q.type==='clockset'?('Set the clock to '+q.words):q.type==='shop'?moneySpeech(q.question):q.word;
   const utt=new SpeechSynthesisUtterance(spokenText);
   utt.rate=0.7; utt.lang='en-AU';
   if(typeof applyVoice==='function') applyVoice(utt);
@@ -8856,17 +8855,9 @@ function showStudentQuestion(q,startedAt,dur){
   // In MC mode tapping a choice submits, so hide the Submit button.
   document.getElementById('student-submit-btn').style.display=isMc?'none':'';
   document.getElementById('student-submit-btn').disabled=isTile;
-  // Grammar-ordering, translate, and custom MC are read-and-pick: hide audio.
-  // Listen-and-Unscramble stays a listening task even in MC mode, so keep audio.
-  // Question-word banks carry noListen: no replay button in either mode. In MC
-  // the learner reads the question and picks; when typing the question is spoken
-  // once as it appears (see studentSpeak).
-  // Clock keeps its audio: hearing "half past seven" and setting the hands is
-  // the listening half of the unit. Money keeps its audio too — the instruction
-  // carries the amount to pay, so it is read out and can be replayed. Form is a
-  // reading task.
-  const hideHear=q.type==='gramscramble'||q.type==='translate'||q.type==='mc'||q.noListen||isForm;
-  document.getElementById('s-hear-btn').style.display=hideHear?'none':'';
+  // Shown when there is something to hear, which is the same question as what
+  // studentSpeak would say: speechFor answers it once for both.
+  document.getElementById('s-hear-btn').style.display=speechFor(q)?'':'none';
   document.getElementById('s-q-type').textContent=
     q.label?q.label:
     q.qword?(isMc?'TAP THE QUESTION WORD':'LISTEN — TYPE THE QUESTION WORD'):
@@ -9273,38 +9264,61 @@ function studentReplay(){
   if(TEST&&TEST.ev) TEST.ev.replays++;
   studentSpeak();
 }
-function studentSpeak(q){
-  currentStudentQ=q||currentStudentQ;
-  const Q=currentStudentQ;
-  if(!Q) return;
-  if(Q.type==='gramscramble'||Q.type==='translate') return;
+/* What a round says out loud, or null when it says nothing.
+   This decision used to exist three times over: once here, once in the
+   student screen deciding whether to show "Hear it again", and once more on
+   the teacher's screen. All three hid the replay button from every type:'mc'
+   round, which was true back when the only multiple choice rounds were
+   read-and-pick, and stopped being true the moment a bank started carrying
+   its own spoken line. Sight Words says the word and asks the learner to tap
+   it, and there was no way to hear it a second time — twelve banks were in
+   that position. One function now, so the button is shown exactly when
+   pressing it would do something. */
+function speechFor(Q){
+  if(!Q) return null;
+  // Arranging words already on the screen is reading, not listening.
+  if(Q.type==='gramscramble'||Q.type==='translate') return null;
   // Some rounds must never speak, because the thing that would be spoken is
   // the answer: putting numbers in order is the obvious one.
-  if(Q.mute) return;
+  if(Q.mute) return null;
   // A question can carry its own spoken line. The banks below this one each
   // speak a different part of themselves (the word, the sentence, the money
   // instruction), which worked while every bank was one of a known handful.
   // The newer ones say things that are not any field the old branches know
   // about, so they say what to speak rather than being guessed at.
-  if(Q.say){ speakTTS(Q.say); return; }
-  // Question-word banks in multiple choice are a reading task — no audio would
-  // give the answer away. When typing, fall through so the full question is read.
-  if(Q.qword&&Array.isArray(Q.choices)&&Q.choices.length) return;
-  if(Q.type==='letter'){ speakTTS(Q.letter); return; }
-  if(Q.type==='oddone'){ speakTTS('Tap the one that does not belong.'); return; }
+  if(Q.say) return Q.say;
+  /* Question-word banks in multiple choice are a reading task — audio would
+     give the answer away. Typed, the question is read out, which it always
+     was; but the round also carries noListen, so the button was hidden and the
+     learner heard it once with no way to hear it again. Checked before
+     noListen for exactly that reason. */
+  if(Q.qword) return (Array.isArray(Q.choices)&&Q.choices.length)?null
+                    :(Q.sentence||'').replace('___',Q.blank);
+  // Everything past here is a round that has to be guessed at, and noListen is
+  // how a round says not to.
+  if(Q.noListen) return null;
+  if(Q.type==='letter') return Q.letter;
+  if(Q.type==='oddone') return 'Tap the one that does not belong.';
   // Money speaks its instruction: the amount is the whole task, and on a short
   // screen the written prompt is the first thing dropped (see the lt560 rule),
   // so hearing "Pay fifty dollars and fifty cents for a chair" is the only way
   // a pre-reader gets it at all. Form stays a reading task; the clock is the
   // listening half of the time unit, so it speaks the target as "half past seven".
-  if(Q.type==='shop'){ speakTTS(moneySpeech(Q.question)); return; }
-  if(Q.type==='form') return;
-  if(Q.type==='clockset'){ speakTTS('Set the clock to '+Q.words); return; }
+  if(Q.type==='shop') return moneySpeech(Q.question);
+  if(Q.type==='form') return null;
+  if(Q.type==='clockset') return 'Set the clock to '+Q.words;
+  // A multiple choice round with nothing of its own to say has nothing to say:
+  // there is no field below that would be right to read out.
+  if(Q.type==='mc') return null;
   // Speaking asks the question out loud — that is the whole prompt. The answer
   // is what the learner is building, so it is never spoken here.
   const text=Q.type==='sentence'?Q.sentence.replace('___',Q.blank):Q.type==='unscramble'?Q.sentence:Q.type==='speak'?Q.question:Q.word;
-  if(!text) return;
-  speakTTS(text);
+  return text||null;
+}
+function studentSpeak(q){
+  currentStudentQ=q||currentStudentQ;
+  const text=speechFor(currentStudentQ);
+  if(text) speakTTS(text);
 }
 
 let studentTimerInt=null;
