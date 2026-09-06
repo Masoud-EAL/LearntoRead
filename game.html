@@ -1378,6 +1378,9 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 /* A row of figures with one of them picked out: first, second, third is a
    position in a line before it is a word. */
 .ord-row{display:flex;align-items:center;justify-content:center;gap:2px;font-size:2rem;}
+/* The one device that is drawn rather than picked from the emoji set. Sized to
+   sit at about the height the emoji beside it render at. */
+.dev-art{width:150px;height:auto;display:block;margin:0 auto;}
 .ord-fig{opacity:.45;filter:grayscale(1);}
 .ord-fig.ord-hit{opacity:1;filter:none;transform:scale(1.25);}
 .ord-arrow{color:var(--muted);font-size:1.1rem;}
@@ -3596,17 +3599,61 @@ const DEVICES=[
   {n:'keyboard',e:'⌨️', use:'To type'},
   {n:'mouse',   e:'🖱️', use:'To point and click'},
   {n:'headphones',e:'🎧',use:'To listen'},
-  /* The plug on its own is an old two-pin wall plug, which is not what anyone
-     charges a phone with. Plug and battery together say charging without
-     needing a picture of a cable, which no emoji provides. */
-  {n:'charger', e:'🔌🔋', use:'To give it power'},
+  /* Drawn, not an emoji: see chargerArt below for why none of them will do. */
+  {n:'charger', art:chargerArt, use:'To give it power'},
   {n:'wifi',    e:'📶', use:'To get on the internet'},
 ];
+/* A charger, drawn rather than borrowed from the emoji set. No emoji is a
+   charger: the plug on its own is a two-pin wall plug, which is the thing an
+   appliance has, not the thing that comes in the box with a phone. What a
+   learner here actually owns is a small block with a cable coiled beside it
+   and a connector on the end, so that is what this draws.
+
+   The pins are the Australian pair, splayed into a V, because the charger in
+   this learner's bag has those and not the flat parallel blades of the North
+   American one in the photo it is drawn from. Everything else follows the
+   photo: the block, the plug pushed into its side, the loop of cable, and the
+   connector at the loose end.
+
+   Light on dark, which is the only theme the app has. It is a white charger,
+   which is real enough and is the version that can be seen against the card. */
+function chargerArt(){
+  return '<svg class="dev-art" viewBox="0 0 210 170" role="img" aria-label="a charger">'
+    // The two pins, each a flat blade tilted out from the top of the block.
+    + '<g fill="#ccd3e6" stroke="#98a0ba" stroke-width="2.5" stroke-linejoin="round">'
+    +   '<rect x="90" y="8" width="15" height="31" rx="3" transform="rotate(-18 97.5 23)"/>'
+    +   '<rect x="113" y="8" width="15" height="31" rx="3" transform="rotate(18 120.5 23)"/>'
+    + '</g>'
+    // The cable: out of the plug, once around a loop, and away to the end.
+    + '<path d="M176 63 C 198 86 188 112 156 122 C 112 136 52 128 46 106'
+    +         ' C 41 88 74 82 94 92 C 110 100 116 114 114 126" fill="none"'
+    +   ' stroke="#c3cadf" stroke-width="7" stroke-linecap="round"/>'
+    // The block, and the plug pushed into its side.
+    + '<rect x="146" y="52" width="31" height="22" rx="4" fill="#d5dbea"'
+    +   ' stroke="#a8b0c9" stroke-width="2.5"/>'
+    + '<rect x="70" y="32" width="77" height="58" rx="11" fill="#e9ecf6"'
+    +   ' stroke="#a8b0c9" stroke-width="2.5"/>'
+    + '<rect x="80" y="41" width="46" height="9" rx="4.5" fill="#ffffff" opacity=".6"/>'
+    // The connector on the loose end, body and metal tip.
+    + '<g transform="translate(114 126) rotate(28)">'
+    +   '<rect x="-2" y="-11" width="34" height="22" rx="5" fill="#d5dbea"'
+    +     ' stroke="#a8b0c9" stroke-width="2.5"/>'
+    +   '<rect x="31" y="-7.5" width="13" height="15" rx="2" fill="#f4f6fc"'
+    +     ' stroke="#a8b0c9" stroke-width="2.5"/>'
+    + '</g>'
+    + '</svg>';
+}
+
 /* ── WHICH DEVICE / WHAT IS IT FOR ──
    ".12 Begins to recognise there are different digital devices commonly used
    to connect with others"; ".13 Begins to recognise extremely familiar
    digital devices"; and at Stage B "Begins to understand the purpose of some
    extremely familiar digital devices and software". */
+/* Most items are an emoji; one is a drawing. Both arrive as markup, so the
+   rounds below never have to know which is which. */
+function deviceArt(d){
+  return d.art?d.art():'<span style="font-size:3.4rem;">'+d.e+'</span>';
+}
 function genDeviceQuestions(n,from){
   const out=[], purpose=!!from;
   for(let i=0;i<(n||8);i++){
@@ -3615,7 +3662,7 @@ function genDeviceQuestions(n,from){
       const alts=shuffle(DEVICES.filter(function(x){ return x.n!==d.n; })).slice(0,3)
                   .map(function(x){ return x.use; });
       out.push({type:'mc', say:'What is a '+d.n+' for?',
-        icon:'<span style="font-size:3.4rem;">'+d.e+'</span>',
+        icon:deviceArt(d),
         question:'🔊 What is this for?',
         answer:d.use.toLowerCase(), choices:shuffle([d.use].concat(alts))});
     } else {
@@ -3625,7 +3672,7 @@ function genDeviceQuestions(n,from){
          stops there. Saying "which one is the keyboard" named the answer, and
          a learner could pick the right word without ever looking at the icon. */
       out.push({type:'mc', say:'What is this called?',
-        icon:'<span style="font-size:3.4rem;">'+d.e+'</span>',
+        icon:deviceArt(d),
         question:'🔊 What is this called?',
         answer:d.n, choices:shuffle([d.n].concat(alts))});
     }
