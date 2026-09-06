@@ -3831,23 +3831,67 @@ const COPY_WORDS=['bus','shop','milk','name','home','work','food','door','week',
    from 0: single words, shown and typed.
    from 1: a first and last name, and one or two digit numbers, which are the
            two the checklist names specifically. */
+/* Capitals and spaces are marked, and a copy that gets the letters right but
+   not those is worth something rather than nothing. The framework draws the
+   line in exactly that place:
+
+     Stage A expects the letters and forgives the rest. Its own words are
+     "Copies text, but demonstrates lack of consistency between upper and
+     lower case" (PLA.06), and its copying features ask only that the word be
+     copied, "clearly presented" and "left to right and top to bottom".
+
+     Stage B is where they start to count: "Writes full name accurately",
+     "Leaves spaces between words", and "Uses upper and lower case in
+     extremely familiar words, e.g. own name" (all PLB.06).
+
+   So a copy with the right letters and the wrong case, or with the space
+   missing out of a name, is a partly correct answer: it demonstrates the
+   Stage A feature and it does not demonstrate the Stage B one. The rounds
+   carry their own claims for that reason, and the Stage B ones are marked so
+   that a partly correct answer scores nothing towards them rather than half.
+
+   The name round used to lowercase its own answer, which made the capitals
+   unmarkable even in principle. */
+const PF_COPY_A=[
+  ['02','PLA','Uses extremely familiar learning strategies, such as copying',1],
+  ['02','PLA','Responds to modelling by copying action',1]];
+const PF_COPY_WORD=PF_COPY_A.concat([
+  ['05','PLA','Copies letters of the alphabet and short whole words that are clearly presented',1],
+  ['05','PLA','Copies single words left to right and top to bottom',1],
+  ['06','PLA','Copies a very limited number of extremely familiar words',1],
+  ['06','PLA','Copies text, but demonstrates lack of consistency between upper and lower case',1]]);
+const PF_COPY_NAME=PF_COPY_A.concat([
+  ['05','PLA','Copies first and last name',1],
+  ['06','PLA','Copies first and last name',1],
+  ['05','PLB','Writes limited personal details though may need to copy or check some aspects',1],
+  // The three that need it right. The fifth slot says so: a partly correct
+  // copy is counted as asked and not shown, never as half shown.
+  ['06','PLB','Writes full name accurately',1,1],
+  ['06','PLB','Leaves spaces between words',1,1],
+  ['06','PLB','Uses upper and lower case in extremely familiar words, e.g. own name',1,1]]);
+const PF_COPY_NUM=PF_COPY_A.concat([
+  ['05','PLA','Copies numbers of one or two digits',1]]);
 function genCopyQuestions(n,from){
   const out=[];
   for(let i=0;i<(n||8);i++){
     const mode=from?(i%3):(i%2);
     if(mode===0){
       const w=COPY_WORDS[randInt(0,COPY_WORDS.length-1)];
-      out.push({type:'typein', label:'COPY THE WORD', noListen:true,
+      out.push({type:'typein', label:'COPY THE WORD', noListen:true, matchCase:true,
+        acsf:PF_COPY_WORD,
         icon:'<span class="copy-model">'+w+'</span>',
         question:'Type this word', placeholder:w.length+' letters', answer:w});
     } else if(mode===1){
       const c=FORM_CARDS[randInt(0,FORM_CARDS.length-1)];
-      out.push({type:'typein', label:'COPY THE NAME', noListen:true,
+      out.push({type:'typein', label:'COPY THE NAME', noListen:true, matchCase:true,
+        acsf:PF_COPY_NAME,
         icon:'<span class="copy-model">'+c.who+'</span>',
-        question:'Type this name', placeholder:'First and last name', answer:c.who.toLowerCase()});
+        question:'Type this name', placeholder:'Big letters and a space',
+        answer:c.who});
     } else {
       const v=randInt(1,99);
       out.push({type:'typein', label:'COPY THE NUMBER', noListen:true,
+        acsf:PF_COPY_NUM,
         icon:'<span class="copy-model">'+v+'</span>',
         question:'Type this number', placeholder:'1 or 2 numbers', answer:String(v)});
     }
@@ -7107,17 +7151,11 @@ const ACSF_CLAIMS={
     ['01','L1','Identifies one or two short term learning objectives with assistance',1],
     ['01','L1','Identifies some potential barriers to learning, e.g. childcare issues',1],
   ]},
-  'copyword':{base:[
-    ['02','PLA','Uses extremely familiar learning strategies, such as copying',1],
-    ['02','PLA','Responds to modelling by copying action',1],
-    ['05','PLA','Copies letters of the alphabet and short whole words that are clearly presented',1],
-    ['05','PLA','Copies first and last name',1],
-    ['05','PLA','Copies single words left to right and top to bottom',1],
-    ['05','PLB','Writes limited personal details though may need to copy or check some aspects',1],
-    ['06','PLA','Copies a very limited number of extremely familiar words',1],
-    ['06','PLA','Copies first and last name',1],
-    ['06','PLB','Writes full name accurately',1],
-  ]},
+  /* Every feature any of the three copy rounds can show, because that is what
+     the band picker needs to know the bank is worth reaching. What is actually
+     credited is decided round by round: see PF_COPY_WORD, PF_COPY_NAME and
+     PF_COPY_NUM, because copying 57 is not evidence of writing a full name. */
+  'copyword':{base:PF_COPY_WORD.concat(PF_COPY_NAME.slice(2),PF_COPY_NUM.slice(2))},
   /* The phonics and ordering rounds sit in the ladder for their own sake, but
      they answer named features too: hearing a sound and finding the letter is
      exactly "links spoken and written forms of the names and sounds of
@@ -7979,8 +8017,15 @@ function newAcsfEvidence(){
    from the bank, as before. */
 function acsfCredit(step,tier,q){
   if(!TEST||!TEST.ev) return;
-  const worth=tier==='correct'?1:tier==='partial'?0.5:0;
+  const half=tier==='correct'?1:tier==='partial'?0.5:0;
   ((q&&q.acsf)||acsfClaimsFor(step)).forEach(function(c){
+    /* A feature whose own words are "accurately", "leaves spaces between
+       words" or "uses upper and lower case" is either shown or it is not. A
+       copy with the right letters and the wrong capitals is half an answer,
+       and it is half credit towards the Stage A copying features, but it is
+       no evidence at all towards these. Counted as asked and not shown rather
+       than skipped, because that is the thing an assessor wants to see. */
+    const worth=c[4]?(tier==='correct'?1:0):half;
     const b=TEST.ev.byInd[c[0]]||(TEST.ev.byInd[c[0]]={});
     const s=b[c[1]]||(b[c[1]]={seen:0,right:0,why:{}});
     s.seen++; s.right+=worth;
@@ -9817,18 +9862,19 @@ function typeinTier(q,ans){
   if(q.exact){
     let a=got, b=(q.answer||'').replace(/\s+/g,' ').trim();
     if(a===b) return 'correct';
-    const bare=function(x){ return x.toLowerCase().replace(/[.!?,]/g,'').trim(); };
-    return bare(a)===bare(b)?'partial':'wrong';
+    return normalize(a)===normalize(b)?'partial':'wrong';
   }
   if(q.matchCase||q.matchPunct){
     let a=got, b=(q.answer||'').replace(/\s+/g,' ').trim();
     if(!q.matchPunct){ a=a.replace(/[.!?,]/g,'').trim(); b=b.replace(/[.!?,]/g,'').trim(); }
     if(a===b) return 'correct';
-    // Right words, wrong capital or missing stop, is the near miss this round
-    // exists to catch — so the comparison that decides "partial" has to
-    // ignore both, or a missing full stop reads the same as a wrong sentence.
-    const bare=function(x){ return x.toLowerCase().replace(/[.!?,]/g,'').trim(); };
-    return bare(a)===bare(b)?'partial':'wrong';
+    /* Right letters, wrong capital, missing stop or missing space is the near
+       miss these rounds exist to catch, so the comparison that decides
+       "partial" has to ignore all three. normalize() is the app's own test for
+       "the same letters", and using it here is what makes SaraAhmed a near
+       miss rather than a different name: the hand-rolled version this replaces
+       kept spaces, so a run-together copy read as wrong. */
+    return normalize(a)===normalize(b)?'partial':'wrong';
   }
   return null;
 }

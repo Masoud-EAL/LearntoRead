@@ -192,7 +192,7 @@ partial: one round of one game is not the sustained performance Level 1 describe
 | 1 | Copies a very limited number of extremely familiar words | 🆕 built | Copy It |
 | 2 | Copies first and last name | 🆕 built | Copy It: your name |
 | 3 | Copies a very limited number of highly familiar words, but may have spelling inaccuracies | ✅ had it | All Spelling |
-| 4 | Copies text, but demonstrates lack of consistency between upper and lower case | 🆕 built | Big and Small Letters |
+| 4 | Copies text, but demonstrates lack of consistency between upper and lower case | 🆕 built | Big and Small Letters; Copy It (a copy with the wrong case marks partly correct) |
 
 ### `PLB1.06` — Displays limited vocabulary, grammatical accuracy and understanding of conventions, Pre Level 1 Stage B
 
@@ -201,8 +201,8 @@ partial: one round of one game is not the sustained performance Level 1 describe
 | 1 | Writes full name accurately | 🆕 built | Copy It: your name |
 | 2 | Uses capital letters and full stops accurately in sentences adapted from a model | 🆕 built | Write a Sentence |
 | 3 | Writes a very limited number of extremely familiar words, which may have spelling inaccuracies | ✅ had it | All Spelling |
-| 4 | Leaves spaces between words | 🆕 built | Write a Sentence (spacing) |
-| 5 | Uses upper and lower case in extremely familiar words, e.g. own name | 🆕 built | Big and Small Letters |
+| 4 | Leaves spaces between words | 🆕 built | Write a Sentence (spacing); Copy It: your name |
+| 5 | Uses upper and lower case in extremely familiar words, e.g. own name | 🆕 built | Big and Small Letters; Copy It: your name |
 
 ### `1.06` — Displays limited vocabulary, grammatical accuracy and understanding of conventions, Level 1
 
