@@ -3330,31 +3330,56 @@ const LIST_ITEMS=[['🍞','Bread'],['🥛','Milk'],['🥚','Eggs'],['🍎','Appl
 function genTableQuestions(n,hi){
   hi=hi||10;
   const out=[];
-  for(let i=0;i<(n||8);i++){
-    // Prices have to differ from each other, or two options read the same and
-    // a learner tapping the "wrong" one has in fact answered correctly.
-    // Capped well under the band's ceiling too: the checklist asks for a
-    // number to be located in a list, and $98 for a loaf of bread would be
-    // the first thing an adult noticed instead.
-    const cap=Math.min(hi,20), seen={}, rows=[];
-    shuffle(LIST_ITEMS.slice()).slice(0,4).forEach(function(it){
-      let c;
-      do { c=randInt(1,cap)*100+(Math.random()<0.5?50:0); } while(seen[c]);
-      seen[c]=1;
-      rows.push({name:it[1], emoji:it[0], cents:c});
-    });
-    const tgt=rows[randInt(0,rows.length-1)];
-    const dearest=rows.slice().sort(function(a,b){ return b.cents-a.cents; })[0];
-    const ask=i%2===0;
-    const html='<table class="pricelist"><tr><th>Item</th><th>Price</th></tr>'
+  const priceList=function(rows){
+    return '<table class="pricelist"><tr><th>Item</th><th>Price</th></tr>'
       +rows.map(function(r){ return '<tr><td>'+r.emoji+' '+r.name+'</td><td>'+money(r.cents)+'</td></tr>'; }).join('')
       +'</table>';
-    const correct=ask?moneyAnswer(tgt.cents):dearest.name;
-    const alts=ask?rows.filter(function(r){ return r!==tgt; }).map(function(r){ return moneyAnswer(r.cents); })
-                  :rows.filter(function(r){ return r!==dearest; }).map(function(r){ return r.name; });
-    out.push({type:'mc', noListen:true, icon:html,
-      question:ask?('How much is '+tgt.name+'?'):'Which one costs the most?',
-      answer:correct.toLowerCase(), choices:shuffle([correct].concat(alts.slice(0,3)))});
+  };
+  for(let i=0;i<(n||8);i++){
+    // Capped well under the band's ceiling: the checklist asks for a number to
+    // be located in a list, and $98 for a loaf of bread would be the first
+    // thing an adult noticed instead.
+    const cap=Math.min(hi,20);
+    if(i%2===0){
+      // Locate a price. Four rows, and the prices differ from each other or
+      // two options read the same and a learner tapping the "wrong" one has
+      // in fact answered correctly. Cents are in play here, which is where
+      // "Monetary amounts up to $100, e.g. 50c, $24.50" lives.
+      const seen={}, rows=[];
+      shuffle(LIST_ITEMS.slice()).slice(0,4).forEach(function(it){
+        let c;
+        do { c=randInt(1,cap)*100+(Math.random()<0.5?50:0); } while(seen[c]);
+        seen[c]=1;
+        rows.push({name:it[1], emoji:it[0], cents:c});
+      });
+      const tgt=rows[randInt(0,rows.length-1)];
+      // Shown with the dollar sign, the way the list shows it and the way the
+      // feature describes it: "Recognises and writes money as symbols". An
+      // option reading 8.00 under a list reading $8.00 asks the learner to
+      // strip the sign in their head before they can answer.
+      out.push({type:'mc', noListen:true, icon:priceList(rows),
+        question:'How much is '+tgt.name+'?',
+        answer:money(tgt.cents),
+        choices:shuffle(rows.map(function(r){ return money(r.cents); }))});
+    } else {
+      // Compare two. "Which one costs the most" is a superlative, and a
+      // learner at this level has "more" long before they have "most", so it
+      // asks about two things and uses the comparative. Whole dollars only:
+      // the feature says "whole dollar monetary amounts", and it keeps the
+      // comparison a comparison rather than a test of reading cents.
+      const two=shuffle(LIST_ITEMS.slice()).slice(0,2);
+      const d1=randInt(1,cap);
+      let d2; do { d2=randInt(1,cap); } while(d2===d1);
+      const rows=[{name:two[0][1], emoji:two[0][0], cents:d1*100},
+                  {name:two[1][1], emoji:two[1][0], cents:d2*100}];
+      const dear=rows[0].cents>rows[1].cents?rows[0]:rows[1];
+      const cheap=dear===rows[0]?rows[1]:rows[0];
+      const wantDear=Math.random()<0.5;
+      out.push({type:'mc', noListen:true, icon:priceList(rows),
+        question:wantDear?'Which one is more expensive?':'Which one is cheaper?',
+        answer:(wantDear?dear:cheap).name.toLowerCase(),
+        choices:shuffle(rows.map(function(r){ return r.name; }))});
+    }
   }
   return out;
 }
