@@ -181,15 +181,24 @@ partial: one round of one game is not the sustained performance Level 1 describe
 | 2 | Writes personally relevant numbers correctly when filling in an extremely simple form, e.g. house number | 🔧 extended | Forms: typed numbers |
 | 3 | Writes two simple sentences adapted from a model | 🆕 built | Write a Sentence |
 
+
+> **Level 1 Writing is not reported.** Every feature in `1.05` and `1.06` asks
+> for something this app does not see: two short simple text types, short texts,
+> a learner checking and correcting their own writing, a bank of words they reach
+> for themselves, structures and tenses they produce rather than arrange, and a
+> legible script. The longest thing written here is one sentence adapted from a
+> model. The claim map carries no Level 1 rows for `.05` or `.06`, and both
+> indicators stop at PLB.
+
 ### `1.05` — Conveys a simple idea, opinion, factual information or message in writing, Level 1
 
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
-| 1 | Writes two short simple text types: | 🆕 built | Write a Sentence |
-| 2 | Text type 1 (e.g. simple formatted text) | 🆕 built | Write a Sentence |
-| 3 | Text type 2 (e.g. contains simple sentences) | 🆕 built | Write a Sentence |
-| 4 | Writes short texts with simple structures | 🆕 built | Write a Sentence |
-| 5 | Begins to check writing by re-reading and makes some corrections with guidance, e.g. capital letters and full stops | ✅ had it | spelling feedback + retry |
+| 1 | Writes two short simple text types: | ❌ not assessed | nothing in this app measures it |
+| 2 | Text type 1 (e.g. simple formatted text) | ❌ not assessed | nothing in this app measures it |
+| 3 | Text type 2 (e.g. contains simple sentences) | ❌ not assessed | nothing in this app measures it |
+| 4 | Writes short texts with simple structures | ❌ not assessed | nothing in this app measures it |
+| 5 | Begins to check writing by re-reading and makes some corrections with guidance, e.g. capital letters and full stops | ❌ not assessed | nothing in this app measures it |
 
 ### `PLA1.06` — Displays limited vocabulary, grammatical accuracy and understanding of conventions, Pre Level 1 Stage A
 
@@ -214,10 +223,10 @@ partial: one round of one game is not the sustained performance Level 1 describe
 
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
-| 1 | Uses a small bank of individual words and phrases or word lists related to giving personal details or meeting survival needs. May be memorised or formulaic | ✅ had it | All Spelling, Forms |
-| 2 | Uses basic structures and limited verb tenses | ✅ had it | Grammar Unscramble |
-| 3 | Uses basic punctuation (e.g. capital letters and full stops), but this may be inconsistent | 🆕 built | Write a Sentence |
-| 4 | Writes mostly legible script. | ✅ had it | tracing.html (handwriting, outside the test) |
+| 1 | Uses a small bank of individual words and phrases or word lists related to giving personal details or meeting survival needs. May be memorised or formulaic | ❌ not assessed | nothing in this app measures it |
+| 2 | Uses basic structures and limited verb tenses | ❌ not assessed | nothing in this app measures it |
+| 3 | Uses basic punctuation (e.g. capital letters and full stops), but this may be inconsistent | ❌ not assessed | nothing in this app measures it |
+| 4 | Writes mostly legible script. | ❌ not assessed | nothing in this app measures it |
 
 ---
 

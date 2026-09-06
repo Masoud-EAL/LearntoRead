@@ -7140,12 +7140,18 @@ const ACSF_INDICATORS={
   '04':{skill:'Reading', name:'Uses a limited range of strategies to locate specific information and construct meaning',
         ceiling:'L1',
         capNote:'Longer word phonics is the top of the decoding ladder here.'},
+  /* Both stop at PLB. The Level 1 writing features are two short simple text
+     types, short texts with simple structures, checking your own writing and
+     correcting it, and a mostly legible script. The longest thing anyone
+     writes here is one sentence adapted from a model, there is nowhere to
+     revise a submitted answer, and handwriting is not on screen at all. None
+     of that is measurable in this app, so none of it is printed. */
   '05':{skill:'Writing', name:'Conveys a simple idea, opinion, factual information or message in writing',
-        ceiling:'L1', screenOnly:true,
-        capNote:'On screen only. Handwriting, letter forms and spacing are not observed by this app.'},
+        ceiling:'PLB', screenOnly:true,
+        capNote:'The Level 1 features ask for two short text types, for short texts, and for checking and correcting your own writing. The longest thing written here is one sentence adapted from a model, and there is nowhere to revise an answer once it is sent.'},
   '06':{skill:'Writing', name:'Displays limited vocabulary, grammatical accuracy and understanding of conventions',
-        ceiling:'L1', screenOnly:true,
-        capNote:'On screen only, and no extended writing. Handwriting must be checked on paper.'},
+        ceiling:'PLB', screenOnly:true,
+        capNote:'The Level 1 features ask for a bank of words the learner reaches for themselves, for structures and verb tenses they produce rather than arrange, and for a legible script. None of the three is something this app sees.'},
   '07':{skill:'Oral Communication', name:'Gives or elicits basic information in a short, simple spoken context',
         ceiling:null,
         capNote:'Nothing in this app records speech, including the Speaking game, which is built from tiles. Speaking has to be heard.'},
@@ -7303,23 +7309,35 @@ const ACSF_CLAIMS={
     ['11','PLB','Uses personally relevant and informal symbolism including numbers up to 100, e.g.: 25 $, +, = $25.20'],
     ['13','PLA','Uses an extremely limited range of digital letters and symbols'],
   ]},
+  /* No Level 1 rows. Write a Sentence gives a model and takes back one
+     sentence with one word changed, which is "Writes two simple sentences
+     adapted from a model" and stops there. The Level 1 features above it ask
+     for two short simple TEXT TYPES with "text type 1" and "text type 2" as
+     their own sub-features, and for short texts with simple structures: two
+     different kinds of writing, longer than a sentence. One adapted sentence
+     is not either of them, whatever partial marker is put beside it.
+     The Level 1 punctuation feature is the same observation as the PLB one
+     directly above it, and the PLB wording — "in sentences adapted from a
+     model" — is literally this game. Claiming both off one typed sentence is
+     counting one thing twice to reach a higher level. */
   'modelsentence':{base:[
     ['05','PLB','Writes two simple sentences adapted from a model'],
-    ['05','L1','Writes two short simple text types:',1],
-    ['05','L1','Text type 1 (e.g. simple formatted text)',1],
-    ['05','L1','Text type 2 (e.g. contains simple sentences)',1],
-    ['05','L1','Writes short texts with simple structures',1],
     ['06','PLB','Uses capital letters and full stops accurately in sentences adapted from a model'],
     ['06','PLB','Leaves spaces between words'],
-    ['06','L1','Uses basic punctuation (e.g. capital letters and full stops), but this may be inconsistent',1],
   ]},
   'spelling':{base:[
     ['06','PLA','Copies a very limited number of highly familiar words, but may have spelling inaccuracies'],
+    /* Not the Level 1 row above this one either. Spelling a dictated word is
+       writing a word the app chose; that feature is about a learner reaching
+       for a bank of words of their own to give personal details or meet a
+       need. The PLB line here is the same observation, honestly placed. */
     ['06','PLB','Writes a very limited number of extremely familiar words, which may have spelling inaccuracies'],
-    ['06','L1','Uses a small bank of individual words and phrases or word lists related to giving personal details or meeting survival needs. May be memorised or formulaic',1],
   ]},
   'gramscramble':{base:[
-    ['06','L1','Uses basic structures and limited verb tenses',1],
+    /* "Uses basic structures and limited verb tenses" is not shown by putting
+       given words in order. The words are supplied, the structure is the
+       answer, and the learner produces neither. Dropped rather than kept with
+       a partial marker on it. */
   ]},
   'greetings':{base:[
     ['08','PLA','Understands extremely familiar social exchanges using single words'],
@@ -8466,7 +8484,10 @@ function acsfSignalRows(ev){
   }
   // Re-reading and correcting is what the spelling feedback exists for, so it
   // only counts where the learner actually saw it.
-  if((ev.hints||0)>0||(ev.replays||0)>0) put('05','L1',Math.max(2,help),help,P(HELP,'Begins to check writing by re-reading and makes some corrections with guidance, e.g. capital letters and full stops',Math.max(2,help),help));
+  /* No .05 Level 1 row from pressing Hint or Hear it again. That feature is a
+     learner re-reading what they wrote and correcting it; this app marks an
+     answer and moves on, and there is nowhere in it to revise a submitted
+     one. Asking to hear the question again is not checking your own writing. */
   return rows;
 }
 
