@@ -1693,7 +1693,6 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="notice" class="q-type-tab" onclick="selectSoloType('notice',this)">📢 Read the Notice</button>
         <button data-type="greetings" class="q-type-tab" onclick="selectSoloType('greetings',this)">👋 Greetings</button>
         <button data-type="instructions" class="q-type-tab" onclick="selectSoloType('instructions',this)">🖐️ Do What It Says</button>
-        <button data-type="mylearning" class="q-type-tab" onclick="selectSoloType('mylearning',this)">🎯 My Learning</button>
         <button data-type="forms" class="q-type-tab" onclick="selectSoloType('forms',this)">📋 Forms</button>
         <button data-type="all" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">✨ All games</button>
         <button data-type="test:*" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">🎯 Test Yourself</button>
@@ -1900,7 +1899,6 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
             <button data-type="notice" class="q-type-tab" onclick="selectQType('notice',this)">📢 Read the Notice</button>
             <button data-type="greetings" class="q-type-tab" onclick="selectQType('greetings',this)">👋 Greetings</button>
             <button data-type="instructions" class="q-type-tab" onclick="selectQType('instructions',this)">🖐️ Do What It Says</button>
-            <button data-type="mylearning" class="q-type-tab" onclick="selectQType('mylearning',this)">🎯 My Learning</button>
             <button data-type="forms" class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
             <button data-type="all" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">✨ All games</button>
         <button data-type="test:*" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">🎯 Test Yourself</button>
@@ -6788,7 +6786,6 @@ const BANK_SECTIONS=[
   {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target','numbertap','numeralwrite','addup','addmoney','ordering','placevalue','tableread','digitaltime','calendar','ordinals','position']},
   {id:'translation',label:'🌐 Translation',      banks:['translate']},
   {id:'digital',    label:'💻 Using a device',   banks:['devices','digisymbols','prompts','safeinfo','sms','forms','instructions']},
-  {id:'learning',   label:'🎯 My learning',      banks:['mylearning']},
   {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','sms','clock','shop','forms','beginner','unscramble','gramscramble','speaking','translate','digitaltime','calendar']},
 ];
 /* Every bank a learner can be dealt from "All games", read off the sections
@@ -6824,7 +6821,6 @@ const SECTION_DEFAULTS={
   translation:  {type:'translate',    mc:true},
   everyday:     {type:'beginner',     mc:true},
   digital:      {type:'devices',      mc:true},
-  learning:     {type:'mylearning',   mc:true},
 };
 
 /* ══════════════ TEST YOURSELF ══════════════
@@ -7637,6 +7633,15 @@ const GAME_INFO={
   instructions:{skill:'listening', name:'Do What It Says', blurb:'Listen, then tap what it says.'},
   /* No wrong answers here: it is about what the learner wants, not what they
      know. See genMyLearningQuestions. */
+  /* Off the picker, and out of the sections, on purpose. Every option is
+     right — it asks a learner what they want to learn, and nobody is wrong
+     about that — so as a game it is a hundred points a tap for as long as you
+     care to tap, and inside an All mix it was free points among real
+     questions. It is worth asking, though: it is the only thing in the app
+     that evidences .01, the learning-goal features, which is why it stays a
+     bank and why the level check band that names it still deals it. The panel
+     already reports those rows as a signal to confirm in interview rather
+     than as a result. */
   mylearning:  {skill:'learning', name:'My Learning', blurb:'Your goal, and what would help you.'},
   all:         {blurb:'A mix of every game.'},
 };
@@ -8143,7 +8148,14 @@ function testStartRound(){
    class test — in a test the learner marks and advances themselves either way. */
 function testRecord(tier,pts,timedOut){
   if(!testActive()) return;
-  TEST.tally.push(tier);
+  /* A question nobody can get wrong says nothing about what a learner can do,
+     so it is marked here and left out of the round's score. My Learning asks
+     what you want to learn; counting that as a right answer moved the ladder
+     up on the strength of a tap, and a round where the other two were wrong
+     dropped one rung instead of two. It still counts as evidence for .01, and
+     it still scores for the learner. */
+  const open=isOpenQ(currentStudentQ);
+  TEST.tally.push(open?'open':tier);
   TEST.roundPts+=pts;
   // Which step this particular question came from. In an ordinary round that
   // is the rung, and every question in the round shares it; in a level check
@@ -8164,7 +8176,9 @@ function testRecord(tier,pts,timedOut){
   // climbs through several games crosses several skills — the whole-app test
   // most of all. A part-right spelling is half a mistake: enough to say the
   // skill needs work, not enough to be counted as wrong outright.
-  const sk=(GAME_INFO[step.type]||{}).skill;
+  // Nor towards "strong in" / "needs practice": a skill made only of questions
+  // that cannot be failed came out a strength on every single report.
+  const sk=open?null:(GAME_INFO[step.type]||{}).skill;
   if(!sk) return;
   const b=TEST.bySkill[sk]||(TEST.bySkill[sk]={asked:0,wrong:0});
   b.asked++;
@@ -8600,7 +8614,20 @@ function acsfCopyFallback(txt,done){
 function testEndRound(){
   clearInterval(studentTimerInt);
   const score=TEST.tally.reduce((a,t)=>a+(t==='correct'?1:t==='partial'?0.5:0),0);
-  const move=score>=2.5?2:score>=1.5?1:score>=0.5?-1:-2;
+  /* Out of the questions that could have been got wrong, not out of three.
+     Written as whole numbers rather than as a fraction against 0.83 and 0.17,
+     because 0.5 out of 3 is 0.1666 and lands on the wrong side of a rounded
+     threshold: a round of one partly right and two wrong would have dropped
+     two rungs where it has always dropped one. Against these, an ordinary
+     round of three moves exactly as it always has — 3 and 2.5 climb two, 2 and
+     1.5 climb one, 1 and 0.5 drop one, 0 drops two. What they add is a round
+     holding a question that could not be failed, which is decided on the ones
+     that could be. A round of nothing but those moves nowhere. */
+  const closed=TEST.tally.filter(function(t){ return t!=='open'; }).length;
+  const move=!closed?0
+    :score*6>=closed*5?2
+    :score*2>=closed?1
+    :score*6>=closed?-1:-2;
   const before=TEST.level;
   TEST.level=Math.max(0,Math.min(TEST.ladder.length-1,TEST.level+move));
   // What actually happened, not what was asked for: at the bottom of a ladder

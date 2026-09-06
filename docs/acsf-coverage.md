@@ -47,6 +47,12 @@ partial: one round of one game is not the sustained performance Level 1 describe
 ## Learning
 
 
+> **My Learning** is a bank, not a game on the list. Every option in it is
+> right — nobody is wrong about what they want to learn — so it cannot be
+> played for a score. It is dealt by Test Yourself and by the level check
+> band that names it, and the rows it feeds are reported as signals to
+> confirm in interview rather than as results.
+
 ### `PLA1.01` — Demonstrates some awareness of self as a learner, Pre Level 1 Stage A
 
 | # | Key performance feature (verbatim) | Status | Game |
