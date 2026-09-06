@@ -5822,8 +5822,10 @@ function applyTargetSetup(scope){
   const on=type==='target', test=isTestType(type);
   const opts=document.getElementById('tgt-opts-'+scope);
   if(opts) opts.classList.toggle('on',on);
+  // Shown only where it changes the game. mcAppliesTo says where that is, and
+  // it covers the dice game and Test Yourself, named here by hand until now.
   const mc=document.getElementById(scope+'-mc-toggle');
-  if(mc) mc.style.display=(on||test)?'none':'';
+  if(mc) mc.style.display=mcAppliesTo(type)?'':'none';
   // The level check is a Test Yourself setting and belongs to nothing else. It
   // is solo only: a class test is self-paced across thirty phones, and a
   // profile is something a teacher reads with one learner.
@@ -7702,6 +7704,32 @@ const GAME_MC_DEFAULT={unscramble:false,gramscramble:false,speaking:false,spelli
   'wp1:build':false,'wp2:build':false,ordering:false,copyword:false,numeralwrite:false,
   addup:false,addmoney:false,modelsentence:false,safeinfo:false};
 function defaultMcFor(type){ return GAME_MC_DEFAULT[type]!==false; }
+/* The games the Multiple Choice toggle can actually change, and so the only
+   ones whose start screen offers it. A bank has two modes when its rounds are
+   answered by typing a word or by arranging tiles: those are what
+   attachMcChoices converts into four options, and it converts nothing else.
+   Every other bank deals rounds that already are four options (Signs,
+   Messages, Odd One Out, Letter Names, the phonics gap and word rungs, and
+   the numeracy and digital banks) or rounds that are neither typing nor
+   choosing (tapping coins, dragging clock hands, dropping chips into a form,
+   building a word from its sounds, tracing a numeral). On those the switch
+   moved and the game came out exactly the same, which reads as a broken
+   control, so it is no longer shown. Custom is listed because a teacher's own
+   questions can be any of the convertible shapes. */
+const MC_CAPABLE_BANKS=['beginner','elementary','questionwords','numbers','numbers1120',
+  'numbers2199','days','months','weather','fruits','body','clothes','spelling','unscramble',
+  'gramscramble','ordering','speaking','translate','custom'];
+/* An "All" offers the toggle when any bank it draws on has two modes, which
+   is every section but Using a device, whose banks are all four-option
+   reading. Dice has no questions at all, and Test Yourself decides tapping
+   against typing rung by rung, so neither takes the toggle either. */
+function mcAppliesTo(type){
+  if(!type||isSpecialGame(type)||isTestType(type)) return false;
+  if(MC_CAPABLE_BANKS.indexOf(type)>=0) return true;
+  const sec=sectionOf(type);
+  if(sec) return sec.banks.some(b=>mcAppliesTo(b));
+  return type==='all'&&ALL_BANKS.some(b=>mcAppliesTo(b));
+}
 function soloSeconds(){
   const el=document.getElementById('solo-t-limit');
   const v=el?parseInt(el.value,10):NaN;
@@ -7769,7 +7797,7 @@ function soloLinkParams(type){
     if(limit!==10) p.set('q',limit);
     const secs=soloSeconds();
     if(secs!==TIMER_DURATION) p.set('t',secs);
-    if(mcMode!==defaultMcFor(type)) p.set('mc',mcMode?'1':'0');
+    if(mcAppliesTo(type)&&mcMode!==defaultMcFor(type)) p.set('mc',mcMode?'1':'0');
   }
   return p;
 }
