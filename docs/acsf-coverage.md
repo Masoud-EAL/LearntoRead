@@ -348,8 +348,8 @@ partial: one round of one game is not the sustained performance Level 1 describe
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
 | 1 | Begins to understand the purpose of some extremely familiar digital devices and software | 🆕 built | Using a Device: what is it for |
-| 2 | Demonstrates an extremely limited capacity to maintain digital devices | 🆕 built | Using a Device: looking after it |
+| 2 | Demonstrates an extremely limited capacity to maintain digital devices | 🆕 built | What Should You Do? (the device-problem half) |
 | 3 | Begins to navigate extremely simple digital screen | 📊 from the run | moves between screens in the app |
 | 4 | Uses an extremely limited number of digital devices and software applications | 📊 from the run | works the app on a phone or tablet |
-| 5 | Recognises and responds to a limited number of digital prompts or alerts, texts and symbols | 🆕 built | Using a Device: messages on the screen |
+| 5 | Recognises and responds to a limited number of digital prompts or alerts, texts and symbols | 🆕 built | What Should You Do? (the notice half) |
 | 6 | Demonstrates a recognition of the relationship between digital peripherals and action on screen | 📊 from the run | drag and tap move things on screen |

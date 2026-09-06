@@ -1683,8 +1683,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="position" class="q-type-tab" onclick="selectSoloType('position',this)">🧭 Where Is It</button>
         <button data-type="devices" class="q-type-tab" onclick="selectSoloType('devices',this)">💻 Devices</button>
         <button data-type="digisymbols" class="q-type-tab" onclick="selectSoloType('digisymbols',this)">🔣 Screen Symbols</button>
-        <button data-type="prompts" class="q-type-tab" onclick="selectSoloType('prompts',this)">⚠️ Screen Messages</button>
-        <button data-type="devicecare" class="q-type-tab" onclick="selectSoloType('devicecare',this)">🔋 Looking After It</button>
+        <button data-type="prompts" class="q-type-tab" onclick="selectSoloType('prompts',this)">⚠️ What Should You Do?</button>
         <button data-type="safeinfo" class="q-type-tab" onclick="selectSoloType('safeinfo',this)">🔒 Safe or Private</button>
         <button data-type="copyword" class="q-type-tab" onclick="selectSoloType('copyword',this)">📝 Copy It</button>
         <button data-type="casematch" class="q-type-tab" onclick="selectSoloType('casematch',this)">🔠 Big and Small Letters</button>
@@ -1892,8 +1891,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
             <button data-type="position" class="q-type-tab" onclick="selectQType('position',this)">🧭 Where Is It</button>
             <button data-type="devices" class="q-type-tab" onclick="selectQType('devices',this)">💻 Devices</button>
             <button data-type="digisymbols" class="q-type-tab" onclick="selectQType('digisymbols',this)">🔣 Screen Symbols</button>
-            <button data-type="prompts" class="q-type-tab" onclick="selectQType('prompts',this)">⚠️ Screen Messages</button>
-            <button data-type="devicecare" class="q-type-tab" onclick="selectQType('devicecare',this)">🔋 Looking After It</button>
+            <button data-type="prompts" class="q-type-tab" onclick="selectQType('prompts',this)">⚠️ What Should You Do?</button>
             <button data-type="safeinfo" class="q-type-tab" onclick="selectQType('safeinfo',this)">🔒 Safe or Private</button>
             <button data-type="copyword" class="q-type-tab" onclick="selectQType('copyword',this)">📝 Copy It</button>
             <button data-type="casematch" class="q-type-tab" onclick="selectQType('casematch',this)">🔠 Big and Small Letters</button>
@@ -3707,10 +3705,21 @@ function genSymbolQuestions(n){
   return out;
 }
 
-/* ── MESSAGES ON THE SCREEN ──
-   ".13 Recognises and responds to a limited number of digital prompts or
-   alerts, texts and symbols". A real dialog box, and the question is what to
-   tap — which is the whole skill. */
+/* ── WHAT SHOULD YOU DO? ──
+   Two halves of one question, which is why they are now one game. A notice
+   arrives and the learner decides what to tap: ".13 Recognises and responds
+   to a limited number of digital prompts or alerts, texts and symbols". Or
+   something has stopped working and the learner decides what to check: ".13
+   Demonstrates an extremely limited capacity to maintain digital devices".
+   Both ask what to do about a phone, and apart five and seven questions each
+   was not a game, it was a handful of questions dealt twice over.
+
+   The two features stay apart in the evidence even though the bank is one,
+   because each question names the feature it shows and acsfCredit takes the
+   question's word over the bank's. A learner who only ever saw notices has
+   not shown they can keep a device working. */
+const PF_PROMPT=['13','PLB','Recognises and responds to a limited number of digital prompts or alerts, texts and symbols'];
+const PF_CARE  =['13','PLB','Demonstrates an extremely limited capacity to maintain digital devices'];
 const PROMPTS=[
   {t:'Battery low',        b:'10% left',                 a:'Charge it',    alts:['Delete it','Print it','Call someone']},
   {t:'No internet',        b:'You are not connected',    a:'Turn on wifi', alts:['Charge it','Take a photo','Save the file']},
@@ -3736,42 +3745,39 @@ const PROMPTS=[
   {t:'Alarm',              b:'It is time to get up',     a:'Turn it off',  alts:['Take a photo','Print it','Call someone']},
   {t:'Photos are ready',   b:'They are on the computer now', a:'Print them', alts:['Charge it','Turn on wifi','Call someone']},
 ];
-/* Shuffled and sliced, the way a fixed bank is dealt. It used to walk the list
-   with i%length, which is what padded a ten question game out of seven. */
+/* Both halves in one shuffle, so a game is a mix rather than a run of notices
+   followed by a run of problems. Shuffled and sliced, the way a fixed bank is
+   dealt: it used to walk the list with i%length, which is what padded a ten
+   question game out of seven. */
 function genPromptQuestions(n){
-  const out=[];
-  const pool=shuffle(PROMPTS.slice()).slice(0,n||6);
-  for(let i=0;i<pool.length;i++){
-    const p=pool[i];
-    out.push({type:'mc', say:p.t+'. '+p.b,
+  const dialogs=PROMPTS.map(function(p){
+    return {type:'mc', say:p.t+'. '+p.b, acsf:[PF_PROMPT],
       icon:'<div class="digi-dialog"><div class="dd-title">'+p.t+'</div><div class="dd-body">'+p.b+'</div></div>',
       question:'🔊 What should you do?',
-      answer:p.a.toLowerCase(), choices:shuffle([p.a].concat(p.alts))});
-  }
-  return out;
+      answer:p.a.toLowerCase(), choices:shuffle([p.a].concat(p.alts))};
+  });
+  const cares=DEVICE_CARE.map(function(c){
+    return {type:'mc', say:c.q, question:'🔊 '+c.q, acsf:[PF_CARE],
+      answer:c.a.toLowerCase(), choices:shuffle([c.a].concat(c.alts))};
+  });
+  return shuffle(dialogs.concat(cares)).slice(0,n||6);
 }
 
-/* ── LOOKING AFTER IT ──
-   ".13 Demonstrates an extremely limited capacity to maintain digital
-   devices". Charging, volume, connection: the three things that stop a
-   device working and that a learner can fix themselves. */
+/* The other half of What Should You Do?: the things that stop a phone working
+   and that a learner can put right themselves. Dealt by genPromptQuestions
+   above, alongside the notices. */
 const DEVICE_CARE=[
   {q:'The screen is black and it will not turn on. What is wrong?', a:'The battery is flat', alts:['It is too loud','The wifi is off','It is upside down']},
   {q:'You cannot hear anything. What do you check?',                a:'The sound',           alts:['The battery','The printer','The camera']},
   {q:'Nothing will load. What do you check?',                       a:'The internet',        alts:['The sound','The camera','The keyboard']},
   {q:'The battery is nearly empty. What do you do?',                a:'Plug in the charger', alts:['Turn up the sound','Take a photo','Delete a photo']},
   {q:'You are going out. How do you keep the battery?',             a:'Turn the screen off', alts:['Turn the sound up','Open more apps','Take more photos']},
+  {q:'The phone is very slow. What do you do?',                     a:'Close some apps',     alts:['Take a photo','Turn the sound up','Print it']},
+  {q:'The phone will not charge. What do you check?',               a:'The cable',           alts:['The sound','The camera','The printer']},
+  {q:'The phone fell in water. What do you do first?',              a:'Turn it off',         alts:['Charge it','Take a photo','Turn the sound up']},
+  {q:'The screen is dirty. What do you do?',                        a:'Clean it with a cloth',alts:['Charge it','Turn it off','Take a photo']},
+  {q:'You are in class. What do you do with your phone?',           a:'Turn the sound off',  alts:['Turn the sound up','Call someone','Take a photo']},
 ];
-function genDeviceCareQuestions(n){
-  const out=[], pool=shuffle(DEVICE_CARE.slice());
-  for(let i=0;i<(n||5);i++){
-    const c=pool[i%pool.length];
-    out.push({type:'mc', say:c.q, question:'🔊 '+c.q,
-      answer:c.a.toLowerCase(), choices:shuffle([c.a].concat(c.alts))});
-  }
-  return out;
-}
-
 /* ── SAFE OR NOT SAFE, AND THE CODE ──
    ".12 Copies simple risk protection code" and ".12 Begins to understand
    there are risks associated with providing information". The first is a
@@ -4577,7 +4583,6 @@ const GEN_BANKS={
   devices:      function(n,f){ return genDeviceQuestions(n,f); },
   digisymbols:  function(n){ return genSymbolQuestions(n); },
   prompts:      function(n){ return genPromptQuestions(n); },
-  devicecare:   function(n){ return genDeviceCareQuestions(n); },
   safeinfo:     function(n,f){ return genSafeQuestions(n,f); },
   copyword:     function(n,f){ return genCopyQuestions(n,f); },
   casematch:    function(n,f){ return genCaseQuestions(n,f); },
@@ -4590,6 +4595,7 @@ const GEN_BANKS={
   instructions: function(n){ return genInstructionQuestions(n); },
   mylearning:   function(n){ return genMyLearningQuestions(n); },
 };
+const RETIRED_GAMES={devicecare:'prompts'};
 function isGenBank(t){ return Object.prototype.hasOwnProperty.call(GEN_BANKS,t); }
 
 /* -- DEALING FROM A GENERATED BANK --
@@ -6740,7 +6746,7 @@ const BANK_SECTIONS=[
   {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble']},
   {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target','numbertap','numeralwrite','addup','addmoney','ordering','placevalue','tableread','digitaltime','calendar','ordinals','position']},
   {id:'translation',label:'🌐 Translation',      banks:['translate']},
-  {id:'digital',    label:'💻 Using a device',   banks:['devices','digisymbols','prompts','devicecare','safeinfo','sms','forms','instructions']},
+  {id:'digital',    label:'💻 Using a device',   banks:['devices','digisymbols','prompts','safeinfo','sms','forms','instructions']},
   {id:'learning',   label:'🎯 My learning',      banks:['mylearning']},
   {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','sms','clock','shop','forms','beginner','unscramble','gramscramble','speaking','translate','digitaltime','calendar']},
 ];
@@ -7301,12 +7307,12 @@ const ACSF_CLAIMS={
   'digisymbols':{base:[
     ['13','PLA','Begins to recognise extremely familiar digital symbols'],
   ]},
-  'devicecare':{base:[
-    ['13','PLB','Demonstrates an extremely limited capacity to maintain digital devices'],
-  ]},
-  'prompts':{base:[
-    ['13','PLB','Recognises and responds to a limited number of digital prompts or alerts, texts and symbols'],
-  ]},
+  /* Both halves of What Should You Do?. A question names which of the two it
+     shows (see genPromptQuestions), and acsfCredit takes the question's word,
+     so answering notices all game does not print the maintenance feature as
+     evidence. Both are listed here because the bank can evidence both, which
+     is what the band picker needs to know. */
+  'prompts':{base:[PF_PROMPT, PF_CARE]},
 };
 
 /* Banks whose `from` decides which range they work in, and therefore which
@@ -7380,7 +7386,7 @@ const ACSF_BANDS=[
   {label:'Reading a message, money and order', pool:[
     {type:'sms',mc:true},{type:'wp1:build',mc:false},{type:'addmoney',mc:false,from:0},
     {type:'ordering',mc:false,from:0},{type:'questionwords',mc:true},
-    {type:'copyword',mc:false,from:1},{type:'devicecare',mc:true},
+    {type:'copyword',mc:false,from:1},{type:'prompts',mc:true},
     {type:'notice',mc:true},{type:'ordinals',mc:true,from:0},{type:'forms',mc:false}]},
   {label:'Writing what you hear, forms and time', pool:[
     {type:'beginner',mc:false},{type:'forms',mc:false},{type:'spelling',mc:false},
@@ -7567,8 +7573,7 @@ const GAME_INFO={
      reading them off how the learner happened to work the app. */
   devices:     {skill:'digital', name:'Devices', blurb:'Name a device and say what it is for.'},
   digisymbols: {skill:'digital', name:'Screen Symbols', blurb:'What the buttons on a screen do.'},
-  prompts:     {skill:'digital', name:'Screen Messages', blurb:'Answer a message on the screen.'},
-  devicecare:  {skill:'digital', name:'Looking After It', blurb:'Battery, sound and internet.'},
+  prompts:     {skill:'digital', name:'What Should You Do?', blurb:'A message, or a problem with the phone.'},
   safeinfo:    {skill:'digital', name:'Safe or Private', blurb:'Copy a code, and what to keep private.'},
   /* The writing half of the checklist is mostly the word "copies", and none
      of it was on screen: tracing.html is a different app and outside the test. */
@@ -7966,10 +7971,16 @@ function newAcsfEvidence(){
   return {byInd:{}, used:{}, tick:0, asked:0, attempts:0, timeouts:0,
           hints:0, replays:0, modes:{}, trend:[], finished:false};
 }
-function acsfCredit(step,tier){
+/* A question may name the features it shows, and when it does that is what is
+   credited. One bank can hold two kinds of question — What Should You Do? deals
+   notices and device problems together — and crediting the bank's whole list
+   for either would print the maintenance feature as evidence for a learner who
+   only ever answered notices. Everything else has no q.acsf and is credited
+   from the bank, as before. */
+function acsfCredit(step,tier,q){
   if(!TEST||!TEST.ev) return;
   const worth=tier==='correct'?1:tier==='partial'?0.5:0;
-  acsfClaimsFor(step).forEach(function(c){
+  ((q&&q.acsf)||acsfClaimsFor(step)).forEach(function(c){
     const b=TEST.ev.byInd[c[0]]||(TEST.ev.byInd[c[0]]={});
     const s=b[c[1]]||(b[c[1]]={seen:0,right:0,why:{}});
     s.seen++; s.right+=worth;
@@ -8091,7 +8102,7 @@ function testRecord(tier,pts,timedOut){
   // rather than when the question appeared, because a question that timed out
   // untouched says nothing about what the learner can work.
   if(timedOut) TEST.ev.timeouts++; else { TEST.ev.attempts++; acsfNoteMode(currentStudentQ); }
-  acsfCredit(step,tier);
+  acsfCredit(step,tier,currentStudentQ);
   // Also keep the run's answers by skill, for the report at the end. A rung is
   // a game, and every game belongs to one skill (GAME_INFO), so a ladder that
   // climbs through several games crosses several skills — the whole-app test
@@ -10389,7 +10400,10 @@ window.addEventListener('load',()=>{
     // A shared game link: apply whatever it carries, then open that game's own
     // start screen. An unknown game id leaves the learner on the picker rather
     // than on an empty card.
-    const game=params.get('game');
+    /* A game that has been folded into another still answers to its old id, so
+       a link a teacher wrote down before the merge opens the game that now
+       holds those questions rather than dropping them on the picker. */
+    const game=RETIRED_GAMES[params.get('game')]||params.get('game');
     // A section's All and its Test Yourself live on one pill each, retargeted
     // by whichever skill chip is showing — so a link to one has to put the
     // picker on that skill before the pill can be found at all.
