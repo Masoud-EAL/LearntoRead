@@ -44,6 +44,36 @@ partial: one round of one game is not the sustained performance Level 1 describe
 
 ---
 
+## How the level check chooses what to ask
+
+A staircase per indicator, not one ladder for all of them. Every indicator
+starts at Stage A. An indicator is asked **every** feature of the stage it is
+on, and climbs to the next stage only where it has shown that one. An indicator
+that does not show its stage stops there and is asked nothing harder, so Stage B
+questions for `.03` are never put to a learner who has not shown Stage A `.03`.
+That holds even when a question dealt for another indicator happens to claim a
+level the run has not reached: the claim is not counted.
+
+The run therefore has no fixed length. Measured over full runs: about **23
+questions** for a learner who shows nothing, and about **65** for one who
+clears every stage.
+
+Two kinds of question are deliberately outside the pool:
+
+- **The longer-word phonics rungs.** `wp2:gap` claims the same feature as
+  `wp1:gap`, word for word, and `wp2:word` the same feature as `wp1:word`,
+  whose own wording is *"extremely familiar words"* — which a longer word with
+  a digraph in it is not. `wp2:build` claims nothing at all.
+- **The sentence-with-a-gap rungs typed rather than tapped.** Typing the
+  missing word claims exactly the features tapping it claims — `.03` and `.08`,
+  which are comprehension features — so the typed version asks a learner to
+  spell as well and credits them for nothing extra. Writing is evidenced where
+  it is the task: Copy It, Spelling, Write the Number, Forms, Write a Sentence.
+
+Grammar Unscramble is also out: its only claim was the Level 1 *"uses basic
+structures and limited verb tenses"*, which went when Level 1 Writing did.
+
+
 ## Learning
 
 

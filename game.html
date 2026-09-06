@@ -7481,81 +7481,286 @@ function acsfClaimsFor(step){
   return out;
 }
 
-/* ══════════════ LEVEL CHECK — THE BANDS ══════════════
+/* Translate is deliberately absent from the pool below: it needs a first
+   language chosen on the start screen, and a level check should not depend on
+   one having been picked. The offsets into Clock, Shop and the rest are
+   chosen rather than incidental — odd is the doing half of each. */
+/* ══════════════ LEVEL CHECK — THE STEPS, AND THE STAIRCASE ══════════════
    The ordinary Test Yourself ladder is one game per rung, which is right for
    what it is for: it finds the hardest thing a learner can do and hands them
-   that game to practise. It is the wrong shape for an ACSF profile, because a
-   learner only ever meets six to ten of its eighteen rungs. Clock is rung ten
-   and Shop is rung thirteen, so anyone who settles low never attempts .10 or
-   .11 at all, and the profile could only ever say "not assessed" for them.
+   that game to practise.
 
-   So a band is a rung with a pool instead of a single game. The ladder still
-   moves exactly as it does in the ordinary test, and the three questions of a
-   round are still three questions; they are just drawn from across the band by
-   acsfPickSteps, which takes whatever is least covered so far. Difficulty
-   comes from the band, breadth comes from the picker, and no extra questions
-   are asked of the learner.
+   A level check used to be a second ladder of the same shape — one global
+   difficulty band that the whole run moved up and down together. That was
+   wrong in two ways. A learner is not one level: somebody can count money at
+   Stage B and not know a letter, and a single band cannot say so. And a band
+   asked whatever it happened to hold, so a learner who settled at band 2 was
+   asked some Stage A features, some Stage B ones, and never the rest of
+   either.
 
-   Band 0 is the floor, and it carries a numeracy doing step on purpose
-   (clock from:1 sets the hands, shop from:0 pays an exact amount). A learner
-   who never leaves band 0 still attempts .10 and .11, and getting them wrong
-   is a real result (that is what the sheet's NYA box is for) where never
-   being asked is not.
+   So the run is now a staircase per indicator rather than one ladder for all
+   of them. Every indicator starts at Stage A. An indicator is asked the
+   features of its current stage — all of them, not a sample — and only when
+   it has shown that stage does it move up to the next. An indicator that does
+   not show its stage stops there and is asked nothing harder, which is the
+   whole point: Stage B questions for .03 are not put to a learner who has not
+   shown Stage A .03, so the run spends its time establishing where they
+   actually are instead of proving twice over what they cannot do.
 
-   Offsets into Clock and Shop are chosen, not incidental: odd is the doing
-   half of each. Translate is deliberately absent, since it needs a first
-   language chosen on the start screen and a level check should not depend on
-   one being picked. */
-const ACSF_ROUNDS=12;
-const ACSF_BANDS=[
-  /* Where Is It is here as well as in band 1, because the floor has to carry a
-     step for every indicator a learner could be shown. It was the one band
-     with nothing claiming .11, so a learner who never left it came out "not
-     assessed" for .11 rather than "not shown" — and the difference between
-     those two is the difference between a gap in the learner and a gap in the
-     test. Only two banks evidence .11 at all; the other is Write the Number,
-     which is typed and belongs higher up. Up, down, left and right, tapped, is
-     the Stage A feature word for word. */
-  {label:'Letters, numbers and signs', pool:[
-    {type:'letter',mc:true},{type:'numbertap',mc:true},
-    {type:'signs',mc:true},{type:'oddone',mc:true},{type:'casematch',mc:true},
-    {type:'greetings',mc:true},{type:'devices',mc:true},{type:'position',mc:true},
-    {type:'shopsmall',mc:false,from:0},{type:'copyword',mc:false,from:0},
-    {type:'mylearning',mc:true}]},
-  {label:'Familiar words, money and devices', pool:[
-    {type:'clothes',mc:true},{type:'wp1:word',mc:true},{type:'numbertap',mc:true},
-    {type:'shopsmall',mc:false,from:0},{type:'instructions',mc:true},
-    {type:'digisymbols',mc:true},{type:'direction',mc:true},{type:'forms',mc:false},
-    {type:'position',mc:true},{type:'copyword',mc:false,from:0}]},
-  {label:'Sounds in words, copying, adding', pool:[
-    {type:'wp1:gap',mc:true},{type:'beginner',mc:true},{type:'copyword',mc:false,from:0},
-    {type:'addup',mc:false,from:0},{type:'numeralwrite',mc:false,from:0},
-    {type:'sightwords',mc:true},{type:'signs',mc:true},{type:'safeinfo',mc:false,from:0},
-    {type:'ordering',mc:false,from:0},{type:'prompts',mc:true}]},
-  {label:'Reading a message, money and order', pool:[
-    {type:'sms',mc:true},{type:'wp1:build',mc:false},{type:'addmoney',mc:false,from:0},
-    {type:'ordering',mc:false,from:0},{type:'questionwords',mc:true},
-    {type:'copyword',mc:false,from:1},{type:'prompts',mc:true},
-    {type:'notice',mc:true},{type:'ordinals',mc:true,from:0},{type:'forms',mc:false}]},
-  {label:'Writing what you hear, forms and time', pool:[
-    {type:'beginner',mc:false},{type:'forms',mc:false},{type:'spelling',mc:false},
-    {type:'numeralwrite',mc:false,from:1},{type:'digitaltime',mc:true,from:0},
-    {type:'calendar',mc:true},{type:'punctuation',mc:true,from:0},
-    {type:'casematch',mc:false,from:1},{type:'tableread',mc:true,from:0},
-    {type:'safeinfo',mc:false,from:1}]},
-  {label:'Longer words, hundreds, sentences', pool:[
-    {type:'wp2:gap',mc:true},{type:'elementary',mc:true},{type:'numbertap',mc:true,from:1},
-    {type:'addup',mc:false,from:1},{type:'placevalue',mc:true},
-    {type:'modelsentence',mc:false},{type:'gramscramble',mc:false},
-    {type:'devices',mc:true,from:1},{type:'tableread',mc:true,from:1},
-    {type:'ordering',mc:false,from:1}]},
-  {label:'Writing sentences and working in hundreds', pool:[
-    {type:'elementary',mc:false},{type:'modelsentence',mc:false},
-    {type:'numeralwrite',mc:false,from:1},{type:'addmoney',mc:false,from:1},
-    {type:'punctuation',mc:false,from:1},{type:'shop',mc:false,from:1},
-    {type:'digitaltime',mc:false,from:2},{type:'unscramble',mc:false},
-    {type:'wp2:word',mc:true},{type:'sms',mc:true},{type:'forms',mc:false}]},
+   The run therefore has no fixed length. A learner who shows nothing is asked
+   each Stage A feature and stops, which is short. A learner who clears Stage
+   A everywhere is asked all of Stage B as well, which is long, and worth it.
+
+   These are the steps it draws from — a bank, how hard, and whether it is
+   tapped or typed. Two kinds are deliberately absent:
+
+     The longer-word phonics rungs. wp2:gap claims the same feature as
+     wp1:gap, word for word, and wp2:word the same feature as wp1:word, whose
+     own wording is "extremely familiar words" — which a longer word with a
+     digraph in it is not. wp2:build claims nothing at all. They were three
+     harder questions buying no coverage.
+
+     The sentence-with-a-gap rungs typed rather than tapped. Typing the
+     missing word claims exactly the features tapping it claims — they are
+     comprehension features, .03 and .08 — so the typed version asks a learner
+     to spell as well and credits them for nothing extra. Writing is evidenced
+     where it is actually the task: Copy It, Spelling, Write the Number, Forms
+     and Write a Sentence. */
+const ACSF_POOL=[
+  // Letters, sounds and print
+  {type:'letter',mc:true},{type:'casematch',mc:true},{type:'casematch',mc:false,from:1},
+  {type:'wp1:gap',mc:true},{type:'wp1:word',mc:true},{type:'wp1:build',mc:false},
+  {type:'sightwords',mc:true},{type:'direction',mc:true},
+  // Reading
+  {type:'signs',mc:true},{type:'oddone',mc:true},{type:'sms',mc:true},
+  {type:'notice',mc:true},{type:'questionwords',mc:true},{type:'beginner',mc:true},
+  {type:'elementary',mc:true},{type:'tableread',mc:true,from:0},{type:'tableread',mc:true,from:1},
+  // Writing
+  {type:'copyword',mc:false,from:0},{type:'copyword',mc:false,from:1},
+  {type:'spelling',mc:false},{type:'numeralwrite',mc:false,from:0},
+  {type:'numeralwrite',mc:false,from:1},{type:'punctuation',mc:true,from:0},
+  {type:'punctuation',mc:false,from:1},{type:'modelsentence',mc:false},
+  /* Grammar Unscramble is not here. Its only claim was the Level 1 "uses basic
+     structures and limited verb tenses", which came out when Level 1 Writing
+     did, and a step that claims nothing can never serve a stage. It is still a
+     game; it is just not evidence of anything the profile reports. */
+  {type:'unscramble',mc:false},{type:'forms',mc:false},
+  // Numeracy
+  {type:'numbertap',mc:true},{type:'numbertap',mc:true,from:1},
+  {type:'shopsmall',mc:false,from:0},{type:'shop',mc:false,from:1},
+  {type:'addup',mc:false,from:0},{type:'addup',mc:false,from:1},
+  {type:'addmoney',mc:false,from:0},{type:'addmoney',mc:false,from:1},
+  {type:'ordering',mc:false,from:0},{type:'ordering',mc:false,from:1},
+  {type:'placevalue',mc:true},{type:'ordinals',mc:true,from:0},{type:'position',mc:true},
+  {type:'digitaltime',mc:true,from:0},{type:'digitaltime',mc:false,from:2},
+  {type:'calendar',mc:true},
+  // Using a device
+  {type:'devices',mc:true},{type:'devices',mc:true,from:1},{type:'digisymbols',mc:true},
+  {type:'prompts',mc:true},{type:'safeinfo',mc:false,from:0},{type:'safeinfo',mc:false,from:1},
+  {type:'instructions',mc:true},
+  // Learning
+  {type:'mylearning',mc:true},{type:'greetings',mc:true},
 ];
+
+/* The stages a level check walks, in order, and the one an indicator starts
+   on. Level 1 is a stage like the others: it is only reached by an indicator
+   that has shown Stage B, and only where the ceiling allows it at all. */
+const ACSF_STAGE_ORDER=['PLA','PLB','L1'];
+/* The most questions a level check will ask before stopping regardless. A
+   learner who clears every stage everywhere would be asked around eighty; this
+   is the guard against a bank that cannot deal what a stage still needs. */
+const ACSF_MAX_QUESTIONS=150;
+
+/* Every feature the pool can put in front of a learner for one indicator at
+   one stage, and which steps show it. Worked out once from the claim map and
+   the pool together, so neither can drift from the other. */
+let ACSF_STAGE_MAP=null;
+function acsfStageMap(){
+  if(ACSF_STAGE_MAP) return ACSF_STAGE_MAP;
+  const m={};
+  ACSF_POOL.forEach(function(st){
+    acsfClaimsFor(st).forEach(function(c){
+      const k=c[0]+'|'+c[1];
+      const e=m[k]||(m[k]={feats:{},steps:[]});
+      (e.feats[c[2]]=e.feats[c[2]]||[]).push(acsfStepKey(st));
+      if(e.steps.indexOf(st)<0) e.steps.push(st);
+    });
+  });
+  return (ACSF_STAGE_MAP=m);
+}
+function acsfStageFeatures(ind,lvl){
+  const e=acsfStageMap()[ind+'|'+lvl];
+  return e?Object.keys(e.feats):[];
+}
+/* The indicators a level check walks. Oral Communication has no ceiling
+   because nothing here records speech, so it is not one of them. */
+function acsfWalked(){
+  return ACSF_ORDER.filter(function(i){ return !!ACSF_INDICATORS[i].ceiling; });
+}
+function acsfNewPlan(){
+  const stage={};
+  acsfWalked().forEach(function(i){ stage[i]=acsfFirstStage(i); });
+  return {stage:stage, asked:{}, done:{}, qs:{}};
+}
+/* The first stage an indicator has any questions for. Almost always PLA; this
+   skips a stage the pool simply cannot ask so an indicator is not closed for
+   failing something it was never shown. */
+function acsfFirstStage(ind){
+  const top=acsfLvlNo(ACSF_INDICATORS[ind].ceiling);
+  for(let i=0;i<ACSF_STAGE_ORDER.length;i++){
+    const lvl=ACSF_STAGE_ORDER[i];
+    if(acsfLvlNo(lvl)>top) break;
+    if(acsfStageFeatures(ind,lvl).length) return lvl;
+  }
+  return null;
+}
+function acsfNextStage(ind,lvl){
+  const top=acsfLvlNo(ACSF_INDICATORS[ind].ceiling);
+  for(let i=ACSF_STAGE_ORDER.indexOf(lvl)+1;i<ACSF_STAGE_ORDER.length;i++){
+    const nx=ACSF_STAGE_ORDER[i];
+    if(acsfLvlNo(nx)>top) return null;
+    if(acsfStageFeatures(ind,nx).length) return nx;
+  }
+  return null;
+}
+/* The stages still being asked about: an indicator, the stage it is on, and
+   the features of that stage it has not been shown yet. */
+function acsfOpenStages(){
+  const plan=TEST.plan, out=[];
+  Object.keys(plan.stage).forEach(function(ind){
+    const lvl=plan.stage[ind];
+    if(!lvl) return;
+    const left=acsfStageFeatures(ind,lvl).filter(function(f){
+      return !plan.asked[ind+'|'+lvl+'|'+f];
+    });
+    out.push({ind:ind, lvl:lvl, left:left});
+  });
+  return out;
+}
+/* What a step is worth right now: the features it would show that an open
+   stage still needs. A step serving three indicators at once outranks one
+   serving a single feature, which is what keeps the run from being eleven
+   separate tests bolted together. */
+function acsfStepValue(st,open){
+  let v=0;
+  const cl=acsfClaimsFor(st);
+  open.forEach(function(o){
+    cl.forEach(function(c){
+      if(c[0]===o.ind&&c[1]===o.lvl&&o.left.indexOf(c[2])>=0) v++;
+    });
+  });
+  return v;
+}
+/* The next few steps to ask. Coverage first, then whatever has waited longest,
+   so a stage that needs one more feature is finished rather than circled. */
+function acsfPickNext(n){
+  const open=acsfOpenStages();
+  if(!open.length) return [];
+  const used=TEST.ev.used;
+  const ranked=ACSF_POOL.map(function(st,i){
+    return {st:st, v:acsfStepValue(st,open), last:used[acsfStepKey(st)]||0, i:i};
+  }).filter(function(r){ return r.v>0; })
+    .sort(function(a,b){ return b.v-a.v||a.last-b.last||a.i-b.i; });
+  /* Nothing left that would show a feature this run still needs, but a stage
+     is short of the evidence a verdict takes. Top it up from the steps that
+     serve it rather than stopping on one question. */
+  const pool=ranked.length?ranked:ACSF_POOL.map(function(st,i){
+      return {st:st, v:acsfStepTops(st,open), last:used[acsfStepKey(st)]||0, i:i};
+    }).filter(function(r){ return r.v>0; })
+      .sort(function(a,b){ return b.v-a.v||a.last-b.last||a.i-b.i; });
+  const out=pool.slice(0,n).map(function(r){ return r.st; });
+  out.forEach(function(st){ used[acsfStepKey(st)]=++TEST.ev.tick; });
+  return out;
+}
+/* A step's worth to an open stage that has seen every feature but still has
+   less evidence than a verdict needs. */
+function acsfStepTops(st,open){
+  let v=0;
+  acsfClaimsFor(st).forEach(function(c){
+    open.forEach(function(o){
+      if(c[0]!==o.ind||c[1]!==o.lvl) return;
+      const b=TEST.ev.byInd[o.ind], e=b&&b[o.lvl];
+      if(!e||e.seen<ACSF_MIN_EVIDENCE) v++;
+    });
+  });
+  return v;
+}
+/* After a round: every open stage that has been asked everything it has, and
+   has enough evidence to judge, is judged. Shown it, and the indicator climbs
+   to the next stage. Not shown it, and the indicator stops there and is asked
+   nothing harder. A stage that can no longer reach the mark however the rest
+   of it goes is closed now rather than asked out in full, which is what makes
+   a run short for a learner who is not ready for it. */
+const ACSF_MERCY_QS=3;
+function acsfReviewStages(){
+  const plan=TEST.plan;
+  // The same evidence the panel will report, so what the run decides to ask
+  // next and what it finally prints cannot disagree.
+  const sig=acsfSignalRows(TEST.ev);
+  acsfOpenStages().forEach(function(o){
+    const key=o.ind+'|'+o.lvl;
+    const e=acsfEvidenceAt(o.ind,o.lvl,TEST.ev.byInd,sig)||{seen:0,right:0,why:{}};
+    const meta=ACSF_INDICATORS[o.ind];
+    const enough=e.seen>=ACSF_MIN_EVIDENCE;
+    if(!o.left.length&&enough){
+      // Everything this stage has to show has been shown. Judge it: shown, and
+      // the indicator climbs; not shown, and it stops here.
+      const st=acsfLevelState(e,meta);
+      plan.done[key]=st;
+      plan.stage[o.ind]=st==='yes'?acsfNextStage(o.ind,o.lvl):null;
+      return;
+    }
+    /* The mercy rule, and it is deliberately reluctant. The point of the
+       staircase is that a learner who is at Stage A is asked every Stage A
+       feature, so one wrong answer must not close a stage — with a
+       three-quarters bar and a stage of four features, a single wrong answer
+       is already arithmetically fatal, and closing there would ask a learner
+       one question and write off the whole indicator. So a stage is only
+       abandoned once it has had a fair few questions AND cannot come good
+       however the rest of it goes. */
+    const qn=plan.qs[key]||0;
+    const room=Math.max(o.left.length, enough?0:ACSF_MIN_EVIDENCE-e.seen);
+    const best=(e.right+room)/Math.max(1,e.seen+room);
+    if(qn>=ACSF_MERCY_QS&&best<0.75){
+      plan.done[key]='no';
+      plan.stage[o.ind]=null;
+    }
+  });
+}
+/* Whether a claim is one this run is entitled to count.
+   A step is picked for the stage it serves, but a step can claim several
+   levels of the same indicator at once — Messages carries .03 at Stage B and
+   at Level 1 in the one question. Without this, a learner who did not show
+   Stage A .03 would still pick up Stage B .03 credit from a question dealt for
+   something else, which is the very thing the staircase exists to prevent.
+   A stage counts once the run has reached it: it is the one the indicator is
+   on now, or one it has already been through and settled. */
+function acsfStageOpen(ind,lvl){
+  if(!TEST||!TEST.plan) return true;          // an ordinary test has no staircase
+  if(TEST.plan.done[ind+'|'+lvl]) return true; // already been asked and settled
+  return TEST.plan.stage[ind]===lvl;
+}
+/* Recorded as each question is dealt, so a feature is not asked twice while
+   a stage still has ones nobody has seen. Only for the stages this run has
+   reached, or a stage it never opened would look as though it had been. */
+function acsfNoteAsked(step){
+  if(!TEST||!TEST.plan) return;
+  acsfClaimsFor(step).forEach(function(c){
+    if(!acsfStageOpen(c[0],c[1])) return;
+    TEST.plan.asked[c[0]+'|'+c[1]+'|'+c[2]]=1;
+  });
+}
+/* What the round card says a level check is doing, in place of a rung label. */
+function acsfProgressLabel(){
+  const open=acsfOpenStages();
+  if(!open.length) return 'Every skill checked';
+  const at={};
+  open.forEach(function(o){ at[o.lvl]=(at[o.lvl]||0)+1; });
+  const parts=ACSF_STAGE_ORDER.filter(function(l){ return at[l]; })
+    .map(function(l){ return at[l]+' at '+acsfLvlText(l); });
+  return 'Still checking: '+parts.join(', ');
+}
+
 /* The test games are addressed like a section's All pill — the type string
    carries the skill, so nothing needs hidden state. */
 function isTestType(t){ return typeof t==='string'&&t.indexOf('test:')===0; }
@@ -7785,9 +7990,10 @@ const UNSHAREABLE_GAMES=['custom'];
 function gameInfoFor(type){
   if(isLevelCheck(type)) return {skill:null, skillLabel:'For your teacher',
     name:'Level Check',
-    blurb:ACSF_ROUNDS+' rounds of '+TEST_PER_ROUND+' questions, spread across every skill so'
-         +' that nothing is left untested. It ends with an indicative ACSF level a teacher can'
-         +' start from. Longer and wider than Test Yourself.'};
+    blurb:'Rounds of '+TEST_PER_ROUND+' questions, one skill at a time, going up a stage only'
+         +' where the learner has shown the one below. It ends when every skill has been'
+         +' settled, so it is short for a learner who is not ready for it and long for one'
+         +' who is. It gives an indicative ACSF level a teacher can start from.'};
   const sid=isTestType(type)?testSectionId(type):null;
   if(sid) return {skill:sid==='*'?null:sid,
                   skillLabel:sid==='*'?'Every skill':undefined,
@@ -7986,9 +8192,10 @@ function updateSoloCountDisplay(){
   }
   if(isTestType(soloSelectedType)){
     display.textContent=isLevelCheck(soloSelectedType)
-      ?ACSF_ROUNDS+' rounds of '+TEST_PER_ROUND+' questions, spread across every skill'
-        +' so that nothing is left untested. It gets harder or easier as you go. '
-        +'The seconds are for tapping an answer; writing one gets up to three times as long.'
+      ?'Rounds of '+TEST_PER_ROUND+' questions. Each skill is asked every feature of the'
+        +' stage it is on, and moves up only where the learner has shown that stage, so the'
+        +' test has no fixed length. The seconds are for tapping an answer; writing one gets'
+        +' up to three times as long.'
       :TEST_ROUNDS+' rounds of '+TEST_PER_ROUND
         +' questions, from '+testSkillLabel(soloSelectedType).toLowerCase()
         +'. It gets harder or easier as you go.';
@@ -8066,7 +8273,7 @@ function showSoloResult(submittedAns,correctAns,timeLeft,timedOut){
   // In a test the run is measured in rounds, not in a single list of
   // questions, so both lines count within the round the learner is in.
   document.getElementById('result-rank').textContent=testActive()
-    ?'Round '+TEST.round+' of '+testRounds()
+    ?(TEST.acsf?('Round '+TEST.round):('Round '+TEST.round+' of '+testRounds()))
     :'Question '+(soloQIdx+1)+' of '+soloQuestions.length;
   document.getElementById('solo-next-wrap').style.display='';
   document.getElementById('solo-progress').textContent=testActive()
@@ -8163,22 +8370,34 @@ let testPlayersListener=null;
 
 function newTestGame(mode,type,acsf){
   resetGenSeen();
-  // A level check swaps the ladder for the bands and runs two rounds longer.
-  // Everything downstream of this (the move, the round card, the class
-  // scoreboard) reads TEST.ladder and TEST.rounds and needs no branch of its
-  // own, because a band carries a label exactly as a rung does.
-  // From the type, so the classroom and the teacher's own screen get the bands
-  // without every caller having to remember to ask for them.
-  const bands=!!acsf||isLevelCheck(type);
-  return {mode:mode, type:type, acsf:bands,
-          ladder:bands?ACSF_BANDS:(ladderFor(type)||[]),
-          rounds:bands?ACSF_ROUNDS:TEST_ROUNDS,
+  /* A level check has no ladder and no fixed length: it walks a staircase per
+     indicator and stops when every one of them has stopped. Taken from the
+     type, so the classroom and the teacher's own screen get it without every
+     caller having to remember to ask. */
+  const walk=!!acsf||isLevelCheck(type);
+  return {mode:mode, type:type, acsf:walk,
+          ladder:walk?[]:(ladderFor(type)||[]),
+          plan:walk?acsfNewPlan():null,
+          rounds:walk?0:TEST_ROUNDS,
           level:0, round:1, tally:[], roundPts:0, lastMove:0,
           bySkill:{}, secs:TIMER_DURATION,
           roundSteps:[], ev:newAcsfEvidence()};
 }
-function testStep(){ return testStepAt(TEST.ladder,TEST.level); }
+function testStep(){
+  // A level check's questions each carry their own step (roundSteps), so there
+  // is no single rung the round is "at". The label is what it is working on.
+  if(TEST&&TEST.acsf) return {type:null, label:acsfProgressLabel()};
+  return testStepAt(TEST.ladder,TEST.level);
+}
+/* A level check is over when nothing is still being asked about, so it has no
+   number of rounds to count down. Everything that shows progress asks
+   testFinished() instead. */
 function testRounds(){ return (TEST&&TEST.rounds)||TEST_ROUNDS; }
+function testFinished(){
+  if(!TEST) return true;
+  if(!TEST.acsf) return TEST.round>=testRounds();
+  return !acsfOpenStages().length||TEST.ev.asked>=ACSF_MAX_QUESTIONS;
+}
 
 /* ── LEVEL CHECK — EVIDENCE ──
    Everything the profile is built from. byInd is the count of what was asked
@@ -8206,7 +8425,22 @@ function acsfCredit(step,tier,q,ans){
     return normalize(d)===normalize(ans);
   }));
   const half=declined?0:tier==='correct'?1:tier==='partial'?0.5:0;
-  ((q&&q.acsf)||acsfClaimsFor(step)).forEach(function(c){
+  const claims=((q&&q.acsf)||acsfClaimsFor(step))
+    .filter(function(c){ return acsfStageOpen(c[0],c[1]); });
+  /* How many questions this indicator has had at this stage, counted once for
+     the question however many of that stage's features it happens to show.
+     The staircase's mercy rule counts questions; `seen` counts features, and
+     one question can carry several. */
+  if(TEST.plan){
+    const once={};
+    claims.forEach(function(c){
+      const pk=c[0]+'|'+c[1];
+      if(once[pk]) return;
+      once[pk]=1;
+      TEST.plan.qs[pk]=(TEST.plan.qs[pk]||0)+1;
+    });
+  }
+  claims.forEach(function(c){
     /* A feature whose own words are "accurately", "leaves spaces between
        words" or "uses upper and lower case" is either shown or it is not. A
        copy with the right letters and the wrong capitals is half an answer,
@@ -8216,6 +8450,7 @@ function acsfCredit(step,tier,q,ans){
     const worth=c[4]?(!declined&&tier==='correct'?1:0):half;
     const b=TEST.ev.byInd[c[0]]||(TEST.ev.byInd[c[0]]={});
     const s=b[c[1]]||(b[c[1]]={seen:0,right:0,why:{}});
+
     s.seen++; s.right+=worth;
     const w=s.why[c[2]]||(s.why[c[2]]={n:0,ok:0,partial:!!c[3]});
     w.n++; w.ok+=worth;
@@ -8243,33 +8478,8 @@ function acsfNoteMode(q){
   if(m) TEST.ev.modes[m]=(TEST.ev.modes[m]||0)+1;
 }
 
-/* ── LEVEL CHECK — THE PICKER ──
-   Three questions from across the band, taking whatever is least covered so
-   far. `need` is the biggest shortfall against ACSF_MIN_EVIDENCE among the
-   indicators a step would credit, so a step that is the only route to
-   something untouched outranks one that would deepen what is already known.
-   Ties go to whatever has waited longest, then to the pool's own order, so a
-   learner who spends the whole run on one band still sweeps it rather than
-   seeing the same three games twelve times. */
+/* One step's identity, for remembering which have been dealt lately. */
 function acsfStepKey(st){ return st.type+(st.mc?'|mc':'|w')+(st.from!=null?'|'+st.from:''); }
-function acsfNeed(st){
-  const cl=acsfClaimsFor(st);
-  let worst=0;
-  cl.forEach(function(c){
-    const b=TEST.ev.byInd[c[0]], s=b&&b[c[1]];
-    worst=Math.max(worst,ACSF_MIN_EVIDENCE-(s?s.seen:0));
-  });
-  return worst;
-}
-function acsfPickSteps(band,n){
-  const used=TEST.ev.used;
-  const ranked=band.pool.map(function(st,i){
-    return {st:st, need:acsfNeed(st), last:used[acsfStepKey(st)]||0, i:i};
-  }).sort(function(a,b){ return b.need-a.need||a.last-b.last||a.i-b.i; });
-  const out=ranked.slice(0,n).map(function(r){ return r.st; });
-  out.forEach(function(st){ used[acsfStepKey(st)]=++TEST.ev.tick; });
-  return out;
-}
 
 /* Three questions at one rung. Clock and Shop are asked for a slice of their
    own ladder rather than the first three rounds they would otherwise deal;
@@ -8293,10 +8503,14 @@ function testStartRound(){
     // bank, so the options are attached per question: within a round a tap
     // round and a typed round can sit side by side.
     qs=[];
-    acsfPickSteps(step,TEST_PER_ROUND).forEach(function(st){
+    acsfPickNext(TEST_PER_ROUND).forEach(function(st){
       const q=testQuestions(st,1)[0];
       if(!q) return;
       if(st.mc) attachMcChoices([q],st.type);
+      // Marked asked as it is dealt, so the next pick moves on to a feature
+      // nobody has seen rather than dealing the same one three times in a
+      // round.
+      acsfNoteAsked(st);
       qs.push(q); TEST.roundSteps.push(st);
     });
   } else {
@@ -8552,6 +8766,22 @@ function acsfAllFeatures(ind,lvl){
   }
   return Object.keys(ACSF_FEATURE_INDEX[ind+'|'+lvl]||{});
 }
+/* One indicator at one level, question evidence and behavioural signal added
+   together. A signal stands in where there is no question evidence and adds to
+   it where there is: .13 has message questions in the claim map and five ways
+   of working a device in the signals, and a verdict built from either half
+   alone is wrong. Shared, so the staircase that decides what to ask next and
+   the panel that reports it are reading the same thing. */
+function acsfEvidenceAt(ind,lvl,byInd,sig){
+  const a=(byInd&&byInd[ind]||{})[lvl], b=((sig&&sig[ind])||{})[lvl];
+  const aOk=a&&a.seen, bOk=b&&b.seen;
+  if(!aOk&&!bOk) return null;
+  if(!bOk) return a;
+  if(!aOk) return b;
+  const why={};
+  [a,b].forEach(function(x){ Object.keys(x.why||{}).forEach(function(k){ why[k]=x.why[k]; }); });
+  return {seen:a.seen+b.seen, right:a.right+b.right, why:why};
+}
 function acsfRow(ind,byInd,sig){
   const meta=ACSF_INDICATORS[ind];
   const row={ind:ind, code:'.'+ind, skill:meta.skill, name:meta.name,
@@ -8561,22 +8791,7 @@ function acsfRow(ind,byInd,sig){
     row.state='na'; row.line='Not assessable by this app'; row.sub=meta.capNote;
     return row;
   }
-  const src=byInd[ind]||{};
-  const extra=(sig&&sig[ind])||{};
-  // A signal row stands in where there is no question-level evidence and adds
-  // to it where there is, so the two are summed rather than one chosen: .13
-  // has message questions in the map and five ways of working a device in the
-  // signals, and a row built from either half alone is wrong.
-  const at=function(lvl){
-    const a=src[lvl], b=extra[lvl];
-    const aOk=a&&a.seen, bOk=b&&b.seen;
-    if(!aOk&&!bOk) return null;
-    if(!bOk) return a;
-    if(!aOk) return b;
-    const why={};
-    [a,b].forEach(function(x){ Object.keys(x.why||{}).forEach(function(k){ why[k]=x.why[k]; }); });
-    return {seen:a.seen+b.seen, right:a.right+b.right, why:why};
-  };
+  const at=function(lvl){ return acsfEvidenceAt(ind,lvl,byInd,sig); };
   let demo=null, towards=null, sawAnything=false, sawWrong=false;
   ACSF_STEPS.forEach(function(lvl){
     const s=at(lvl);
@@ -8867,17 +9082,25 @@ function testEndRound(){
      holding a question that could not be failed, which is decided on the ones
      that could be. A round of nothing but those moves nowhere. */
   const closed=TEST.tally.filter(function(t){ return t!=='open'; }).length;
-  const move=!closed?0
-    :score*6>=closed*5?2
-    :score*2>=closed?1
-    :score*6>=closed?-1:-2;
-  const before=TEST.level;
-  TEST.level=Math.max(0,Math.min(TEST.ladder.length-1,TEST.level+move));
-  // What actually happened, not what was asked for: at the bottom of a ladder
-  // a bad round cannot go anywhere, and the card must not claim it did.
-  TEST.lastMove=TEST.level-before;
+  if(TEST.acsf){
+    /* No rung to move. Each indicator has just been asked about, so each one
+       is judged on its own: the ones that showed their stage climb to the
+       next, the ones that did not stop where they are. */
+    acsfReviewStages();
+    TEST.lastMove=0;
+  } else {
+    const move=!closed?0
+      :score*6>=closed*5?2
+      :score*2>=closed?1
+      :score*6>=closed?-1:-2;
+    const before=TEST.level;
+    TEST.level=Math.max(0,Math.min(TEST.ladder.length-1,TEST.level+move));
+    // What actually happened, not what was asked for: at the bottom of a
+    // ladder a bad round cannot go anywhere, and the card must not claim it.
+    TEST.lastMove=TEST.level-before;
+  }
   TEST.ev.trend.push(score);
-  const last=TEST.round>=testRounds();
+  const last=testFinished();
   if(last){ TEST.ev.finished=true; acsfSaveRun(); }
   if(TEST.mode==='class') writeTestProgress(last);
   showTestCard(score,last);
@@ -8900,7 +9123,10 @@ function showTestCard(score,final){
   const ab=document.getElementById('test-acsf-btn');
   if(ab) ab.style.display=TEST.acsf?'':'none';
   document.getElementById('test-round-no').textContent=
-    final?'Test finished':'Round '+TEST.round+' of '+testRounds();
+    final?'Test finished'
+      // A level check runs until every indicator has stopped, so there is no
+      // total to count towards and it would be a made-up number to print one.
+      :TEST.acsf?('Round '+TEST.round):('Round '+TEST.round+' of '+testRounds());
   // Three dots, one per question, in the order they were answered.
   /* A question that could not be got wrong gets no dot: it has no outcome to
      show, and a filled one would say the learner got something right. */
@@ -8921,14 +9147,20 @@ function showTestCard(score,final){
   const mv=document.getElementById('test-move');
   if(final){
     mv.className='test-move level';
-    mv.innerHTML='<span class="test-move-lbl">You are working at</span>'
+    // A level check does not end on a rung, so it does not claim one. The
+    // profile behind the button is what it has to say.
+    mv.innerHTML='<span class="test-move-lbl">'
+      +(TEST.acsf?'Finished':'You are working at')+'</span>'
       +'<span class="test-move-step"></span>';
-    mv.querySelector('.test-move-step').textContent=step.label;
+    mv.querySelector('.test-move-step').textContent=
+      TEST.acsf?(TEST.ev.asked+' questions, every skill checked'):step.label;
   } else {
-    mv.className='test-move '+(TEST.lastMove>0?'up':TEST.lastMove<0?'down':'same');
+    mv.className='test-move '+(TEST.acsf?'same':(TEST.lastMove>0?'up':TEST.lastMove<0?'down':'same'));
     mv.innerHTML='<span class="test-move-lbl"></span><span class="test-move-step"></span>';
-    mv.querySelector('.test-move-lbl').textContent=
-      TEST.lastMove>0?'↑ Harder now':TEST.lastMove<0?'↓ A bit easier':'→ Same level';
+    /* A level check moves no rung, so "same level" would be saying nothing
+       about nothing. What it has instead is how much is left to settle. */
+    mv.querySelector('.test-move-lbl').textContent=TEST.acsf?''
+      :TEST.lastMove>0?'↑ Harder now':TEST.lastMove<0?'↓ A bit easier':'→ Same level';
     mv.querySelector('.test-move-step').textContent=step.label;
   }
   const rbox=document.getElementById('test-report');
