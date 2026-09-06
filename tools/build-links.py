@@ -98,6 +98,13 @@ TESTS = [
 ]
 GAMES += [(slug, 'test:' + sec, title, TEST_BLURB % what) for slug, sec, title, what in TESTS]
 
+# The level check is a test type too, but it is not one of the per-skill ones:
+# it covers every skill on purpose, and it has its own blurb because it is for
+# a teacher rather than for the learner deciding what to practise next.
+GAMES += [('level-check', 'test:level', 'Level Check',
+           '12 rounds of 3 questions, spread across every skill so that nothing is left '
+           'untested. It ends with an indicative ACSF level a teacher can start from.')]
+
 TAIL = ' Free English practice for adult learners. No sign-up.'
 
 PAGE = """<!DOCTYPE html>

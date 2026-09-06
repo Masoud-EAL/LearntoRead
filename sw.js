@@ -61,6 +61,8 @@ const OPTIONAL = [
   './letter-names',
   './letter-sounds.html',
   './letter-sounds',
+  './level-check.html',
+  './level-check',
   './messages.html',
   './messages',
   './months.html',

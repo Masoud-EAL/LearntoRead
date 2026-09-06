@@ -1696,6 +1696,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="forms" class="q-type-tab" onclick="selectSoloType('forms',this)">📋 Forms</button>
         <button data-type="all" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">✨ All games</button>
         <button data-type="test:*" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">🎯 Test Yourself</button>
+        <!-- Its own entry rather than a toggle buried on the Test Yourself
+             card. They answer two different questions: Test Yourself tells a
+             learner what to practise next, and this one tells a teacher where
+             somebody is starting from. The type carries the mode, so there is
+             nothing to switch on and nothing to forget to switch on. -->
+        <button data-type="test:level" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">📋 Level Check</button>
         <button data-type="custom" class="q-type-tab" id="solo-custom-tab" onclick="showBankPicker('solo',this)">📚 Custom</button>
       </div>
       </div><!-- /.setup-main -->
@@ -1763,17 +1769,6 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <div>
           <div class="mc-toggle-txt">🔵 Multiple Choice (4 options)</div>
           <div class="mc-toggle-sub">Listen & tap — no typing. Great for early readers.</div>
-        </div>
-      </div>
-      <!-- Only ever on a Test Yourself card, where the Multiple Choice row
-           above is hidden: the level check decides tapping against typing step
-           by step, because which one a learner can manage is itself part of
-           what is being found out. -->
-      <div class="mc-toggle-wrap acsf-toggle" id="solo-acsf-toggle" onclick="toggleAcsfMode()">
-        <div class="mc-switch"></div>
-        <div>
-          <div class="mc-toggle-txt">🎯 Level check</div>
-          <div class="mc-toggle-sub">Covers every skill and ends with an indicative ACSF level for the teacher. Two rounds longer.</div>
         </div>
       </div>
       <div class="launch-nums" id="solo-limit-row">
@@ -1902,6 +1897,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
             <button data-type="forms" class="q-type-tab" onclick="selectQType('forms',this)">📋 Forms</button>
             <button data-type="all" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">✨ All games</button>
         <button data-type="test:*" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">🎯 Test Yourself</button>
+        <button data-type="test:level" class="q-type-tab" onclick="selectQType(this.dataset.type,this)">📋 Level Check</button>
             <button data-type="custom" class="q-type-tab" id="teacher-custom-tab" onclick="showBankPicker('teacher',this)">📚 Custom</button>
           </div>
           <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;" id="q-count-display">Loading…</div>
@@ -2264,8 +2260,11 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       <!-- Quiet, and second. The learner's card is about what they did; the
            ACSF codes behind this button are for whoever is placing them, and
            putting them on the card itself would hand a pre-level reader a page
-           of levels they cannot read and did not ask for. -->
-      <button class="btn btn-ghost btn-sm" onclick="openAcsfPanel()">📋 For your teacher</button>
+           of levels they cannot read and did not ask for.
+           Only after a level check. An ordinary Test Yourself run reaches six
+           or seven of the twelve indicators, and a profile built from that is
+           the half-honest thing this button exists to avoid. -->
+      <button class="btn btn-ghost btn-sm" id="test-acsf-btn" onclick="openAcsfPanel()">📋 For your teacher</button>
       <button class="btn btn-ghost btn-sm" onclick="quitTestGame()">← Choose another game</button>
     </div>
     <div class="test-acts class-only">
@@ -5754,16 +5753,8 @@ function setMcMode(on){
    ladder, so that the profile at the end has something to say about every
    indicator rather than only the ones the learner's own route happened to
    cross. Off by default, since the ordinary test is what most people want. */
-let acsfMode=false;
-function setAcsfMode(on){
-  acsfMode=!!on;
-  const e=document.getElementById('solo-acsf-toggle');
-  if(e) e.classList.toggle('on',acsfMode);
-}
-function toggleAcsfMode(){
-  setAcsfMode(!acsfMode);
-  if(soloMode) onSoloSettingChange();
-}
+
+
 
 /* ══════════════ DICE — setup ══════════════
    The target and the wrong-answer rule are shared between the solo and the
@@ -7468,6 +7459,11 @@ const ACSF_BANDS=[
 /* The test games are addressed like a section's All pill — the type string
    carries the skill, so nothing needs hidden state. */
 function isTestType(t){ return typeof t==='string'&&t.indexOf('test:')===0; }
+/* The level check is a test type like the rest, and it is the only one that
+   runs the bands. Keeping the mode in the type rather than in a separate flag
+   means a link, the picker and the run itself cannot disagree about which of
+   the two a learner is sitting. */
+function isLevelCheck(t){ return t==='test:level'; }
 function testSectionId(t){ return isTestType(t)?t.slice(5):null; }
 function ladderFor(type){ return TEST_LADDERS[testSectionId(type)]||null; }
 /* The skill's own name, for the launch card and the teacher's screen. */
@@ -7683,6 +7679,11 @@ const UNSHAREABLE_GAMES=['custom'];
    worked out from the skill they are currently pointing at rather than listed
    thirty-three more times in GAME_INFO. */
 function gameInfoFor(type){
+  if(isLevelCheck(type)) return {skill:null, skillLabel:'For your teacher',
+    name:'Level Check',
+    blurb:ACSF_ROUNDS+' rounds of '+TEST_PER_ROUND+' questions, spread across every skill so'
+         +' that nothing is left untested. It ends with an indicative ACSF level a teacher can'
+         +' start from. Longer and wider than Test Yourself.'};
   const sid=isTestType(type)?testSectionId(type):null;
   if(sid) return {skill:sid==='*'?null:sid,
                   skillLabel:sid==='*'?'Every skill':undefined,
@@ -7763,7 +7764,6 @@ function soloLinkParams(type){
   if(isTestType(type)){
     const secs=soloSeconds();
     if(secs!==TIMER_DURATION) p.set('t',secs);
-    if(acsfMode) p.set('acsf','1');
   } else if(type!=='target'){
     const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
     if(limit!==10) p.set('q',limit);
@@ -7813,7 +7813,8 @@ const GAME_SLUG={
   spelling:'spelling',unscramble:'unscramble',gramscramble:'word-order',speaking:'speaking-game',
   translate:'translate',letter:'letter-names',oddone:'odd-one-out',
   signs:'signs',sms:'messages',clock:'clock',shop:'shop',target:'dice',forms:'forms',all:'all-games',
-  'test:*':'test-yourself','test:letters':'test-letters','test:vocab':'test-vocabulary',
+  'test:*':'test-yourself','test:level':'level-check',
+  'test:letters':'test-letters','test:vocab':'test-vocabulary',
   'test:listening':'test-listening','test:speaking':'test-speaking','test:reading':'test-reading',
   'test:writing':'test-writing','test:grammar':'test-grammar','test:numeracy':'test-numeracy',
   'test:translation':'test-translation','test:everyday':'test-everyday',
@@ -7852,7 +7853,7 @@ function updateSoloCountDisplay(){
     return;
   }
   if(isTestType(soloSelectedType)){
-    display.textContent=acsfMode
+    display.textContent=isLevelCheck(soloSelectedType)
       ?ACSF_ROUNDS+' rounds of '+TEST_PER_ROUND+' questions, spread across every skill'
         +' so that nothing is left untested. It gets harder or easier as you go.'
       :TEST_ROUNDS+' rounds of '+TEST_PER_ROUND
@@ -7876,7 +7877,7 @@ function startSoloGame(){
     if(typeUsesTranslate(soloSelectedType))
       localStorage.setItem('translateLang',document.getElementById('solo-lang-pick').value);
     roomGame=null;
-    TEST=newTestGame('solo',soloSelectedType,acsfMode);
+    TEST=newTestGame('solo',soloSelectedType);
     TEST.secs=soloSeconds();
     myScore=0;
     testStartRound();
@@ -8033,7 +8034,9 @@ function newTestGame(mode,type,acsf){
   // Everything downstream of this (the move, the round card, the class
   // scoreboard) reads TEST.ladder and TEST.rounds and needs no branch of its
   // own, because a band carries a label exactly as a rung does.
-  const bands=!!acsf;
+  // From the type, so the classroom and the teacher's own screen get the bands
+  // without every caller having to remember to ask for them.
+  const bands=!!acsf||isLevelCheck(type);
   return {mode:mode, type:type, acsf:bands,
           ladder:bands?ACSF_BANDS:(ladderFor(type)||[]),
           rounds:bands?ACSF_ROUNDS:TEST_ROUNDS,
@@ -8486,7 +8489,7 @@ function acsfCopyText(prof){
   if(!prof) return '';
   const out=['WordLink level check: indicative ACSF profile',
     new Date().toLocaleString(),
-    prof.asked+' questions answered'+(prof.levelCheck?'':'  (ordinary Test Yourself run, not a level check)'),
+    prof.asked+' questions answered'+(prof.levelCheck?'':'  (an ordinary Test Yourself run, not a level check)'),
     prof.assessed+' of '+prof.total+' indicators had evidence',
     '',
     'INDICATIVE ONLY. This is one run on a phone or tablet, marked automatically.',
@@ -8532,6 +8535,9 @@ function acsfSaveRun(){
   if(!TEST||!TEST.ev) return;
   let runs=[];
   try{ runs=JSON.parse(acsfStore.get(ACSF_STORE_KEY)||'[]')||[]; }catch(e){ runs=[]; }
+  // An ordinary Test Yourself run has no panel to open any more, and keeping
+  // its evidence would push real level checks out of a five-slot history.
+  if(!TEST.acsf) return;
   runs.unshift({at:Date.now(), levelCheck:!!TEST.acsf, score:myScore,
                 label:(testStep()||{}).label||'', ev:TEST.ev});
   acsfStore.set(ACSF_STORE_KEY,JSON.stringify(runs.slice(0,ACSF_STORE_MAX)));
@@ -8573,8 +8579,12 @@ function renderAcsfPanel(prof,run){
       .innerHTML='<b>Indicative only.</b> One run on a phone or tablet, marked automatically. '
         +'A starting point for assessment, not an assessment.';
   const ul=acsfEl('ul');
+  /* Kept as a backstop rather than removed: nothing offers this panel after an
+     ordinary Test Yourself run any more, and those runs are no longer stored,
+     but a profile saved before the two were split apart can still be read back
+     out of a learner's device and it has to say what it is. */
   [prof.levelCheck?null
-     :'This was an ordinary Test Yourself run, not a level check, so it only reached the indicators its own route happened to cross. Turn on Level check for a full sweep.',
+     :'This was an ordinary Test Yourself run, saved before Test Yourself and Level Check were separate. It only reached the indicators its own route happened to cross. Run a Level Check for a full sweep.',
    'Oral Communication .07 is not assessable here. Nothing in this app records speech.',
    'Writing .05 and .06 are on screen only. Handwriting, letter forms and spacing have to be checked on paper.',
    'Learning .01 and .02 are read off how the learner went about the run, not from an interview.',
@@ -8694,14 +8704,20 @@ function showTestCard(score,final){
   const step=testStep();
   const scr=document.getElementById('screen-test-round');
   scr.dataset.state=!final?'round':(TEST.mode==='class'?'class-final':'solo-final');
+  // Only a level check has a profile behind this button.
+  const ab=document.getElementById('test-acsf-btn');
+  if(ab) ab.style.display=TEST.acsf?'':'none';
   document.getElementById('test-round-no').textContent=
     final?'Test finished':'Round '+TEST.round+' of '+testRounds();
   // Three dots, one per question, in the order they were answered.
-  document.getElementById('test-dots').innerHTML=TEST.tally.map(t=>
+  /* A question that could not be got wrong gets no dot: it has no outcome to
+     show, and a filled one would say the learner got something right. */
+  const dots=TEST.tally.filter(function(t){ return t!=='open'; });
+  document.getElementById('test-dots').innerHTML=dots.map(t=>
     '<span class="test-dot '+(t==='correct'?'ok':t==='partial'?'part':'no')+'">'
     +(t==='correct'?'●':t==='partial'?'◐':'○')+'</span>').join('');
   const whole=score===Math.floor(score)?String(score):score.toFixed(1);
-  document.getElementById('test-round-score').textContent=whole+' of '+TEST_PER_ROUND+' right';
+  document.getElementById('test-round-score').textContent=whole+' of '+dots.length+' right';
   document.getElementById('test-round-pts').textContent='+'+TEST.roundPts+' points';
   // At the end the total is the headline — the biggest thing on the screen and
   // the thing the learner came away with. Between rounds it is a running note
@@ -10543,7 +10559,11 @@ window.addEventListener('load',()=>{
     /* A game that has been folded into another still answers to its old id, so
        a link a teacher wrote down before the merge opens the game that now
        holds those questions rather than dropping them on the picker. */
-    const game=RETIRED_GAMES[params.get('game')]||params.get('game');
+    let game=RETIRED_GAMES[params.get('game')]||params.get('game');
+    /* The level check used to be a flag on a Test Yourself link. It is its own
+       game now, so a link written before the split opens the same run it always
+       did rather than a Test Yourself with the flag quietly dropped. */
+    if(params.get('acsf')==='1'&&isTestType(game)) game='test:level';
     // A section's All and its Test Yourself live on one pill each, retargeted
     // by whichever skill chip is showing — so a link to one has to put the
     // picker on that skill before the pill can be found at all.
@@ -10556,7 +10576,7 @@ window.addEventListener('load',()=>{
       if(t>=10&&t<=120) document.getElementById('solo-t-limit').value=t;
       const mc=params.get('mc');
       setMcMode(mc===null?defaultMcFor(game):mc==='1');
-      setAcsfMode(params.get('acsf')==='1');
+
       openSoloLaunch(game);
     }
   }
