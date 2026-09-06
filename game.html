@@ -6976,6 +6976,22 @@ const TEST_LADDERS={
     {type:'translate', mc:true,  label:'Tap the English sentence'},
     {type:'translate', mc:false, label:'Read it in your language, write it in English'},
   ],
+  /* Using a device had no ladder, so tapping Test Yourself under that chip
+     threw before the first question: the section was added with the .12/.13
+     games and the ladder was never written to go with it. Ordered the way the
+     others are, easiest rung first, and it climbs from naming a thing on a
+     screen to reading a message and filling a form. */
+  digital:[
+    {type:'devices',     mc:true,  from:0, label:'Name the device'},
+    {type:'digisymbols', mc:true,  label:'What the button does'},
+    {type:'instructions',mc:true,  label:'Listen, then do what it says'},
+    {type:'prompts',     mc:true,  label:'A message on the screen — what to do'},
+    {type:'devices',     mc:true,  from:1, label:'What the device is for'},
+    {type:'safeinfo',    mc:false, from:0, label:'Copy the code'},
+    {type:'sms',         mc:true,  label:'Read the message, tap the answer'},
+    {type:'safeinfo',    mc:true,  from:1, label:'Safe to share, or private'},
+    {type:'forms',       mc:false, label:'Put each answer in the right box'},
+  ],
   everyday:[
     {type:'signs',       mc:true,  label:'Read the sign'},
     {type:'sms',         mc:true,  label:'Read the message, tap the answer'},
@@ -7401,11 +7417,20 @@ function acsfClaimsFor(step){
    one being picked. */
 const ACSF_ROUNDS=12;
 const ACSF_BANDS=[
+  /* Where Is It is here as well as in band 1, because the floor has to carry a
+     step for every indicator a learner could be shown. It was the one band
+     with nothing claiming .11, so a learner who never left it came out "not
+     assessed" for .11 rather than "not shown" — and the difference between
+     those two is the difference between a gap in the learner and a gap in the
+     test. Only two banks evidence .11 at all; the other is Write the Number,
+     which is typed and belongs higher up. Up, down, left and right, tapped, is
+     the Stage A feature word for word. */
   {label:'Letters, numbers and signs', pool:[
     {type:'letter',mc:true},{type:'numbertap',mc:true},
     {type:'signs',mc:true},{type:'oddone',mc:true},{type:'casematch',mc:true},
-    {type:'greetings',mc:true},{type:'devices',mc:true},
-    {type:'shopsmall',mc:false,from:0},{type:'mylearning',mc:true}]},
+    {type:'greetings',mc:true},{type:'devices',mc:true},{type:'position',mc:true},
+    {type:'shopsmall',mc:false,from:0},{type:'copyword',mc:false,from:0},
+    {type:'mylearning',mc:true}]},
   {label:'Familiar words, money and devices', pool:[
     {type:'clothes',mc:true},{type:'wp1:word',mc:true},{type:'numbertap',mc:true},
     {type:'shopsmall',mc:false,from:0},{type:'instructions',mc:true},
@@ -7583,6 +7608,11 @@ const GAME_INFO={
   sms:         {skill:'everyday',  blurb:'Read a short message and answer it.'},
   clock:       {skill:'numeracy',  blurb:'Read the time and write it.'},
   shop:        {skill:'numeracy',  blurb:'Count the coins and pay the right amount.'},
+  /* The same game under $10. It is not on the picker — Shop covers that — but
+     it is a step in two level check bands, and testRecord reads the skill from
+     here to build the "strong in" line. Without an entry it returned early and
+     those rounds went uncounted. */
+  shopsmall:   {skill:'numeracy',  name:'Shop', blurb:'Count the coins and pay the right amount.'},
   target:      {skill:'numeracy',  blurb:'Roll two dice and get closest to the target.'},
   forms:       {skill:'everyday',  blurb:'Fill in a form with your details.'},
   /* The counted numeracy skills the SEE Reporting Checklist actually names:
@@ -8323,7 +8353,18 @@ function acsfSignalRows(ev){
     put('02','PLB',asked,solid?asked:asked*0.6,w);
   }
   if(tries>0){
-    put('05','PLA',tries,tries,W('Checks copied letters and single words with structured support from expert/mentor',tries,tries));
+    /* Writing .05 at Stage A is a writing feature: a learner checking letters
+       and words they copied, with the answer shown back to them. Counting it
+       from attempts awarded it on a run of pure tapping where nothing was
+       written and nothing was right — 36 of 36 for a learner who got every
+       question wrong. It needs a typed round to have happened, it is counted
+       out of those rather than out of everything, and it is a partial claim,
+       because what the app sees is the correction being shown and not the
+       learner reading it. The Level 1 row below has always been gated this way.
+       .12 stays on attempts: using the app is what that feature is about, and
+       a learner tapping wrong answers is still working the software. */
+    const typed=(ev.modes&&ev.modes.type)||0;
+    if(typed>0) put('05','PLA',typed,typed,P('Checks copied letters and single words with structured support from expert/mentor',typed,typed));
     put('12','PLB',tries,tries,W('Begins to use an extremely limited number of digital devices and software applications',tries,tries));
     if(modes.length>=2){
       const w={};
