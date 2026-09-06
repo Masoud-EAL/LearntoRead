@@ -1370,9 +1370,9 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .calendar{border-collapse:collapse;margin:0 auto;font-size:.82rem;}
 .calendar caption{font-family:'Fredoka One',cursive;font-size:1.05rem;color:var(--gold);
   padding-bottom:6px;}
-.calendar th{font-size:.62rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);
-  padding:2px 0;width:30px;}
-.calendar td{padding:3px 0;text-align:center;color:var(--text);width:30px;height:26px;}
+.calendar th{font-size:.62rem;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);
+  padding:2px 0;width:34px;}
+.calendar td{padding:3px 0;text-align:center;color:var(--text);width:34px;height:26px;}
 .calendar td.cal-mark{background:var(--accent);color:#fff;border-radius:8px;
   font-family:'Fredoka One',cursive;}
 /* A row of figures with one of them picked out: first, second, third is a
@@ -3478,7 +3478,7 @@ function genCalendarQuestions(n){
       if((start+d)%7===0) cells+='</tr><tr>';
     }
     const grid='<table class="calendar"><caption>'+name+'</caption><tr>'
-      +SPELL_DAYS.map(function(d){ return '<th>'+d.slice(0,2)+'</th>'; }).join('')
+      +SPELL_DAYS.map(function(d){ return '<th>'+d.slice(0,3)+'</th>'; }).join('')
       +'</tr><tr>'+cells+'</tr></table>';
     const askDay=i%2===0;
     const correct=askDay?dow:name;
@@ -3587,13 +3587,19 @@ function genPositionQuestions(n){
 const DEVICES=[
   {n:'phone',   e:'📱', use:'To call someone'},
   {n:'laptop',  e:'💻', use:'To do work and write'},
-  {n:'tablet',  e:'📲', use:'To read and watch'},
+  /* Not the tablet emoji: it is a phone with an arrow beside it, so on a
+     small screen it and the phone above are the same picture, and the round
+     came down to a coin toss between two right-looking answers. */
+  {n:'screen',  e:'🖥️', use:'To read and watch'},
   {n:'printer', e:'🖨️', use:'To put it on paper'},
   {n:'camera',  e:'📷', use:'To take a photo'},
   {n:'keyboard',e:'⌨️', use:'To type'},
   {n:'mouse',   e:'🖱️', use:'To point and click'},
   {n:'headphones',e:'🎧',use:'To listen'},
-  {n:'charger', e:'🔌', use:'To fill the battery'},
+  /* The plug on its own is an old two-pin wall plug, which is not what anyone
+     charges a phone with. Plug and battery together say charging without
+     needing a picture of a cable, which no emoji provides. */
+  {n:'charger', e:'🔌🔋', use:'To give it power'},
   {n:'wifi',    e:'📶', use:'To get on the internet'},
 ];
 /* ── WHICH DEVICE / WHAT IS IT FOR ──
@@ -3632,7 +3638,10 @@ function genDeviceQuestions(n,from){
    every screen an adult already holds, rather than a general icon quiz. */
 const DIGI_SYMBOLS=[
   {s:'🔍', n:'Search'},   {s:'🏠', n:'Home'},      {s:'⬅️', n:'Go back'},
-  {s:'▶️', n:'Play'},     {s:'⏸️', n:'Stop'},      {s:'🔊', n:'Sound on'},
+  /* The symbol is pause, and that is what it is called on a screen, but stop
+     is the word most learners already have for it. Both are printed so the
+     one they know is never the wrong answer. */
+  {s:'▶️', n:'Play'},     {s:'⏸️', n:'Stop (pause)'}, {s:'🔊', n:'Sound on'},
   {s:'🔇', n:'Sound off'},{s:'📶', n:'Internet'},  {s:'🔋', n:'Battery'},
   {s:'⚙️', n:'Settings'}, {s:'🗑️', n:'Delete'},    {s:'💾', n:'Save'},
   {s:'📷', n:'Camera'},   {s:'✉️', n:'Message'},   {s:'☰',  n:'Menu'},
