@@ -1381,6 +1381,9 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 /* The one device that is drawn rather than picked from the emoji set. Sized to
    sit at about the height the emoji beside it render at. */
 .dev-art{width:150px;height:auto;display:block;margin:0 auto;}
+/* The same drawing on a multiple choice button, where it sits where an emoji
+   would and has to match the size of the emoji beside it. */
+.dev-art-sm{width:3.2rem;height:auto;display:block;margin:0 auto;}
 .ord-fig{opacity:.45;filter:grayscale(1);}
 .ord-fig.ord-hit{opacity:1;filter:none;transform:scale(1.25);}
 .ord-arrow{color:var(--muted);font-size:1.1rem;}
@@ -1471,6 +1474,10 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   padding-left:13px;position:relative;}
 .acsf-why li::before{content:'·';position:absolute;left:3px;color:var(--teal);font-weight:900;}
 .acsf-why .lv{color:var(--text);font-weight:800;}
+/* A feature the run never reached. Quieter than the rest, and the marker in
+   front of it is hollow, because nothing was observed either way. */
+.acsf-why li.not-asked{opacity:.5;}
+.acsf-why li.not-asked::before{content:'○';color:var(--muted);font-weight:400;}
 /* The page scrolls, so the three things you came here to do follow you down
    it rather than sitting under thirteen indicators. */
 .acsf-acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
@@ -3610,8 +3617,8 @@ const DEVICES=[
 
    Light on dark, which is the only theme the app has. It is a white charger,
    which is real enough and is the version that can be seen against the card. */
-function chargerArt(){
-  return '<svg class="dev-art" viewBox="0 0 210 170" role="img" aria-label="a charger">'
+function chargerArt(cls){
+  return '<svg class="'+(cls||'dev-art')+'" viewBox="0 0 210 170" role="img" aria-label="a charger">'
     // The two pins, each a flat blade tilted out from the top of the block.
     + '<g fill="#ccd3e6" stroke="#98a0ba" stroke-width="2.5" stroke-linejoin="round">'
     +   '<rect x="90" y="8" width="15" height="31" rx="3" transform="rotate(-18 97.5 23)"/>'
@@ -4122,17 +4129,29 @@ const INSTRUCTIONS=[
    strip to nothing and mark every option correct. */
 const INSTRUCTION_ART={book:'📖',pen:'✏️',bag:'🎒',chair:'🪑',door:'🚪',window:'🪟',cup:'☕',
   phone:'📱',laptop:'💻',camera:'📷',headphones:'🎧',keyboard:'⌨️',printer:'🖨️',
-  'sound on':'🔊','sound off':'🔇',internet:'📶',battery:'🔋',charger:'🔌',bin:'🗑️',
+  'sound on':'🔊','sound off':'🔇',internet:'📶',battery:'🔋',bin:'🗑️',
   save:'💾',home:'🏠',play:'▶️',search:'🔍',message:'✉️',settings:'⚙️'};
-function instrChip(w){ return (INSTRUCTION_ART[w]||'')+' '+w; }
+/* The charger is the drawing, here as well as in Devices. The emoji is a
+   two-pin wall plug, which is the thing an appliance has and not the thing
+   that comes in the box with a phone; it was still on this card after Devices
+   stopped using it. It goes through q.art rather than into the option text,
+   because an option's text is also its value and markup cannot live there. */
+function instrArt(w){
+  return w==='charger'?chargerArt('dev-art-sm')
+    :'<span>'+(INSTRUCTION_ART[w]||'')+'</span>';
+}
+function instrArtMap(words){
+  const m={};
+  words.forEach(function(w){ m[w]=instrArt(w); });
+  return m;
+}
 function genInstructionQuestions(n){
-  const out=[], pool=shuffle(INSTRUCTIONS.slice());
-  for(let i=0;i<(n||8);i++){
-    const it=pool[i%pool.length];
-    out.push({type:'mc', say:it.say, question:'🔊 '+it.say, textOnly:true,
-      answer:instrChip(it.a).toLowerCase(),
-      choices:shuffle([it.a].concat(it.alts).map(instrChip))});
-  }
+  const out=[], pool=shuffle(INSTRUCTIONS.slice()).slice(0,n||8);
+  pool.forEach(function(it){
+    const words=shuffle([it.a].concat(it.alts));
+    out.push({type:'mc', say:it.say, question:'🔊 '+it.say,
+      art:instrArtMap(words), answer:it.a, choices:words});
+  });
   return out;
 }
 
@@ -4150,22 +4169,34 @@ function genInstructionQuestions(n){
    could say which game would help. Nobody loses points for what they want to
    learn, and the panel reports these rows as a signal to confirm rather than
    as a result, which is what they are. */
+/* Each list ends with a way of saying "none". A learner who has not settled on
+   a goal should be able to say so instead of picking one at random to get past
+   the screen, and a learner who nothing is stopping should not have to invent
+   a barrier. These are marked as declines below: they still score, because no
+   answer here is wrong, but they are not counted as having named a goal. */
 const GOALS=[
   {e:'📖', t:'Read better'},   {e:'✍️', t:'Write better'},
   {e:'🗣️', t:'Speak better'},  {e:'👂', t:'Understand people'},
   {e:'🔢', t:'Numbers and money'}, {e:'💻', t:'Use a phone or computer'},
   {e:'💼', t:'Get a job'},     {e:'📄', t:'Fill in forms'},
+  {e:'🤷', t:'No goal yet'},
 ];
 const BARRIERS=[
   {e:'👶', t:'Child care'},    {e:'🚌', t:'Getting here'},
   {e:'💼', t:'Work hours'},    {e:'🏥', t:'Health'},
   {e:'⏰', t:'No time'},       {e:'🙂', t:'Nothing stops me'},
+  {e:'🤷', t:'No reason'},
 ];
 const EASYHARD=[
   {e:'🔤', t:'Letters and sounds'}, {e:'📖', t:'Reading'},
   {e:'✍️', t:'Writing'},            {e:'👂', t:'Listening'},
   {e:'🔢', t:'Numbers'},            {e:'💻', t:'Using a device'},
+  {e:'🤷', t:'I do not know'},
 ];
+/* The options that mean "none of these". Kept as the one list both the picker
+   and the evidence read, so a new way of saying it cannot be added to a game
+   without the profile learning about it. */
+const NO_ANSWER_OPTS=['🤷 No goal yet','🤷 No reason','🤷 I do not know','🙂 Nothing stops me'];
 function chipRow(list){
   return list.map(function(x){ return x.e+' '+x.t; });
 }
@@ -4173,17 +4204,35 @@ function chipRow(list){
    comes back, so a learner can never be wrong about their own goal. */
 function genMyLearningQuestions(n){
   const out=[];
+  /* Only two of these five stand for a feature. Naming a goal is
+     "expresses/identifies a learning goal"; choosing the game that would help
+     is "locates learning materials" and "selects learning materials for a
+     specific task". What is easy, what is hard and what gets in the way are
+     worth asking and worth a teacher reading, but the features they used to
+     stand on were the Level 1 ones, which are an interview and are gone. They
+     carry no claim rather than borrowing the goal one.
+     The goal question is first so a single-question draw always lands on it. */
   const asks=[
-    {q:'What do you want to learn?',   list:GOALS,    label:'YOUR GOAL'},
+    {q:'What do you want to learn?',   list:GOALS,    label:'YOUR GOAL',
+     acsf:[['01','PLA','Begins to express extremely simple learning goal',1],
+           ['01','PLB','Identifies at least one personal learning goal',1]]},
+    {q:'Which game would help you most?', list:GOALS, label:'CHOOSE A GAME',
+     acsf:[['01','PLA','Locates limited familiar learning materials and resources following simple, immediate instructions',1],
+           ['01','PLB','Demonstrates capacity to select limited learning materials for a specific task',1]]},
     {q:'What is easy for you now?',    list:EASYHARD, label:'WHAT IS EASY'},
     {q:'What is hard for you now?',    list:EASYHARD, label:'WHAT IS HARD'},
     {q:'What makes it hard to come to class?', list:BARRIERS, label:'WHAT GETS IN THE WAY'},
-    {q:'Which game would help you most?', list:GOALS, label:'CHOOSE A GAME'},
   ];
   for(let i=0;i<(n||5);i++){
     const a=asks[i%asks.length];
-    const opts=shuffle(chipRow(a.list)).slice(0,4);
+    /* The "none of these" option is always on the card rather than left to the
+       shuffle, because a learner who has no goal has to be able to say so
+       every time, not only on the rounds where it happened to be dealt. */
+    const none=chipRow(a.list).filter(function(t){ return NO_ANSWER_OPTS.indexOf(t)>=0; });
+    const rest=shuffle(chipRow(a.list).filter(function(t){ return NO_ANSWER_OPTS.indexOf(t)<0; }));
+    const opts=shuffle(rest.slice(0,4-Math.min(1,none.length)).concat(none.slice(0,1)));
     out.push({type:'mc', say:a.q, question:'🔊 '+a.q, textOnly:true, anyAnswer:true,
+      declines:NO_ANSWER_OPTS, acsf:a.acsf||[],
       answer:opts[0].toLowerCase(), choices:opts});
   }
   return out;
@@ -7066,9 +7115,14 @@ function acsfLvlNo(l){ const i=ACSF_LEVELS.indexOf(l); return i<0?0:i; }
    those rows describe what was observed instead of quoting text this app does
    not have. */
 const ACSF_INDICATORS={
+  /* Stops at PLB. The Level 1 features for .01 are past experience, career
+     goals and barriers to learning: things a person says in a conversation,
+     not things a run of a game can point at. Rows built out of "the learner
+     answered 36 questions" were being printed against them, which is not
+     evidence of any of it. */
   '01':{skill:'Learning', name:'Demonstrates some awareness of self as a learner',
-        ceiling:'L1', inferred:true,
-        capNote:'The Level 1 features about past experience and barriers are a conversation. This app can only show that a goal was chosen.',
+        ceiling:'PLB', inferred:true,
+        capNote:'The Level 1 features are past experience, career goals and barriers to learning. Those are an interview. This app can only show that a goal was chosen.',
         features:{PLA:['Engages in learning activities that involve minimal risk taking'],
                   PLB:['Demonstrates preparedness for learning through active participation',
                        'Engages in learning activities that involve some risk taking',
@@ -7144,9 +7198,6 @@ const ACSF_CLAIMS={
     ['01','PLA','Locates limited familiar learning materials and resources following simple, immediate instructions',1],
     ['01','PLB','Identifies at least one personal learning goal',1],
     ['01','PLB','Demonstrates capacity to select limited learning materials for a specific task',1],
-    ['01','L1','Identifies some past experiences of successful learning and some areas of need',1],
-    ['01','L1','Identifies one or two short term learning objectives with assistance',1],
-    ['01','L1','Identifies some potential barriers to learning, e.g. childcare issues',1],
   ]},
   /* Every feature any of the three copy rounds can show, because that is what
      the band picker needs to know the bank is worth reaching. What is actually
@@ -7938,7 +7989,7 @@ function showSoloResult(submittedAns,correctAns,timeLeft,timedOut){
     tier=isCorrect?'correct':'wrong';
   }
   myScore+=pts;
-  testRecord(tier,pts,timedOut);
+  testRecord(tier,pts,timedOut,submittedAns);
   document.getElementById('result-icon').textContent=tier==='correct'?'🎉':tier==='partial'?'🌟':'😔';
   if(currentStudentQ&&currentStudentQ.type==='translate'){
     document.getElementById('result-word').innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;line-height:2;text-align:center;">'+diffHtml(submittedAns||'',correctAns)+'</div>'+(tier!=='correct'?'<div style="font-size:.78rem;color:var(--muted);margin-top:6px;">Correct: <em style="color:var(--green)">'+correctAns+'</em></div>':'');
@@ -8087,9 +8138,15 @@ function newAcsfEvidence(){
    for either would print the maintenance feature as evidence for a learner who
    only ever answered notices. Everything else has no q.acsf and is credited
    from the bank, as before. */
-function acsfCredit(step,tier,q){
+function acsfCredit(step,tier,q,ans){
   if(!TEST||!TEST.ev) return;
-  const half=tier==='correct'?1:tier==='partial'?0.5:0;
+  /* "No goal yet" is a real answer and it scores, because nobody is wrong
+     about their own goal. It is not evidence of having named one, though, so
+     the features it would have credited are counted as asked and not shown. */
+  const declined=!!(q&&q.declines&&q.declines.some(function(d){
+    return normalize(d)===normalize(ans);
+  }));
+  const half=declined?0:tier==='correct'?1:tier==='partial'?0.5:0;
   ((q&&q.acsf)||acsfClaimsFor(step)).forEach(function(c){
     /* A feature whose own words are "accurately", "leaves spaces between
        words" or "uses upper and lower case" is either shown or it is not. A
@@ -8097,7 +8154,7 @@ function acsfCredit(step,tier,q){
        and it is half credit towards the Stage A copying features, but it is
        no evidence at all towards these. Counted as asked and not shown rather
        than skipped, because that is the thing an assessor wants to see. */
-    const worth=c[4]?(tier==='correct'?1:0):half;
+    const worth=c[4]?(!declined&&tier==='correct'?1:0):half;
     const b=TEST.ev.byInd[c[0]]||(TEST.ev.byInd[c[0]]={});
     const s=b[c[1]]||(b[c[1]]={seen:0,right:0,why:{}});
     s.seen++; s.right+=worth;
@@ -8202,7 +8259,7 @@ function testStartRound(){
 
 /* Called from showSoloResult, which is the marking for both a solo run and a
    class test — in a test the learner marks and advances themselves either way. */
-function testRecord(tier,pts,timedOut){
+function testRecord(tier,pts,timedOut,ans){
   if(!testActive()) return;
   /* A question nobody can get wrong says nothing about what a learner can do,
      so it is marked here and left out of the round's score. My Learning asks
@@ -8226,7 +8283,7 @@ function testRecord(tier,pts,timedOut){
   // rather than when the question appeared, because a question that timed out
   // untouched says nothing about what the learner can work.
   if(timedOut) TEST.ev.timeouts++; else { TEST.ev.attempts++; acsfNoteMode(currentStudentQ); }
-  acsfCredit(step,tier,currentStudentQ);
+  acsfCredit(step,tier,currentStudentQ,ans);
   // Also keep the run's answers by skill, for the report at the end. A rung is
   // a game, and every game belongs to one skill (GAME_INFO), so a ladder that
   // climbs through several games crosses several skills — the whole-app test
@@ -8341,41 +8398,46 @@ function acsfSignalRows(ev){
   const modeName={tap:'Tapped an answer on screen',type:'Typed on the on-screen keyboard',
                   tiles:'Placed tiles in order',drag:'Dragged the hands of a clock',
                   coins:'Picked out coins and notes',chips:'Placed details into a form'};
+  const RUN='questions in this run', ANS='questions the learner answered',
+        TYPED='rounds the learner typed in', HELP='times the learner asked for help';
   const put=function(ind,lvl,seen,right,why){
     rows[ind]=rows[ind]||{}; rows[ind][lvl]={seen:seen,right:right,why:why};
   };
-  const W=function(){ const o={};
-    for(var i=0;i<arguments.length;i+=3) o[arguments[i]]={n:arguments[i+1],ok:arguments[i+2],partial:0};
+  /* run:1 marks a line whose numbers are counted over the whole run rather
+     than over questions of its own. "36 of 36" on a feature nobody could
+     answer a question about was the panel's least readable number; it means
+     36 of the run's 36 questions, and now it says so. */
+  /* The first argument names what the pair of numbers counts. On their own
+     "36 of 36" said nothing about what had been counted, which is the panel's
+     least readable line; every one of these rows now carries its own unit. */
+  const W=function(){ const unit=arguments[0], o={};
+    for(var i=1;i<arguments.length;i+=3)
+      o[arguments[i]]={n:arguments[i+1],ok:arguments[i+2],partial:0,run:unit};
     return o; };
   // Same, but every line marked partial: used for the Level 1 rows, which a
   // run can point at and never establish.
   const P=function(){ const o=W.apply(null,arguments);
     Object.keys(o).forEach(function(k){ o[k].partial=1; }); return o; };
   if(asked>0){
-    put('01','PLA',asked,tries,W('Engages in learning activities that involve minimal risk taking',asked,tries,'Demonstrates preparedness for learning, e.g. need to attend class, although may be inconsistent',asked,tries));
-    put('02','PLA',asked,tries,W('Begins to participate in familiar learning environment interactions, with prompting, e.g. responds to extremely simple directions',asked,tries,'Attempts simple repetitive tasks',asked,tries));
-    put('12','PLA',Math.max(1,tries),tries,W('Demonstrates extremely limited use of digital device',Math.max(1,tries),tries));
-    put('13','PLA',Math.max(1,tries),tries,W('Begins to use digital peripherals',Math.max(1,tries),tries));
+    put('01','PLA',asked,tries,W(RUN,'Engages in learning activities that involve minimal risk taking',asked,tries,'Demonstrates preparedness for learning, e.g. need to attend class, although may be inconsistent',asked,tries));
+    put('02','PLA',asked,tries,W(RUN,'Begins to participate in familiar learning environment interactions, with prompting, e.g. responds to extremely simple directions',asked,tries,'Attempts simple repetitive tasks',asked,tries));
+    put('12','PLA',Math.max(1,tries),tries,W(ANS,'Demonstrates extremely limited use of digital device',Math.max(1,tries),tries));
+    put('13','PLA',Math.max(1,tries),tries,W(ANS,'Begins to use digital peripherals',Math.max(1,tries),tries));
   }
   if(ev.finished){
     // Answering rather than letting the clock run out is the whole of the
     // risk-taking signal, so a run of timeouts does not clear PLB.
     const clean=rate<=0.15;
-    // Level 1 .01 is interview territory: following a teacher's instructions
-    // and taking on new tasks are things a person sees, not things a run
-    // proves. Marked partial so the row can never read better than
-    // "working towards".
-    put('01','PLB',asked,clean?asked:asked*0.5,W('Follows extremely simple instructions and procedures that may require prompting',asked,asked,'Demonstrates preparedness for learning through active participation',asked,asked-tOut));
-    put('01','L1',asked,clean?asked:asked*0.4,P('Follows instructions provided by a supervisor, teacher/trainer, or mentor',asked,asked,'Attempts new concrete tasks/activities of one or two steps with a highly explicit purpose',asked,tries));
+    put('01','PLB',asked,clean?asked:asked*0.5,W(RUN,'Follows extremely simple instructions and procedures that may require prompting',asked,asked,'Demonstrates preparedness for learning through active participation',asked,asked-tOut));
   } else if(asked>=6){
-    put('01','PLB',asked,asked*0.4,W('Follows extremely simple instructions and procedures that may require prompting',asked,asked*0.4,'Demonstrates preparedness for learning through active participation',asked,tries));
+    put('01','PLB',asked,asked*0.4,W(RUN,'Follows extremely simple instructions and procedures that may require prompting',asked,asked*0.4,'Demonstrates preparedness for learning through active participation',asked,tries));
   }
   // Practising a repetitive task means answering it. A learner who let most
   // of the run time out sat through it rather than practised it.
   if(asked>=12&&engaged>=0.5){
     const solid=ev.finished&&engaged>=0.8;
-    const w=W('Practises extremely simple repetitive tasks',asked,tries,'Participates in familiar learning environment interactions but may require prompting',asked,solid?asked:asked*0.6);
-    if(help) w['Uses some limited learning strategies, e.g. developing a word list with support']={n:Math.max(1,help),ok:help,partial:1};
+    const w=W(RUN,'Practises extremely simple repetitive tasks',asked,tries,'Participates in familiar learning environment interactions but may require prompting',asked,solid?asked:asked*0.6);
+    if(help) w['Uses some limited learning strategies, e.g. developing a word list with support']={n:Math.max(1,help),ok:help,partial:1,run:HELP};
     put('02','PLB',asked,solid?asked:asked*0.6,w);
   }
   if(tries>0){
@@ -8390,26 +8452,44 @@ function acsfSignalRows(ev){
        .12 stays on attempts: using the app is what that feature is about, and
        a learner tapping wrong answers is still working the software. */
     const typed=(ev.modes&&ev.modes.type)||0;
-    if(typed>0) put('05','PLA',typed,typed,P('Checks copied letters and single words with structured support from expert/mentor',typed,typed));
-    put('12','PLB',tries,tries,W('Begins to use an extremely limited number of digital devices and software applications',tries,tries));
+    if(typed>0) put('05','PLA',typed,typed,P(TYPED,'Checks copied letters and single words with structured support from expert/mentor',typed,typed));
+    put('12','PLB',tries,tries,W(ANS,'Begins to use an extremely limited number of digital devices and software applications',tries,tries));
     if(modes.length>=2){
       const w={};
-      modes.forEach(function(m){ if(modeName[m]) w[modeName[m]]={n:ev.modes[m],ok:ev.modes[m],partial:0}; });
+      modes.forEach(function(m){ if(modeName[m]) w[modeName[m]]={n:ev.modes[m],ok:ev.modes[m],partial:0,run:'rounds answered that way'}; });
       const enough=modes.length>=3;
-      w['Begins to navigate extremely simple digital screen']={n:tries,ok:tries,partial:0};
-      w['Uses an extremely limited number of digital devices and software applications']={n:tries,ok:tries,partial:0};
-      w['Demonstrates a recognition of the relationship between digital peripherals and action on screen']={n:tries,ok:tries,partial:0};
+      w['Begins to navigate extremely simple digital screen']={n:tries,ok:tries,partial:0,run:ANS};
+      w['Uses an extremely limited number of digital devices and software applications']={n:tries,ok:tries,partial:0,run:ANS};
+      w['Demonstrates a recognition of the relationship between digital peripherals and action on screen']={n:tries,ok:tries,partial:0,run:ANS};
       put('13','PLB',enough?ACSF_MIN_EVIDENCE:2,enough?ACSF_MIN_EVIDENCE:1,w);
     }
   }
   // Re-reading and correcting is what the spelling feedback exists for, so it
   // only counts where the learner actually saw it.
-  if((ev.hints||0)>0||(ev.replays||0)>0) put('05','L1',Math.max(2,help),help,P('Begins to check writing by re-reading and makes some corrections with guidance, e.g. capital letters and full stops',Math.max(2,help),help));
+  if((ev.hints||0)>0||(ev.replays||0)>0) put('05','L1',Math.max(2,help),help,P(HELP,'Begins to check writing by re-reading and makes some corrections with guidance, e.g. capital letters and full stops',Math.max(2,help),help));
   return rows;
 }
 
 /* One indicator, as the panel prints it. `state` is what happened, `line` is
    what it is allowed to say about it. */
+/* Every feature the claim map can put in front of a learner, by indicator and
+   level, worked out once from the map itself so it cannot fall out of step
+   with it. The panel needs this to say which features a run never asked
+   about. */
+let ACSF_FEATURE_INDEX=null;
+function acsfAllFeatures(ind,lvl){
+  if(!ACSF_FEATURE_INDEX){
+    ACSF_FEATURE_INDEX={};
+    Object.keys(ACSF_CLAIMS).forEach(function(t){
+      const e=ACSF_CLAIMS[t];
+      [].concat(e.base||[],e.mc||[],e.typed||[]).forEach(function(c){
+        const k=c[0]+'|'+c[1];
+        (ACSF_FEATURE_INDEX[k]=ACSF_FEATURE_INDEX[k]||{})[c[2]]=1;
+      });
+    });
+  }
+  return Object.keys(ACSF_FEATURE_INDEX[ind+'|'+lvl]||{});
+}
 function acsfRow(ind,byInd,sig){
   const meta=ACSF_INDICATORS[ind];
   const row={ind:ind, code:'.'+ind, skill:meta.skill, name:meta.name,
@@ -8438,14 +8518,27 @@ function acsfRow(ind,byInd,sig){
   let demo=null, towards=null, sawAnything=false, sawWrong=false;
   ACSF_STEPS.forEach(function(lvl){
     const s=at(lvl);
-    if(!s) return;
-    sawAnything=true;
-    const st=acsfLevelState(s,meta);
-    if(st==='no') sawWrong=true;
-    if(st==='yes') demo=lvl;
-    Object.keys(s.why||{}).forEach(function(k){
-      row.why.push({lvl:lvl,text:k,n:s.why[k].n,ok:s.why[k].ok,partial:!!s.why[k].partial});
-    });
+    if(s){
+      sawAnything=true;
+      const st=acsfLevelState(s,meta);
+      if(st==='no') sawWrong=true;
+      if(st==='yes') demo=lvl;
+      Object.keys(s.why||{}).forEach(function(k){
+        row.why.push({lvl:lvl,text:k,n:s.why[k].n,ok:s.why[k].ok,
+                      partial:!!s.why[k].partial,run:s.why[k].run||null});
+      });
+    }
+    /* And the features of this indicator that the run never put in front of
+       the learner. Without them a row showed one PLB line and looked like a
+       narrow indicator, when what happened is that the ladder settled below
+       the band holding the other two and never asked. A teacher has to be
+       able to tell "asked and not shown" from "never asked", and only one of
+       those is about the learner. Nothing above the ceiling is listed: those
+       are features this app cannot show at all, which the cap note says. */
+    if(acsfLvlNo(lvl)<=acsfLvlNo(meta.ceiling))
+      acsfAllFeatures(ind,lvl).forEach(function(f){
+        if(!(s&&s.why&&s.why[f])) row.why.push({lvl:lvl,text:f,notAsked:true});
+      });
   });
   // What the learner is reaching for next, if anything. It cannot leap over a
   // level that was asked and came back short: getting some Level 1 items right
@@ -8516,7 +8609,10 @@ function acsfCopyText(prof){
     prof.assessed+' of '+prof.total+' indicators had evidence',
     '',
     'INDICATIVE ONLY. This is one run on a phone or tablet, marked automatically.',
-    'It is a starting point for assessment, not an assessment.',''];
+    'It is a starting point for assessment, not an assessment.',
+    'The numbers after a feature are how many of its questions were right, out of how',
+    'many were asked. A feature read off the whole run says so, and a feature this run',
+    'never reached says "not asked" rather than a number.',''];
   prof.groups.forEach(function(g){
     out.push(g.skill.toUpperCase());
     g.rows.forEach(function(r){
@@ -8527,7 +8623,7 @@ function acsfCopyText(prof){
       if(r.screenOnly) out.push('    On screen only. Handwriting must be checked on paper.');
       r.why.forEach(function(w){
         out.push('      - '+w.text+'  ('+acsfLvlText(w.lvl)+(w.partial?', partial':'')
-                 +': '+acsfNum(w.ok)+' of '+w.n+')');
+                 +': '+acsfWhyCount(w)+')');
       });
       out.push('');
     });
@@ -8535,6 +8631,15 @@ function acsfCopyText(prof){
   return out.join('\n');
 }
 function acsfNum(n){ return n===Math.floor(n)?String(n):n.toFixed(1); }
+/* What the pair of numbers after a feature means, in words, because on their
+   own they do not say what was counted. A feature with questions of its own is
+   counted in questions; a feature read off how the learner went through the
+   run is counted over the whole run; and a feature no question in this run
+   went near says that instead of a number. */
+function acsfWhyCount(w){
+  if(w.notAsked) return 'not asked in this run';
+  return acsfNum(w.ok)+' of '+w.n+(typeof w.run==='string'?' '+w.run:'');
+}
 
 /* ══════════════ LEVEL CHECK — THE PANEL ══════════════
    A finished run is gone the moment the page reloads, which was fine while the
@@ -8611,7 +8716,8 @@ function renderAcsfPanel(prof,run){
    'Oral Communication .07 is not assessable here. Nothing in this app records speech.',
    'Writing .05 and .06 are on screen only. Handwriting, letter forms and spacing have to be checked on paper.',
    'Learning .01 and .02 are read off how the learner went about the run, not from an interview.',
-   'Level 1 can only ever show as partial. Nothing here supports a full Level 1 award.'
+   'Level 1 can only ever show as partial. Nothing here supports a full Level 1 award.',
+   'The numbers after a feature are how many of its questions were right, out of how many were asked. A feature read off the whole run says so. A feature this run never reached says "not asked" instead of a number.'
   ].forEach(function(t){ if(t) ul.appendChild(acsfEl('li',null,t)); });
   warn.appendChild(ul);
 
@@ -8637,8 +8743,9 @@ function renderAcsfPanel(prof,run){
         // there and how many of them the learner got.
         r.why.forEach(function(w){
           const li=acsfEl('li');
+          li.className=w.notAsked?'not-asked':'';
           li.appendChild(acsfEl('span','lv',acsfLvlText(w.lvl)+(w.partial?' (partial)':'')+': '));
-          li.appendChild(document.createTextNode(w.text+'  '+acsfNum(w.ok)+' of '+w.n));
+          li.appendChild(document.createTextNode(w.text+'  '+acsfWhyCount(w)));
           list.appendChild(li);
         });
         row.appendChild(list);
@@ -9075,12 +9182,18 @@ function renderMcChoices(q){
   const usePics=!q.textOnly&&emojis.every(e=>e)&&!hasDup;
   box.classList.toggle('all-body',usePics&&allBodyPics(emojis));
   q.choices.forEach(word=>{
+    /* A bank can supply the picture for an option instead of the emoji map
+       finding one, which is the only way to put a drawing on a choice: the
+       option's text is also its value, so markup cannot live in it. */
+    const art=q.art&&q.art[word];
     const pic=emo(word);
     const btn=document.createElement('button');
-    const isSentence=!pic&&/\s/.test(word);
-    btn.className='mc-choice'+((usePics&&pic)?'':' mc-text')+(isSentence?' mc-sentence':'');
+    const isSentence=!art&&!pic&&/\s/.test(word);
+    btn.className='mc-choice'+((art||(usePics&&pic))?'':' mc-text')+(isSentence?' mc-sentence':'');
     btn.dataset.word=word;
-    if(usePics&&pic){
+    if(art){
+      btn.innerHTML='<span class="mc-pic">'+art+'</span><span class="mc-label">'+word+'</span>';
+    } else if(usePics&&pic){
       btn.innerHTML='<span class="mc-pic">'+pic+'</span><span class="mc-label">'+word+'</span>';
     } else {
       btn.innerHTML='<span class="mc-label">'+word+'</span>';
