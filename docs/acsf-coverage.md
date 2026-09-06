@@ -125,7 +125,7 @@ partial: one round of one game is not the sustained performance Level 1 describe
 
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
-| 1 | Follows print from left to right and top to bottom | 🆕 built | Which Comes First (left to right, top to bottom) |
+| 1 | Follows print from left to right and top to bottom | 🆕 built | Which Comes First (a bank, not on the games list: Test Yourself, the level check and All Reading) |
 | 2 | Begins to make a connection between extremely simple text, pictures and symbols | ✅ had it | Signs, Odd One Out |
 | 3 | Links spoken and written forms of the names and sounds of letters | ✅ had it | Letter Names |
 | 4 | Recognises different forms of the same letters, e.g. upper and lower case | 🆕 built | Big and Small Letters |

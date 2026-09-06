@@ -1687,7 +1687,6 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="safeinfo" class="q-type-tab" onclick="selectSoloType('safeinfo',this)">🔒 Safe or Private</button>
         <button data-type="copyword" class="q-type-tab" onclick="selectSoloType('copyword',this)">📝 Copy It</button>
         <button data-type="casematch" class="q-type-tab" onclick="selectSoloType('casematch',this)">🔠 Big and Small Letters</button>
-        <button data-type="direction" class="q-type-tab" onclick="selectSoloType('direction',this)">➡️ Which Comes First</button>
         <button data-type="sightwords" class="q-type-tab" onclick="selectSoloType('sightwords',this)">👁️ Sight Words</button>
         <button data-type="punctuation" class="q-type-tab" onclick="selectSoloType('punctuation',this)">❕ Capitals and Full Stops</button>
         <button data-type="modelsentence" class="q-type-tab" onclick="selectSoloType('modelsentence',this)">✏️ Write a Sentence</button>
@@ -1895,7 +1894,6 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
             <button data-type="safeinfo" class="q-type-tab" onclick="selectQType('safeinfo',this)">🔒 Safe or Private</button>
             <button data-type="copyword" class="q-type-tab" onclick="selectQType('copyword',this)">📝 Copy It</button>
             <button data-type="casematch" class="q-type-tab" onclick="selectQType('casematch',this)">🔠 Big and Small Letters</button>
-            <button data-type="direction" class="q-type-tab" onclick="selectQType('direction',this)">➡️ Which Comes First</button>
             <button data-type="sightwords" class="q-type-tab" onclick="selectQType('sightwords',this)">👁️ Sight Words</button>
             <button data-type="punctuation" class="q-type-tab" onclick="selectQType('punctuation',this)">❕ Capitals and Full Stops</button>
             <button data-type="modelsentence" class="q-type-tab" onclick="selectQType('modelsentence',this)">✏️ Write a Sentence</button>
@@ -7215,6 +7213,8 @@ const ACSF_CLAIMS={
   'notice':{base:[
     ['03','L1','Recognises some simple ways in which visual features like layout are used to send a message and how this may influence interpretation, e.g. the placement of a photo or heading in a newspaper',1],
   ]},
+  /* The reason Which Comes First is still a bank after coming off the picker:
+     nothing else in the app shows this one. */
   'direction':{base:[
     ['04','PLA','Follows print from left to right and top to bottom'],
   ]},
@@ -7617,6 +7617,18 @@ const GAME_INFO={
      of it was on screen: tracing.html is a different app and outside the test. */
   copyword:    {skill:'writing', name:'Copy It', blurb:'Copy a word, a name or a number.'},
   casematch:   {skill:'letters', name:'Big and Small Letters', blurb:'Match big and small letters.'},
+  /* Off the picker on purpose: there is no tab for it in either scope. Two
+     questions is all it has — which word is first, which is last — and however
+     many sentences they are asked over, that is not a game somebody sits down
+     to play. It stays a bank because three of its questions inside a longer
+     run are exactly right, and because it is the only thing in the app that
+     evidences .04 "Follows print from left to right and top to bottom". So it
+     still comes up in Test Yourself, in the level check band that names it,
+     and in an All mix. It just cannot be chosen on its own.
+     Not merged into First, Second, Third, which was the other way to fix it:
+     that game is numeracy and this one is reading, so one bank would have had
+     to carry one skill label for both, and the run report would have told a
+     learner who missed the reading half to practise their numbers. */
   direction:   {skill:'reading', name:'Which Comes First', blurb:'Which word is first and which is last.'},
   sightwords:  {skill:'reading', name:'Sight Words', blurb:'The words you see everywhere.'},
   punctuation: {skill:'writing', name:'Capitals and Full Stops', blurb:'Start big, end with a full stop.'},
