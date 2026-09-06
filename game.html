@@ -3719,12 +3719,30 @@ const PROMPTS=[
   {t:'Update ready',       b:'Do you want to install it now?', a:'Later', alts:['Delete it','Print it','Take a photo']},
   {t:'Changes not kept',   b:'What do you want to do?',  a:'Save',         alts:['Delete it','Charge it','Turn it off']},
   {t:'Wrong password',     b:'Try again',                a:'Type it again',alts:['Charge it','Print it','Turn on wifi']},
+  /* Seven was not enough for a ten question game, so it dealt three of them
+     twice. These are the rest of the notices an adult meets on a phone in a
+     week, and none of them names its own answer. */
+  {t:'Missed call',        b:'You did not answer',       a:'Call back',    alts:['Charge it','Print it','Take a photo']},
+  {t:'New message',        b:'Someone has written to you', a:'Read it',    alts:['Charge it','Print it','Turn on wifi']},
+  {t:'Someone is calling', b:'Do you want to talk?',     a:'Answer it',    alts:['Delete it','Print it','Save the file']},
+  {t:'Check it is you',    b:'We sent six numbers to your phone', a:'Type the numbers', alts:['Take a photo','Turn it off','Delete some']},
+  {t:'Phone locked',       b:'This phone is closed',     a:'Type your PIN',alts:['Charge it','Print it','Call someone']},
+  {t:'Aeroplane mode is on',b:'You cannot call or use the internet', a:'Turn it off', alts:['Charge it','Take a photo','Print it']},
+  {t:'No data left',       b:'You have used all of it this month', a:'Turn on wifi', alts:['Charge it','Print it','Take a photo']},
+  {t:'Something went wrong',b:'The app stopped',         a:'Try again',    alts:['Charge it','Print it','Take a photo']},
+  {t:'Card not accepted',  b:'The shop cannot take this one', a:'Use another card', alts:['Take a photo','Charge it','Print it']},
+  {t:'Cannot print',       b:'The printer is empty',     a:'Put paper in it', alts:['Charge it','Turn on wifi','Take a photo']},
+  {t:'Unknown number',     b:'You do not know who this is', a:'Do not answer', alts:['Tell them your PIN','Send them money','Give them your card']},
+  {t:'Alarm',              b:'It is time to get up',     a:'Turn it off',  alts:['Take a photo','Print it','Call someone']},
+  {t:'Photos are ready',   b:'They are on the computer now', a:'Print them', alts:['Charge it','Turn on wifi','Call someone']},
 ];
+/* Shuffled and sliced, the way a fixed bank is dealt. It used to walk the list
+   with i%length, which is what padded a ten question game out of seven. */
 function genPromptQuestions(n){
   const out=[];
-  const pool=shuffle(PROMPTS.slice());
-  for(let i=0;i<(n||6);i++){
-    const p=pool[i%pool.length];
+  const pool=shuffle(PROMPTS.slice()).slice(0,n||6);
+  for(let i=0;i<pool.length;i++){
+    const p=pool[i];
     out.push({type:'mc', say:p.t+'. '+p.b,
       icon:'<div class="digi-dialog"><div class="dd-title">'+p.t+'</div><div class="dd-body">'+p.b+'</div></div>',
       question:'🔊 What should you do?',
@@ -4475,8 +4493,12 @@ function poolFor(type){
   if(type==='clock') return [...questionBank.clock];
   if(type==='shop') return [...questionBank.shop];
   if(type==='forms') return [...questionBank.forms];
-  // The newer generated banks hold no fixed list at all: they are built on
-  // demand, so a draw of them is the only pool there is.
+  /* The newer generated banks hold no fixed list at all, so a draw is the only
+     pool there is. This one is a sample, for pulling plausible wrong answers
+     out of: it is deliberately small, and it is deliberately not a count of
+     what the bank holds. Anything wanting that count wants genDistinctCount,
+     because this line used to be the reason a bank of seven questions told
+     the learner it had twelve. */
   if(isGenBank(type)) return GEN_BANKS[type](12,0);
   // "All" inside a section means all of *that section's* banks — the type
   // string carries the section ("all:numeracy") so nothing needs hidden state.
@@ -4502,8 +4524,22 @@ function typeUsesTranslate(type){
 /* What the picker should say about a selection. Clock and Shop invent their
    rounds, so their bank size is not a ceiling — ask getQuestions, which is
    what actually plays, rather than reporting a bank that will be exceeded. */
+/* A bank that builds its questions fresh has no count to give, and printing a
+   made-up one is how "12 available" came to sit over a bank of seven. It says
+   what is true of each kind instead. */
+function countLine(c){
+  if(c.fresh) return 'New questions every game — '+c.will+' will be used';
+  return c.avail+' available — '+c.will+' will be used';
+}
 function countFor(type,limit){
   const will=getQuestions(type,limit).length;
+  // A generated bank knows its own size now, and past GEN_MADE_FRESH it is
+  // building questions rather than holding them, so no number is the truth
+  // and the launch screen says it in words instead.
+  if(isGenBank(type)){
+    const n=genDistinctCount(type);
+    return {will:will, avail:n, fresh:n>=GEN_MADE_FRESH};
+  }
   return {will:will,avail:Math.max(poolFor(type).length,will)};
 }
 /* The BANK_SECTIONS entry an "all:<section>" type refers to, or null. */
@@ -4556,10 +4592,71 @@ const GEN_BANKS={
 };
 function isGenBank(t){ return Object.prototype.hasOwnProperty.call(GEN_BANKS,t); }
 
+/* -- DEALING FROM A GENERATED BANK --
+   A fixed bank is shuffled and sliced, so a game never shows the same question
+   twice and a bank of seven gives seven. The generated banks did neither: they
+   pick at random on every iteration, or walk the list with i%length, so a ten
+   question game of a seven question bank showed three of them twice, and even
+   the big banks repeated by chance. Nothing about a generated bank should make
+   it behave differently from a fixed one, so the dealing is fixed here, once,
+   rather than in each of the thirty-odd generators.
+
+   Two questions count as the same when they put the same thing in front of the
+   learner. Different distractors behind the same target is still the same
+   question to the person answering it. */
+function qKey(q){
+  return [q.type,q.question,q.say,q.icon,q.answer,q.label].join('|#|');
+}
+/* What this game has already shown. A test ladder deals a question at a time,
+   so filtering within one draw would not stop a round repeating one from three
+   rounds ago. Cleared when a game starts. */
+let genSeen=new Set();
+function resetGenSeen(){ genSeen=new Set(); }
+function drawGen(type,n,from){
+  const want=n||8, out=[], keys=new Set();
+  /* Ask for more than is needed and keep what is new. The later passes stop
+     avoiding what the game has already shown, so a bank that has run out of
+     fresh questions still deals rather than dealing nothing. */
+  for(let pass=0;pass<4&&out.length<want;pass++){
+    const batch=GEN_BANKS[type](Math.max(want*3,12),from||0);
+    for(let i=0;i<batch.length&&out.length<want;i++){
+      const k=qKey(batch[i]);
+      if(keys.has(k)) continue;
+      if(pass<2&&genSeen.has(k)) continue;
+      keys.add(k); out.push(batch[i]);
+    }
+  }
+  // Long enough to cover any game, and bounded so a session that never starts
+  // a fresh one cannot grow it without end.
+  if(genSeen.size>600) resetGenSeen();
+  out.forEach(function(q){ genSeen.add(qKey(q)); });
+  return out;
+}
+/* How many different questions a bank can actually show.
+   The old answer was the literal 12 in poolFor: it asked the generator for
+   twelve and reported however many came back. Screen Messages holds seven and
+   said twelve. This counts instead, by drawing far more than any game deals
+   and seeing what is distinct. Past GEN_MADE_FRESH the bank is plainly
+   building its questions rather than holding them, and a count is the wrong
+   thing to print at all. Measured once per bank and kept. */
+const GEN_MADE_FRESH=60;
+const GEN_SIZES={};
+function genDistinctCount(type){
+  if(GEN_SIZES[type]!=null) return GEN_SIZES[type];
+  const seen=new Set();
+  /* At from 0, because that is the only difficulty the launch screen ever
+     deals: the harder halves of a bank belong to the level check, which
+     prints no count. Counting those too is how Which Device came to say
+     twenty when a game of it can only show ten. */
+  for(let t=0;t<4&&seen.size<GEN_MADE_FRESH;t++)
+    GEN_BANKS[type](60,0).forEach(function(q){ seen.add(qKey(q)); });
+  return (GEN_SIZES[type]=seen.size);
+}
+
 function getQuestions(type,limit){
   // Dice games have no questions at all — they run their own screens.
   if(isSpecialGame(type)) return [];
-  if(isGenBank(type)) return GEN_BANKS[type](limit,0);
+  if(isGenBank(type)) return drawGen(type,limit,0);
   // Both word-pronunciation banks are drawn fresh so the families, the words
   // and the round shapes vary between games.
   if(isPhonicsType(type)) return genPhonicsQuestions(type,limit);
@@ -5725,7 +5822,7 @@ function updateQCountDisplay(){
   }
   const c=countFor(selectedQType,limit);
   if(selectedQType==='custom') disp.textContent=(selectedBankName?'"'+selectedBankName+'" — ':'')+c.avail+' questions available — '+c.will+' will be used';
-  else disp.textContent=c.avail+' available — '+c.will+' will be used';
+  else disp.textContent=countLine(c);
 }
 
 function startGame(){
@@ -5736,6 +5833,7 @@ function startGame(){
   // works through their own rounds at their own level.
   if(isTestType(selectedQType)){ roomGame='test'; startTestClass(); return; }
   roomGame=null;
+  resetGenSeen();
   const limit=parseInt(document.getElementById('q-limit').value)||10;
   teacherTimerDuration=Math.max(10,Math.min(120,parseInt(document.getElementById('t-limit').value)||30));
   currentQuestions=getQuestions(selectedQType,limit);
@@ -7676,10 +7774,13 @@ function updateSoloCountDisplay(){
   const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
   const c=countFor(soloSelectedType,limit);
   if(soloSelectedType==='custom') display.textContent=(selectedBankName?'"'+selectedBankName+'" — ':'')+c.avail+' questions available — '+c.will+' will be used';
-  else display.textContent=c.avail+' available — '+c.will+' will be used';
+  else display.textContent=countLine(c);
 }
 function startSoloGame(){
   syncSoloUrl(soloSelectedType);
+  // A new game may show anything again; it is within one game that a repeat
+  // is a repeat.
+  resetGenSeen();
   if(soloSelectedType==='target'){ roomGame=null; startSoloTarget(); return; }
   // Test Yourself runs its own rounds rather than one flat list of questions.
   if(isTestType(soloSelectedType)){
@@ -7838,6 +7939,7 @@ let TEST=null;
 let testPlayersListener=null;
 
 function newTestGame(mode,type,acsf){
+  resetGenSeen();
   // A level check swaps the ladder for the bands and runs two rounds longer.
   // Everything downstream of this (the move, the round card, the class
   // scoreboard) reads TEST.ladder and TEST.rounds and needs no branch of its
@@ -7931,7 +8033,7 @@ function acsfPickSteps(band,n){
    freshly drawn and the fixed ones stay shuffled. A bank that cannot fill a
    round in one draw is drawn again rather than dealing a short round. */
 function testQuestions(step,n){
-  const draw=()=>isGenBank(step.type)?GEN_BANKS[step.type](n,step.from||0)
+  const draw=()=>isGenBank(step.type)?drawGen(step.type,n,step.from||0)
                                      :getQuestions(step.type,n);
   let qs=draw();
   for(let i=0;qs.length<n&&i<4;i++) qs=qs.concat(draw());
