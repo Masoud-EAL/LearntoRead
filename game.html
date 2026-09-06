@@ -5817,11 +5817,6 @@ function applyTargetSetup(scope){
   // it covers the dice game and Test Yourself, named here by hand until now.
   const mc=document.getElementById(scope+'-mc-toggle');
   if(mc) mc.style.display=mcAppliesTo(type)?'':'none';
-  // The level check is a Test Yourself setting and belongs to nothing else. It
-  // is solo only: a class test is self-paced across thirty phones, and a
-  // profile is something a teacher reads with one learner.
-  const ac=document.getElementById(scope+'-acsf-toggle');
-  if(ac) ac.style.display=(scope==='solo'&&test)?'':'none';
   const lim=document.getElementById(scope+'-limit-row');
   if(lim) lim.style.display=on?'none':'';
   const qf=document.getElementById(scope+'-q-field');
