@@ -2959,7 +2959,11 @@ const SMS_ITEMS=[
     qs:[ {q:'Which day has no class?', answer:'Friday', alts:['Monday','Sunday','Tuesday']},
          {q:'When is the next class?', answer:'Monday', alts:['Friday','Saturday','Tomorrow']} ] },
   { from:'Housing Office', body:'Your rent is due on the 1st of June. Please pay $320 before this date.',
-    qs:[ {q:'How much is the rent?', answer:'$320',       alts:['$302','$3.20','$1320']},
+    /* Not $3.20: the marker strips the dollar sign and the decimal point, so
+       $3.20 and $320 are the same string by the time the answer is checked and
+       both options come back right. $230 is the same transposition trap and
+       survives the stripping. */
+    qs:[ {q:'How much is the rent?', answer:'$320',       alts:['$302','$230','$1320']},
          {q:'When is the rent due?', answer:'1st of June',alts:['1st of July','6th of January','Today']} ] },
 ];
 
@@ -3402,22 +3406,43 @@ function fmtDigital(h,m){ return h+':'+String(m).padStart(2,'0'); }
            concept of AM/PM)".
    from 1: half and quarter hours, still no AM/PM.
    from 2: with AM/PM — ACSF Level 1, "Reads digital time, including AM/PM". */
+/* Spoken the way a digital clock is read: "seven fifteen", not "quarter past
+   seven". The analogue phrasing is timeWords, and it belongs to the Clock
+   game; saying it here would put back the very reading this game exists to
+   replace, and a learner asked to write 7:15 would have heard the word
+   "quarter" instead of either number on the screen. */
+function digitalWords(h,m){
+  if(m===0) return numWord(h)+" o'clock";
+  if(m<10) return numWord(h)+' oh '+numWord(m);
+  return numWord(h)+' '+numWord(m);
+}
+/* AM and PM are what the learner has to write, so the words that stand for
+   them have to be true of the hour they are said over. */
+function partOfDay(h,ampm){
+  if(ampm==='AM') return ' in the morning';
+  return h<6?' in the afternoon':' in the evening';
+}
 function genDigitalTimeQuestions(n,from){
   const out=[], base=from||0;
+  // A plausible hour for the half of the day being named, so "in the evening"
+  // is never said over two in the morning.
+  const pickHour=function(ampm){
+    return ampm==='AM'?randInt(6,11):ampm==='PM'?randInt(1,8):randInt(1,12);
+  };
   for(let i=0;i<(n||8);i++){
     const step=Math.min(base+ (i%2), 2);
-    const h=randInt(1,12);
-    const m=step===0?0:[0,15,30,45][randInt(0,3)];
     const ampm=step>=2?(Math.random()<0.5?'AM':'PM'):'';
+    const h=pickHour(ampm);
+    const m=step===0?0:[0,15,30,45][randInt(0,3)];
     const shown=fmtDigital(h,m)+(ampm?' '+ampm:'');
-    const spoken=timeWords(h,m)+(ampm?(ampm==='AM'?' in the morning':' in the afternoon'):'');
+    const spoken=digitalWords(h,m)+(ampm?partOfDay(h,ampm):'');
     if(i%2===0){
       // Hear it, tap the clock that shows it.
       const alts=[];
-      while(alts.length<3){
-        const ah=randInt(1,12), am=step===0?0:[0,15,30,45][randInt(0,3)];
+      let guard=0;
+      while(alts.length<3&&guard++<60){
         const ap=step>=2?(Math.random()<0.5?'AM':'PM'):'';
-        const c=fmtDigital(ah,am)+(ap?' '+ap:'');
+        const c=fmtDigital(pickHour(ap),step===0?0:[0,15,30,45][randInt(0,3)])+(ap?' '+ap:'');
         if(c!==shown&&alts.indexOf(c)<0) alts.push(c);
       }
       out.push({type:'mc', say:spoken, question:'🔊 Which one shows this time?',
@@ -3472,19 +3497,41 @@ function genCalendarQuestions(n){
 const ORDINALS=['first','second','third','fourth','fifth'];
 const ORD_SHORT=['1st','2nd','3rd','4th','5th'];
 const ORD_FACES=['🧍','🧍‍♀️','🧍‍♂️','🧑','👩'];
+/* Two directions, alternating, and neither of them says its own answer.
+   The old round spoke "which one is second?" over a row of figures with the
+   second one marked and offered the ordinal words as the choices, so the
+   answer was audible and the picture was decoration.
+     even rounds — the row is marked, the prompt asks which one it is, and the
+       learner counts along the row to name the position.
+     odd rounds — there is no row at all, the ordinal is spoken, and the learner
+       taps its written short form. A row of identical unmarked figures only
+       invites a learner to pick one of them, and the choices are the task
+       here. This is the half that carries the quoted feature,
+       "recognise oral ordinal numbers from 1st to 3rd": the word is heard, and
+       1st/2nd/3rd is a different written form from first/second/third, so
+       matching them is the skill rather than an echo. */
 function genOrdinalQuestions(n,from){
   const out=[], top=(from?5:3);
   for(let i=0;i<(n||8);i++){
     const pos=randInt(0,top-1);
+    const hear=i%2===1;
     const row=ORD_FACES.slice(0,top).map(function(f,ix){
       return '<span class="ord-fig'+(ix===pos?' ord-hit':'')+'">'+f+'</span>';
     }).join('<span class="ord-arrow">›</span>');
-    const correct=ORDINALS[pos];
-    const alts=shuffle(ORDINALS.slice(0,top).filter(function(o){ return o!==correct; })).slice(0,3);
-    out.push({type:'mc', say:'Which one is '+correct+'?',
-      icon:'<div class="ord-row">'+row+'</div>',
-      question:'🔊 Which one is marked?',
-      answer:correct, choices:shuffle([correct].concat(alts))});
+    const icon='<div class="ord-row">'+row+'</div>';
+    if(hear){
+      const correct=ORD_SHORT[pos];
+      const alts=shuffle(ORD_SHORT.slice(0,top).filter(function(o){ return o!==correct; })).slice(0,3);
+      out.push({type:'mc', say:'Tap the '+ORDINALS[pos]+' one.',
+        question:'🔊 Which one did you hear?',
+        answer:correct, choices:shuffle([correct].concat(alts))});
+    } else {
+      const correct=ORDINALS[pos];
+      const alts=shuffle(ORDINALS.slice(0,top).filter(function(o){ return o!==correct; })).slice(0,3);
+      out.push({type:'mc', say:'Which one is marked?', icon:icon,
+        question:'🔊 Which one is marked?',
+        answer:correct, choices:shuffle([correct].concat(alts))});
+    }
   }
   return out;
 }
@@ -3568,7 +3615,10 @@ function genDeviceQuestions(n,from){
     } else {
       const alts=shuffle(DEVICES.filter(function(x){ return x.n!==d.n; })).slice(0,3)
                   .map(function(x){ return x.n; });
-      out.push({type:'mc', say:'Which one is the '+d.n+'?',
+      /* The picture is the question, so the audio reads the question out and
+         stops there. Saying "which one is the keyboard" named the answer, and
+         a learner could pick the right word without ever looking at the icon. */
+      out.push({type:'mc', say:'What is this called?',
         icon:'<span style="font-size:3.4rem;">'+d.e+'</span>',
         question:'🔊 What is this called?',
         answer:d.n, choices:shuffle([d.n].concat(alts))});
@@ -3610,8 +3660,8 @@ const PROMPTS=[
   {t:'No internet',        b:'You are not connected',    a:'Turn on wifi', alts:['Charge it','Take a photo','Save the file']},
   {t:'Delete this photo?', b:'This cannot be undone',    a:'Cancel',       alts:['Charge it','Turn it off','Print it']},
   {t:'Storage full',       b:'No room for new photos',   a:'Delete some',  alts:['Charge it','Turn on wifi','Call someone']},
-  {t:'Update ready',       b:'Install now or later?',    a:'Later',        alts:['Delete it','Print it','Take a photo']},
-  {t:'Save changes?',      b:'You have not saved yet',   a:'Save',         alts:['Delete it','Charge it','Turn it off']},
+  {t:'Update ready',       b:'Do you want to install it now?', a:'Later', alts:['Delete it','Print it','Take a photo']},
+  {t:'Changes not kept',   b:'What do you want to do?',  a:'Save',         alts:['Delete it','Charge it','Turn it off']},
   {t:'Wrong password',     b:'Try again',                a:'Type it again',alts:['Charge it','Print it','Turn on wifi']},
 ];
 function genPromptQuestions(n){
@@ -3665,7 +3715,7 @@ function genSafeQuestions(n,from){
     if(from&&i%2===1){
       const it=SAFE_ITEMS[randInt(0,SAFE_ITEMS.length-1)];
       const correct=it.safe?'Safe to share':'Keep it private';
-      out.push({type:'mc', say:'Is it safe to share this? '+it.t,
+      out.push({type:'mc', say:'Can you share this with anyone? '+it.t,
         icon:'<span style="font-size:2.6rem;">'+(it.safe?'🙂':'🔒')+'</span>',
         question:'🔊 '+it.t, answer:correct.toLowerCase(),
         choices:shuffle([correct, it.safe?'Keep it private':'Safe to share'])});
@@ -3903,7 +3953,7 @@ const GREETINGS=[
   {say:'Good morning.',       a:'Good morning.',   alts:['Good night.','Thank you.','Goodbye.']},
   {say:'How are you?',        a:'I am fine, thank you.', alts:['My name is Ali.','It is Monday.','Good night.']},
   {say:'Thank you.',          a:"You're welcome.", alts:['Good morning.','See you tomorrow.','How are you?']},
-  {say:'Goodbye. See you tomorrow.', a:'Goodbye.', alts:['Good morning.','Thank you.','Please.']},
+  {say:'I am going home now.', a:'Goodbye.', alts:['Good morning.','Thank you.','Please.']},
   {say:'What is your name?',  a:'My name is Ali.', alts:['I am fine.','It is nine o’clock.','Yes, please.']},
   {say:'Where are you from?', a:'I am from Vietnam.', alts:['I am fine, thank you.','My name is Sara.','On Monday.']},
   {say:'Please sit down.',    a:'Yes, thank you.', alts:['Good morning.','My name is Omar.','It is Tuesday.']},
