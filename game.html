@@ -4282,21 +4282,40 @@ function genFormQuestions(n){
 const LETTERS='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 // Picture categories for "odd one out". Every word here must have a distinct
 // emoji in the EMOJI map so each round shows four clear pictures.
+/* Every group has to be a category a learner can name in one word, because the
+   round only works if the three that belong obviously belong. Three things
+   from "household" — a mug, a box and a spoon, which on screen are a coffee, a
+   parcel and a spoon — are not a category, so whichever fourth thing is added
+   is odd only because the game says so. A learner can just as well argue the
+   coffee is the odd one, and they are right.
+
+   So the loose groups are gone rather than patched: nature was the sky and the
+   ground in one list, toys held "toy" and "game" which are not pictures of
+   anything in particular, and household was a drawer. What is left is ten
+   groups that each answer "what are these three?" without hesitating. */
 const ODD_GROUPS={
   animals:['cat','dog','pig','cow','duck','fish','bee','fox','hen','rat','bat','crab','elephant'],
   fruit:['apple','banana','orange','grape','mango','peach','pear','lemon','cherry','watermelon','pineapple','coconut','kiwi'],
   transport:['bus','ship','train','truck','van','bike','boat'],
-  clothes:['cap','coat','dress','hat','tie'],
+  clothes:['cap','coat','dress','hat','tie','shirt','skirt','scarf'],
   body:['ear','foot','leg','hand','nose','eye','mouth','teeth','arm','thumb'],
   food:['cake','egg','pie','jam','meat','rice','bun'],
   weather:['sunny','rainy','snowy','windy','cloudy','stormy','foggy'],
   colors:['red','blue','green','brown','black'],
   numbers:['one','two','three','four','five','six','seven','eight','nine','ten'],
-  nature:['sun','moon','star','tree','lake','rock'],
-  toys:['ball','toy','kite','drum','game'],
-  household:['bed','lamp','clock','door','box','bell','mug','spoon','phone','watch'],
   actions:['run','hop','cry','hug','sleep','read']
 };
+/* Pairs that must never meet, because the odd one would share the thing that
+   makes the other three a group. An apple among cake, pie and bun is still
+   food; a cow among cake, meat and egg is most of the way to being one; and
+   orange, lemon and cherry are colours as well as fruit. Everything else is
+   safe: a bus among three animals is a bus. */
+const ODD_CONFLICTS=[['fruit','food'],['animals','food'],['fruit','colors']];
+function oddClashes(a,b){
+  return ODD_CONFLICTS.some(function(p){
+    return (p[0]===a&&p[1]===b)||(p[1]===a&&p[0]===b);
+  });
+}
 function genLetterQuestions(){
   // Some rounds show the letters written rather than typed. The checklist
   // asks for both — "typed print and clear, handwritten letters" — and a
@@ -4484,9 +4503,16 @@ function genOddOneOut(count){
     const same=pickDistinct(ODD_GROUPS[a],3);
     if(same.length<3) continue;
     const sameEmo=new Set(same.map(w=>emo(w)));
-    const b=shuffle(groups.filter(g=>g!==a))[0];
-    // The odd item must show a picture that isn't already on screen.
-    const odd=shuffle([...ODD_GROUPS[b]]).find(w=>{const e=emo(w);return e&&!sameEmo.has(e);});
+    // Not from a group that shares what makes these three a group, or the
+    // learner is being asked to pick between two right answers.
+    const b=shuffle(groups.filter(g=>g!==a&&!oddClashes(a,g)))[0];
+    if(!b) continue;
+    /* The odd item must show a picture that isn't already on screen, and must
+       not be a member of the group it is supposed to be odd against. */
+    const odd=shuffle([...ODD_GROUPS[b]]).find(function(w){
+      const e=emo(w);
+      return e&&!sameEmo.has(e)&&ODD_GROUPS[a].indexOf(w)<0;
+    });
     if(!odd) continue;
     const sig=a+'|'+[...same].sort().join(',')+'|'+odd;
     if(seen.has(sig)) continue;
