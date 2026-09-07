@@ -3597,7 +3597,7 @@ const DEVICES=[
   {n:'printer', e:'🖨️', use:'To put it on paper'},
   {n:'camera',  e:'📷', use:'To take a photo'},
   {n:'keyboard',e:'⌨️', use:'To type'},
-  {n:'mouse',   e:'🖱️', use:'To point and click'},
+  {n:'mouse',   art:mouseArt, use:'To point and click'},
   {n:'headphones',e:'🎧',use:'To listen'},
   /* Drawn, not an emoji: see chargerArt below for why none of them will do. */
   {n:'charger', art:chargerArt, use:'To give it power'},
@@ -3617,6 +3617,23 @@ const DEVICES=[
 
    Light on dark, which is the only theme the app has. It is a white charger,
    which is real enough and is the version that can be seen against the card. */
+/* A mouse, drawn, for the same reason the charger is. The emoji renders on an
+   iPhone as a plain white rounded rectangle — Apple drawing its own mouse —
+   and a learner being asked "what is this called?" over a white blob is being
+   asked a trick question. An oval with a seam down the middle and a wheel at
+   the top is a mouse to anyone who has seen one. */
+function mouseArt(cls){
+  return '<svg class="'+(cls||'dev-art')+'" viewBox="0 0 120 180" role="img" aria-label="a mouse">'
+    + '<rect x="14" y="8" width="92" height="164" rx="46" fill="#e9ecf6"'
+    +   ' stroke="#a8b0c9" stroke-width="4"/>'
+    // The seam between the two buttons, and the wheel sitting in it.
+    + '<line x1="60" y1="8" x2="60" y2="74" stroke="#a8b0c9" stroke-width="4"'
+    +   ' stroke-linecap="round"/>'
+    + '<line x1="14" y1="74" x2="106" y2="74" stroke="#a8b0c9" stroke-width="4"/>'
+    + '<rect x="52" y="26" width="16" height="30" rx="8" fill="#c3cadf"'
+    +   ' stroke="#8f97b5" stroke-width="3.5"/>'
+    + '</svg>';
+}
 function chargerArt(cls){
   return '<svg class="'+(cls||'dev-art')+'" viewBox="0 0 210 170" role="img" aria-label="a charger">'
     // The two pins, each a flat blade tilted out from the top of the block.
@@ -3699,9 +3716,14 @@ function genSymbolQuestions(n){
     const d=DIGI_SYMBOLS[randInt(0,DIGI_SYMBOLS.length-1)];
     const alts=shuffle(DIGI_SYMBOLS.filter(function(x){ return x.n!==d.n; })).slice(0,3)
                 .map(function(x){ return x.n; });
-    out.push({type:'mc', say:'What does this button do?',
+    /* "What is this?" rather than "what does this button do?". Half the list
+       is not a button — the camera, the battery, the message, the wifi bars
+       are things on a screen, and asking what they do makes the round wrong
+       before the learner has answered it. The shorter question is also the
+       easier one to read, which this audience needs. */
+    out.push({type:'mc', say:'What is this?',
       icon:'<span class="digi-key">'+d.s+'</span>',
-      question:'🔊 What does this button do?',
+      question:'🔊 What is this?',
       answer:d.n.toLowerCase(), choices:shuffle([d.n].concat(alts))});
   }
   return out;
@@ -3791,10 +3813,13 @@ const SAFE_ITEMS=[
   {t:'Your bank card number',    safe:false}, {t:'The suburb you live in', safe:true},
   {t:'A photo of your passport', safe:false}, {t:'Your class day',         safe:true},
 ];
+/* `from` chooses the kind, the same way Copy It does: 0 copies the code, 1
+   judges what is safe to share. One kind per step, so a run asks each once
+   instead of dealing codes over and over to reach the other half. */
 function genSafeQuestions(n,from){
   const out=[];
   for(let i=0;i<(n||8);i++){
-    if(from&&i%2===1){
+    if(from){
       const it=SAFE_ITEMS[randInt(0,SAFE_ITEMS.length-1)];
       const correct=it.safe?'Safe to share':'Keep it private';
       out.push({type:'mc', say:'Can you share this with anyone? '+it.t,
@@ -3873,10 +3898,13 @@ const PF_COPY_NAME=PF_COPY_A.concat([
   ['06','PLB','Uses upper and lower case in extremely familiar words, e.g. own name',1,1]]);
 const PF_COPY_NUM=PF_COPY_A.concat([
   ['05','PLA','Copies numbers of one or two digits',1]]);
+/* `from` chooses the kind of copying, not the difficulty: 0 a word, 1 a name,
+   2 a number. One kind per step means the level check asks for each once
+   rather than dealing the same shape over and over hoping to cover the rest. */
 function genCopyQuestions(n,from){
   const out=[];
+  const mode=Math.max(0,Math.min(2,from||0));
   for(let i=0;i<(n||8);i++){
-    const mode=from?(i%3):(i%2);
     if(mode===0){
       const w=COPY_WORDS[randInt(0,COPY_WORDS.length-1)];
       out.push({type:'typein', label:'COPY THE WORD', noListen:true, matchCase:true,
@@ -4016,21 +4044,34 @@ function genPunctuationQuestions(n,from){
    simple structures". A model is given and one word changes: that is what
    "adapted from a model" means, and it is a long way short of free writing,
    which is the honest ceiling here. */
+/* Two sentences, because the feature says two: "Writes two simple sentences
+   adapted from a model". A model of one sentence asking for one sentence back
+   could never show it, however well the learner did — half a feature is not a
+   feature. Each model is a pair a learner can answer about themselves, and the
+   pair is shown together so the pattern is there to follow. */
 const SENTENCE_MODELS=[
-  {model:'My name is David.',        ask:'Write it with your own name.',       stem:'My name is ',  hint:'your name'},
-  {model:'I live in Springvale.',    ask:'Write it with your own suburb.',     stem:'I live in ',   hint:'your suburb'},
-  {model:'I come from Vietnam.',     ask:'Write it with your own country.',    stem:'I come from ', hint:'your country'},
-  {model:'I have two children.',     ask:'Write it with your own number.',     stem:'I have ',      hint:'a number, then children'},
-  {model:'My class is on Monday.',   ask:'Write it with your own day.',        stem:'My class is on ', hint:'a day'},
-  {model:'I go to the shop.',        ask:'Write it with a different place.',   stem:'I go to the ', hint:'a place'},
+  {model:'My name is David. I am from Vietnam.',
+   ask:'Write two sentences about you.', hint:'your name, then your country'},
+  {model:'I live in Springvale. I have two children.',
+   ask:'Write two sentences about you.', hint:'where you live, then your family'},
+  {model:'My class is on Monday. I come by bus.',
+   ask:'Write two sentences about you.', hint:'your class day, then how you come'},
+  {model:'My name is Sara. I speak Arabic.',
+   ask:'Write two sentences about you.', hint:'your name, then your language'},
+  {model:'I have three children. They go to school.',
+   ask:'Write two sentences about you.', hint:'your family, then what they do'},
+  {model:'I work in a shop. I start at nine.',
+   ask:'Write two sentences about you.', hint:'your work, then the time'},
 ];
 function genSentenceQuestions(n){
   const out=[];
   for(let i=0;i<(n||6);i++){
     const m=SENTENCE_MODELS[i%SENTENCE_MODELS.length];
-    out.push({type:'typein', label:'WRITE A SENTENCE', noListen:true, freeText:true,
+    out.push({type:'typein', label:'WRITE TWO SENTENCES', noListen:true,
+      freeText:true, sentences:2,
       icon:'<span class="copy-model sm">'+m.model+'</span>',
-      question:m.ask, placeholder:m.stem+'…', answer:m.model, stem:m.stem, hintText:m.hint});
+      question:m.ask, placeholder:'Two sentences about you',
+      answer:m.model, hintText:m.hint});
   }
   return out;
 }
@@ -4178,7 +4219,9 @@ const GOALS=[
   {e:'📖', t:'Read better'},   {e:'✍️', t:'Write better'},
   {e:'🗣️', t:'Speak better'},  {e:'👂', t:'Understand people'},
   {e:'🔢', t:'Numbers and money'}, {e:'💻', t:'Use a phone or computer'},
-  {e:'💼', t:'Get a job'},     {e:'📄', t:'Fill in forms'},
+  /* Not "Get a job": that is a reason for learning, not a thing to learn, and
+     the question asks what the learner wants to learn. */
+  {e:'💼', t:'English for work'}, {e:'📄', t:'Fill in forms'},
   {e:'🤷', t:'No goal yet'},
 ];
 const BARRIERS=[
@@ -7276,7 +7319,10 @@ const ACSF_CLAIMS={
      the band picker needs to know the bank is worth reaching. What is actually
      credited is decided round by round: see PF_COPY_WORD, PF_COPY_NAME and
      PF_COPY_NUM, because copying 57 is not evidence of writing a full name. */
-  'copyword':{base:PF_COPY_WORD.concat(PF_COPY_NAME.slice(2),PF_COPY_NUM.slice(2))},
+  /* PF_COPY_A is the pair both kinds share, so base carries it once and each
+     `from` adds only what its own round shows. */
+  'copyword':{base:PF_COPY_A,
+    byFrom:{0:PF_COPY_WORD.slice(2), 1:PF_COPY_NAME.slice(2), 2:PF_COPY_NUM.slice(2)}},
   /* The phonics and ordering rounds sit in the ladder for their own sake, but
      they answer named features too: hearing a sound and finding the letter is
      exactly "links spoken and written forms of the names and sounds of
@@ -7388,7 +7434,10 @@ const ACSF_CLAIMS={
      model" — is literally this game. Claiming both off one typed sentence is
      counting one thing twice to reach a higher level. */
   'modelsentence':{base:[
-    ['05','PLB','Writes two simple sentences adapted from a model'],
+    /* The fifth slot: writing one sentence and a fragment is not writing two,
+       so a partly correct answer scores nothing towards this one rather than
+       half of it. Same rule as "writes full name accurately". */
+    ['05','PLB','Writes two simple sentences adapted from a model',0,1],
     ['06','PLB','Uses capital letters and full stops accurately in sentences adapted from a model'],
     ['06','PLB','Leaves spaces between words'],
   ]},
@@ -7473,10 +7522,9 @@ const ACSF_CLAIMS={
     ['13','PLA','Begins to recognise extremely familiar digital devices'],
     ['13','PLB','Begins to understand the purpose of some extremely familiar digital devices and software'],
   ]},
-  'safeinfo':{base:[
-    ['12','PLA','Copies simple risk protection code',1],
-    ['12','PLB','Begins to understand there are risks associated with providing information',1],
-  ]},
+  'safeinfo':{base:[],
+    byFrom:{0:[['12','PLA','Copies simple risk protection code',1]],
+            1:[['12','PLB','Begins to understand there are risks associated with providing information',1]]}},
   'digisymbols':{base:[
     ['13','PLA','Begins to recognise extremely familiar digital symbols'],
   ]},
@@ -7511,6 +7559,14 @@ function acsfClaimsFor(step){
     const wide=!!(step.from);
     out=out.filter(function(c){ return wide?(c[1]!=='PLA'):(c[1]==='PLA'); });
   }
+  /* A bank whose `from` picks which KIND of round it deals, not how hard it
+     deals: Copy It at 0 copies a word, at 1 a name, at 2 a number, and each
+     shows its own features and no others. Without this the picker believed one
+     Copy It step covered everything Copy It can show, marked all of it asked
+     off a single question, and then kept coming back to top up evidence for
+     features that round had not touched — which is why one run served the
+     learner four copying rounds. */
+  if(e.byFrom) out=out.concat(e.byFrom[step.from||0]||[]);
   return out;
 }
 
@@ -7577,6 +7633,7 @@ const ACSF_POOL=[
   {type:'tableread',mc:true,from:0},{type:'tableread',mc:true,from:1},
   // Writing
   {type:'copyword',mc:false,from:0},{type:'copyword',mc:false,from:1},
+  {type:'copyword',mc:false,from:2},
   {type:'spelling',mc:false},{type:'numeralwrite',mc:false,from:0},
   {type:'numeralwrite',mc:false,from:1},{type:'punctuation',mc:true,from:0},
   {type:'punctuation',mc:false,from:1},{type:'modelsentence',mc:false},
@@ -7697,19 +7754,29 @@ function acsfPickNext(n){
   const open=acsfOpenStages();
   if(!open.length) return [];
   const used=TEST.ev.used;
-  const ranked=ACSF_POOL.map(function(st,i){
-    return {st:st, v:acsfStepValue(st,open), last:used[acsfStepKey(st)]||0, i:i};
-  }).filter(function(r){ return r.v>0; })
-    .sort(function(a,b){ return b.v-a.v||a.last-b.last||a.i-b.i; });
+  /* Ranked on what a step would show that is still needed, then on how little
+     the run has leaned on that game already. Without the second key one bank
+     that serves several indicators gets dealt again and again to top up
+     evidence, and the learner sits through four copying rounds while other
+     games go unasked. */
+  const dealt=TEST.ev.dealtBank||(TEST.ev.dealtBank={});
+  const rank=function(valueOf){
+    return ACSF_POOL.map(function(st,i){
+      return {st:st, v:valueOf(st), bank:dealt[st.type]||0,
+              last:used[acsfStepKey(st)]||0, i:i};
+    }).filter(function(r){ return r.v>0; })
+      .sort(function(a,b){ return b.v-a.v||a.bank-b.bank||a.last-b.last||a.i-b.i; });
+  };
+  const ranked=rank(function(st){ return acsfStepValue(st,open); });
   /* Nothing left that would show a feature this run still needs, but a stage
      is short of the evidence a verdict takes. Top it up from the steps that
      serve it rather than stopping on one question. */
-  const pool=ranked.length?ranked:ACSF_POOL.map(function(st,i){
-      return {st:st, v:acsfStepTops(st,open), last:used[acsfStepKey(st)]||0, i:i};
-    }).filter(function(r){ return r.v>0; })
-      .sort(function(a,b){ return b.v-a.v||a.last-b.last||a.i-b.i; });
+  const pool=ranked.length?ranked:rank(function(st){ return acsfStepTops(st,open); });
   const out=pool.slice(0,n).map(function(r){ return r.st; });
-  out.forEach(function(st){ used[acsfStepKey(st)]=++TEST.ev.tick; });
+  out.forEach(function(st){
+    used[acsfStepKey(st)]=++TEST.ev.tick;
+    dealt[st.type]=(dealt[st.type]||0)+1;
+  });
   return out;
 }
 /* A step's worth to an open stage that has seen every feature but still has
@@ -10444,13 +10511,31 @@ function typeinTier(q,ans){
   if(!q||(q.type!=='typein'&&!q.exact)) return null;
   const got=(ans||'').replace(/\s+/g,' ').trim();
   if(q.freeText){
-    const stem=(q.stem||'').replace(/\s+/g,' ').trim();
-    if(got.toLowerCase().indexOf(stem.toLowerCase())!==0)
-      return got.length>2?'partial':'wrong';
-    // The model was kept and something was added. A capital at the front and
-    // a stop at the end is the whole of what .06 asks for on top of that.
-    if(got.slice(stem.length).trim().length<2) return 'wrong';
-    return /^[A-Z]/.test(got)&&/[.!?]$/.test(got)?'correct':'partial';
+    /* "Writes TWO simple sentences adapted from a model" is the feature, and
+       two is not one. A model of two sentences is shown and two are asked for;
+       anything less is a partly correct answer, because the learner wrote —
+       they just did not write what the feature describes.
+         two sentences, each with something in it, each starting with a capital
+         and ending with a stop            -> correct
+         two sentences, capitals or stops missing, or only one sentence
+         written properly                  -> partly correct
+         nothing that reads as a sentence  -> wrong                            */
+    const want=q.sentences||1;
+    // Split on the marks that end a sentence, keeping what came before each.
+    const parts=got.split(/[.!?]+/).map(function(x){ return x.trim(); })
+                   .filter(function(x){ return x.length; });
+    const words=function(x){ return x.split(/\s+/).filter(Boolean).length; };
+    const real=parts.filter(function(x){ return words(x)>=2; });
+    if(!real.length) return 'wrong';
+    if(real.length<want) return 'partial';
+    /* Every sentence has to carry its own capital and its own stop. Counting
+       the stops rather than looking at the end catches "My name is Sara I am
+       from Iraq." — one stop for two sentences. */
+    const stops=(got.match(/[.!?]/g)||[]).length;
+    const caps=got.split(/[.!?]+/).map(function(x){ return x.trim(); })
+                  .filter(function(x){ return x.length; })
+                  .filter(function(x){ return /^[A-Z]/.test(x); }).length;
+    return (stops>=want&&caps>=want)?'correct':'partial';
   }
   if(q.exact){
     let a=got, b=(q.answer||'').replace(/\s+/g,' ').trim();
