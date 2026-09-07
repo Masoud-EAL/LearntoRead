@@ -60,6 +60,12 @@ clears every stage.
 
 Two kinds of question are deliberately outside the pool:
 
+- **The elementary sentence bank.** *"The cook ___ a good look at the food on
+  the stove"*, *"The nation ___ a new station for the next generation"* — those
+  sentences are written to exercise longer words, and a pre-level learner is
+  not assessed by them, they are defeated by them. It carried `.03` and `.08`
+  at Level 1; Level 1 evidence bought at that price is not worth having. The
+  beginner bank stays: *"My ___ is David"*, *"I live in a ___"*.
 - **The longer-word phonics rungs.** `wp2:gap` claims the same feature as
   `wp1:gap`, word for word, and `wp2:word` the same feature as `wp1:word`,
   whose own wording is *"extremely familiar words"* — which a longer word with
@@ -72,6 +78,11 @@ Two kinds of question are deliberately outside the pool:
 
 Grammar Unscramble is also out: its only claim was the Level 1 *"uses basic
 structures and limited verb tenses"*, which went when Level 1 Writing did.
+
+A feature no pool step can reach is not listed on the panel at all. "Not asked
+in this run" says another run might have asked it, and for a feature the level
+check can never reach that would be untrue — the app's own limits belong in the
+cap note, not in a line that reads as a gap in the run.
 
 
 ## Learning

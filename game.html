@@ -7534,7 +7534,14 @@ const ACSF_POOL=[
   // Reading
   {type:'signs',mc:true},{type:'oddone',mc:true},{type:'sms',mc:true},
   {type:'notice',mc:true},{type:'questionwords',mc:true},{type:'beginner',mc:true},
-  {type:'elementary',mc:true},{type:'tableread',mc:true,from:0},{type:'tableread',mc:true,from:1},
+  /* Not the elementary sentence bank. "The cook ___ a good look at the food on
+     the stove", "The nation ___ a new station for the next generation" — those
+     are written to exercise longer words, and a pre-level learner is not being
+     assessed by them, they are being defeated by them. It was in the pool to
+     carry .03 and .08 at Level 1, and Level 1 evidence bought at that price is
+     not worth having. The beginner bank stays: "My ___ is David", "I live in a
+     ___" is the register this test is for. */
+  {type:'tableread',mc:true,from:0},{type:'tableread',mc:true,from:1},
   // Writing
   {type:'copyword',mc:false,from:0},{type:'copyword',mc:false,from:1},
   {type:'spelling',mc:false},{type:'numeralwrite',mc:false,from:0},
@@ -8759,24 +8766,12 @@ function acsfSignalRows(ev){
 
 /* One indicator, as the panel prints it. `state` is what happened, `line` is
    what it is allowed to say about it. */
-/* Every feature the claim map can put in front of a learner, by indicator and
-   level, worked out once from the map itself so it cannot fall out of step
-   with it. The panel needs this to say which features a run never asked
-   about. */
-let ACSF_FEATURE_INDEX=null;
-function acsfAllFeatures(ind,lvl){
-  if(!ACSF_FEATURE_INDEX){
-    ACSF_FEATURE_INDEX={};
-    Object.keys(ACSF_CLAIMS).forEach(function(t){
-      const e=ACSF_CLAIMS[t];
-      [].concat(e.base||[],e.mc||[],e.typed||[]).forEach(function(c){
-        const k=c[0]+'|'+c[1];
-        (ACSF_FEATURE_INDEX[k]=ACSF_FEATURE_INDEX[k]||{})[c[2]]=1;
-      });
-    });
-  }
-  return Object.keys(ACSF_FEATURE_INDEX[ind+'|'+lvl]||{});
-}
+/* The features a level check could put in front of a learner, which is what
+   the pool can ask and not everything the claim map holds. The difference
+   matters on the panel: "not asked in this run" says another run might have
+   asked it, and for a feature no step can reach that would be untrue. Those
+   are the app's own limits and the cap note is where they belong. */
+function acsfAllFeatures(ind,lvl){ return acsfStageFeatures(ind,lvl); }
 /* One indicator at one level, question evidence and behavioural signal added
    together. A signal stands in where there is no question evidence and adds to
    it where there is: .13 has message questions in the claim map and five ways
