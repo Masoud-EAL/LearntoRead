@@ -4543,7 +4543,14 @@ function buildBank(){
   questionBank.numbers=SPELL_NUMBERS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.numbers1120=SPELL_NUMBERS_11_20.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.numbers2199=SPELL_NUMBERS_21_99.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
-  questionBank.days=SPELL_DAYS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
+  /* A day of the week is a proper noun: the capital is part of how the word is
+     spelled, not decoration on top of it. Lowercasing the answer here made
+     "monday" the right spelling and "Monday" a near miss, which is backwards,
+     and the round was already revealing the word as "Monday" while marking it
+     down. The bank keeps the capital, so writing it is what scores in full and
+     leaving it off is the partly correct answer it should always have been.
+     The copy-a-name round stopped lowercasing its own answer for this reason. */
+  questionBank.days=SPELL_DAYS.map(w=>({type:'word',word:w,answer:w}));
   questionBank.months=SPELL_MONTHS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.weather=SPELL_WEATHER.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.fruits=SPELL_FRUITS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
