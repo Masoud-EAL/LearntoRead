@@ -8514,7 +8514,7 @@ function testFinished(){
    in any question, they are in how the learner went about the run. */
 const ACSF_MIN_EVIDENCE=3;
 function newAcsfEvidence(){
-  return {byInd:{}, used:{}, tick:0, asked:0, attempts:0, timeouts:0,
+  return {byInd:{}, used:{}, tick:0, asked:0, attempts:0, timeouts:0, blanks:0,
           hints:0, replays:0, modes:{}, trend:[], finished:false};
 }
 /* A question may name the features it shows, and when it does that is what is
@@ -8578,6 +8578,20 @@ function acsfInputMode(q){
   if(q.type==='mc'||q.type==='letter'||q.type==='oddone'
      ||q.type==='phgap'||q.type==='phword') return 'tap';
   return 'type';
+}
+/* Whether the learner actually put an answer in, as against pressing Submit
+   over a question they never touched. Pressing the button is not attempting
+   the question, and the Learning signals are built on attempts.
+   Most rounds leave the box empty until something is done — a typed answer, a
+   tile placed, a clock hand dragged — but two write something regardless:
+   Shop reports 0.00 with no coins picked up, and Forms reports its separators
+   with no chips placed. Those two are asked about directly. */
+function answerGiven(q,ans){
+  const v=String(ans==null?'':ans).trim();
+  if(!v) return false;
+  if(q&&q.type==='shop') return v!==moneyAnswer(0);
+  if(q&&q.type==='form') return v.replace(/[\s|]/g,'')!=='';
+  return true;
 }
 function acsfNoteMode(q){
   if(!TEST||!TEST.ev) return;
@@ -8662,7 +8676,15 @@ function testRecord(tier,pts,timedOut,ans){
   // the one indicator where the how matters more than the what. Counted here
   // rather than when the question appeared, because a question that timed out
   // untouched says nothing about what the learner can work.
-  if(timedOut) TEST.ev.timeouts++; else { TEST.ev.attempts++; acsfNoteMode(currentStudentQ); }
+  /* Three different things, and only one of them is an attempt. Letting the
+     clock run out is a timeout; pressing Submit over an untouched question is
+     a blank, which is not an attempt either and must not read as one; putting
+     something in is an attempt. The input mode is noted only for a real
+     attempt, or submitting nothing would count as having worked the keyboard. */
+  const gave=answerGiven(currentStudentQ,ans);
+  if(timedOut) TEST.ev.timeouts++;
+  else if(!gave) TEST.ev.blanks=(TEST.ev.blanks||0)+1;
+  else { TEST.ev.attempts++; acsfNoteMode(currentStudentQ); }
   acsfCredit(step,tier,currentStudentQ,ans);
   // Also keep the run's answers by skill, for the report at the end. A rung is
   // a game, and every game belongs to one skill (GAME_INFO), so a ladder that
@@ -8772,7 +8794,11 @@ function acsfLvlText(l){ return l==='L1'?'Level 1':l; }
 function acsfSignalRows(ev){
   const rows={};
   const asked=ev.asked||0, tOut=ev.timeouts||0, tries=ev.attempts||0;
-  const rate=asked?tOut/asked:0, engaged=asked?tries/asked:0;
+  const blank=ev.blanks||0;
+  /* The share of questions the learner gave nothing to, however it happened.
+     Letting the clock run out and pressing Submit over an untouched question
+     are the same thing from here: no answer. */
+  const rate=asked?(tOut+blank)/asked:0, engaged=asked?tries/asked:0;
   const help=(ev.hints||0)+(ev.replays||0);
   const modes=Object.keys(ev.modes||{});
   const modeName={tap:'Tapped an answer on screen',type:'Typed on the on-screen keyboard',
@@ -8819,9 +8845,15 @@ function acsfSignalRows(ev){
     // Answering rather than letting the clock run out is the whole of the
     // risk-taking signal, so a run of timeouts does not clear PLB.
     const clean=rate<=0.15;
-    put('01','PLB',W(RUN,'Follows extremely simple instructions and procedures that may require prompting',asked,asked,'Demonstrates preparedness for learning through active participation',asked,asked-tOut));
+    /* Both counted on answers given, not on questions reached. Following an
+       instruction means doing the thing that was asked, and participating
+       means putting something in; a learner who pressed Submit over twenty
+       untouched questions did neither, and these two rows used to read 20 of
+       20 for exactly that run because one was asked/asked and the other only
+       subtracted the timeouts. */
+    put('01','PLB',W(RUN,'Follows extremely simple instructions and procedures that may require prompting',asked,tries,'Demonstrates preparedness for learning through active participation',asked,tries));
   } else if(asked>=6){
-    put('01','PLB',W(RUN,'Follows extremely simple instructions and procedures that may require prompting',asked,asked*0.4,'Demonstrates preparedness for learning through active participation',asked,tries));
+    put('01','PLB',W(RUN,'Follows extremely simple instructions and procedures that may require prompting',asked,tries*0.4,'Demonstrates preparedness for learning through active participation',asked,tries));
   }
   // Practising a repetitive task means answering it. A learner who let most
   // of the run time out sat through it rather than practised it.
