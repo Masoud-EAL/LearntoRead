@@ -5985,14 +5985,34 @@ function resolveTarget(scope){
 function applyTargetSetup(scope){
   const type=scope==='solo'?soloSelectedType:selectedQType;
   const on=type==='target', test=isTestType(type);
+  /* A level check has no settings at all. Everything else on this card offers
+     the learner a choice; this one is measuring them, and the seconds box was
+     the last thing left that could change the measurement. Set it to 10 and
+     every timed answer runs out, and the report then prints the timeouts as
+     something the learner could not manage. An instrument does not hand its
+     calibration to the person being measured. */
+  const bare=isLevelCheck(type);
   const opts=document.getElementById('tgt-opts-'+scope);
   if(opts) opts.classList.toggle('on',on);
   // Shown only where it changes the game. mcAppliesTo says where that is, and
   // it covers the dice game and Test Yourself, named here by hand until now.
   const mc=document.getElementById(scope+'-mc-toggle');
   if(mc) mc.style.display=mcAppliesTo(type)?'':'none';
+  /* The row goes, the input stays: soloSeconds() reads it and selectSoloType
+     seeds it with defaultSecsFor, which is where a level check's longer base of
+     40 seconds comes from. Removing the field would quietly shorten the test. */
   const lim=document.getElementById(scope+'-limit-row');
-  if(lim) lim.style.display=on?'none':'';
+  if(lim) lim.style.display=(on||bare)?'none':'';
+  // With every control inside it gone the panel is an empty bordered box, so
+  // the panel goes with them.
+  const panel=document.querySelector('#screen-solo-launch .launch-settings');
+  if(panel&&scope==='solo') panel.style.display=bare?'none':'';
+  // Copying a link to your own assessment, and "choose another game" framing it
+  // as one of the games, are both offers this card should not be making.
+  const exits=document.querySelector('#screen-solo-launch .launch-exits');
+  if(exits&&scope==='solo') exits.style.display=bare?'none':'';
+  const play=document.querySelector('#screen-solo-launch .launch-begin');
+  if(play&&scope==='solo') play.textContent=bare?'▶ Start the test':'▶ Play Game';
   const qf=document.getElementById(scope+'-q-field');
   if(qf) qf.style.display=test?'none':'';
   // The launch card already carries a line about the game, under its title.
@@ -8255,7 +8275,10 @@ function soloLinkParams(type){
   // The dice game and Test Yourself both set their own length and answer mode,
   // so a link to one has only the seconds to carry.
   if(isTestType(type)){
-    const secs=soloSeconds();
+    /* Nothing for a level check: it has no settings, so there is nothing for a
+       link to carry, and a link that named a length would be offering by
+       address the setting the card refuses to offer on screen. */
+    const secs=isLevelCheck(type)?defaultSecsFor(type):soloSeconds();
     if(secs!==defaultSecsFor(type)) p.set('t',secs);
   } else if(type!=='target'){
     const limit=parseInt(document.getElementById('solo-q-limit').value)||10;
@@ -11273,8 +11296,12 @@ window.addEventListener('load',()=>{
     if(game&&soloTabFor(game)&&UNSHAREABLE_GAMES.indexOf(game)<0){
       const q=parseInt(params.get('q'),10);
       if(q>=1&&q<=50) document.getElementById('solo-q-limit').value=q;
+      /* Not for a level check, whatever the address says. selectSoloType
+         already reseeds the field from defaultSecsFor a moment later, so this
+         was dead anyway; saying so here means a hand-typed ?t=10 cannot become
+         live again if that order ever changes. */
       const t=parseInt(params.get('t'),10);
-      if(t>=10&&t<=120) document.getElementById('solo-t-limit').value=t;
+      if(t>=10&&t<=120&&!isLevelCheck(game)) document.getElementById('solo-t-limit').value=t;
       const mc=params.get('mc');
       setMcMode(mc===null?defaultMcFor(game):mc==='1');
 
