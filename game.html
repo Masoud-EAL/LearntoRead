@@ -129,6 +129,23 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
    be gone. Auto margins centre the same way but give up the top first. */
 #screen-solo-launch .launch-col > :first-child{margin-top:auto;}
 #screen-solo-launch .launch-col > :last-child{margin-bottom:auto;}
+/* ── The level check's card, which has no settings on it ──
+   Those two autos only centre as a pair, and the level check hides the exits
+   row that is the last child. A display:none element still matches :last-child,
+   so the rule applies and does nothing: no box, no margin. The top auto is left
+   holding all the free space by itself, which on an 860px screen was 375px of
+   nothing above the first line and the whole card sitting on the floor.
+   So this card stops trying to centre and sits up at the top, and because it is
+   also the only card with room going spare, it spends it on type a teacher can
+   read at arm's length rather than on a gap. The 74px is clearance: the back
+   and music chips are fixed, and at 56px they sat on the skill line. */
+#screen-solo-launch .launch-col.launch-bare > :first-child{margin-top:0;}
+#screen-solo-launch .launch-col.launch-bare{gap:20px;
+  padding:74px 20px calc(124px + env(safe-area-inset-bottom,0px));}
+.launch-bare .launch-skill{font-size:1rem;letter-spacing:2.5px;}
+.launch-bare .launch-medallion{width:132px;height:132px;font-size:4.6rem;}
+.launch-bare .home-title{font-size:clamp(2.6rem,12vw,3.6rem);}
+.launch-bare .launch-sub{font-size:1.2rem;line-height:1.5;max-width:30ch;}
 .launch-skill{font-family:'Fredoka One',cursive;font-size:.8rem;letter-spacing:2px;
   text-transform:uppercase;color:var(--lx,var(--muted));opacity:.9;text-align:center;}
 .launch-medallion{width:116px;height:116px;flex:0 0 auto;border-radius:50%;
@@ -215,6 +232,18 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
   padding:46px 14px calc(116px + env(safe-area-inset-bottom,0px));gap:10px;}
 :root[data-app-h~="lt500"] .launch-medallion{width:66px;height:66px;font-size:2.2rem;}
 :root[data-app-h~="lt500"] .launch-sub{font-size:.82rem;}
+/* The bare card gives ground on a short screen like every other card does: a
+   phone held sideways has no room for the big type, and the point of the size
+   was the space, which is gone. Each of these carries the data-app-h prefix to
+   outweigh its plain neighbour above, which would otherwise win on specificity
+   and shrink the card back down at every height. */
+:root[data-app-h~="lt700"] #screen-solo-launch .launch-col.launch-bare{gap:15px;padding-top:64px;}
+:root[data-app-h~="lt700"] .launch-bare .launch-medallion{width:108px;height:108px;font-size:3.7rem;}
+:root[data-app-h~="lt700"] .launch-bare .launch-sub{font-size:1.06rem;}
+:root[data-app-h~="lt560"] #screen-solo-launch .launch-col.launch-bare{gap:9px;padding-top:52px;}
+:root[data-app-h~="lt560"] .launch-bare .launch-medallion{width:84px;height:84px;font-size:2.9rem;}
+:root[data-app-h~="lt560"] .launch-bare .launch-sub{font-size:.95rem;}
+:root[data-app-h~="lt560"] .launch-bare .home-title{font-size:clamp(1.9rem,8vw,2.4rem);}
 :root[data-app-h~="lt500"] #screen-home{padding:0 14px 8px;gap:6px;}
 /* The wordmark is the one thing on these screens that is not a choice, and
    the fixed "← WordLink" chip already names the site — so on a screen this
@@ -6013,6 +6042,11 @@ function applyTargetSetup(scope){
   if(exits&&scope==='solo') exits.style.display=bare?'none':'';
   const play=document.querySelector('#screen-solo-launch .launch-begin');
   if(play&&scope==='solo') play.textContent=bare?'▶ Start the test':'▶ Play Game';
+  /* The card with nothing in it lays out differently, and the stylesheet has to
+     be told which one it is. Toggled, not added, so leaving the level check for
+     an ordinary game puts the ordinary card back. */
+  const col=document.querySelector('#screen-solo-launch .launch-col');
+  if(col&&scope==='solo') col.classList.toggle('launch-bare',bare);
   const qf=document.getElementById(scope+'-q-field');
   if(qf) qf.style.display=test?'none':'';
   // The launch card already carries a line about the game, under its title.
