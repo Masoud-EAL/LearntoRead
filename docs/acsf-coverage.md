@@ -54,9 +54,9 @@ questions for `.03` are never put to a learner who has not shown Stage A `.03`.
 That holds even when a question dealt for another indicator happens to claim a
 level the run has not reached: the claim is not counted.
 
-The run therefore has no fixed length. Measured over full runs: about **23
-questions** for a learner who shows nothing, and about **65** for one who
-clears every stage.
+The run therefore has no fixed length. Measured over full runs: **19
+questions** for a learner who shows nothing, and **62** for one who clears
+every stage. `node tools/checks/check.js run` prints both.
 
 Two kinds of question are deliberately outside the pool:
 
