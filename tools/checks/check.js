@@ -431,6 +431,94 @@ check('gating', 'a failed indicator is never asked, or credited, above its stage
   if (!out.othersClimbed) bad('gating: failing .03/.04 stopped every other indicator climbing too');
 });
 
+/* The report that earned this one: a teacher sent a screenshot of .12 reading
+   "Working towards PLA.12, some of it came through, not enough of it to say
+   more", and asked why the candidate had not got Stage B. The candidate had
+   done nothing wrong. .12 carried alwaysPartial, which acsfLevelState applies
+   at every level, so no run could ever award it and the two Stage B questions
+   the app has were never once asked. .02 and .01 were failing the same way for
+   different reasons. A run answered perfectly is the one case where the report
+   cannot blame the learner, so it is the case worth pinning down. */
+check('reachable', 'a perfect run awards every indicator the top its evidence supports', async ctx => {
+  const RUNS = 4;
+  const tally = {};
+  for (let i = 0; i < RUNS; i++) {
+    const out = await play(ctx.page, 'right', (ev, prof) => {
+      /* Not meta.ceiling: the top an indicator can honestly reach. Every Level 1
+         claim in the app is marked partial on purpose, because one round is not
+         the sustained performance Level 1 describes, and acsfLevelState will not
+         award a level carried only by partial claims. So .03 .04 and .08 stop at
+         Stage B and are right to. The bar is the highest level, within the
+         ceiling, carrying at least one piece of evidence the app does not itself
+         call partial, from the claim map or from the run signals, since .02
+         Stage B has no question of its own and lives entirely in the signals.
+         Worked out from the claim map rather than from the run being checked: a
+         bar read off the same profile it is judging would move down to meet a
+         bug and call it passing. */
+      const solid = {};
+      ACSF_POOL.forEach(st => acsfClaimsFor(st).forEach(c => {
+        if (!c[3]) solid[c[0] + '|' + c[1]] = 1;
+      }));
+      // Every stage forced open, so this sees the signals the app can produce
+      // rather than the ones this particular run reached.
+      const open = { at: {}, done: {} };
+      ACSF_ORDER.forEach(i => ACSF_STEPS.forEach(l => { open.done[i + '|' + l] = 'yes'; }));
+      const able = acsfSignalRows({
+        asked: 40, attempts: 40, timeouts: 0, blanks: 0, hints: 1, replays: 1,
+        modes: { tap: 20, type: 10, tiles: 5, coins: 3, chips: 2 },
+        finished: true, stages: open
+      });
+      Object.keys(able).forEach(i => Object.keys(able[i]).forEach(l => {
+        const w = able[i][l].why || {};
+        if (Object.keys(w).some(k => !w[k].partial)) solid[i + '|' + l] = 1;
+      }));
+      const top = ind => {
+        let best = null;
+        ACSF_STEPS.forEach(lvl => {
+          if (acsfLvlNo(lvl) > acsfLvlNo(ACSF_INDICATORS[ind].ceiling)) return;
+          if (solid[ind + '|' + lvl]) best = lvl;
+        });
+        return best;
+      };
+      return acsfWalked().map(ind => {
+        const r = prof.rows.find(x => x.ind === ind);
+        /* A level cannot be both awarded and never asked about. The staircase
+           only judges a stage once every feature in it has been dealt, so a row
+           saying "not asked" underneath an awarded level means the plan counted
+           a feature as shown that the learner was never given: My Learning
+           deals five different asks and only two stand for a feature, and
+           marking the bank's whole list on the first of them told the staircase
+           that "locates learning materials" had been put to the learner while
+           the panel printed, truthfully, that it had not. */
+        const ghost = r.why.filter(w => w.notAsked && r.level &&
+                                        acsfLvlNo(w.lvl) <= acsfLvlNo(r.level))
+                           .map(w => w.lvl + ' ' + w.text);
+        return { ind: ind, want: top(ind), got: r.level, line: r.line, ghost: ghost };
+      });
+    });
+    out.forEach(r => {
+      const t = tally[r.ind] || (tally[r.ind] = { want: r.want, hit: 0, n: 0, lines: {} });
+      t.n++;
+      if (r.got === r.want) t.hit++;
+      t.lines[r.line] = (t.lines[r.line] || 0) + 1;
+      r.ghost.forEach(g => bad('reachable: .' + r.ind + ' was awarded ' + r.got +
+                               ' with a feature the panel calls not asked: ' + g));
+    });
+  }
+  Object.keys(tally).sort().forEach(ind => {
+    const t = tally[ind];
+    say('  .' + ind + '  ' + t.hit + '/' + t.n + ' reached ' + (t.want || 'nothing to reach') +
+        '   ' + Object.keys(t.lines).join(' | '));
+    // Every run, not most of them. .01 used to come out three different ways
+    // across four identical perfect runs, which is a verdict about the deal
+    // rather than about the learner.
+    if (t.want && t.hit < t.n) {
+      bad('reachable: .' + ind + ' reached ' + t.want + ' on only ' + t.hit + ' of ' + t.n +
+          ' perfect runs (' + Object.keys(t.lines).join(' | ') + ')');
+    }
+  });
+});
+
 check('leaks', 'no question speaks or shows its own answer, and no two options collide', async ctx => {
   const rows = await ctx.page.evaluate(() => {
     soloMode = true;

@@ -23,15 +23,17 @@ legible script are also not claimed, because that is `tracing.html` and paper.
 | 🔧 extended | An existing game was extended to reach it |
 | 🆕 built | A new game was built for it |
 | 📊 from the run | Shown by how the learner works through a run, not by a right answer |
+| ❌ not assessed | The app cannot measure it, so it claims nothing and the panel says so |
 
 ## Totals
 
 | Status | Features |
 |---|---|
-| ✅ had it | 36 |
+| ✅ had it | 32 |
 | 📊 from the run | 16 |
 | 🔧 extended | 8 |
-| 🆕 built | 72 |
+| 🆕 built | 64 |
+| ❌ not assessed | 12 |
 | **Total** | **132** |
 
 ## Ceilings
@@ -116,10 +118,10 @@ cap note, not in a line that reads as a gap in the run.
 
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
-| 1 | Identifies some past experiences of successful learning and some areas of need | 🆕 built | My Learning: what is easy / what is hard |
+| 1 | Identifies some past experiences of successful learning and some areas of need | ❌ not assessed | an interview, not a round: the app claims nothing here |
 | 2 | Follows instructions provided by a supervisor, teacher/trainer, or mentor | 📊 from the run | follows each round’s task |
-| 3 | Identifies one or two short term learning objectives with assistance | 🆕 built | My Learning: pick a goal |
-| 4 | Identifies some potential barriers to learning, e.g. childcare issues | 🆕 built | My Learning: pick a barrier |
+| 3 | Identifies one or two short term learning objectives with assistance | ❌ not assessed | the app can show that a goal was chosen, not that it is a short term objective |
+| 4 | Identifies some potential barriers to learning, e.g. childcare issues | ❌ not assessed | an interview, not a round: the app claims nothing here |
 | 5 | Attempts new concrete tasks/activities of one or two steps with a highly explicit purpose | 📊 from the run | attempts new task types each round |
 
 ### `PLA1.02` — Takes first steps towards developing explicit learning strategies, Pre Level 1 Stage A

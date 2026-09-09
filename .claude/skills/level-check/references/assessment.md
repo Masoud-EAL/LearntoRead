@@ -42,6 +42,15 @@ Every Level 1 claim anywhere in the app is marked **partial**. One round of one
 game is not the sustained performance Level 1 describes, and a report that
 said otherwise would be a report a teacher could not use.
 
+That is what `partial` is for, and it is the only thing it is for. It is not a
+way to express general unease about an indicator. Marking every claim of a stage
+partial makes the stage unwinnable, because `acsfLevelState` will not award a
+level carried only by partial claims, and an unwinnable stage is not caution, it
+is a row that reads as the learner's failure. `.12` carried an `alwaysPartial`
+flag on top of that and could not be awarded at all: see rule 8a in
+`invariants.md`. Caution about how much a round shows belongs in the cap note,
+which is about the app, where a teacher can read it as such.
+
 ## What is deliberately not assessed
 
 - **`.07`, speaking.** Nothing here records or judges speech.
@@ -64,8 +73,12 @@ Per indicator, per level:
 3. `acsfRow` climbs the levels in order, stopping at the first one not shown,
    and also stopping at a level that was never asked, when features exist there
    and the ceiling allows them. Nothing to climb on means nothing above it.
-4. `ACSF_MIN_EVIDENCE` (3) is the floor. Below it the row reports what was
-   seen rather than what the learner can do.
+4. `acsfEnough` is the floor: `ACSF_MIN_EVIDENCE` (3), or two where every
+   feature the level has was put to the learner, because a level the app has
+   shown in full is a short level and not a thin performance. Below it the row
+   reports what was seen rather than what the learner can do. The stage review
+   and the panel read the same function, so they cannot disagree about what is
+   judgeable.
 5. `.01` and `.02` also take whole-run signals from `acsfSignalRows`: how much
    of the run was attempted, how much timed out, how much was submitted blank.
    One observation per feature, not one per question.
@@ -83,13 +96,22 @@ A screenshot of the teacher panel is a dense thing. What to look at first:
   produced by two independent faults.
 - **A row saying not assessed** is usually correct and deliberate. Check
   `docs/acsf-coverage.md` before treating it as a gap.
+- **"Working towards" on a learner who did well**, or a row that never awards
+  anything however the run goes, is rule 8a. Run
+  `node tools/checks/check.js reachable` first: it answers "could anybody have
+  got this?" in about a minute, and if the answer is no, the report is not about
+  the learner at all.
+- **A feature marked "not asked" underneath a level that was awarded** is the
+  plan and the panel disagreeing about what was shown. See rule 5.
 - **An indicator with far more questions than its neighbours** is rule 5: the
   picker and the round disagree about what the step showed.
 
 ## Run length
 
-There is no fixed length, by design. Measured over full runs: 19 questions for
-a learner who shows nothing, and 62 for one who clears every stage.
+There is no fixed length, by design. Measured over full runs: about 18
+questions for a learner who shows nothing, and about 68 for one who clears every
+stage. Both moved up when `.12` started asking its Stage B questions, which no
+run had ever reached.
 `node tools/checks/check.js run` prints both, so if a change moves them you
 will see it. `ACSF_MAX_QUESTIONS` (150) is a guard against a bank that cannot
 deal what a stage still needs, not a target.

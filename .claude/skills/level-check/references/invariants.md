@@ -72,6 +72,21 @@ so the staircase never recorded the step as done and kept asking. `byFrom` in
 `ACSF_CLAIMS` splits a bank's claims by round kind, which is what made the two
 agree. When a game keeps coming back, this is the first place to look.
 
+It came back a second time, in My Learning, the moment `acsfNoteAsked` started
+taking the dealt question's word instead of the bank's. One step claimed all
+four `.01` features, but a draw of one only ever returned the goal ask, because
+the options are shuffled and no two draws share a `qKey`, so nothing the run
+dealt could mark "locates learning materials" as shown. It was dealt eleven
+times in one run waiting for a question it was never going to be given. Same
+fix: `from` chooses the ask, `byFrom` splits the claims, and the three asks that
+stand for no feature are not in the pool at all, because a step that claims
+nothing cannot serve a stage. `spread` is what caught it.
+
+`acsfNoteAsked` takes `q` as well as the step for this reason. Where a question
+carries its own `q.acsf` it has the last word, exactly as it does in
+`acsfCredit`, or the plan records features the learner was never shown and the
+panel prints "not asked" about a feature the staircase has already counted.
+
 ### 6. Nothing is claimed that the app cannot measure
 *no check, judgement*
 
@@ -97,10 +112,76 @@ still credited every level it claimed. `acsfStageOpen` is checked in
 version of the staircase did exactly that and produced an eleven-question run.
 
 ### 8. Evidence needs a floor before it becomes a verdict
-*no check, judgement*
+*check: `reachable`*
 
 `ACSF_MIN_EVIDENCE` is 3. Below it the row says what was seen rather than what
 the learner can do. One question is an anecdote.
+
+The floor is about thin evidence, not about short levels. A level whose every
+feature has been put to the learner and answered is judged on what it has, down
+to two: `.02` Stage B has three features and the third is only visible when the
+learner asks for help, so holding it to three capped every learner good enough
+not to need a hint, every run. `acsfEnough` is the one place that decides, and
+the stage review and the panel both read it, so what the run decides to ask and
+what it finally prints cannot disagree. Two, shown whole. Never one.
+
+### 8a. Every indicator can be awarded
+*check: `reachable`*
+
+> "What happened here? Why didn't the candidate get PLB? What are the mistakes?"
+
+The candidate had done nothing wrong. `.12` carried `alwaysPartial`, which
+`acsfLevelState` applies at every level, and `acsfRow` climbs only on a full
+yes, so no run could award `.12` to anybody: a learner who answered all 62
+questions correctly read "Working towards PLA.12, some of it came through, not
+enough of it to say more". Worse, `acsfReviewStages` judges through the same
+call, so the stage never climbed and the two Stage B questions the app does have
+were never once asked in any run.
+
+Three indicators were failing this way at once, for three different reasons, and
+`.12` is only the one that got screenshotted. So the rule is not about
+`alwaysPartial`: a run answered perfectly is the one case where the report
+cannot honestly blame the learner, and every indicator has to reach the top its
+evidence supports on every such run. Not most runs: `.01` came out three
+different ways across four identical perfect runs, which is a verdict about the
+deal rather than about the learner.
+
+The bar is not `meta.ceiling`. Every Level 1 claim in the app is marked partial
+on purpose, so `.03` `.04` and `.08` stop at Stage B and are right to. It is the
+highest level carrying one piece of evidence the app does not itself call
+partial, worked out from the claim map rather than from the run being judged: a
+bar read off the profile it is checking moves down to meet a bug.
+
+### 8b. A run signal is credited through the staircase, like everything else
+*check: `reachable`, `gating`*
+
+The screenshot that produced rule 8a also had a Stage B row reading "61 of 61
+questions the learner answered" sitting underneath a "Working towards PLA"
+verdict. `acsfSignalRows` was a fourth way to write evidence and the only one
+the staircase did not police: rule 7 put `acsfStageOpen` in `acsfPickNext`,
+`acsfCredit` and `acsfNoteAsked`, and signals were missed.
+
+`acsfSignalOpen` is the gate, and it reads the staircase off the evidence rather
+than off `TEST.plan`, because a panel rebuilt from storage after a reload has no
+plan left to ask and has to print the same page. One wrinkle it has to allow
+for: a stage with no claim of its own is stepped over by `acsfNextStage` and
+never recorded as reached, so it counts as open once every stage below it has
+been shown. `.02` Stage B is the only one, and without that clause the gate
+silenced it entirely.
+
+### 8c. The app's ceiling is never printed as the learner's shortfall
+*no check, judgement*
+
+"Some of it came through, not enough of it to say more" is a sentence about a
+learner. When what actually happened is that the app cannot show more, that
+sentence is false in the direction that costs someone. `acsfRow` already has the
+honest wording and uses it ("PLB is the highest this run can show for .13"),
+so the fault is never the words, it is a row reaching the "working towards"
+branch when it should have reached the capped one.
+
+Read every row of a perfect run out loud as a teacher before shipping a change
+to the panel. No sentence may describe an app limit as something the learner did
+not manage.
 
 ---
 

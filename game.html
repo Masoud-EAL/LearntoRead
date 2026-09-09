@@ -4245,7 +4245,19 @@ function chipRow(list){
 }
 /* Every option is right. `anyAnswer` tells the marking to accept whatever
    comes back, so a learner can never be wrong about their own goal. */
-function genMyLearningQuestions(n){
+/* `from` chooses the ask, the way Copy It and Safe or Not Safe do: 0 names a
+   goal, 1 chooses the game that would help. Those are the two that stand for a
+   performance feature, so the pool holds one step for each and the level check
+   asks both. Anything else cycles all five, which is how the set is worth
+   reading whole.
+
+   Without the split the picker and the round disagreed. One pool step claimed
+   all four features, but a draw of one only ever came back with the goal ask,
+   because the options are shuffled and no two draws share a qKey, so nothing
+   the run dealt could ever mark "locates learning materials" as shown. The run
+   dealt My Learning eleven times waiting for a question it was never going to
+   be given. */
+function genMyLearningQuestions(n,from){
   const out=[];
   /* Only two of these five stand for a feature. Naming a goal is
      "expresses/identifies a learning goal"; choosing the game that would help
@@ -4253,8 +4265,9 @@ function genMyLearningQuestions(n){
      specific task". What is easy, what is hard and what gets in the way are
      worth asking and worth a teacher reading, but the features they used to
      stand on were the Level 1 ones, which are an interview and are gone. They
-     carry no claim rather than borrowing the goal one.
-     The goal question is first so a single-question draw always lands on it. */
+     carry no claim rather than borrowing the goal one. They are not in the
+     level check's pool for that reason: a step that claims nothing cannot serve
+     a stage. The goal question is first so a cycling draw still leads on it. */
   const asks=[
     {q:'What do you want to learn?',   list:GOALS,    label:'YOUR GOAL',
      acsf:[['01','PLA','Begins to express extremely simple learning goal',1],
@@ -4266,8 +4279,9 @@ function genMyLearningQuestions(n){
     {q:'What is hard for you now?',    list:EASYHARD, label:'WHAT IS HARD'},
     {q:'What makes it hard to come to class?', list:BARRIERS, label:'WHAT GETS IN THE WAY'},
   ];
+  const only=(from===0||from===1)?asks[from]:null;
   for(let i=0;i<(n||5);i++){
-    const a=asks[i%asks.length];
+    const a=only||asks[i%asks.length];
     /* The "none of these" option is always on the card rather than left to the
        shuffle, because a learner who has no goal has to be able to say so
        every time, not only on the rounds where it happened to be dealt. */
@@ -4757,7 +4771,7 @@ const GEN_BANKS={
   notice:       function(n){ return genNoticeQuestions(n); },
   greetings:    function(n){ return genGreetingQuestions(n); },
   instructions: function(n){ return genInstructionQuestions(n); },
-  mylearning:   function(n){ return genMyLearningQuestions(n); },
+  mylearning:   function(n,from){ return genMyLearningQuestions(n,from); },
 };
 const RETIRED_GAMES={devicecare:'prompts'};
 function isGenBank(t){ return Object.prototype.hasOwnProperty.call(GEN_BANKS,t); }
@@ -7277,8 +7291,17 @@ const ACSF_INDICATORS={
   '11':{skill:'Numeracy', name:'Communicating and representing mathematics',
         ceiling:'PLB',
         capNote:'The checklist numeracy tables stop at Pre Level 1 Stage B.'},
+  /* No alwaysPartial here. It used to carry one, and because acsfLevelState
+     applies it at every level and acsfRow climbs only on a full yes, .12 could
+     not be awarded to anybody: a learner who answered all 62 questions
+     correctly still read "Working towards PLA.12". Worse, acsfReviewStages
+     judges with the same call, so PLA.12 settled as part, the stage never
+     climbed, and the two Stage B questions this app does have were never once
+     asked in any run. The caution behind the flag is real but belongs where
+     the other indicators keep it: in the per-claim partial flags, and in the
+     cap note. */
   '12':{skill:'Digital', name:'Active awareness of self as a digital user',
-        ceiling:'PLB', alwaysPartial:true,
+        ceiling:'PLB',
         capNote:'Only the form and code rounds touch digital identity, and the risk questions are kept simple.'},
   '13':{skill:'Digital', name:'Knowledge, use and application of digital literacy skills',
         ceiling:'PLB',
@@ -7309,12 +7332,15 @@ const ACSF_ORDER=['01','02','03','04','05','06','07','08','09','10','11','12','1
    script (that is tracing.html, and paper), and the whole of .07, which is
    speaking. */
 const ACSF_CLAIMS={
-  'mylearning':{base:[
-    ['01','PLA','Begins to express extremely simple learning goal',1],
-    ['01','PLA','Locates limited familiar learning materials and resources following simple, immediate instructions',1],
-    ['01','PLB','Identifies at least one personal learning goal',1],
-    ['01','PLB','Demonstrates capacity to select limited learning materials for a specific task',1],
-  ]},
+  /* Split by ask, because the two feature-bearing questions are two questions:
+     from 0 names a goal, from 1 chooses the game that would help, and a step
+     that has dealt one has not shown the other. Claiming all four off either of
+     them left the staircase waiting on a feature the round could not deal. */
+  'mylearning':{base:[],
+    byFrom:{0:[['01','PLA','Begins to express extremely simple learning goal',1],
+               ['01','PLB','Identifies at least one personal learning goal',1]],
+            1:[['01','PLA','Locates limited familiar learning materials and resources following simple, immediate instructions',1],
+               ['01','PLB','Demonstrates capacity to select limited learning materials for a specific task',1]]}},
   /* Every feature any of the three copy rounds can show, because that is what
      the band picker needs to know the bank is worth reaching. What is actually
      credited is decided round by round: see PF_COPY_WORD, PF_COPY_NAME and
@@ -7516,15 +7542,20 @@ const ACSF_CLAIMS={
   'placevalue':{base:[
     ['10','PLB','Understands place value for ones and tens'],
   ]},
+  /* The .12 rows are not marked partial. They were, and it made the same
+     question count differently depending on which indicator was reading it:
+     the learner picks the device that connects you to people, and that was
+     full evidence for .13 and only half for .12, from one tap. Where the app
+     puts the feature in front of the learner and marks it, it is credited. */
   'devices':{base:[
-    ['12','PLA','Begins to recognise there are different digital devices commonly used to connect with others',1],
-    ['12','PLB','Begins to understand the purpose of some commonly used digital devices and software',1],
+    ['12','PLA','Begins to recognise there are different digital devices commonly used to connect with others'],
+    ['12','PLB','Begins to understand the purpose of some commonly used digital devices and software'],
     ['13','PLA','Begins to recognise extremely familiar digital devices'],
     ['13','PLB','Begins to understand the purpose of some extremely familiar digital devices and software'],
   ]},
   'safeinfo':{base:[],
-    byFrom:{0:[['12','PLA','Copies simple risk protection code',1]],
-            1:[['12','PLB','Begins to understand there are risks associated with providing information',1]]}},
+    byFrom:{0:[['12','PLA','Copies simple risk protection code']],
+            1:[['12','PLB','Begins to understand there are risks associated with providing information']]}},
   'digisymbols':{base:[
     ['13','PLA','Begins to recognise extremely familiar digital symbols'],
   ]},
@@ -7656,7 +7687,8 @@ const ACSF_POOL=[
   {type:'prompts',mc:true},{type:'safeinfo',mc:false,from:0},{type:'safeinfo',mc:false,from:1},
   {type:'instructions',mc:true},
   // Learning
-  {type:'mylearning',mc:true},{type:'greetings',mc:true},
+  {type:'mylearning',mc:true,from:0},{type:'mylearning',mc:true,from:1},
+  {type:'greetings',mc:true},
 ];
 
 /* The stages a level check walks, in order, and the one an indicator starts
@@ -7801,6 +7833,9 @@ function acsfStepTops(st,open){
 const ACSF_MERCY_QS=3;
 function acsfReviewStages(){
   const plan=TEST.plan;
+  // Where every indicator stands entering this review, so the signal rows below
+  // are gated on the same staircase the judging is about to read.
+  acsfSnapPlan();
   // The same evidence the panel will report, so what the run decides to ask
   // next and what it finally prints cannot disagree.
   const sig=acsfSignalRows(TEST.ev);
@@ -7808,7 +7843,7 @@ function acsfReviewStages(){
     const key=o.ind+'|'+o.lvl;
     const e=acsfEvidenceAt(o.ind,o.lvl,TEST.ev.byInd,sig)||{seen:0,right:0,why:{}};
     const meta=ACSF_INDICATORS[o.ind];
-    const enough=e.seen>=ACSF_MIN_EVIDENCE;
+    const enough=acsfEnough(e);
     if(!o.left.length&&enough){
       // Everything this stage has to show has been shown. Judge it: shown, and
       // the indicator climbs; not shown, and it stops here.
@@ -7833,6 +7868,9 @@ function acsfReviewStages(){
       plan.stage[o.ind]=null;
     }
   });
+  // And where they stand now the review has settled, which is the state the
+  // panel reports from, live or rebuilt out of storage.
+  acsfSnapPlan();
 }
 /* Whether a claim is one this run is entitled to count.
    A step is picked for the stage it serves, but a step can claim several
@@ -7849,10 +7887,20 @@ function acsfStageOpen(ind,lvl){
 }
 /* Recorded as each question is dealt, so a feature is not asked twice while
    a stage still has ones nobody has seen. Only for the stages this run has
-   reached, or a stage it never opened would look as though it had been. */
-function acsfNoteAsked(step){
+   reached, or a stage it never opened would look as though it had been.
+
+   The dealt question has the last word, exactly as it does in acsfCredit. My
+   Learning deals five different asks and only two of them stand for a feature:
+   naming a goal, and choosing the game that would help. Marking the bank's
+   whole list the moment any one of them was dealt told the staircase that
+   "locates learning materials" had been put to the learner when it had not, so
+   .01 was judged on evidence it never gathered and the panel printed the
+   feature as "not asked" in the same breath. Same run, same answers, three
+   different verdicts across four runs. */
+function acsfNoteAsked(step,q){
   if(!TEST||!TEST.plan) return;
-  acsfClaimsFor(step).forEach(function(c){
+  const claims=(q&&q.acsf)||acsfClaimsFor(step);
+  claims.forEach(function(c){
     if(!acsfStageOpen(c[0],c[1])) return;
     TEST.plan.asked[c[0]+'|'+c[1]+'|'+c[2]]=1;
   });
@@ -8515,7 +8563,34 @@ function testFinished(){
 const ACSF_MIN_EVIDENCE=3;
 function newAcsfEvidence(){
   return {byInd:{}, used:{}, tick:0, asked:0, attempts:0, timeouts:0, blanks:0,
-          hints:0, replays:0, modes:{}, trend:[], finished:false};
+          hints:0, replays:0, modes:{}, trend:[], finished:false, stages:null};
+}
+/* The staircase, mirrored onto the evidence as it settles.
+   acsfSignalRows has to answer the same "may this level be credited?" question
+   that acsfCredit answers with acsfStageOpen, but it runs at report time, and a
+   panel rebuilt from storage after a reload has no TEST.plan left to ask. The
+   evidence is what survives, so the plan rides along on it. */
+function acsfSnapPlan(){
+  if(!TEST||!TEST.plan||!TEST.ev) return;
+  const p=TEST.plan;
+  TEST.ev.stages={at:Object.assign({},p.stage), done:Object.assign({},p.done)};
+}
+/* acsfStageOpen's rule, read off the evidence rather than the live plan. */
+function acsfSignalOpen(ev,ind,lvl){
+  const s=ev&&ev.stages;
+  if(!s) return acsfStageOpen(ind,lvl);
+  if(s.done[ind+'|'+lvl]||s.at[ind]===lvl) return true;
+  /* A stage the staircase stepped over because it has no question of its own is
+     still a stage the learner climbed to. .02 Stage B has no claim in the map
+     at all, because practising a repetitive task and taking part are things a
+     run shows and not things it asks, so acsfNextStage skips straight past it
+     and the plan never records it as reached. It is open once every stage below
+     it has been shown, and shut the moment one of them was not, which is the
+     only part of the rule that was ever protecting anybody. */
+  const n=acsfLvlNo(lvl);
+  return ACSF_STAGE_ORDER.every(function(l){
+    return acsfLvlNo(l)>=n||s.done[ind+'|'+l]==='yes';
+  });
 }
 /* A question may name the features it shows, and when it does that is what is
    credited. One bank can hold two kinds of question — What Should You Do? deals
@@ -8631,7 +8706,7 @@ function testStartRound(){
       // Marked asked as it is dealt, so the next pick moves on to a feature
       // nobody has seen rather than dealing the same one three times in a
       // round.
-      acsfNoteAsked(st);
+      acsfNoteAsked(st,q);
       qs.push(q); TEST.roundSteps.push(st);
     });
   } else {
@@ -8744,6 +8819,19 @@ function testReportRow(kind,icon,label,value){
   return row;
 }
 
+/* Whether there is enough here to call it. ACSF_MIN_EVIDENCE is the floor,
+   because one question is an anecdote. But a level the app has shown in full
+   and that still has only two observations is a short level, not a thin
+   performance, and holding it below the floor charged the learner for the app's
+   shape: .02 Stage B has three features and the third is only visible when the
+   learner asks for help, so anyone good enough not to need a hint was capped at
+   Stage A, every run. Shown whole and answered, two is a verdict. One never is.
+   Shared, so the review that decides whether an indicator climbs and the panel
+   that prints the level cannot disagree about what counts as judgeable. */
+function acsfEnough(s){
+  return !!s&&(s.seen>=ACSF_MIN_EVIDENCE||(s.full&&s.seen>=2));
+}
+
 /* ══════════════ LEVEL CHECK — THE PROFILE ══════════════
    What the run is willing to say. Everything here is deliberately cautious,
    because the thing being produced looks like an assessment and is not one:
@@ -8762,7 +8850,7 @@ function testReportRow(kind,icon,label,value){
 function acsfVerdict(s){
   if(!s||!s.seen) return 'none';
   const acc=s.right/s.seen;
-  if(s.seen>=ACSF_MIN_EVIDENCE&&acc>=0.75) return 'yes';
+  if(acsfEnough(s)&&acc>=0.75) return 'yes';
   if(s.seen>=2&&acc>=0.5) return 'part';
   if(s.seen===1&&s.right>0) return 'part';
   return 'no';
@@ -8813,7 +8901,14 @@ function acsfSignalRows(ev){
      the learner having answered questions at all. The 35 is still printed,
      because it says what was watched; it is worth one observation, the same
      as a feature with a question of its own. */
+  /* Gated the same way acsfCredit is. Without this, signals were a fourth way
+     to write evidence and the only one the staircase did not police: a run
+     wrote "62 of 62" against a Stage B feature of an indicator whose Stage A
+     had never been shown, and the panel printed that row underneath a
+     "Working towards PLA" verdict. A learner who has not reached a stage is
+     not credited with it, whichever path the evidence comes down. */
   const put=function(ind,lvl,why,override){
+    if(!acsfSignalOpen(ev,ind,lvl)) return;
     const ks=Object.keys(why);
     const seen=override?override[0]:ks.length;
     const right=override?override[1]:ks.reduce(function(a,k){
@@ -8914,11 +9009,17 @@ function acsfEvidenceAt(ind,lvl,byInd,sig){
   const a=(byInd&&byInd[ind]||{})[lvl], b=((sig&&sig[ind])||{})[lvl];
   const aOk=a&&a.seen, bOk=b&&b.seen;
   if(!aOk&&!bOk) return null;
-  if(!bOk) return a;
-  if(!aOk) return b;
-  const why={};
-  [a,b].forEach(function(x){ Object.keys(x.why||{}).forEach(function(k){ why[k]=x.why[k]; }); });
-  return {seen:a.seen+b.seen, right:a.right+b.right, why:why};
+  const why={}; let seen=0, right=0;
+  [aOk?a:null,bOk?b:null].forEach(function(x){
+    if(!x) return;
+    seen+=x.seen; right+=x.right;
+    Object.keys(x.why||{}).forEach(function(k){ why[k]=x.why[k]; });
+  });
+  /* Whether every feature this level has a question for has now been put to
+     the learner. It decides whether a level short of ACSF_MIN_EVIDENCE is thin
+     evidence or simply a short level: see acsfVerdict. */
+  const full=acsfStageFeatures(ind,lvl).every(function(f){ return !!why[f]; });
+  return {seen:seen, right:right, why:why, full:full};
 }
 function acsfRow(ind,byInd,sig){
   const meta=ACSF_INDICATORS[ind];

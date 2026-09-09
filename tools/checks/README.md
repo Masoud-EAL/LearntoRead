@@ -43,6 +43,7 @@ NODE_PATH=/opt/node22/lib/node_modules node tools/checks/check.js
 | `ordering` | over all 64 combinations of per-level verdicts, no indicator is awarded a level without the one below it | "You cannot not get PLA. But get PLB." |
 | `blanks` | Submit over an untouched question is not an attempt (typed, tiles, clock, shop and form), and a run of them credits nothing | "I submitted many answers without writing anything but got PLB in learning" |
 | `gating` | a learner who fails one indicator is never asked, and never credited, above its stage, while other indicators still climb | the per-indicator staircase |
+| `reachable` | over four perfect runs, every indicator reaches the top its evidence supports, every time, and no awarded level carries a feature the panel calls not asked | "Why didn't the candidate get PLB?": .12 could not be awarded to anybody |
 | `leaks` | no prompt says the answer out loud unless the answer is meant to be heard; no two options collide under `normalize()` | "which one is behind?" spoken aloud; `$3.20` marked right for `$320` |
 | `audio` | "Hear it again" appears exactly where a round speaks, and nowhere else | Sight Words had no replay button, and neither did eleven other banks |
 | `repeats` | no generated bank repeats a question inside a run of 10 or 20, and the launch screen's count is a measured count | "Screen messages repeats questions in a ten question game. Does it really have 12?" |
