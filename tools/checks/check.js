@@ -705,10 +705,11 @@ check('oddone', 'the odd one out is clearly odd', async ctx => {
 });
 
 check('register', 'the level check stays at the register it is for', async ctx => {
-  // Two rules, both from the same report: "questions chosen from elementary
+  // Three rules. Two from one report: "questions chosen from elementary
   // phonics may have words that are too difficult for a pre-learner", and
   // "a listening or writing test with a sentence gap to type into may be
-  // harder than PLA or PLB requires".
+  // harder than PLA or PLB requires". The third from another asking whether
+  // two digit deduction questions are needed for PLB numeracy.
   //
   // Length is a bad proxy here and the numbers say so: the pool's longest word
   // is "wheelchairs" on a street sign, which a PLA learner is genuinely
@@ -750,9 +751,28 @@ check('register', 'the level check stays at the register it is for', async ctx =
       });
     });
     [...new Set(gaps)].forEach(k => bad.push(k + ' asks the learner to type a word into a sentence gap'));
+    // 3. Nothing in the pool asks the learner to subtract. "Sometimes two
+    //    digit deduction questions are used. Is this needed for PLB?" It is
+    //    not: across all twenty key performance features of .09 .10 and .11
+    //    at both stages, the only arithmetic named is adding, and even that
+    //    is held to totals of 100 with no carrying. Shop's change round was
+    //    in the pool, so a learner who could recognise every note and coin
+    //    still had to take $16.50 off $50 to show it.
+    const sums = [];
+    ACSF_POOL.forEach(function (st) {
+      let qs = [];
+      try { qs = testQuestions(st, 6); } catch (e) { return; }
+      qs.forEach(function (q) {
+        const text = String(q.question || '') + ' ' + String(q.say || '');
+        if (q.mode === 'change' || /\d\s*(-|\u2212|minus|take away|less than)\s*\d/i.test(text)) {
+          sums.push(acsfStepKey(st));
+        }
+      });
+    });
+    [...new Set(sums)].forEach(k => bad.push(k + ' asks the learner to subtract'));
     return { bad: bad, pool: ACSF_POOL.length };
   });
-  say('  ' + out.pool + ' pool steps checked for source and task');
+  say('  ' + out.pool + ' pool steps checked for source, task and arithmetic');
   out.bad.forEach(x => bad('register: ' + x));
 });
 

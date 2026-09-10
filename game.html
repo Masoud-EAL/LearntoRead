@@ -3102,15 +3102,25 @@ function moneySpeech(text){
     (m,d,c)=>moneySpoken(parseInt(d,10)*100+(c?parseInt(c,10):0)));
 }
 
-/* from offsets the pay/change alternation, for the same reason genClockQuestions
-   takes one: counting change is the harder half of the money unit, and a
-   three-question round starting at 0 never reaches it. Defaults to 0. */
+/* `from` names which round this deals, rather than where in an alternating
+   pair the count happens to start: 0 is both halves, which is what free play
+   and a section mix want, 1 is paying an amount and 2 is counting change. A
+   step that deals whichever half the count lands on cannot honestly be claimed
+   against a performance feature, and the rung labelled "Pay the right amount"
+   was dealing a change round as its second question.
+
+   The level check asks for 1 and never for 2. Counting change means taking a
+   two digit price off the note, and no key performance feature at Pre Level 1
+   Stage A or Stage B asks a learner to subtract anything at all: the only
+   arithmetic either stage names is adding, and even that is held to totals of
+   100 with no carrying. What Shop is evidence of at this band is recognising
+   coins, notes and monetary amounts, and paying shows that on its own. */
 function genShopQuestions(n,from,small){
   const out=[];
-  const base=from||0;
+  const kind=from||0;
   for(let i=0;i<(n||8);i++){
     const item=SHOP_ITEMS[Math.floor(Math.random()*SHOP_ITEMS.length)];
-    if((base+i)%2===0){
+    if(kind===1||(kind===0&&i%2===0)){
       // Pay the exact amount. Prices land in the unit's 50–100 range, in 50c
       // steps so the 50c piece stays in play. `small` moves the whole game
       // under $10, which is where Stage A of the checklist lives: "monetary
@@ -3123,7 +3133,8 @@ function genShopQuestions(n,from,small){
              +'</span><span class="price-tag">'+money(cents)+'</span></div>',
         question:'Pay '+money(cents)+' for '+item.name});
     } else {
-      // Count the change. You don't always hand over $100 in real life, so
+      // Count the change. Not in the level check (see above), but a real
+      // thing to practise. You don't always hand over $100 in real life, so
       // the note varies: a $20 for something small, a $50, or a $100. Each
       // price is set well below the note so the change is worth counting.
       const notes=small?[
@@ -7145,10 +7156,10 @@ const TEST_LADDERS={
     {type:'numbers2199', mc:true,  label:'Tap the number 21–99'},
     {type:'clock',       mc:false, from:2, label:'Read and set the clock — half past'},
     {type:'numbers1120', mc:false, label:'Write the number 11–20'},
-    {type:'shop',        mc:false, from:0, label:'Pay the right amount'},
+    {type:'shop',        mc:false, from:1, label:'Pay the right amount'},
     {type:'clock',       mc:false, from:4, label:'Read and set the clock — quarter past and to'},
     {type:'numbers2199', mc:false, label:'Write the number 21–99'},
-    {type:'shop',        mc:false, from:1, label:'Count your change'},
+    {type:'shop',        mc:false, from:2, label:'Count your change'},
     {type:'clock',       mc:false, from:6, label:'Read and set the clock — every five minutes'},
   ],
   /* One game in the skill, so the ladder is honestly two rungs: reading the
@@ -7178,13 +7189,13 @@ const TEST_LADDERS={
     {type:'sms',         mc:true,  label:'Read the message, tap the answer'},
     {type:'clock',       mc:false, from:0, label:"Read and set the clock — o'clock"},
     {type:'beginner',    mc:true,  label:'Listen, tap the missing word'},
-    {type:'shop',        mc:false, from:0, label:'Pay the right amount'},
+    {type:'shop',        mc:false, from:1, label:'Pay the right amount'},
     {type:'clock',       mc:false, from:4, label:'Read and set the clock — quarter past and to'},
     {type:'gramscramble',mc:true,  label:'Tap the sentence in the right order'},
     {type:'forms',       mc:false, label:'Put each answer in the right box'},
     {type:'unscramble',  mc:true,  label:'Listen, tap the sentence in order'},
     {type:'translate',   mc:true,  label:'Tap the English sentence'},
-    {type:'shop',        mc:false, from:1, label:'Count your change'},
+    {type:'shop',        mc:false, from:2, label:'Count your change'},
     {type:'beginner',    mc:false, label:'Write the missing word'},
     {type:'gramscramble',mc:false, label:'Put the words in the right order'},
     {type:'speaking',    mc:false, label:'Listen, build your answer'},
@@ -7205,7 +7216,7 @@ const TEST_LADDERS={
     {type:'clock',       mc:false, from:2, label:'Read and set the clock'},
     {type:'questionwords',mc:true, label:'Tap the question word'},
     {type:'wp1:build',   mc:false, label:'Build a short word'},
-    {type:'shop',        mc:false, from:1, label:'Count your change'},
+    {type:'shop',        mc:false, from:2, label:'Count your change'},
     {type:'forms',       mc:false, label:'Put each answer in the right box'},
     {type:'wp2:gap',     mc:true,  label:'Longer words — tap the missing sound'},
     {type:'spelling',    mc:false, label:'Spell words from every topic'},
@@ -7522,21 +7533,27 @@ const ACSF_CLAIMS={
     ['10','PLA','Matches 0 to 10 symbols with oral name'],
     ['10','PLB','Matches 0 to 100 symbols with oral name'],
   ]},
-  'shopsmall':{base:[
+  /* Both Shop rows hang off `from`, so only the paying round carries them.
+     Counting change is still a Shop round and still worth practising; it is
+     not evidence of anything the checklist names at this band, because every
+     one of these features is about recognising and matching money and none of
+     them is about arithmetic. Claiming nothing also keeps it out of the pool
+     by itself: integrity fails a pool step that claims no feature. */
+  'shopsmall':{base:[],byFrom:{1:[
     ['09','PLA','Shows some recognition of whole dollar monetary amounts up to $10'],
     ['09','PLA','Shows some recognition of whole dollar Australian coins and notes up to $10'],
     ['10','PLA','Matches whole dollar Australian notes and coins up to $10 in monetary amount'],
     ['10','PLA','Names Australian coins and notes up to $10'],
-  ]},
+  ]}},
   'position':{base:[
     ['09','PLA','Shows some recognition of extremely simple relative position words accompanied by gestures, e.g. up, down'],
     ['11','PLA','Uses personally relevant informal language and gestures to convey very simple numeracy-based information, e.g.: today, tomorrow, yesterday pointing and saying up and down one, two, three five dollars'],
     ['11','PLB','Uses personally relevant informal language and gestures to convey very simple numeracy-based information, (Choose three from these example): days of the week, months, own birthday, up, down, left, right, in front, behind twenty-five first, second, third round, straight, big, small forty dollars, fifty cents'],
   ]},
-  'shop':{base:[
+  'shop':{base:[],byFrom:{1:[
     ['09','PLB','Australian coins and notes'],
     ['09','PLB','Monetary amounts up to $100, e.g. 50c, $24.50'],
-  ]},
+  ]}},
   'digitaltime':{base:[
     ['09','PLB','Digital time in whole hours'],
   ]},
@@ -7624,7 +7641,8 @@ function acsfClaimsFor(step){
 /* Translate is deliberately absent from the pool below: it needs a first
    language chosen on the start screen, and a level check should not depend on
    one having been picked. The offsets into Clock, Shop and the rest are
-   chosen rather than incidental — odd is the doing half of each. */
+   chosen rather than incidental: each names the half of that bank the stage it
+   serves actually asks for, which for Shop is paying and not change. */
 /* ══════════════ LEVEL CHECK — THE STEPS, AND THE STAIRCASE ══════════════
    The ordinary Test Yourself ladder is one game per rung, which is right for
    what it is for: it finds the hardest thing a learner can do and hands them
@@ -7695,7 +7713,7 @@ const ACSF_POOL=[
   {type:'unscramble',mc:false},{type:'forms',mc:false},
   // Numeracy
   {type:'numbertap',mc:true},{type:'numbertap',mc:true,from:1},
-  {type:'shopsmall',mc:false,from:0},{type:'shop',mc:false,from:1},
+  {type:'shopsmall',mc:false,from:1},{type:'shop',mc:false,from:1},
   {type:'addup',mc:false,from:0},{type:'addup',mc:false,from:1},
   {type:'addmoney',mc:false,from:0},{type:'addmoney',mc:false,from:1},
   {type:'ordering',mc:false,from:0},{type:'ordering',mc:false,from:1},

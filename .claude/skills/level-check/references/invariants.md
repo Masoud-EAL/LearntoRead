@@ -240,6 +240,27 @@ The first attempt at this fix removed `wp2:*` but left the elementary
 *sentence* bank, which is where "The cook ___ a good look at the food on the
 stove" came from. It had to be reported twice. Sweep the whole class.
 
+### 12a. The level check asks only the arithmetic the band names
+*check: `register`*
+
+> "In level check, sometimes two digit deduction questions are used. Is this
+> needed for PLB in numeracy?"
+
+No. Across all twenty key performance features of .09 .10 and .11 at both
+stages, the only arithmetic named is adding, and even that is held to "a total
+of 100 or less (with no carrying)". Nothing at either stage asks a learner to
+subtract. Shop's change round was in the pool, so PLB.09 "Australian coins and
+notes" and "Monetary amounts up to $100" could only be shown by taking $16.50
+off a $50 note first, and a learner who knows every coin and note could be
+stopped by the arithmetic and never climb.
+
+The cause was the same shape as rule 5: the step's `from` set where an
+alternation started rather than naming the round it dealt, so the pool step and
+the ladder rung labelled "Pay the right amount" both dealt change rounds. `from`
+now names the round, and only the paying round carries the claims, so the
+change round cannot serve a stage at all. It is still a game, and still worth
+practising, which is the same answer rule 12 gave the elementary sentences.
+
 ### 13. The odd one out is clearly odd
 *check: `oddone`*
 

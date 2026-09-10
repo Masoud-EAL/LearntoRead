@@ -48,7 +48,7 @@ NODE_PATH=/opt/node22/lib/node_modules node tools/checks/check.js
 | `audio` | "Hear it again" appears exactly where a round speaks, and nowhere else | Sight Words had no replay button, and neither did eleven other banks |
 | `repeats` | no generated bank repeats a question inside a run of 10 or 20, and the launch screen's count is a measured count | "Screen messages repeats questions in a ten question game. Does it really have 12?" |
 | `oddone` | the odd word is not in the group, the other three are, no two options share a picture, and no category joins the game without a pairing review | "I get coffee, bag, pen and bus. The answer is bus, but it could be coffee too" |
-| `register` | the level-check pool never draws on the elementary banks, and a gap in a sentence may be tapped but never typed | "The cook ___ a good look at the food on the stove" |
+| `register` | the level-check pool never draws on the elementary banks, a gap in a sentence may be tapped but never typed, and no question asks the learner to subtract | "The cook ___ a good look at the food on the stove"; "are two digit deduction questions needed for PLB?" |
 | `spread` | no single game is dealt more than four times in one run | "Why did I get 5 or maybe 6 copy a word questions?" |
 | `variants` | all twelve ordinary Test Yourself ladders still finish with full rounds | regression guard for the path that is not the level check |
 | `links` | re-running `build-links.py` changes nothing, then puts the tree back | the generated stubs, sitemap and sw.js are checked in and drift silently |

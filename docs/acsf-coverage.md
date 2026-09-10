@@ -315,8 +315,8 @@ cap note, not in a line that reads as a gap in the run.
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
 | 1 | Shows some recognition of whole numbers up to 10 (including 0) | 🆕 built | Tap the Number (0 to 10) |
-| 2 | Shows some recognition of whole dollar monetary amounts up to $10 | 🔧 extended | Shop: amounts up to $10 |
-| 3 | Shows some recognition of whole dollar Australian coins and notes up to $10 | 🔧 extended | Shop: coins and notes up to $10 |
+| 2 | Shows some recognition of whole dollar monetary amounts up to $10 | 🔧 extended | Shop: pay, amounts up to $10 |
+| 3 | Shows some recognition of whole dollar Australian coins and notes up to $10 | 🔧 extended | Shop: pay, coins and notes up to $10 |
 | 4 | Shows some recognition of extremely simple relative position words accompanied by gestures, e.g. up, down | 🆕 built | Where Is It (up, down) |
 
 ### `PLB1.09` — Identifying mathematical information and meaning in activities and texts, Pre Level 1 Stage B
@@ -324,8 +324,8 @@ cap note, not in a line that reads as a gap in the run.
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
 | 1 | Whole numbers up to 100 (including 0) | 🆕 built | Tap the Number (0 to 100) |
-| 2 | Australian coins and notes | ✅ had it | Shop |
-| 3 | Monetary amounts up to $100, e.g. 50c, $24.50 | ✅ had it | Shop |
+| 2 | Australian coins and notes | ✅ had it | Shop: pay, up to $100 |
+| 3 | Monetary amounts up to $100, e.g. 50c, $24.50 | ✅ had it | Shop: pay, up to $100 |
 | 4 | Digital time in whole hours | 🆕 built | Digital Time (whole hours) |
 | 5 | Days of the week, months of the year and personal key dates | 🔧 extended | Days + Months + Find the Date |
 | 6 | Recognise oral ordinal numbers from 1st to 3rd | 🆕 built | First, Second, Third |
@@ -335,7 +335,7 @@ cap note, not in a line that reads as a gap in the run.
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
 | 1 | Matches 0 to 10 symbols with oral name | 🆕 built | Tap the Number |
-| 2 | Matches whole dollar Australian notes and coins up to $10 in monetary amount | 🔧 extended | Shop: up to $10 |
+| 2 | Matches whole dollar Australian notes and coins up to $10 in monetary amount | 🔧 extended | Shop: pay, up to $10 |
 | 3 | Adds two whole numbers up to a total of 10 or less | 🆕 built | Add It Up (to 10) |
 | 4 | Adds two whole dollar monetary amounts, up to a total of $10 or less | 🆕 built | Add It Up: money (to $10) |
 | 5 | Orders: Australian whole dollar notes and coins up to $10 AND two whole numbers between 1 and 10 | 🆕 built | Put In Order |
