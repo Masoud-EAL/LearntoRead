@@ -3812,8 +3812,17 @@ const PROMPTS=[
 /* Both halves in one shuffle, so a game is a mix rather than a run of notices
    followed by a run of problems. Shuffled and sliced, the way a fixed bank is
    dealt: it used to walk the list with i%length, which is what padded a ten
-   question game out of seven. */
-function genPromptQuestions(n){
+   question game out of seven.
+
+   `from` names the half, the way Copy It and Safe or Not Safe do: 0 deals
+   notices, 1 deals the device problems, and anything else keeps the mix for
+   the standalone game and the ladder. The level check needs the split because
+   the two halves stand for two different features and one draw can only show
+   the one it dealt. Without it the bank claimed both off a single step, the
+   staircase kept waiting on whichever half the shuffle had not turned up, and
+   a run dealt What Should You Do? six times to get evidence it could have had
+   in two. Same shape as the copy-a-word report. */
+function genPromptQuestions(n,from){
   const dialogs=PROMPTS.map(function(p){
     return {type:'mc', say:p.t+'. '+p.b, acsf:[PF_PROMPT],
       icon:'<div class="digi-dialog"><div class="dd-title">'+p.t+'</div><div class="dd-body">'+p.b+'</div></div>',
@@ -3824,7 +3833,8 @@ function genPromptQuestions(n){
     return {type:'mc', say:c.q, question:'🔊 '+c.q, acsf:[PF_CARE],
       answer:c.a.toLowerCase(), choices:shuffle([c.a].concat(c.alts))};
   });
-  return shuffle(dialogs.concat(cares)).slice(0,n||6);
+  const pick=from===0?dialogs:from===1?cares:dialogs.concat(cares);
+  return shuffle(pick).slice(0,n||6);
 }
 
 /* The other half of What Should You Do?: the things that stop a phone working
@@ -4285,40 +4295,37 @@ function chipRow(list){
 /* Every option is right. `anyAnswer` tells the marking to accept whatever
    comes back, so a learner can never be wrong about their own goal. */
 /* `from` chooses the ask, the way Copy It and Safe or Not Safe do: 0 names a
-   goal, 1 chooses the game that would help. Those are the two that stand for a
-   performance feature, so the pool holds one step for each and the level check
-   asks both. Anything else cycles all five, which is how the set is worth
-   reading whole.
+   goal, and it is the only one that stands for a performance feature, so the
+   pool holds one step for it. Anything else cycles all four, which is how the
+   set is worth reading whole.
 
-   Without the split the picker and the round disagreed. One pool step claimed
-   all four features, but a draw of one only ever came back with the goal ask,
-   because the options are shuffled and no two draws share a qKey, so nothing
-   the run dealt could ever mark "locates learning materials" as shown. The run
-   dealt My Learning eleven times waiting for a question it was never going to
-   be given. */
+   There was a second feature-bearing ask, "Which game would help you most?",
+   and it was dealt the GOALS list, so it asked about a game and offered
+   "Read better" and "No goal yet". It named no task and no game, and every
+   option scored, so it could not show either of the features it claimed:
+   locating learning materials, and selecting them for a specific task. Both
+   are marked not assessed in docs/acsf-coverage.md now. A question that asks
+   one thing and answers another measures nothing, and a claim the app cannot
+   meet is worse than a gap in the coverage table. */
 function genMyLearningQuestions(n,from){
   const out=[];
-  /* Only two of these five stand for a feature. Naming a goal is
-     "expresses/identifies a learning goal"; choosing the game that would help
-     is "locates learning materials" and "selects learning materials for a
-     specific task". What is easy, what is hard and what gets in the way are
-     worth asking and worth a teacher reading, but the features they used to
-     stand on were the Level 1 ones, which are an interview and are gone. They
-     carry no claim rather than borrowing the goal one. They are not in the
-     level check's pool for that reason: a step that claims nothing cannot serve
-     a stage. The goal question is first so a cycling draw still leads on it. */
+  /* Only one of these four stands for a feature: naming a goal is
+     "expresses/identifies a learning goal". What is easy, what is hard and what
+     gets in the way are worth asking and worth a teacher reading, but the
+     features they used to stand on were the Level 1 ones, which are an
+     interview and are gone. They carry no claim rather than borrowing the goal
+     one. They are not in the level check's pool for that reason: a step that
+     claims nothing cannot serve a stage. The goal question is first so a
+     cycling draw still leads on it. */
   const asks=[
     {q:'What do you want to learn?',   list:GOALS,    label:'YOUR GOAL',
      acsf:[['01','PLA','Begins to express extremely simple learning goal',1],
            ['01','PLB','Identifies at least one personal learning goal',1]]},
-    {q:'Which game would help you most?', list:GOALS, label:'CHOOSE A GAME',
-     acsf:[['01','PLA','Locates limited familiar learning materials and resources following simple, immediate instructions',1],
-           ['01','PLB','Demonstrates capacity to select limited learning materials for a specific task',1]]},
     {q:'What is easy for you now?',    list:EASYHARD, label:'WHAT IS EASY'},
     {q:'What is hard for you now?',    list:EASYHARD, label:'WHAT IS HARD'},
     {q:'What makes it hard to come to class?', list:BARRIERS, label:'WHAT GETS IN THE WAY'},
   ];
-  const only=(from===0||from===1)?asks[from]:null;
+  const only=(from===0)?asks[from]:null;
   for(let i=0;i<(n||5);i++){
     const a=only||asks[i%asks.length];
     /* The "none of these" option is always on the card rather than left to the
@@ -4799,7 +4806,7 @@ const GEN_BANKS={
   position:     function(n){ return genPositionQuestions(n); },
   devices:      function(n,f){ return genDeviceQuestions(n,f); },
   digisymbols:  function(n){ return genSymbolQuestions(n); },
-  prompts:      function(n){ return genPromptQuestions(n); },
+  prompts:      function(n,f){ return genPromptQuestions(n,f); },
   safeinfo:     function(n,f){ return genSafeQuestions(n,f); },
   copyword:     function(n,f){ return genCopyQuestions(n,f); },
   casematch:    function(n,f){ return genCaseQuestions(n,f); },
@@ -7396,15 +7403,13 @@ const ACSF_ORDER=['01','02','03','04','05','06','07','08','09','10','11','12','1
    script (that is tracing.html, and paper), and the whole of .07, which is
    speaking. */
 const ACSF_CLAIMS={
-  /* Split by ask, because the two feature-bearing questions are two questions:
-     from 0 names a goal, from 1 chooses the game that would help, and a step
-     that has dealt one has not shown the other. Claiming all four off either of
-     them left the staircase waiting on a feature the round could not deal. */
+  /* Kept on `byFrom` rather than moved to `base` now that one ask is left. A
+     draw with no `from` cycles all four asks, and three of them say nothing
+     about a learning goal, so claiming off the bank rather than off the goal
+     ask would credit a feature from a question about child care. */
   'mylearning':{base:[],
     byFrom:{0:[['01','PLA','Begins to express extremely simple learning goal',1],
-               ['01','PLB','Identifies at least one personal learning goal',1]],
-            1:[['01','PLA','Locates limited familiar learning materials and resources following simple, immediate instructions',1],
-               ['01','PLB','Demonstrates capacity to select limited learning materials for a specific task',1]]}},
+               ['01','PLB','Identifies at least one personal learning goal',1]]}},
   /* Every feature any of the three copy rounds can show, because that is what
      the band picker needs to know the bank is worth reaching. What is actually
      credited is decided round by round: see PF_COPY_WORD, PF_COPY_NAME and
@@ -7632,9 +7637,15 @@ const ACSF_CLAIMS={
   /* Both halves of What Should You Do?. A question names which of the two it
      shows (see genPromptQuestions), and acsfCredit takes the question's word,
      so answering notices all game does not print the maintenance feature as
-     evidence. Both are listed here because the bank can evidence both, which
-     is what the band picker needs to know. */
-  'prompts':{base:[PF_PROMPT, PF_CARE]},
+     evidence.
+
+     Split by half rather than listed together on `base`. Both were on base
+     because the bank can evidence both, but a pool step is dealt one question
+     and one question is one half, so the step promised the staircase a feature
+     the draw could not deliver and the run kept coming back for it. `from` now
+     names the half and each half carries only its own claim. */
+  'prompts':{base:[],
+    byFrom:{0:[PF_PROMPT], 1:[PF_CARE]}},
 };
 
 /* Banks whose `from` decides which range they work in, and therefore which
@@ -7755,10 +7766,11 @@ const ACSF_POOL=[
   {type:'calendar',mc:true},
   // Using a device
   {type:'devices',mc:true},{type:'devices',mc:true,from:1},{type:'digisymbols',mc:true},
-  {type:'prompts',mc:true},{type:'safeinfo',mc:false,from:0},{type:'safeinfo',mc:false,from:1},
+  {type:'prompts',mc:true,from:0},{type:'prompts',mc:true,from:1},
+  {type:'safeinfo',mc:false,from:0},{type:'safeinfo',mc:false,from:1},
   {type:'instructions',mc:true},
   // Learning
-  {type:'mylearning',mc:true,from:0},{type:'mylearning',mc:true,from:1},
+  {type:'mylearning',mc:true,from:0},
   {type:'greetings',mc:true},
 ];
 
@@ -8203,7 +8215,7 @@ const GAME_INFO={
      bank and why the level check band that names it still deals it. The panel
      already reports those rows as a signal to confirm in interview rather
      than as a result. */
-  mylearning:  {skill:'learning', name:'My Learning', blurb:'Your goal, and what would help you.'},
+  mylearning:  {skill:'learning', name:'My Learning', blurb:'Your goal, and what makes learning hard.'},
   all:         {blurb:'A mix of every game.'},
 };
 /* Custom banks belong to one account and mean nothing to whoever the link is

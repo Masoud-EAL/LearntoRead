@@ -102,7 +102,7 @@ cap note, not in a line that reads as a gap in the run.
 |---|---|---|---|
 | 1 | Engages in learning activities that involve minimal risk taking | 📊 from the run | attempts questions rather than timing out |
 | 2 | Begins to express extremely simple learning goal | 🆕 built | My Learning: pick a goal |
-| 3 | Locates limited familiar learning materials and resources following simple, immediate instructions | 🆕 built | My Learning: open the game you are told to |
+| 3 | Locates limited familiar learning materials and resources following simple, immediate instructions | ❌ not assessed | nothing in the app tells a learner to open a particular game and then watches them find it |
 | 4 | Demonstrates preparedness for learning, e.g. need to attend class, although may be inconsistent | 📊 from the run | finishes the rounds |
 
 ### `PLB1.01` — Demonstrates some awareness of self as a learner, Pre Level 1 Stage B
@@ -112,7 +112,7 @@ cap note, not in a line that reads as a gap in the run.
 | 1 | Follows extremely simple instructions and procedures that may require prompting | 📊 from the run | follows each round’s changing task |
 | 2 | Identifies at least one personal learning goal | 🆕 built | My Learning: pick a goal |
 | 3 | Demonstrates preparedness for learning through active participation | 📊 from the run | finishes the rounds |
-| 4 | Demonstrates capacity to select limited learning materials for a specific task | 🆕 built | My Learning: choose a game for a task |
+| 4 | Demonstrates capacity to select limited learning materials for a specific task | ❌ not assessed | the ask that claimed it named no task and offered no materials, and every answer scored |
 
 ### `1.01` — Demonstrates some awareness of self as a learner, Level 1
 

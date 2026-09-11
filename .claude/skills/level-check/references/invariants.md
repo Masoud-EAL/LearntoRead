@@ -87,6 +87,18 @@ carries its own `q.acsf` it has the last word, exactly as it does in
 `acsfCredit`, or the plan records features the learner was never shown and the
 panel prints "not asked" about a feature the staircase has already counted.
 
+Third time was What Should You Do?, and it is the one to read if you think this
+rule is about My Learning. The bank deals two halves from one shuffle, notices
+and device problems, and each question names its own feature. But the claim map
+listed both features on `base`, so one pool step promised both while the draw
+could only ever show the half it dealt. `spread` caught it at six deals of one
+game. The tell is a bank whose questions carry different `q.acsf` values while
+its claim entry has no `byFrom`: `base` describes what the bank could show, and
+the staircase needs what this step will show. It stayed latent for as long as it
+did because the run had slack; removing a step elsewhere is what pushed it over
+the threshold, so a `spread` failure after an unrelated deletion is usually this
+waiting underneath rather than something the deletion broke.
+
 ### 6. Nothing is claimed that the app cannot measure
 *no check, judgement*
 
@@ -297,10 +309,24 @@ answer without any decoding.
 *no check, judgement*
 
 > "Camera is not a button. The question can be as simple as 'what is this?'" ·
-> "Get a job does not answer 'what do you want to learn?'"
+> "Get a job does not answer 'what do you want to learn?'" · "The answers are
+> like: no goals yet, write better. The question doesn't match the answers."
 
 Wrong questions, not wrong answers. No script finds these; read the round out
 loud as the learner meets it.
+
+The third one killed the question rather than reworded it. My Learning asked
+"Which game would help you most?" and was handed the `GOALS` list, so it asked
+about a game and offered "Write better" and "No goal yet". It claimed two
+features on that: locating learning materials, and selecting them for a specific
+task. It could not show either. It named no task, listed no materials, and
+`anyAnswer` accepted every option, so by rule 6 it was not evidence of anything.
+Both features are marked not assessed now.
+
+So when a question does not match its options, check what it claims before
+rewording it. A mismatch this size usually means the claim was written first and
+the question was made to gesture at it, and then the honest fix is to drop the
+claim, not to patch the wording until it reads well enough to keep.
 
 ### 16. Two sentences means two sentences
 *check: covered by `run` reaching a verdict, then judgement*
