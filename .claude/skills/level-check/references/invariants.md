@@ -415,6 +415,32 @@ The general rule, and what `models` enforces: **tightening a marking rule is how
 a round starts showing an example it would itself mark down.** Whenever a rule
 moves, check the models against it.
 
+### 16b. The example is not an acceptable answer
+*check: `models`*
+
+> "Make sure 'My name is David. I am from Vietnam.' is not accepted. Some may
+> just copy."
+
+The feature is "writes two simple sentences **adapted from** a model", and a
+model handed straight back has not been adapted. Copying is a round the app
+already has, and this is not it. Partly correct rather than wrong, because two
+well formed sentences did get written. The comparison is on `spellLetterForm`,
+the app's own test for "the same words", so recapitalising or respacing the
+example is still a copy.
+
+This one has a tail worth knowing about. The check harness answers a perfect run
+with `q.answer`, which for this round *is* the model, so the moment a copy stopped
+scoring the perfect run stopped being perfect and `reachable` would have gone red.
+`PLAY` types an adapted answer for `q.freeText` now. Any round whose right answer
+is something the learner has to produce rather than reproduce will hit the same
+thing: the harness's idea of answering correctly is echoing `q.answer`, and that
+is exactly the answer such a round must refuse.
+
+It also inverted the rule above it. `models` used to assert that each model scores
+`correct`, which is now the opposite of what the round does. It marks the model
+against a *different* model, so the copy test does not fire and only the form
+rules are being read.
+
 ### 17. Every answer gets time in proportion to what it takes to give
 *no check, judgement*
 

@@ -10811,6 +10811,15 @@ function typeinTier(q,ans){
     const real=parts.filter(function(x){ return words(x)>=2; });
     if(!real.length) return 'wrong';
     if(real.length<want) return 'partial';
+    /* The feature is "writes two simple sentences ADAPTED from a model", and a
+       model handed straight back has not been adapted. Some learners will copy
+       the example rather than write about themselves, and copying is a round we
+       already have; this one is not evidence of it. Partly correct rather than
+       wrong, because two well formed sentences did get written.
+         Compared on letter form, which is the app's own test for "the same
+       words", so recapitalising or respacing the example is still a copy. */
+    if(q.answer&&typeof spellLetterForm==='function'&&
+       spellLetterForm(got)===spellLetterForm(q.answer)) return 'partial';
     /* Every sentence has to carry its own capitals and its own stop. Counting
        the stops rather than looking at the end catches "My name is Sara I am
        from Iraq.", which is one stop for two sentences.

@@ -138,6 +138,12 @@ const PLAY = function (how, reportSrc) {
         if (isOpenQ(q)) {
           a = (q.choices || []).find(c => (q.declines || []).indexOf(c) < 0) || q.answer;
         }
+        // Write Two Sentences marks the model down when it is handed back, so
+        // q.answer is the one answer a learner who did the task would not
+        // give. A perfect run has to adapt it the way the round asks: two
+        // sentences, each opening with a capital and carrying the one a name
+        // or a country takes.
+        if (q.freeText) a = 'My name is Ali. I am from Iraq.';
         // Right letters, no capitals, no spaces: the copy a learner at Stage A
         // makes. Only touches typed rounds; tapped ones keep the exact option.
         if (how === 'sloppy' && q.type === 'typein' && !q.anyAnswer) {
@@ -762,9 +768,21 @@ check('models', 'an example would score full marks under its own round\'s rule',
     const bad = [];
     SENTENCE_MODELS.forEach(function (m, i) {
       const q = GEN_BANKS['modelsentence'](1, i)[0];
-      const tier = typeinTier(q, m.model);
+      // The example must be well formed by the rule its own round applies:
+      // marked against a different example, so the copy test does not fire,
+      // it is just a learner's two sentences and should score full marks.
+      const other = SENTENCE_MODELS[(i + 1) % SENTENCE_MODELS.length].model;
+      const tier = typeinTier(Object.assign({}, q, { answer: other }), m.model);
       if (tier !== 'correct') {
         bad.push('"' + m.model + '" is shown as the Example but its own round marks it ' + tier);
+      }
+      // "Some may just copy." Handing the example back is not adapting it.
+      if (typeinTier(q, m.model) === 'correct') {
+        bad.push('"' + m.model + '" scores full marks when copied straight back');
+      }
+      if (typeinTier(q, m.model.toUpperCase()) === 'correct' ||
+          typeinTier(q, m.model.replace(/\s+/g, '  ')) === 'correct') {
+        bad.push('"' + m.model + '" scores full marks when copied back with the case or spacing changed');
       }
       if (String(q.icon || '').indexOf('Example') < 0) {
         bad.push('"' + m.model + '" is shown with no Example label over it');
