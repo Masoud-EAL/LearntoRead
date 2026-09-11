@@ -3372,11 +3372,27 @@ function genPlaceValueQuestions(n){
    amounts", and Reading ".04 Identifies information in a simple diagram,
    table, map or plan". A two column price list is the most ordinary table an
    adult meets, so that is the one this asks about. */
-const LIST_ITEMS=[['🍞','Bread'],['🥛','Milk'],['🥚','Eggs'],['🍎','Apples'],['🧀','Cheese'],
-  ['🍚','Rice'],['🫖','Tea'],['☕','Coffee'],['🍌','Bananas'],['🧴','Soap']];
-function genTableQuestions(n,hi){
-  hi=hi||10;
+/* The third field marks a plural name, because the question is built around it
+   and "How much is Apples?" is the app teaching an adult the wrong sentence. */
+const LIST_ITEMS=[['🍞','Bread'],['🥛','Milk'],['🥚','Eggs',1],['🍎','Apples',1],['🧀','Cheese'],
+  ['🍚','Rice'],['🫖','Tea'],['☕','Coffee'],['🍌','Bananas',1],['🧴','Soap']];
+/* `from` names the round and the range together, because this bank has two
+   axes and the level check has to be able to ask for one exact round: 0 locates
+   a price in a list capped at $10, 1 locates one capped at $100, 2 compares two
+   prices. A draw that names no `from` alternates, for the standalone game and
+   the ladder rungs.
+
+   It used to alternate on the question's index alone, which meant the kind was
+   decided by position in the draw rather than by anything the picker could ask
+   for. The level check deals a step one question at a time, so `i` was always 0
+   and every one of the three tableread rounds in a run was "How much is X?".
+   The comparing round could not be reached at all, and a three question rung
+   was always two locates around one compare, in that order. The offset is what
+   stops the ladder repeating that shape every time. */
+function genTableQuestions(n,from){
+  const hi=from?100:10;
   const out=[];
+  const offset=randInt(0,1);
   const priceList=function(rows){
     return '<table class="pricelist"><tr><th>Item</th><th>Price</th></tr>'
       +rows.map(function(r){ return '<tr><td>'+r.emoji+' '+r.name+'</td><td>'+money(r.cents)+'</td></tr>'; }).join('')
@@ -3387,7 +3403,8 @@ function genTableQuestions(n,hi){
     // be located in a list, and $98 for a loaf of bread would be the first
     // thing an adult noticed instead.
     const cap=Math.min(hi,20);
-    if(i%2===0){
+    const locate=from===2?false:(from===0||from===1)?true:((i+offset)%2===0);
+    if(locate){
       // Locate a price. Four rows, and the prices differ from each other or
       // two options read the same and a learner tapping the "wrong" one has
       // in fact answered correctly. Cents are in play here, which is where
@@ -3397,7 +3414,7 @@ function genTableQuestions(n,hi){
         let c;
         do { c=randInt(1,cap)*100+(Math.random()<0.5?50:0); } while(seen[c]);
         seen[c]=1;
-        rows.push({name:it[1], emoji:it[0], cents:c});
+        rows.push({name:it[1], emoji:it[0], plural:it[2], cents:c});
       });
       const tgt=rows[randInt(0,rows.length-1)];
       // Shown with the dollar sign, the way the list shows it and the way the
@@ -3405,7 +3422,7 @@ function genTableQuestions(n,hi){
       // option reading 8.00 under a list reading $8.00 asks the learner to
       // strip the sign in their head before they can answer.
       out.push({type:'mc', noListen:true, icon:priceList(rows),
-        question:'How much is '+tgt.name+'?',
+        question:'How much '+(tgt.plural?'are':'is')+' '+tgt.name+'?',
         answer:money(tgt.cents),
         choices:shuffle(rows.map(function(r){ return money(r.cents); }))});
     } else {
@@ -4652,9 +4669,16 @@ function buildBank(){
      and the round was already revealing the word as "Monday" while marking it
      down. The bank keeps the capital, so writing it is what scores in full and
      leaving it off is the partly correct answer it should always have been.
-     The copy-a-name round stopped lowercasing its own answer for this reason. */
+     The copy-a-name round stopped lowercasing its own answer for this reason.
+     Months are the same word class and were missed the first time: the fix went
+     onto the line above and not this one, so "November" stayed a near miss and
+     had to be reported again. The first letter of the answer is also the hint,
+     so a lowercased answer put an "n" on screen above a word the learner is
+     being taught to write as "November". SPELL_DAYS and SPELL_MONTHS are the
+     only two banks here holding proper nouns; the rest are common nouns and
+     lowercase is their spelling. */
   questionBank.days=SPELL_DAYS.map(w=>({type:'word',word:w,answer:w}));
-  questionBank.months=SPELL_MONTHS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
+  questionBank.months=SPELL_MONTHS.map(w=>({type:'word',word:w,answer:w}));
   questionBank.weather=SPELL_WEATHER.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.fruits=SPELL_FRUITS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.body=SPELL_BODY.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
@@ -4799,7 +4823,7 @@ const GEN_BANKS={
   addmoney:     function(n,f){ return genAddQuestions(n,f?100:10,true); },
   ordering:     function(n,f){ return genOrderQuestions(n,f?100:10); },
   placevalue:   function(n){ return genPlaceValueQuestions(n); },
-  tableread:    function(n,f){ return genTableQuestions(n,f?100:10); },
+  tableread:    function(n,f){ return genTableQuestions(n,f); },
   digitaltime:  function(n,f){ return genDigitalTimeQuestions(n,f); },
   calendar:     function(n){ return genCalendarQuestions(n); },
   ordinals:     function(n,f){ return genOrdinalQuestions(n,f); },
@@ -6975,7 +6999,15 @@ function showHint(){
 function hintParts(q){
   const word=spellTidy(q.answer||'');
   const tiles=typeof phonicsTiles==='function'?phonicsTiles(word):null;
-  return (tiles&&tiles.map(t=>t.d).join('')===word.toLowerCase())?tiles.map(t=>t.d):word.split('');
+  if(!tiles||tiles.map(t=>t.d).join('')!==word.toLowerCase()) return word.split('');
+  /* The tiles come back lowercase, because the phoneme map is written in
+     lowercase. Cut the answer itself to the same lengths instead of showing
+     them, so a proper noun keeps its capital: the hint reveals the first parts
+     of the word the learner then has to write, and an "n" on screen above a
+     word they are being taught to write as "November" teaches the spelling
+     this round is marking them down for. */
+  let at=0;
+  return tiles.map(function(t){ const s=word.substr(at,t.d.length); at+=t.d.length; return s; });
 }
 
 let hintSoundStop=null;
@@ -7497,11 +7529,19 @@ const ACSF_CLAIMS={
     ['04','PLB','Recognises frequently used question words, e.g. who, what'],
     ['08','L1','Comprehends simple questions',1],
   ]},
-  'tableread':{base:[
-    ['04','L1','Identifies information in a simple diagram, table, map or plan',1],
-    ['10','PLA','Uses knowledge of personally relevant and extremely simple lists and two column tables to locate: whole numbers up to 10 AND whole dollar monetary amounts up to $10'],
-    ['10','PLB','Uses knowledge of personally relevant and extremely simple lists and tables to locate: whole numbers up to 100 OR whole dollar monetary amounts up to $100'],
-  ]},
+  /* Both axes live on `from` here, so the claims do too rather than splitting
+     the range through ACSF_RANGED and leaving the round kind unnamed. The .10
+     features say "locate", and what the learner hands back in a locating round
+     is the amount itself; the comparing round answers with an item name, so it
+     shows the table was read but not that an amount was located. It carries the
+     Reading claim only. Stretching .10 onto it would be claiming a feature off
+     a round that does not show it. */
+  'tableread':{base:[],
+    byFrom:{0:[['04','L1','Identifies information in a simple diagram, table, map or plan',1],
+               ['10','PLA','Uses knowledge of personally relevant and extremely simple lists and two column tables to locate: whole numbers up to 10 AND whole dollar monetary amounts up to $10']],
+            1:[['04','L1','Identifies information in a simple diagram, table, map or plan',1],
+               ['10','PLB','Uses knowledge of personally relevant and extremely simple lists and tables to locate: whole numbers up to 100 OR whole dollar monetary amounts up to $100']],
+            2:[['04','L1','Identifies information in a simple diagram, table, map or plan',1]]}},
   'punctuation':{base:[
     ['04','L1','Recognises some basic punctuation and understands its use in meaning-making, e.g. a full stop',1],
   ]},
@@ -7656,7 +7696,10 @@ const ACSF_CLAIMS={
    The banks that alternate their modes within a single draw (Copy It, Big and
    Small Letters, Capitals and Full Stops, Safe or Private) genuinely do show
    both halves in one round, so they are not listed here. */
-const ACSF_RANGED={numbertap:1,numeralwrite:1,addup:1,addmoney:1,ordering:1,tableread:1,devices:1};
+/* Read the List is not here any more: its `from` carries a round kind as well
+   as a range, so the split is written out in its `byFrom` where both axes are
+   visible together, rather than half here and half implied. */
+const ACSF_RANGED={numbertap:1,numeralwrite:1,addup:1,addmoney:1,ordering:1,devices:1};
 
 /* A step is {type, mc, from} — the shape the ladders already use — so this
    answers for a level-check band, an ordinary Test Yourself rung, and the
@@ -7743,7 +7786,7 @@ const ACSF_POOL=[
      carry .03 and .08 at Level 1, and Level 1 evidence bought at that price is
      not worth having. The beginner bank stays: "My ___ is David", "I live in a
      ___" is the register this test is for. */
-  {type:'tableread',mc:true,from:0},{type:'tableread',mc:true,from:1},
+  {type:'tableread',mc:true,from:0},{type:'tableread',mc:true,from:1},{type:'tableread',mc:true,from:2},
   // Writing
   {type:'copyword',mc:false,from:0},{type:'copyword',mc:false,from:1},
   {type:'copyword',mc:false,from:2},

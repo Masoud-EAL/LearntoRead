@@ -704,6 +704,50 @@ check('oddone', 'the odd one out is clearly odd', async ctx => {
   out.bad.forEach(x => bad('oddone: ' + x));
 });
 
+check('propernouns', 'a name keeps its capital in the answer and in the hint', async ctx => {
+  // "Months need a capital first letter. Both hint and correct answer should
+  // be fixed."
+  //
+  // Days had already been fixed for exactly this and months were missed, on
+  // the very next line, because the decision was written out once per bank.
+  // A round that shows "November" and marks "november" makes writing the
+  // capital a near miss and leaving it off full marks, which is backwards.
+  // The hint is the same fault one step further on: it reveals the first
+  // parts of the answer, and the phoneme tiles it builds them from are all
+  // lowercase, so it printed "n" over a word the round was teaching as
+  // "November".
+  const out = await ctx.page.evaluate(() => {
+    buildBank();
+    const bad = [];
+    let n = 0;
+    Object.keys(questionBank).forEach(function (g) {
+      (questionBank[g] || []).forEach(function (q) {
+        if (!q || q.type !== 'word' || !q.word) return;
+        n++;
+        const word = String(q.word);
+        const ans = String(q.answer === null || q.answer === undefined ? '' : q.answer);
+        if (spellLetterForm(word) !== spellLetterForm(ans)) {
+          bad.push(g + ': shows "' + word + '" but the answer is "' + ans + '"');
+          return;
+        }
+        // Only words that carry a capital are in question. A common noun is
+        // spelled lowercase and lowercase is what it should mark.
+        if (word !== word.toLowerCase() && ans !== word) {
+          bad.push(g + ': shows "' + word + '" but marks "' + ans +
+                   '", so writing the capital is scored as a near miss');
+        }
+        const revealed = hintParts({ answer: ans }).join('');
+        if (revealed !== ans) {
+          bad.push(g + ': the hint for "' + ans + '" spells it "' + revealed + '"');
+        }
+      });
+    });
+    return { bad: [...new Set(bad)], n: n };
+  });
+  say('  ' + out.n + ' spelling words checked');
+  out.bad.forEach(x => bad('propernouns: ' + x));
+});
+
 check('register', 'the level check stays at the register it is for', async ctx => {
   // Three rules. Two from one report: "questions chosen from elementary
   // phonics may have words that are too difficult for a pre-learner", and

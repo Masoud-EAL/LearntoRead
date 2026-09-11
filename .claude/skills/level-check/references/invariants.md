@@ -273,6 +273,30 @@ now names the round, and only the paying round carries the claims, so the
 change round cannot serve a stage at all. It is still a game, and still worth
 practising, which is the same answer rule 12 gave the elementary sentences.
 
+### 12b. A round's kind is something the picker asks for, not where it lands in the draw
+*check: `spread`, and the counts under it*
+
+> "Last time I played the game and aimed at answering all questions correctly,
+> I got the 'how much is it' question many times."
+
+Read the List alternates two rounds, locating a price and comparing two, and it
+chose between them on `i%2`, the question's index inside the draw. The level
+check deals a step one question at a time, so `i` was always 0 and every one of
+the three Read the List rounds in a run was "How much is X?". The comparing
+round could not be reached at all, and a three question ladder rung was always
+two locates around one compare, in that order.
+
+`from` names the round now. The wrinkle worth knowing is that this bank needed
+two axes, kind and range, and `from` was already spent on the range through
+`ACSF_RANGED`. Both went onto `from` and into `byFrom`, where the two are
+visible together, rather than half in one mechanism and half implied by the
+other. The comparing round answers with an item name, not an amount, so it
+carries the Reading claim and not the .10 "locate" ones: it shows the table was
+read, not that a price was located.
+
+Grep for `i%` in the generators when a report says a question keeps coming back.
+Any bank that picks its kind that way deals only kind 0 to the level check.
+
 ### 13. The odd one out is clearly odd
 *check: `oddone`*
 
@@ -327,6 +351,28 @@ So when a question does not match its options, check what it claims before
 rewording it. A mismatch this size usually means the claim was written first and
 the question was made to gesture at it, and then the honest fix is to drop the
 claim, not to patch the wording until it reads well enough to keep.
+
+### 15a. A round marks the spelling it taught
+*check: `propernouns`*
+
+> "Months need a capital first letter. Both hint and correct answer should be
+> fixed."
+
+Days had been fixed for this already, and months were missed on the next line
+down, because the decision was written out once per bank. A round showing
+"November" and marking "november" makes the capital a near miss and leaving it
+off full marks, which is backwards.
+
+The hint is the same fault one step further on, and it is why the report says
+both. `hintParts` reveals the answer's first parts, and it builds them from the
+phoneme tiles, which are lowercase because the phoneme map is written that way.
+So it printed "n" over a word the round was teaching as "November". Fixing the
+answer alone leaves this live for every word the phoneme map knows, which is
+where May, June and July were still lowercase after the answer was right. Two
+decisions, two places, one report.
+
+`SPELL_DAYS` and `SPELL_MONTHS` are the only banks here holding proper nouns.
+Anything added beside them is a common noun and lowercase is its spelling.
 
 ### 16. Two sentences means two sentences
 *check: covered by `run` reaching a verdict, then judgement*
