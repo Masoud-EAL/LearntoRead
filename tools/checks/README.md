@@ -52,7 +52,7 @@ NODE_PATH=/opt/node22/lib/node_modules node tools/checks/check.js
 | `models` | every Example a round shows would score full marks under that round's own marking, is labelled as an example, and a round demanding the capital a proper noun takes has asked for one | "Write Example above the model sentences"; "two capital letters in each sentence are needed" |
 | `propernouns` | a spelling word shown with a capital is marked with that capital, and the hint reveals it with the capital too | "Months need a capital first letter. Both hint and correct answer should be fixed." |
 | `register` | the level-check pool never draws on the elementary banks, a gap in a sentence may be tapped but never typed, and no question asks the learner to subtract | "The cook ___ a good look at the food on the stove"; "are two digit deduction questions needed for PLB?" |
-| `spread` | no single game is dealt more than four times in one run | "Why did I get 5 or maybe 6 copy a word questions?" |
+| `spread` | no single game is dealt more than four times in one run, and a perfect run stays inside its question budget | "Why did I get 5 or maybe 6 copy a word questions?"; "too many questions or repeated questions of the same type in perfect runs" |
 | `variants` | all twelve ordinary Test Yourself ladders still finish with full rounds | regression guard for the path that is not the level check |
 | `links` | re-running `build-links.py` changes nothing, then puts the tree back | the generated stubs, sitemap and sw.js are checked in and drift silently |
 

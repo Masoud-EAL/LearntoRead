@@ -876,6 +876,16 @@ check('spread', 'no one game fills the level check', async ctx => {
   // coming back is usually the picker's model of it disagreeing with what the
   // round credits, so the staircase never records it as done.
   const MAX = 4;
+  /* A budget, not a law of nature. The level check asks what the staircase
+     needs and no more, so this number only moves when the claim map moves.
+     It caught three questions a perfect run was spending on steps whose whole
+     worth had already been taken by an earlier pick in the same round: the
+     ranking for a round is worked out before any of its questions is chosen,
+     so it cannot see its own overlap. If this fails after a deliberate change
+     to the pool, read the new number, satisfy yourself the extra questions are
+     each showing something, and move it. If it fails after a change to the
+     picker, it is probably padding. */
+  const BUDGET = 60;
   for (const how of ['right', 'sloppy']) {
     const out = await play(ctx.page, how, function (ev, prof, seen, perStep) {
       const labels = {};
@@ -891,6 +901,11 @@ check('spread', 'no one game fills the level check', async ctx => {
         ' x' + Math.max(...Object.values(out.per)));
     over.forEach(k => bad('spread (' + how + '): ' + k + ' was dealt ' + out.per[k] +
                           ' times, more than ' + MAX));
+    if (out.asked > BUDGET) {
+      bad('spread (' + how + '): the run asks ' + out.asked + ' questions, over the ' +
+          BUDGET + ' it needs. Check whether a step is being dealt that shows nothing ' +
+          'the round had not already asked for');
+    }
     Object.keys(out.labels).forEach(k => {
       if (out.labels[k] > MAX) bad('spread (' + how + '): ' + k + ' came up ' + out.labels[k] + ' times');
     });

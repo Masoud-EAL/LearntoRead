@@ -7926,12 +7926,17 @@ function acsfOpenStages(){
    stage still needs. A step serving three indicators at once outranks one
    serving a single feature, which is what keeps the run from being eleven
    separate tests bolted together. */
-function acsfStepValue(st,open){
+/* `taken` is what the picks already made for THIS round cover. A step whose
+   whole worth was claimed by an earlier pick in the same round is worth
+   nothing now, however the ranking saw it before that pick existed. */
+function acsfStepValue(st,open,taken){
   let v=0;
   const cl=acsfClaimsFor(st);
   open.forEach(function(o){
     cl.forEach(function(c){
-      if(c[0]===o.ind&&c[1]===o.lvl&&o.left.indexOf(c[2])>=0) v++;
+      if(c[0]!==o.ind||c[1]!==o.lvl||o.left.indexOf(c[2])<0) return;
+      if(taken&&taken[c[0]+'|'+c[1]+'|'+c[2]]) return;
+      v++;
     });
   });
   return v;
@@ -7946,7 +7951,23 @@ function acsfPickNext(n){
      the run has leaned on that game already. Without the second key one bank
      that serves several indicators gets dealt again and again to top up
      evidence, and the learner sits through four copying rounds while other
-     games go unasked. */
+     games go unasked.
+
+     The ranking is worked out once for the whole round, before any of its
+     questions is chosen, so it cannot know that two steps near the top want the
+     same feature. Three questions of a perfect run were steps whose whole worth
+     had already been taken by an earlier pick in the same round, one of them a
+     second "How much is X?" in a round that had just asked one. Each pick
+     records what it covers and the ones after it are measured against what is
+     left, so a step with nothing of its own to show is dropped and the round is
+     shorter. 63 questions to 60.
+
+     Dropped from the ranking rather than replaced from further down it, and the
+     ranking itself is not redone. Re-ranking after every pick reads as the
+     tidier thing to do and costs more than it saves: it reshuffles when each
+     stage opens, and one arrangement it produced dealt Write Two Sentences
+     twice, which is the slowest question in the test. Three light questions are
+     not worth one of those. */
   const dealt=TEST.ev.dealtBank||(TEST.ev.dealtBank={});
   const rank=function(valueOf){
     return ACSF_POOL.map(function(st,i){
@@ -7960,7 +7981,20 @@ function acsfPickNext(n){
      is short of the evidence a verdict takes. Top it up from the steps that
      serve it rather than stopping on one question. */
   const pool=ranked.length?ranked:rank(function(st){ return acsfStepTops(st,open); });
-  const out=pool.slice(0,n).map(function(r){ return r.st; });
+  const taken={};
+  const out=[];
+  pool.slice(0,n).forEach(function(r){
+    const v=ranked.length?acsfStepValue(r.st,open,taken):acsfStepTops(r.st,open,taken);
+    if(v<=0) return;
+    acsfClaimsFor(r.st).forEach(function(c){
+      open.forEach(function(o){
+        if(c[0]!==o.ind||c[1]!==o.lvl) return;
+        if(o.left.indexOf(c[2])>=0) taken[c[0]+'|'+c[1]+'|'+c[2]]=1;
+        taken['top|'+o.ind+'|'+o.lvl]=1;
+      });
+    });
+    out.push(r.st);
+  });
   out.forEach(function(st){
     used[acsfStepKey(st)]=++TEST.ev.tick;
     dealt[st.type]=(dealt[st.type]||0)+1;
@@ -7969,11 +8003,12 @@ function acsfPickNext(n){
 }
 /* A step's worth to an open stage that has seen every feature but still has
    less evidence than a verdict needs. */
-function acsfStepTops(st,open){
+function acsfStepTops(st,open,taken){
   let v=0;
   acsfClaimsFor(st).forEach(function(c){
     open.forEach(function(o){
       if(c[0]!==o.ind||c[1]!==o.lvl) return;
+      if(taken&&taken['top|'+o.ind+'|'+o.lvl]) return;
       const b=TEST.ev.byInd[o.ind], e=b&&b[o.lvl];
       if(!e||e.seen<ACSF_MIN_EVIDENCE) v++;
     });

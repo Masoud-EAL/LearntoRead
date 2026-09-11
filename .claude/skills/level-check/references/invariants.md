@@ -129,6 +129,36 @@ Generalising: **where a question's answer cannot change between two asks, one as
 is all the evidence there is.** Claiming two stages off it buys a second turn and
 no second observation.
 
+### 5b. A round does not ask twice for the same thing
+*check: `spread`, the run-length budget in it*
+
+> "I do see too many questions or repeated questions of the same type in perfect
+> runs, such as two times writing a full name. Check and reduce question numbers
+> if possible."
+
+The ranking for a round is worked out once, before any of its questions is
+chosen, so it cannot know that two steps near the top of it want the same
+feature. Three questions of a perfect run were steps whose whole worth had
+already been taken by an earlier pick in the same round. Each pick records what
+it covers now and the ones after it are measured against what is left. 63 to 60.
+
+**The trap, and it is worth knowing before you touch this function.** Re-ranking
+after every pick is the tidier-looking fix and it is the wrong one. It reshuffles
+when each stage opens, and the arrangement it produced dealt Write Two Sentences
+twice: the slowest question in the test, at three times the base pace. Same 60
+questions, a worse test. Dropping from the existing ranking keeps the order the
+run already had. Measure the shape of the run, not just its length.
+
+The repeats that remain are not padding, and this is the answer to "why am I
+still copying a name twice". Copy the Name claims Stage A features ("Copies first
+and last name") and Stage B ones ("Writes full name accurately", "Leaves spaces
+between words", "Uses upper and lower case"). Stage B is closed the first time,
+because the learner has not shown Stage A yet, so the second ask is the Stage B
+observation. Crediting the first answer retroactively once Stage B opens would
+collapse these, and would also collapse three signs into one and three messages
+into one, which is rule 8 in reverse: one observation standing in for two stages.
+The repeat is the staircase confirming, not the picker wasting.
+
 ### 6. Nothing is claimed that the app cannot measure
 *no check, judgement*
 
