@@ -748,6 +748,46 @@ check('propernouns', 'a name keeps its capital in the answer and in the hint', a
   out.bad.forEach(x => bad('propernouns: ' + x));
 });
 
+check('models', 'an example would score full marks under its own round\'s rule', async ctx => {
+  // "The sentence needs correct capitalization and punctuation. Two full
+  // stops, and two capital letters in each sentence are needed."
+  //
+  // Tightening a rule is how a round starts showing an Example that its own
+  // marking calls partly correct. Four of the six Write Two Sentences models
+  // carry one capital in a sentence ("I work in a shop. I start at nine."),
+  // so a blanket two-capital rule would have done exactly that. The rule
+  // belongs to the model whose ask names a name and a country, and this is
+  // what keeps the ask, the example and the marking in step.
+  const out = await ctx.page.evaluate(() => {
+    const bad = [];
+    SENTENCE_MODELS.forEach(function (m, i) {
+      const q = GEN_BANKS['modelsentence'](1, i)[0];
+      const tier = typeinTier(q, m.model);
+      if (tier !== 'correct') {
+        bad.push('"' + m.model + '" is shown as the Example but its own round marks it ' + tier);
+      }
+      if (String(q.icon || '').indexOf('Example') < 0) {
+        bad.push('"' + m.model + '" is shown with no Example label over it');
+      }
+      // A round may only demand the capital a proper noun takes when it has
+      // told the learner that is what it wants.
+      if ((q.capsEach || 1) > 1 && !/name and country/i.test(q.question)) {
+        bad.push('"' + q.question + '" demands ' + q.capsEach +
+                 ' capitals a sentence without naming what the second is for');
+      }
+    });
+    ACSF_POOL.filter(s => s.type === 'modelsentence').forEach(function (s) {
+      if (s.from === undefined || s.from === null) {
+        bad.push('the modelsentence pool step names no model, so the level check ' +
+                 'gets whichever one index 0 happens to be');
+      }
+    });
+    return { bad: [...new Set(bad)], n: SENTENCE_MODELS.length };
+  });
+  say('  ' + out.n + ' examples checked against their own marking');
+  out.bad.forEach(x => bad('models: ' + x));
+});
+
 check('register', 'the level check stays at the register it is for', async ctx => {
   // Three rules. Two from one report: "questions chosen from elementary
   // phonics may have words that are too difficult for a pre-learner", and

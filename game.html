@@ -1432,6 +1432,13 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   color:var(--teal);background:rgba(15,155,142,.10);border:1.5px dashed rgba(15,155,142,.5);
   border-radius:12px;padding:6px 18px;letter-spacing:1px;}
 .copy-model.sm{font-size:1.25rem;letter-spacing:0;}
+/* "Example", over the two sentences in Write Two Sentences. The Copy It rounds
+   show a word to be reproduced exactly and are not labelled: there the model is
+   the answer. Here it is somebody else's answer, shown so the learner can see
+   the shape and then write their own, and without the label a learner who
+   cannot yet read the instruction copies David's sentences back. */
+.model-label{display:block;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--teal);opacity:.85;margin-bottom:6px;font-weight:700;}
 .case-big{font-family:'Fredoka One',cursive;font-size:3.6rem;color:var(--gold);}
 /* A written hand rather than a typed one. The same letter looks different
    enough between the two that recognising one is not recognising the other,
@@ -4115,9 +4122,17 @@ function genPunctuationQuestions(n,from){
    could never show it, however well the learner did — half a feature is not a
    feature. Each model is a pair a learner can answer about themselves, and the
    pair is shown together so the pattern is there to follow. */
+/* `caps` is how many capitals each sentence of the answer has to carry. It is
+   2 only where the ask names what the second one is for: "your name and
+   country" tells the learner that David and Vietnam are the words that take
+   one, on top of the capital that opens the sentence. The models that ask for
+   a family or a start time stay at 1, because "I have two children." is a
+   correct sentence and marking it down for having no proper noun in it would
+   be marking the learner on what they were asked to write about. */
 const SENTENCE_MODELS=[
   {model:'My name is David. I am from Vietnam.',
-   ask:'Write two sentences about you.', hint:'your name, then your country'},
+   ask:'Write two sentences about your name and country.',
+   hint:'your name, then your country', caps:2},
   {model:'I live in Springvale. I have two children.',
    ask:'Write two sentences about you.', hint:'where you live, then your family'},
   {model:'My class is on Monday. I come by bus.',
@@ -4129,13 +4144,19 @@ const SENTENCE_MODELS=[
   {model:'I work in a shop. I start at nine.',
    ask:'Write two sentences about you.', hint:'your work, then the time'},
 ];
-function genSentenceQuestions(n){
+/* `from` names the model, so the level check asks for the one it means rather
+   than getting it by landing on index 0. Its step wants the name and country
+   model: that is the ask whose two sentences both carry a proper noun, so it
+   is the one that can be marked on the capital a name takes. Left open, the
+   pool would have been one edit away from dealing "your work, then the time"
+   and marking it against a rule that ask never set up. */
+function genSentenceQuestions(n,from){
   const out=[];
   for(let i=0;i<(n||6);i++){
-    const m=SENTENCE_MODELS[i%SENTENCE_MODELS.length];
+    const m=SENTENCE_MODELS[(from===undefined||from===null)?i%SENTENCE_MODELS.length:from];
     out.push({type:'typein', label:'WRITE TWO SENTENCES', noListen:true,
-      freeText:true, sentences:2,
-      icon:'<span class="copy-model sm">'+m.model+'</span>',
+      freeText:true, sentences:2, capsEach:m.caps||1,
+      icon:'<span class="model-label">Example</span><span class="copy-model sm">'+m.model+'</span>',
       question:m.ask, placeholder:'Two sentences about you',
       answer:m.model, hintText:m.hint});
   }
@@ -4837,7 +4858,7 @@ const GEN_BANKS={
   direction:    function(n){ return genDirectionQuestions(n); },
   sightwords:   function(n){ return genSightWordQuestions(n); },
   punctuation:  function(n,f){ return genPunctuationQuestions(n,f); },
-  modelsentence:function(n){ return genSentenceQuestions(n); },
+  modelsentence:function(n,f){ return genSentenceQuestions(n,f); },
   notice:       function(n){ return genNoticeQuestions(n); },
   greetings:    function(n){ return genGreetingQuestions(n); },
   instructions: function(n){ return genInstructionQuestions(n); },
@@ -7792,7 +7813,7 @@ const ACSF_POOL=[
   {type:'copyword',mc:false,from:2},
   {type:'spelling',mc:false},{type:'numeralwrite',mc:false,from:0},
   {type:'numeralwrite',mc:false,from:1},{type:'punctuation',mc:true,from:0},
-  {type:'punctuation',mc:false,from:1},{type:'modelsentence',mc:false},
+  {type:'punctuation',mc:false,from:1},{type:'modelsentence',mc:false,from:0},
   /* Grammar Unscramble is not here. Its only claim was the Level 1 "uses basic
      structures and limited verb tenses", which came out when Level 1 Writing
      did, and a step that claims nothing can never serve a stage. It is still a
@@ -10790,14 +10811,25 @@ function typeinTier(q,ans){
     const real=parts.filter(function(x){ return words(x)>=2; });
     if(!real.length) return 'wrong';
     if(real.length<want) return 'partial';
-    /* Every sentence has to carry its own capital and its own stop. Counting
+    /* Every sentence has to carry its own capitals and its own stop. Counting
        the stops rather than looking at the end catches "My name is Sara I am
-       from Iraq." — one stop for two sentences. */
+       from Iraq.", which is one stop for two sentences.
+         `capsEach` is how many capitalised words the sentence needs. It is 1
+       almost everywhere: the capital that opens it. Where the ask names a
+       proper noun, as "your name and country" does, it is 2, because a name
+       and a country take a capital and writing "my name is david" is the thing
+       that round is there to teach. One capital was all that was checked
+       before, so "My name is david. I am from vietnam." scored full marks with
+       both proper nouns in lowercase. */
     const stops=(got.match(/[.!?]/g)||[]).length;
-    const caps=got.split(/[.!?]+/).map(function(x){ return x.trim(); })
-                  .filter(function(x){ return x.length; })
-                  .filter(function(x){ return /^[A-Z]/.test(x); }).length;
-    return (stops>=want&&caps>=want)?'correct':'partial';
+    const needCaps=q.capsEach||1;
+    const capWords=function(x){
+      return x.split(/\s+/).filter(function(w){ return /^[A-Z]/.test(w); }).length;
+    };
+    const written=real.filter(function(x){
+      return /^[A-Z]/.test(x)&&capWords(x)>=needCaps;
+    }).length;
+    return (stops>=want&&written>=want)?'correct':'partial';
   }
   if(q.exact){
     let a=got, b=(q.answer||'').replace(/\s+/g,' ').trim();

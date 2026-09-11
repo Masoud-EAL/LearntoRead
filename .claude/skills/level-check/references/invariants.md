@@ -375,7 +375,7 @@ decisions, two places, one report.
 Anything added beside them is a common noun and lowercase is its spelling.
 
 ### 16. Two sentences means two sentences
-*check: covered by `run` reaching a verdict, then judgement*
+*check: `models`, and `run` reaching a verdict, then judgement*
 
 > "Writing 2 sentences adapted from a model cannot be just 1. The test should
 > have a model like: My name is David. I'm from Vietnam. And then ask learners
@@ -384,6 +384,36 @@ Anything added beside them is a common noun and lowercase is its spelling.
 `typeinTier` counts sentences with at least two words, and requires a full stop
 and a capital for each before it will say correct. Fewer than asked is partial.
 Where the feature says two, one is not evidence of it.
+
+### 16a. An example is labelled, and scores full marks under its own rule
+*check: `models`*
+
+> "Write 'Example' above the model sentences about David." · "Two full stops,
+> and two capital letters in each sentence are needed. One for I, one for name
+> or country."
+
+The label first: the model is somebody else's answer, shown so the learner can
+see the shape. Unlabelled, a learner who cannot yet read the instruction copies
+David's sentences back. The Copy It rounds are deliberately not labelled, because
+there the model *is* the answer.
+
+The marking is the part worth reading twice. One capital a sentence was all that
+was checked, so "My name is david. I am from vietnam." scored full marks with
+both proper nouns in lowercase. But the rule as reported, two capitals in every
+sentence, would have failed four of the app's own six models: "I work in a shop.
+I start at nine." has one capital in each. The app would have been showing an
+Example its own marking calls partly correct.
+
+So the rule belongs to the ask, not to the round. `capsEach` is 2 only where the
+ask names what the second capital is for ("your name and country"), and the level
+check's pool step names that model rather than getting it by landing on index 0.
+Elsewhere it stays 1, because "I have two children." is a correct sentence and
+marking it down for carrying no proper noun marks the learner on what they were
+asked to write about.
+
+The general rule, and what `models` enforces: **tightening a marking rule is how
+a round starts showing an example it would itself mark down.** Whenever a rule
+moves, check the models against it.
 
 ### 17. Every answer gets time in proportion to what it takes to give
 *no check, judgement*
