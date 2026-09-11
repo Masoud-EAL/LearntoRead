@@ -4309,7 +4309,10 @@ const GOALS=[
   /* Not "Get a job": that is a reason for learning, not a thing to learn, and
      the question asks what the learner wants to learn. */
   {e:'💼', t:'English for work'}, {e:'📄', t:'Fill in forms'},
-  {e:'🤷', t:'No goal yet'},
+  /* "No goal", not "No goal yet". The "yet" made it a reasonable thing to
+     say, and it is meant to be the answer that does not identify a goal: it
+     declines, so PLB.01 is recorded as asked and not shown. */
+  {e:'🤷', t:'No goal'},
 ];
 const BARRIERS=[
   {e:'👶', t:'Child care'},    {e:'🚌', t:'Getting here'},
@@ -4326,7 +4329,7 @@ const EASYHARD=[
 /* The options that mean "none of these". Kept as the one list both the picker
    and the evidence read, so a new way of saying it cannot be added to a game
    without the profile learning about it. */
-const NO_ANSWER_OPTS=['🤷 No goal yet','🤷 No reason','🤷 I do not know','🙂 Nothing stops me'];
+const NO_ANSWER_OPTS=['🤷 No goal','🤷 No reason','🤷 I do not know','🙂 Nothing stops me'];
 function chipRow(list){
   return list.map(function(x){ return x.e+' '+x.t; });
 }
@@ -4339,7 +4342,7 @@ function chipRow(list){
 
    There was a second feature-bearing ask, "Which game would help you most?",
    and it was dealt the GOALS list, so it asked about a game and offered
-   "Read better" and "No goal yet". It named no task and no game, and every
+   "Read better" and "No goal". It named no task and no game, and every
    option scored, so it could not show either of the features it claimed:
    locating learning materials, and selecting them for a specific task. Both
    are marked not assessed in docs/acsf-coverage.md now. A question that asks
@@ -4356,9 +4359,16 @@ function genMyLearningQuestions(n,from){
      claims nothing cannot serve a stage. The goal question is first so a
      cycling draw still leads on it. */
   const asks=[
+    /* PLB only, so the goal is asked once. "Begins to express extremely simple
+       learning goal" is the Stage A feature, and sitting the level check is
+       already that: somebody who works through it wants to start coming to
+       class, which is a simple learning goal expressed by doing rather than by
+       tapping. It is a run signal now, beside "need to attend class". Claiming
+       both off this one ask had the staircase deal it twice, once to show Stage
+       A and again for Stage B, which is two turns spent on a question whose
+       answer cannot change in between. */
     {q:'What do you want to learn?',   list:GOALS,    label:'YOUR GOAL',
-     acsf:[['01','PLA','Begins to express extremely simple learning goal',1],
-           ['01','PLB','Identifies at least one personal learning goal',1]]},
+     acsf:[['01','PLB','Identifies at least one personal learning goal',1]]},
     {q:'What is easy for you now?',    list:EASYHARD, label:'WHAT IS EASY'},
     {q:'What is hard for you now?',    list:EASYHARD, label:'WHAT IS HARD'},
     {q:'What makes it hard to come to class?', list:BARRIERS, label:'WHAT GETS IN THE WAY'},
@@ -7461,8 +7471,7 @@ const ACSF_CLAIMS={
      about a learning goal, so claiming off the bank rather than off the goal
      ask would credit a feature from a question about child care. */
   'mylearning':{base:[],
-    byFrom:{0:[['01','PLA','Begins to express extremely simple learning goal',1],
-               ['01','PLB','Identifies at least one personal learning goal',1]]}},
+    byFrom:{0:[['01','PLB','Identifies at least one personal learning goal',1]]}},
   /* Every feature any of the three copy rounds can show, because that is what
      the band picker needs to know the bank is worth reaching. What is actually
      credited is decided round by round: see PF_COPY_WORD, PF_COPY_NAME and
@@ -8750,9 +8759,10 @@ function acsfSignalOpen(ev,ind,lvl){
    from the bank, as before. */
 function acsfCredit(step,tier,q,ans){
   if(!TEST||!TEST.ev) return;
-  /* "No goal yet" is a real answer and it scores, because nobody is wrong
-     about their own goal. It is not evidence of having named one, though, so
-     the features it would have credited are counted as asked and not shown. */
+  /* "No goal" is a real answer and it scores, because nobody is wrong about
+     their own goal. It is not evidence of having named one, though, so the
+     features it would have credited are counted as asked and not shown. That
+     is what makes it the answer that does not clear PLB.01. */
   const declined=!!(q&&q.declines&&q.declines.some(function(d){
     return normalize(d)===normalize(ans);
   }));
@@ -9081,7 +9091,14 @@ function acsfSignalRows(ev){
   const P=function(){ const o=W.apply(null,arguments);
     Object.keys(o).forEach(function(k){ o[k].partial=1; }); return o; };
   if(asked>0){
-    put('01','PLA',W(RUN,'Engages in learning activities that involve minimal risk taking',asked,tries,'Demonstrates preparedness for learning, e.g. need to attend class, although may be inconsistent',asked,tries));
+    /* "Begins to express extremely simple learning goal" sits here rather than
+       on a question. Working through a level check is somebody saying they want
+       to start coming to class, and that is a simple learning goal expressed by
+       doing. Stage B still asks: "Identifies at least one personal learning
+       goal" wants a goal named, and the My Learning question is where the
+       learner names it. Counted on attempts like its neighbours, so a run that
+       answered nothing still shows nothing here. */
+    put('01','PLA',W(RUN,'Engages in learning activities that involve minimal risk taking',asked,tries,'Demonstrates preparedness for learning, e.g. need to attend class, although may be inconsistent',asked,tries,'Begins to express extremely simple learning goal',asked,tries));
     put('02','PLA',W(RUN,'Begins to participate in familiar learning environment interactions, with prompting, e.g. responds to extremely simple directions',asked,tries,'Attempts simple repetitive tasks',asked,tries));
     put('12','PLA',W(ANS,'Demonstrates extremely limited use of digital device',Math.max(1,tries),tries));
     put('13','PLA',W(ANS,'Begins to use digital peripherals',Math.max(1,tries),tries));
@@ -9171,6 +9188,54 @@ function acsfEvidenceAt(ind,lvl,byInd,sig){
   const full=acsfStageFeatures(ind,lvl).every(function(f){ return !!why[f]; });
   return {seen:seen, right:right, why:why, full:full};
 }
+/* The highest level this app could ever award an indicator outright, which is
+   not always `meta.ceiling`. Every Level 1 claim here is marked partial on
+   purpose, because one round is not the sustained performance Level 1
+   describes, and acsfLevelState will not award a level carried only by partial
+   claims. So .03 .04 and .08 reach Stage B and stop, however well the learner
+   reads, and the row printed "Working towards Level 1.03" underneath a
+   performance with nothing wrong in it. That is the app's own ceiling written
+   as the learner's shortfall, which rule 8c says never to print.
+
+   Read off the claim map and the signals the app can produce, never off the run
+   being judged: a bar taken from the same profile it is describing moves down to
+   meet a bug and calls it passing. Worked out once and kept, because it is a
+   fact about the app rather than about a run. */
+let ACSF_AWARD_TOP=null;
+function acsfAwardCeiling(ind){
+  if(!ACSF_AWARD_TOP){
+    const solid={};
+    ACSF_POOL.forEach(function(st){
+      acsfClaimsFor(st).forEach(function(c){ if(!c[3]) solid[c[0]+'|'+c[1]]=1; });
+    });
+    /* Every stage forced open, so this sees the signals the app is capable of
+       rather than the ones one run happened to reach. */
+    const open={at:{},done:{}};
+    ACSF_ORDER.forEach(function(i){
+      ACSF_STEPS.forEach(function(l){ open.done[i+'|'+l]='yes'; });
+    });
+    const able=acsfSignalRows({asked:40,attempts:40,timeouts:0,blanks:0,hints:1,replays:1,
+      modes:{tap:20,type:10,tiles:5,coins:3,chips:2},finished:true,stages:open});
+    Object.keys(able).forEach(function(i){
+      Object.keys(able[i]).forEach(function(l){
+        const w=able[i][l].why||{};
+        if(Object.keys(w).some(function(k){ return !w[k].partial; })) solid[i+'|'+l]=1;
+      });
+    });
+    ACSF_AWARD_TOP={};
+    ACSF_ORDER.forEach(function(i){
+      const m=ACSF_INDICATORS[i];
+      if(!m) return;
+      let best=null;
+      ACSF_STEPS.forEach(function(lvl){
+        if(acsfLvlNo(lvl)>acsfLvlNo(m.ceiling)) return;
+        if(solid[i+'|'+lvl]) best=lvl;
+      });
+      ACSF_AWARD_TOP[i]=best;
+    });
+  }
+  return ACSF_AWARD_TOP[ind];
+}
 function acsfRow(ind,byInd,sig){
   const meta=ACSF_INDICATORS[ind];
   const row={ind:ind, code:'.'+ind, skill:meta.skill, name:meta.name,
@@ -9238,7 +9303,14 @@ function acsfRow(ind,byInd,sig){
     else if(st==='no') blocked=true;
   });
   row.level=demo; row.towards=towards;
-  row.capped=!!(demo&&demo===meta.ceiling);
+  /* Not `demo===meta.ceiling`. An indicator whose levels above this one are
+     all carried by partial claims cannot be awarded any of them however the
+     learner does, so reaching the top the app can award is what "at least"
+     is about. Read against the declared ceiling as well, so an indicator that
+     genuinely reaches it still says so. */
+  const awardTop=acsfAwardCeiling(ind);
+  row.capped=!!(demo&&(demo===meta.ceiling||
+    (awardTop&&acsfLvlNo(demo)>=acsfLvlNo(awardTop))));
   if(demo){
     row.state='yes';
     // The one piece of wording the whole feature turns on. At the ceiling the

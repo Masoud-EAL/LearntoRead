@@ -99,6 +99,36 @@ did because the run had slack; removing a step elsewhere is what pushed it over
 the threshold, so a `spread` failure after an unrelated deletion is usually this
 waiting underneath rather than something the deletion broke.
 
+### 5a. A question is asked once where its answer cannot change
+*check: `spread`, and the counts under it*
+
+> "In the goals question, only ask the question once, since doing the level check
+> means the learner wants to start going to class, which is a goal. For PLB, ask
+> the question." · "Change No goal yet to No goal. The word yet makes the option
+> somehow defensible, but we want that to be the wrong option for PLB."
+
+The goal ask claimed both the Stage A feature ("Begins to express extremely
+simple learning goal") and the Stage B one ("Identifies at least one personal
+learning goal"), so the staircase dealt it twice: once to show Stage A, again for
+Stage B. The same question, and an answer that cannot have changed in between.
+
+Stage A is a run signal now. Sitting the level check *is* expressing a simple
+learning goal: somebody working through it wants to start coming to class. It
+sits beside "Demonstrates preparedness for learning, e.g. need to attend class",
+counted on attempts like its neighbours, so a run that answered nothing still
+shows nothing (rule 4 holds). Stage B stays a question, because naming a goal is
+what that feature asks for.
+
+The wording matters to the same end. "No goal yet" is a reasonable thing to say,
+and it was meant to be the answer that does **not** identify a goal. "No goal" is
+what it says now. The mechanism was already right: `NO_ANSWER_OPTS` makes it a
+decline, which scores (nobody is wrong about their own goal) but records the
+feature as asked and not shown.
+
+Generalising: **where a question's answer cannot change between two asks, one ask
+is all the evidence there is.** Claiming two stages off it buys a second turn and
+no second observation.
+
 ### 6. Nothing is claimed that the app cannot measure
 *no check, judgement*
 
@@ -194,6 +224,26 @@ branch when it should have reached the capped one.
 Read every row of a perfect run out loud as a teacher before shipping a change
 to the panel. No sentence may describe an app limit as something the learner did
 not manage.
+
+It was reported anyway, from a screenshot of a run with nothing wrong in it:
+
+> "Change the wording to at least PLB.03. Generally, when there is no wrong
+> answer, all indicators say at least, right now only some say it."
+
+`row.capped` was `demo===meta.ceiling`, and `.03` `.04` and `.08` declare a
+ceiling of L1 they can never be awarded, because every Level 1 claim in the app
+is partial. So they reached PLB, `capped` stayed false, and the row read
+"PLB.03 / Working towards Level 1.03" over a perfect performance.
+
+The bar is `acsfAwardCeiling`, which is rule 8a's bar: the highest level, within
+the declared ceiling, carrying one piece of evidence the app does not itself call
+partial. It lives in the app now and `reachable` calls it rather than keeping its
+own copy, because a verdict and the bar it is judged against are exactly the pair
+that must not drift. `reachable` also asserts the wording, not just the level.
+
+The lesson underneath: **a declared ceiling is what the app aims at, not what it
+can hit.** Anywhere the two are treated as the same thing, the difference gets
+printed as something the learner failed to do.
 
 ---
 

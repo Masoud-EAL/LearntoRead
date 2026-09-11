@@ -454,38 +454,13 @@ check('reachable', 'a perfect run awards every indicator the top its evidence su
          claim in the app is marked partial on purpose, because one round is not
          the sustained performance Level 1 describes, and acsfLevelState will not
          award a level carried only by partial claims. So .03 .04 and .08 stop at
-         Stage B and are right to. The bar is the highest level, within the
-         ceiling, carrying at least one piece of evidence the app does not itself
-         call partial, from the claim map or from the run signals, since .02
-         Stage B has no question of its own and lives entirely in the signals.
-         Worked out from the claim map rather than from the run being checked: a
-         bar read off the same profile it is judging would move down to meet a
-         bug and call it passing. */
-      const solid = {};
-      ACSF_POOL.forEach(st => acsfClaimsFor(st).forEach(c => {
-        if (!c[3]) solid[c[0] + '|' + c[1]] = 1;
-      }));
-      // Every stage forced open, so this sees the signals the app can produce
-      // rather than the ones this particular run reached.
-      const open = { at: {}, done: {} };
-      ACSF_ORDER.forEach(i => ACSF_STEPS.forEach(l => { open.done[i + '|' + l] = 'yes'; }));
-      const able = acsfSignalRows({
-        asked: 40, attempts: 40, timeouts: 0, blanks: 0, hints: 1, replays: 1,
-        modes: { tap: 20, type: 10, tiles: 5, coins: 3, chips: 2 },
-        finished: true, stages: open
-      });
-      Object.keys(able).forEach(i => Object.keys(able[i]).forEach(l => {
-        const w = able[i][l].why || {};
-        if (Object.keys(w).some(k => !w[k].partial)) solid[i + '|' + l] = 1;
-      }));
-      const top = ind => {
-        let best = null;
-        ACSF_STEPS.forEach(lvl => {
-          if (acsfLvlNo(lvl) > acsfLvlNo(ACSF_INDICATORS[ind].ceiling)) return;
-          if (solid[ind + '|' + lvl]) best = lvl;
-        });
-        return best;
-      };
+         Stage B and are right to.
+           The app works this out itself now, in acsfAwardCeiling, because the
+         panel needs the same answer to decide whether to print "at least": a
+         verdict and the bar it is judged against drifting apart is the bug this
+         whole file exists to catch. Called here rather than recomputed, so there
+         is one definition and the check reads the one the app ships. */
+      const top = acsfAwardCeiling;
       return acsfWalked().map(ind => {
         const r = prof.rows.find(x => x.ind === ind);
         /* A level cannot be both awarded and never asked about. The staircase
@@ -499,7 +474,16 @@ check('reachable', 'a perfect run awards every indicator the top its evidence su
         const ghost = r.why.filter(w => w.notAsked && r.level &&
                                         acsfLvlNo(w.lvl) <= acsfLvlNo(r.level))
                            .map(w => w.lvl + ' ' + w.text);
-        return { ind: ind, want: top(ind), got: r.level, line: r.line, ghost: ghost };
+        /* The app's own ceiling must never be printed as the learner's
+           shortfall. A row that reached the top this app can award says "at
+           least", because what stopped the climb was the app running out of
+           things to ask, not the learner running out of answers. .03 .04 and
+           .08 read "PLB.03 / Working towards Level 1.03" under a performance
+           with nothing wrong in it, which is a sentence about a learner. */
+        const atTop = r.level && top(ind) && acsfLvlNo(r.level) >= acsfLvlNo(top(ind));
+        return { ind: ind, want: top(ind), got: r.level, line: r.line, ghost: ghost,
+                 shortfall: !!(atTop && !/^At least /.test(r.line || '')),
+                 sub: r.sub || '' };
       });
     });
     out.forEach(r => {
@@ -509,6 +493,15 @@ check('reachable', 'a perfect run awards every indicator the top its evidence su
       t.lines[r.line] = (t.lines[r.line] || 0) + 1;
       r.ghost.forEach(g => bad('reachable: .' + r.ind + ' was awarded ' + r.got +
                                ' with a feature the panel calls not asked: ' + g));
+      if (r.shortfall) {
+        bad('reachable: .' + r.ind + ' reached the top this app can award but reads "' +
+            r.line + '" instead of "At least ...", so the app\'s ceiling is printed ' +
+            'as the learner\'s shortfall');
+      }
+      if (r.shortfall && /Working towards/.test(r.sub)) {
+        bad('reachable: .' + r.ind + ' is at the app\'s ceiling but its note still says "' +
+            r.sub + '"');
+      }
     });
   }
   Object.keys(tally).sort().forEach(ind => {
@@ -941,6 +934,36 @@ check('variants', 'every ordinary Test Yourself ladder still finishes', async ct
     else if (r.short) bad('variants: ' + r.v + ' dealt ' + r.short + ' short rounds');
     else if (!r.asked) bad('variants: ' + r.v + ' asked nothing');
   });
+});
+
+check('coverage', 'the coverage totals match the rows they count', async () => {
+  // The totals table is read as the app's honest account of what it claims, so
+  // it going stale is the same class of fault as a claim the app cannot meet.
+  // It had drifted by three: two features moved to "not assessed" when the
+  // My Learning game question came out, and one moved to "from the run" when
+  // the Stage A goal stopped being asked. Counted rather than trusted now.
+  const md = fs.readFileSync(path.join(ROOT, 'docs', 'acsf-coverage.md'), 'utf8');
+  const rows = md.match(/^\|\s*\d+\s*\|[^|]*\|\s*([^|]+?)\s*\|[^|]*\|\s*$/gm) || [];
+  const counted = {};
+  rows.forEach(r => {
+    const mark = r.split('|')[3].trim();
+    counted[mark] = (counted[mark] || 0) + 1;
+  });
+  const stated = {};
+  (md.match(/^\|\s*(✅ had it|📊 from the run|🔧 extended|🆕 built|❌ not assessed)\s*\|\s*(\d+)\s*\|\s*$/gm) || [])
+    .forEach(r => { const p = r.split('|'); stated[p[1].trim()] = Number(p[2].trim()); });
+  const total = Object.values(counted).reduce((a, b) => a + b, 0);
+  say('  ' + total + ' feature rows across ' + Object.keys(counted).length + ' marks');
+  Object.keys(counted).forEach(k => {
+    if (stated[k] === undefined) bad('coverage: no total stated for "' + k + '"');
+    else if (stated[k] !== counted[k]) {
+      bad('coverage: "' + k + '" is stated as ' + stated[k] + ' but ' + counted[k] + ' rows carry it');
+    }
+  });
+  const statedTotal = Number((md.match(/^\|\s*\*\*Total\*\*\s*\|\s*\*\*(\d+)\*\*\s*\|\s*$/m) || [])[1]);
+  if (statedTotal !== total) {
+    bad('coverage: the total is stated as ' + statedTotal + ' but ' + total + ' rows were counted');
+  }
 });
 
 check('links', 'the generated short pages are in step with build-links.py', async () => {

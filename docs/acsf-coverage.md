@@ -30,10 +30,10 @@ legible script are also not claimed, because that is `tracing.html` and paper.
 | Status | Features |
 |---|---|
 | ✅ had it | 32 |
-| 📊 from the run | 16 |
+| 📊 from the run | 17 |
 | 🔧 extended | 8 |
-| 🆕 built | 64 |
-| ❌ not assessed | 12 |
+| 🆕 built | 61 |
+| ❌ not assessed | 14 |
 | **Total** | **132** |
 
 ## Ceilings
@@ -101,7 +101,7 @@ cap note, not in a line that reads as a gap in the run.
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
 | 1 | Engages in learning activities that involve minimal risk taking | 📊 from the run | attempts questions rather than timing out |
-| 2 | Begins to express extremely simple learning goal | 🆕 built | My Learning: pick a goal |
+| 2 | Begins to express extremely simple learning goal | 📊 from the run | works through the level check: starting it is wanting to come to class |
 | 3 | Locates limited familiar learning materials and resources following simple, immediate instructions | ❌ not assessed | nothing in the app tells a learner to open a particular game and then watches them find it |
 | 4 | Demonstrates preparedness for learning, e.g. need to attend class, although may be inconsistent | 📊 from the run | finishes the rounds |
 
