@@ -311,6 +311,44 @@ The transcript is also most of what a saved run weighs. When the device has no
 room left, `acsfSaveRun` gives the transcripts back one at a time, oldest first,
 rather than losing five profiles to keep one transcript.
 
+### 8e. The report is a document on paper, not a screenshot of an app
+*check: `printable`*
+
+> A print preview from an iPhone, four indicators drawn on top of each other
+> and the right-hand side of the sheet cut off. "Fix print."
+
+The panel is the one screen here meant to leave the device, and printing it is
+not the same as showing it. The app is a fixed-height thing that scrolls inside
+itself, built of nested flex columns; a printer wants one column as tall as it
+needs to be, cut into pages. Everything between those two is what the print
+rules undo, and undoing it by halves is what produced that preview.
+
+Three faults, and each is now a line in `printable`:
+
+- **A flex box that meets a page edge.** Safari does not fragment a flex
+  container: where one crosses a break it draws the rest of itself over the top
+  of the next page. `.acsf-wrap`, `.acsf-body` and `.acsf-evidence` are column
+  stacks and nothing more, so on paper they are blocks and their `gap` becomes
+  a margin. A flex row short enough to sit inside a block that never breaks
+  cannot meet a page edge, so the rule is about the tall ones, and the check
+  reads heights rather than banning flex.
+- **The phone's own height and clipping.** `--app-h` is measured in JS and sits
+  on `body` and `.screen` as a `min-height`; `body` also carries
+  `overflow-x:hidden`. On paper that is a blank half-sheet wherever the height
+  lands and a cut-off right-hand side wherever the paper is narrower than the
+  phone. Both are undone for the whole chain, not for the panel alone.
+- **Holding a whole skill group together.** `break-inside:avoid` on a group of
+  three or four indicators asks for something that often cannot be given: the
+  break goes in front of the group anyway and the page before it ends a third
+  full. What is worth keeping whole is an indicator with its features, a
+  question with its answer, and a heading with the row beneath it.
+
+One more, found by the check rather than by the report: the rule that makes
+those three blocks `display:block!important` on paper also beat the browser's
+own rule for the `hidden` attribute, so the questions printed for a teacher who
+had never opened them. Anything `!important` enough to change layout is
+`!important` enough to resurrect something hidden.
+
 ---
 
 ## Question quality

@@ -91,6 +91,7 @@ node tools/checks/check.js repeats    # after anything about a question coming b
 node tools/checks/check.js ordering   # after anything about levels
 node tools/checks/check.js blanks     # after anything about credit for doing nothing
 node tools/checks/check.js evidence   # after anything about the questions the report prints
+node tools/checks/check.js printable  # after anything about the printed sheet
 ```
 
 `tools/checks/README.md` lists every one of them and what each proves.

@@ -1602,13 +1602,40 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   body{background:#fff!important;color:#000!important;}
   body::before,body::after{display:none!important;}
   .screen{display:none!important;}
-  #screen-test-acsf{display:block!important;position:static!important;padding:0!important;}
+  /* The app is a fixed-height thing that scrolls inside itself. A printer
+     wants the opposite: one column as tall as it needs to be, cut into pages.
+     Both heights are the phone's, measured in JS and written into --app-h, and
+     both were still on the page at print time: a blank half-sheet wherever one
+     of them landed. overflow-x:hidden is the same mistake in the other
+     direction, clipping anything the paper is too narrow for instead of
+     letting it wrap. */
+  html,body{height:auto!important;min-height:0!important;width:auto!important;
+    overflow:visible!important;}
+  #screen-test-acsf{display:block!important;position:static!important;padding:0!important;
+    min-height:0!important;height:auto!important;overflow:visible!important;}
   #screen-test-acsf,#screen-test-acsf *{color:#000!important;
     text-shadow:none!important;box-shadow:none!important;}
   #screen-test-acsf .acsf-acts,.music-btn,.back-btn,
   .site-back,#solo-back-btn,#music-chip,#toast{display:none!important;}
-  .acsf-wrap{max-width:none;}
-  .acsf-body{overflow:visible!important;max-height:none!important;}
+  /* Nothing in the printed flow may be a flex container. Safari does not
+     fragment one: where a flex column crosses a page break it draws the rest
+     of itself over the top of the next page instead of continuing onto it,
+     which is what a teacher printing from an iPhone got, four indicators
+     stacked on top of each other and the right-hand side of the sheet cut off.
+     These three are column stacks and nothing else, so on paper they are
+     blocks, and the gap that held them apart becomes the margin that does.
+     The small rows inside a question stay flex: they are one line each, inside
+     a block that does not break, so they never meet a page edge. */
+  .acsf-wrap,.acsf-body,.acsf-evidence{display:block!important;max-width:none;
+    overflow:visible!important;max-height:none!important;}
+  /* Said again, louder, for the same reason it is said on the screen: the line
+     above is important enough to beat the browser's rule for the hidden
+     attribute, and printing the questions nobody asked for is the one thing
+     this panel must not do behind a teacher's back. */
+  .acsf-evidence[hidden]{display:none!important;}
+  .acsf-wrap>*{margin-bottom:12px;}
+  .acsf-body>.acsf-group{margin-bottom:14px;}
+  .acsf-evidence>.acsf-q{margin-bottom:8px;}
   .acsf-acts{position:static!important;}
   .acsf-head,.acsf-row,.acsf-warn,.acsf-flag,.acsf-q,.acsf-q-again{background:#fff!important;}
   .acsf-head,.acsf-warn{border:1px solid #000!important;}
@@ -1623,7 +1650,16 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   #screen-test-acsf .acsf-ev-head h3,#screen-test-acsf .acsf-q-said,
   #screen-test-acsf .acsf-q-opts,#screen-test-acsf .acsf-q-label,
   #screen-test-acsf .acsf-q-ans .k{color:#444!important;}
-  .acsf-group,.acsf-row,.acsf-q{break-inside:avoid;page-break-inside:avoid;}
+  /* An indicator is what has to stay whole, not a whole skill. A skill group
+     is three or four indicators and taller than a sheet as often as not, and
+     asking for it whole is asking for something that cannot be given: the
+     break goes in front of the group anyway and the page before it ends a
+     third full. Numeracy was doing exactly that, printing on its own page
+     under two thirds of white. What is worth keeping together is an indicator
+     with its features, a question with its answer, and a skill's heading with
+     the first row under it. */
+  .acsf-row,.acsf-q{break-inside:avoid;page-break-inside:avoid;}
+  .acsf-group h3{break-after:avoid;page-break-after:avoid;}
   /* The questions start their own page. The profile is the document a teacher
      files; the working is the attachment behind it, and a sheet that ends
      halfway through the last indicator and carries on into question one reads

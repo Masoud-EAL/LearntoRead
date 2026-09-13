@@ -418,24 +418,117 @@ check('evidence', 'the panel prints every question asked and the answer given to
   if (out.open.copy.indexOf('THE QUESTIONS THIS RUN ASKED') < 0) {
     bad('evidence: Copy leaves the questions out while they are on the screen');
   }
-  // Printable means printable with the questions: the page a teacher takes to
-  // the learner is the paper one.
+  page.errs.forEach(e => bad('evidence: ' + e));
+  await page.close();
+});
+
+/* Everything about the sheet that comes out of the printer. The panel is the
+   one screen in this app meant to leave it, and a teacher printing from a
+   phone got rows drawn on top of each other with the right-hand side cut off:
+   the app is a fixed-height thing that scrolls inside itself, made of nested
+   flex columns, and none of that survives being cut into pages. */
+check('printable', 'the teacher panel prints as a document, not as an app', async ctx => {
+  const page = await openApp(ctx.browser, ctx.base, 'test:level');
+  // A synthetic run through the app's own round functions: this check is about
+  // the page, not about the answering, and it needs a panel with both halves
+  // on it. showStudentQuestion, because that is what puts a question on screen.
+  await page.evaluate(() => {
+    soloMode = true; myScore = 0; TEST = newTestGame('solo', 'test:level');
+    let guard = 0;
+    while (!testFinished() && guard++ < 40) {
+      testStartRound();
+      const qs = (soloQuestions || []).slice();
+      TEST.tally = []; TEST.roundPts = 0;
+      qs.forEach(function (q, i) {
+        soloQIdx = i; currentStudentQ = q;
+        showStudentQuestion(q, Date.now());
+        const right = i % 3 !== 2;
+        const a = right ? (q.freeText ? 'My name is Ali. I am from Iraq.' : q.answer) : 'zzzz';
+        testRecord(right ? 'correct' : 'wrong', right ? 10 : 0, false, a);
+      });
+      testEndRound(); TEST.round++;
+    }
+    openAcsfPanel();
+  });
   await page.emulateMedia({ media: 'print' });
-  const paper = await page.evaluate(() => {
+  const shut = await page.evaluate(() => ({
+    list: getComputedStyle(document.getElementById('acsf-evidence')).display,
+    acts: getComputedStyle(document.querySelector('.acsf-acts')).display
+  }));
+  if (shut.list !== 'none') bad('printable: the questions print before anyone asks for them');
+  if (shut.acts !== 'none') bad('printable: the buttons print with the report');
+  const out = await page.evaluate(() => {
+    toggleAcsfEvidence();
+    const panel = document.getElementById('screen-test-acsf');
+    const bad = [];
+    /* The chain the page is cut down. A printer needs one column as tall as it
+       needs to be: anything on the way to it that is positioned, clipped, or
+       held at the height of a phone screen either loses what will not fit or
+       draws it over the next page. */
+    let el = document.getElementById('acsf-evidence');
+    while (el) {
+      const c = getComputedStyle(el), nm = el.tagName.toLowerCase() + (el.id ? '#' + el.id : '');
+      if (c.position !== 'static') bad.push(nm + ' prints ' + c.position + ', not static');
+      if (c.overflowX !== 'visible' || c.overflowY !== 'visible') bad.push(nm + ' clips what it prints (overflow ' + c.overflowX + '/' + c.overflowY + ')');
+      if (c.transform !== 'none') bad.push(nm + ' prints under a transform');
+      if (parseFloat(c.minHeight) > 0) bad.push(nm + ' prints with a min-height of ' + c.minHeight + ', which is the phone\'s');
+      el = el.parentElement;
+    }
+    /* No tall flex box anywhere in what is printed. Safari does not fragment a
+       flex container: where one crosses a page break it draws the remainder
+       over the next page instead of continuing onto it. A flex row short
+       enough to sit inside a block that never breaks cannot meet a page edge,
+       so the rule is about the tall ones. */
+    const PAGE = 600;
+    panel.querySelectorAll('*').forEach(function (e) {
+      const c = getComputedStyle(e);
+      if (!/flex|grid/.test(c.display)) return;
+      if (e.getBoundingClientRect().height <= PAGE) return;
+      bad.push((e.id ? '#' + e.id : '.' + String(e.className).split(' ')[0]) +
+               ' is a ' + c.display + ' box ' + Math.round(e.getBoundingClientRect().height) +
+               'px tall, taller than a page');
+    });
+    // Nothing may be wider than the paper it is printed on.
+    const over = [];
+    panel.querySelectorAll('*').forEach(function (e) {
+      if (e.getBoundingClientRect().width > document.body.clientWidth + 1) {
+        over.push((e.className && String(e.className).split(' ')[0]) || e.tagName.toLowerCase());
+      }
+    });
     const ink = s => { const el = document.querySelector(s); return el ? getComputedStyle(el) : null; };
-    const q = ink('.acsf-q'), nm = ink('.acsf-q-game');
+    const q = ink('.acsf-q'), nm = ink('.acsf-q-game'), row = ink('.acsf-row');
     return {
+      bad: bad, over: over.slice(0, 4),
       list: getComputedStyle(document.getElementById('acsf-evidence')).display,
-      q: q && q.backgroundColor, ink: nm && nm.color,
-      acts: getComputedStyle(document.querySelector('.acsf-acts')).display
+      qBg: q && q.backgroundColor, qInk: nm && nm.color, rowBg: row && row.backgroundColor,
+      // An indicator and a question stay whole; a skill group is taller than a
+      // sheet as often as not, and asking for that whole only buys white paper.
+      keepRow: row && (row.breakInside || row.pageBreakInside),
+      keepQ: q && (q.breakInside || q.pageBreakInside),
+      keepGroup: ink('.acsf-group') && (ink('.acsf-group').breakInside || ink('.acsf-group').pageBreakInside),
+      newPage: ink('.acsf-ev-head') && (ink('.acsf-ev-head').breakBefore || ink('.acsf-ev-head').pageBreakBefore)
     };
   });
-  if (paper.list === 'none') bad('evidence: the questions do not print');
-  if (!paper.q) bad('evidence: nothing to print: the list has no questions in it');
-  else if (paper.q !== 'rgb(255, 255, 255)') bad('evidence: a question prints on ' + paper.q + ', not white paper');
-  if (paper.ink && paper.ink !== 'rgb(0, 0, 0)') bad('evidence: a question prints in ' + paper.ink + ', not black ink');
-  if (paper.acts !== 'none') bad('evidence: the buttons print with the report');
-  page.errs.forEach(e => bad('evidence: ' + e));
+  say('  ' + (out.bad.length ? 'x ' : '') + 'the printed page is one plain column' +
+      (out.bad.length ? ': ' + out.bad[0] : ''));
+  out.bad.forEach(x => bad('printable: ' + x));
+  out.over.forEach(x => bad('printable: ' + x + ' is wider than the paper'));
+  if (out.list === 'none') bad('printable: the questions do not print once they are shown');
+  if (out.qBg !== 'rgb(255, 255, 255)') bad('printable: a question prints on ' + out.qBg + ', not white paper');
+  if (out.rowBg !== 'rgb(255, 255, 255)') bad('printable: an indicator prints on ' + out.rowBg + ', not white paper');
+  if (out.qInk !== 'rgb(0, 0, 0)') bad('printable: a question prints in ' + out.qInk + ', not black ink');
+  if (out.keepRow !== 'avoid') bad('printable: an indicator may be split across two pages');
+  if (out.keepQ !== 'avoid') bad('printable: a question may be split from its answer across two pages');
+  if (out.keepGroup === 'avoid') bad('printable: a whole skill group is held together, which ends a page early');
+  if (!/page|always/.test(out.newPage || '')) bad('printable: the questions do not start their own page');
+  // And the pages themselves: real pagination, not an emulated one. A page
+  // that comes out blank is content that was pushed off the sheet.
+  const pdf = await page.pdf({ format: 'A4', printBackground: true,
+                               margin: { top: '12mm', bottom: '12mm', left: '10mm', right: '10mm' } });
+  const pages = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
+  say('  ' + pages + ' pages of A4');
+  if (pages < 2) bad('printable: the whole report came out on ' + pages + ' page');
+  page.errs.forEach(e => bad('printable: ' + e));
   await page.close();
 });
 
