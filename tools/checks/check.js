@@ -305,6 +305,140 @@ check('run', 'the level check finishes through the real UI, four ways', async ct
   }
 });
 
+check('evidence', 'the panel prints every question asked and the answer given to it', async ctx => {
+  const page = await openApp(ctx.browser, ctx.base, 'test:level');
+  await page.click('.launch-begin');
+  await page.waitForTimeout(300);
+  // Answered three ways in turn, so the list has a right answer, a wrong one
+  // and an untouched question in it. Through the real UI, because what the
+  // list prints is what was on the screen and only the UI puts it there.
+  await page.evaluate(() => { window.__gave = []; });
+  let guard = 0, n = 0;
+  while (guard++ < 500) {
+    const st = await page.evaluate(() => {
+      const on = [...document.querySelectorAll('.screen.active')].map(s => s.id);
+      const rd = document.getElementById('screen-test-round');
+      return { screen: on[0] || null, state: rd ? rd.dataset.state : null };
+    });
+    if (st.screen === 'screen-test-round') {
+      if (st.state !== 'round') break;
+      await page.click('#screen-test-round .round-only button');
+      await page.waitForTimeout(140);
+      continue;
+    }
+    if (st.screen === 'screen-student-result') {
+      await page.click('#solo-next-wrap button, #solo-next-wrap .btn');
+      await page.waitForTimeout(110);
+      continue;
+    }
+    if (st.screen === 'screen-student-answer') {
+      const how = ['right', 'wrong', 'blank', 'timeout'][n++ % 4];
+      await page.evaluate(h => {
+        const q = currentStudentQ;
+        const a = (h === 'blank' || h === 'timeout') ? '' : h === 'wrong' ? 'zzzz'
+          : (q.freeText ? 'My name is Ali. I am from Iraq.' : String(q.answer));
+        window.__gave.push(a);
+        answered = true; clearInterval(studentTimerInt);
+        // Pressing Submit over an untouched question and letting the clock run
+        // out are the same empty answer and different things to read, so the
+        // list has to tell them apart.
+        showSoloResult(a, q.answer, 10, h === 'timeout');
+      }, how);
+      await page.waitForTimeout(100);
+      continue;
+    }
+    await page.waitForTimeout(100);
+  }
+  const out = await page.evaluate(() => {
+    const ev = TEST.ev;
+    openAcsfPanel();
+    const box = document.getElementById('acsf-evidence');
+    const btn = document.getElementById('acsf-ev-btn');
+    const shut = { hidden: box.hidden, blocks: box.querySelectorAll('.acsf-q').length,
+                   copy: acsfCopyText(acsfShown, acsfEvidenceOn ? acsfShownEv : null) };
+    toggleAcsfEvidence();
+    const open = { hidden: box.hidden, shown: getComputedStyle(box).display,
+                   blocks: box.querySelectorAll('.acsf-q').length,
+                   copy: acsfCopyText(acsfShown, acsfEvidenceOn ? acsfShownEv : null) };
+    // A feature the list prints under a question has to be one the profile
+    // counted. Anything else is working the app never did, printed on a page a
+    // teacher may act on.
+    const loose = [], thin = [];
+    (ev.qs || []).forEach(function (e, i) {
+      if (!e.game || !e.ask) thin.push(i + 1 + ' ' + (e.game || '(no game)') + ': nothing to read');
+      if (!e.feats.length) thin.push(i + 1 + ' ' + e.game + ': counted towards nothing');
+      e.feats.forEach(function (f) {
+        const w = ((ev.byInd[f.ind] || {})[f.lvl] || {}).why || {};
+        if (!w[f.text]) loose.push(i + 1 + ' ' + e.game + ': .' + f.ind + ' ' + f.lvl + ' ' + f.text);
+      });
+    });
+    // A teacher comes back to this page with the learner beside them, which
+    // is the whole reason the run is kept on the device. The working has to
+    // survive the reload with it.
+    const kept = ((acsfLastRun() || {}).ev || {}).qs || [];
+    return {
+      asked: ev.asked, qs: (ev.qs || []).map(function (e) { return { ans: e.ans, how: e.how, game: e.game }; }),
+      gave: window.__gave, shut: shut, open: open, loose: loose, thin: thin,
+      kept: kept.length, btn: btn.textContent
+    };
+  });
+  say('  ' + out.asked + ' questions asked, ' + out.qs.length + ' written down, ' +
+      out.open.blocks + ' printed');
+  if (out.qs.length !== out.asked) {
+    bad('evidence: ' + out.asked + ' questions asked but ' + out.qs.length + ' written down');
+  }
+  if (out.qs.length !== out.gave.length) {
+    bad('evidence: ' + out.gave.length + ' answers given but ' + out.qs.length + ' written down');
+  }
+  out.gave.forEach(function (a, i) {
+    const e = out.qs[i];
+    if (e && e.ans !== a.trim()) {
+      bad('evidence: question ' + (i + 1) + ' was answered "' + a + '" and the list says "' + e.ans + '"');
+    }
+  });
+  ['correct', 'wrong', 'blank', 'timeout'].forEach(function (h) {
+    if (!out.qs.some(function (e) { return e.how === h; })) {
+      bad('evidence: no question came out as ' + h + ', so that outcome is untested here');
+    }
+  });
+  out.thin.forEach(x => bad('evidence: ' + x));
+  out.loose.forEach(x => bad('evidence: a feature printed that the profile never counted: ' + x));
+  if (out.kept !== out.qs.length) {
+    bad('evidence: the run was saved with ' + out.kept + ' of its ' + out.qs.length +
+        ' questions, so a teacher coming back to it loses the working');
+  }
+  if (!out.shut.hidden) bad('evidence: the questions are open before anyone asks for them');
+  if (out.shut.copy.indexOf('THE QUESTIONS THIS RUN ASKED') >= 0) {
+    bad('evidence: Copy carries the questions while they are hidden');
+  }
+  if (out.open.hidden || out.open.shown === 'none') bad('evidence: the button did not open the list');
+  if (out.open.blocks !== out.qs.length) {
+    bad('evidence: ' + out.qs.length + ' questions written down but ' + out.open.blocks + ' on the page');
+  }
+  if (out.open.copy.indexOf('THE QUESTIONS THIS RUN ASKED') < 0) {
+    bad('evidence: Copy leaves the questions out while they are on the screen');
+  }
+  // Printable means printable with the questions: the page a teacher takes to
+  // the learner is the paper one.
+  await page.emulateMedia({ media: 'print' });
+  const paper = await page.evaluate(() => {
+    const ink = s => { const el = document.querySelector(s); return el ? getComputedStyle(el) : null; };
+    const q = ink('.acsf-q'), nm = ink('.acsf-q-game');
+    return {
+      list: getComputedStyle(document.getElementById('acsf-evidence')).display,
+      q: q && q.backgroundColor, ink: nm && nm.color,
+      acts: getComputedStyle(document.querySelector('.acsf-acts')).display
+    };
+  });
+  if (paper.list === 'none') bad('evidence: the questions do not print');
+  if (!paper.q) bad('evidence: nothing to print: the list has no questions in it');
+  else if (paper.q !== 'rgb(255, 255, 255)') bad('evidence: a question prints on ' + paper.q + ', not white paper');
+  if (paper.ink && paper.ink !== 'rgb(0, 0, 0)') bad('evidence: a question prints in ' + paper.ink + ', not black ink');
+  if (paper.acts !== 'none') bad('evidence: the buttons print with the report');
+  page.errs.forEach(e => bad('evidence: ' + e));
+  await page.close();
+});
+
 check('ordering', 'no indicator is awarded a level without the one below it', async ctx => {
   const out = await ctx.page.evaluate(() => {
     // Every combination of per-level verdicts, including levels never asked.

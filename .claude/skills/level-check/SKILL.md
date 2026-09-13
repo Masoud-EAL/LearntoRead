@@ -90,9 +90,10 @@ node tools/checks/check.js leaks      # after anything about a question giving i
 node tools/checks/check.js repeats    # after anything about a question coming back
 node tools/checks/check.js ordering   # after anything about levels
 node tools/checks/check.js blanks     # after anything about credit for doing nothing
+node tools/checks/check.js evidence   # after anything about the questions the report prints
 ```
 
-`tools/checks/README.md` lists all fourteen and what each proves.
+`tools/checks/README.md` lists every one of them and what each proves.
 
 If the report describes a fault no check would have caught, add one. A check
 earns its place by failing on the real bug: reintroduce the fault, watch the

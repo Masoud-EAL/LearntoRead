@@ -24,7 +24,10 @@ testStartRound                          8618   picks the round's steps and deals
 testRecord(tier,pts,timedOut,ans)       8656   one answer
   answerGiven(q,ans)                    8589   was anything actually entered
   acsfNoteMode(q)                       8596   how the learner answered
-  acsfCredit(step,tier,q,ans)           8526   write evidence against features
+  acsfCredit(step,tier,q,ans)           8526   write evidence against features,
+                                               and hand back what it wrote
+  acsfNoteQuestion(step,q,r)            9223   write the question down for the
+                                               teacher's evidence list
 testEndRound                            9225   close stages, decide whether to stop
   acsfReviewStages                      7802   a stage is done when it is shown or failed
 testFinished                            8503   nothing open, or the guard is reached
@@ -33,7 +36,10 @@ acsfProfile(ev,true)                    9017   turn evidence into the report
   acsfRow(ind,byInd,sig)                8923   one indicator's verdict, level by level
   acsfLevelState(s,meta)                8774   yes / part / no at one level
 openAcsfPanel / renderAcsfPanel   9109 / 9127   the teacher screen
-acsfCopyText(prof)                      9034   the copyable report
+renderAcsfEvidence(ev)                 10038   the questions and the answers
+toggleAcsfEvidence()                   10105   the button that shows them
+acsfCopyText(prof,ev)                   9034   the copyable report, with the
+                                               questions when they are on screen
 ```
 
 ## The claim map
@@ -97,6 +103,7 @@ changes every game:
 | `normalize(s)` | 10525 | the app's "same letters" test. Strips everything but a-z0-9, which is why `$3.20` and `$320` were once the same answer |
 | `typeinTier(q,ans)` | 10540 | correct / partial / wrong for a typed answer, including capitals, spacing and sentence counting |
 | `speechFor(Q)` | 9943 | the single answer to "does this round speak, and what". The replay button is shown iff this is truthy: one decision, one place |
+| `questionShown(q)` | 10424 | what a question says on the screen: its label, its prompt, its picture, its options. The answer screen and the teacher's evidence list both read it, so a transcript cannot word a question differently from the way it was put |
 | `showStudentQuestion` | 9489 | draws the question; line 9521 is the replay button |
 | `renderMcChoices(q)` | 9621 | draws tapped options, including whether they get pictures |
 | `attachMcChoices` | 4874 | puts options on a question at round time |
@@ -105,6 +112,7 @@ changes every game:
 | `genDistinctCount` / `countFor` / `countLine` | 4710 / 4704 / 4700 | how many questions a bank really has, and what the launch screen says |
 | `emo(word)` | grep | the word-to-picture map |
 | `GAME_INFO` | 7991 | each game's skill and blurb |
+| `gameNameFor(type)` | 8649 | a game's own name, from GAME_INFO or from its tab in the picker. The launch screen and the evidence list both read it |
 | `BANK_SECTIONS` / `TEST_LADDERS` | 6924 / 7015 | the ordinary Test Yourself path |
 
 ## Games the level check draws on

@@ -275,6 +275,42 @@ The lesson underneath: **a declared ceiling is what the app aims at, not what it
 can hit.** Anywhere the two are treated as the same thing, the difference gets
 printed as something the learner failed to do.
 
+### 8d. The report can show its working, and the working is what the learner saw
+*check: `evidence`*
+
+> "The final report should have an option to show evidence from the test: the
+> results are accompanied by the questions that were used and the user's
+> answers to those questions. Printable."
+
+A verdict a teacher cannot argue with is a verdict they have to take on trust,
+and this one is produced by a phone marking itself. So the panel keeps the run
+written down: every question in the order it was asked, what was on the screen,
+what was said out loud, what was on offer, what the learner answered, and the
+features that answer was counted against. `TEST.ev.qs` holds it, which means it
+rides along with the evidence into storage and comes back with the profile after
+a reload.
+
+Three things decide whether it is worth having:
+
+- **It prints what the learner saw.** `questionShown` is the one place that
+  decides how a question is worded, and both the answer screen and the evidence
+  list read it. A transcript that worded a question its own way would be a
+  second account of the run, and the one a teacher could check against the
+  learner's memory is the screen.
+- **It names only features that were really credited.** `acsfCredit` hands back
+  what it wrote against, gated stages and all, rather than the list being worked
+  out again beside it. The claim map says what a step could show; only the
+  crediting knows what this run let it show, and printing the first as evidence
+  would be putting working on the page that never happened.
+- **It is a choice, not a scroll.** Shut until the teacher asks for it, because
+  the profile is the document and sixty questions stapled behind it is a
+  different one. Copy and Print both take the page as it stands, so the teacher
+  who opened it gets it on the sheet and the one who did not is not handed it.
+
+The transcript is also most of what a saved run weighs. When the device has no
+room left, `acsfSaveRun` gives the transcripts back one at a time, oldest first,
+rather than losing five profiles to keep one transcript.
+
 ---
 
 ## Question quality

@@ -1539,8 +1539,55 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
    front of it is hollow, because nothing was observed either way. */
 .acsf-why li.not-asked{opacity:.5;}
 .acsf-why li.not-asked::before{content:'○';color:var(--muted);font-weight:400;}
-/* The page scrolls, so the three things you came here to do follow you down
-   it rather than sitting under thirteen indicators. */
+/* The working: every question and every answer, under the profile it produced.
+   Built to be read on paper as much as on a phone, because the reason a
+   teacher opens it is to take it to the learner. Each question is one block
+   that does not break across a page. */
+.acsf-evidence{display:flex;flex-direction:column;gap:8px;}
+/* A flex box outranks the browser's own rule for the hidden attribute, so the
+   attribute has to be said again here or "hidden" shows the whole list. */
+.acsf-evidence[hidden]{display:none;}
+.acsf-ev-head{border-top:1px solid rgba(255,255,255,.10);padding-top:12px;}
+.acsf-ev-head h3{font-family:'Fredoka One',cursive;font-size:.78rem;font-weight:400;
+  letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.acsf-ev-head p{font-size:.76rem;color:var(--muted);line-height:1.45;}
+.acsf-q{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);
+  border-left-width:4px;border-radius:12px;padding:10px 12px;}
+/* The same four colours the indicator rows use, so green means the same thing
+   in both halves of the page. */
+.acsf-q.yes{border-left-color:var(--green);}
+.acsf-q.part{border-left-color:var(--gold);}
+.acsf-q.no{border-left-color:var(--accent);}
+.acsf-q.none{border-left-color:var(--muted);}
+.acsf-q-top{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;}
+.acsf-q-n{font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--teal);min-width:20px;}
+.acsf-q-game{font-size:.84rem;font-weight:800;color:var(--text);}
+.acsf-q-verdict{font-size:.72rem;font-weight:800;letter-spacing:.5px;
+  text-transform:uppercase;margin-left:auto;}
+.acsf-q.yes .acsf-q-verdict{color:var(--green);}
+.acsf-q.part .acsf-q-verdict{color:var(--gold);}
+.acsf-q.no .acsf-q-verdict{color:var(--accent);}
+.acsf-q.none .acsf-q-verdict{color:var(--muted);}
+.acsf-q-again{font-size:.65rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
+  color:var(--gold);background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.35);
+  border-radius:6px;padding:1px 5px;}
+.acsf-q-label{font-size:.68rem;font-weight:800;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--muted);margin-top:6px;}
+.acsf-q-ask{font-size:.9rem;line-height:1.35;margin-top:3px;
+  display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;}
+.acsf-q-icon{font-size:1.3rem;line-height:1;}
+.acsf-q-icon svg,.acsf-q-icon img{width:1.5em;height:1.5em;vertical-align:middle;}
+.acsf-q-said,.acsf-q-opts{font-size:.76rem;color:var(--muted);line-height:1.45;margin-top:3px;}
+/* The answer is the thing a teacher came to this list for, so it is the line
+   that is set apart rather than another grey note. */
+.acsf-q-ans{display:flex;align-items:baseline;gap:8px;margin-top:5px;font-size:.84rem;}
+.acsf-q-ans .k{font-size:.68rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
+  color:var(--muted);min-width:62px;}
+.acsf-q-ans .v{font-weight:700;word-break:break-word;}
+.acsf-q-ans.right .v{color:var(--green);}
+.acsf-q .acsf-why{margin-top:6px;}
+/* The page scrolls, so the things you came here to do follow you down it
+   rather than sitting under thirteen indicators. */
 .acsf-acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
   position:sticky;bottom:0;padding:10px 0 4px;background:var(--bg);
   box-shadow:0 -10px 18px var(--bg);}
@@ -1563,16 +1610,25 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   .acsf-wrap{max-width:none;}
   .acsf-body{overflow:visible!important;max-height:none!important;}
   .acsf-acts{position:static!important;}
-  .acsf-head,.acsf-row,.acsf-warn,.acsf-flag{background:#fff!important;}
+  .acsf-head,.acsf-row,.acsf-warn,.acsf-flag,.acsf-q,.acsf-q-again{background:#fff!important;}
   .acsf-head,.acsf-warn{border:1px solid #000!important;}
-  .acsf-row{border:1px solid #999!important;border-left:4px solid #000!important;}
-  .acsf-flag{border:1px solid #666!important;}
+  .acsf-row,.acsf-q{border:1px solid #999!important;border-left:4px solid #000!important;}
+  .acsf-flag,.acsf-q-again{border:1px solid #666!important;}
+  .acsf-ev-head{border-top:1px solid #000!important;}
   /* The greys that carry the reading order still have to differ from the
      statements they sit under, so they come back one step lighter. */
   #screen-test-acsf .acsf-name,#screen-test-acsf .acsf-sub,
   #screen-test-acsf .acsf-meta,#screen-test-acsf .acsf-why li,
-  #screen-test-acsf .acsf-group h3{color:#444!important;}
-  .acsf-group,.acsf-row{break-inside:avoid;page-break-inside:avoid;}
+  #screen-test-acsf .acsf-group h3,#screen-test-acsf .acsf-ev-head p,
+  #screen-test-acsf .acsf-ev-head h3,#screen-test-acsf .acsf-q-said,
+  #screen-test-acsf .acsf-q-opts,#screen-test-acsf .acsf-q-label,
+  #screen-test-acsf .acsf-q-ans .k{color:#444!important;}
+  .acsf-group,.acsf-row,.acsf-q{break-inside:avoid;page-break-inside:avoid;}
+  /* The questions start their own page. The profile is the document a teacher
+     files; the working is the attachment behind it, and a sheet that ends
+     halfway through the last indicator and carries on into question one reads
+     as one thing rather than two. */
+  .acsf-ev-head{break-before:page;page-break-before:always;padding-top:0!important;}
 }
 /* Short screens: the dots and the moving line are what must survive, so the
    running total and the round's points go first. */
@@ -2377,7 +2433,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       <div class="acsf-warn" id="acsf-warn"></div>
     </div>
     <div class="acsf-body" id="acsf-body"></div>
+    <!-- The working behind the profile: every question and every answer, in
+         the order they were asked. Hidden until a teacher asks for it, and
+         printed and copied with the rest once they have. -->
+    <div class="acsf-evidence" id="acsf-evidence" hidden></div>
     <div class="acsf-acts">
+      <button class="btn btn-teal btn-sm" id="acsf-ev-btn" onclick="toggleAcsfEvidence()">📄 Show the questions</button>
       <button class="btn btn-teal btn-sm" onclick="copyAcsfProfile()">📋 Copy</button>
       <button class="btn btn-teal btn-sm" onclick="window.print()">🖨 Print</button>
       <button class="btn btn-ghost btn-sm" onclick="showScreen('screen-test-round')">← Back</button>
@@ -8581,6 +8642,18 @@ function gameInfoFor(type){
                   blurb:'A mix of every '+sec.label.replace(/^\S+\s+/,'').toLowerCase()+' game.'};
   return GAME_INFO[type]||{};
 }
+/* A game's own name, for anywhere that has to say which game a question came
+   from. Most banks are named once, on their tab in the picker, so that is
+   where the name is read from rather than written out a second time; the few
+   that need a different name on a card of their own carry one in GAME_INFO. */
+function gameNameFor(type){
+  const info=gameInfoFor(type);
+  if(info.name) return info.name;
+  const tab=soloTabFor(type);
+  const label=tab?(tab.textContent||'').trim():'';
+  const sp=label.indexOf(' ');
+  return (sp>0?label.slice(sp+1):label)||type||'';
+}
 /* The games that open with typing rather than four choices — the ordering
    games are the arranging, and All Spelling is the writing bank. Same
    reasoning as SECTION_DEFAULTS, applied to one game instead of one skill. */
@@ -8641,7 +8714,7 @@ function openSoloLaunch(type){
   col.style.setProperty('--lx-glow',skill.glow);
   document.getElementById('launch-skill').textContent=info.skillLabel||skill.label;
   document.getElementById('launch-emoji').textContent=sp>0?label.slice(0,sp):'🎮';
-  document.getElementById('launch-title').textContent=info.name||(sp>0?label.slice(sp+1):label);
+  document.getElementById('launch-title').textContent=gameNameFor(type);
   document.getElementById('launch-sub').textContent=
     info.blurb||document.getElementById('solo-count-display').textContent;
   applyTargetSetup('solo');
@@ -8985,8 +9058,14 @@ function testFinished(){
    in any question, they are in how the learner went about the run. */
 const ACSF_MIN_EVIDENCE=3;
 function newAcsfEvidence(){
+  /* `qs` is the run written down: every question as the learner met it, what
+     they answered, and the features the answer was counted against. The
+     verdicts above are what the panel argues; this is the working a teacher
+     can hold the verdict up against, and it is the only part of the evidence
+     a learner's answer appears in. */
   return {byInd:{}, used:{}, tick:0, asked:0, attempts:0, timeouts:0, blanks:0,
-          hints:0, replays:0, modes:{}, trend:[], finished:false, stages:null};
+          hints:0, replays:0, modes:{}, trend:[], finished:false, stages:null,
+          qs:[]};
 }
 /* The staircase, mirrored onto the evidence as it settles.
    acsfSignalRows has to answer the same "may this level be credited?" question
@@ -9020,9 +9099,14 @@ function acsfSignalOpen(ev,ind,lvl){
    notices and device problems together — and crediting the bank's whole list
    for either would print the maintenance feature as evidence for a learner who
    only ever answered notices. Everything else has no q.acsf and is credited
-   from the bank, as before. */
+   from the bank, as before.
+     Hands back the features it wrote against, which is what the evidence list
+   prints under each question. Read off the crediting itself rather than worked
+   out a second time beside it, because a list that named a feature this
+   function had gated out would be showing a teacher working that never
+   happened. */
 function acsfCredit(step,tier,q,ans){
-  if(!TEST||!TEST.ev) return;
+  if(!TEST||!TEST.ev) return [];
   /* "No goal" is a real answer and it scores, because nobody is wrong about
      their own goal. It is not evidence of having named one, though, so the
      features it would have credited are counted as asked and not shown. That
@@ -9050,6 +9134,7 @@ function acsfCredit(step,tier,q,ans){
       TEST.plan.qs[pk]=(TEST.plan.qs[pk]||0)+1;
     });
   }
+  const wrote=[];
   claims.forEach(function(c){
     /* A feature whose own words are "accurately", "leaves spaces between
        words" or "uses upper and lower case" is either shown or it is not. A
@@ -9058,6 +9143,7 @@ function acsfCredit(step,tier,q,ans){
        no evidence at all towards these. Counted as asked and not shown rather
        than skipped, because that is the thing an assessor wants to see. */
     const worth=c[4]?(!declined&&tier==='correct'?1:0):half;
+    wrote.push({ind:c[0], lvl:c[1], text:c[2], ok:worth});
     const b=TEST.ev.byInd[c[0]]||(TEST.ev.byInd[c[0]]={});
     const s=b[c[1]]||(b[c[1]]={seen:0,right:0,why:{}});
     const w0=s.why[c[2]];
@@ -9090,6 +9176,7 @@ function acsfCredit(step,tier,q,ans){
        the verdict and the other is the bar it is judged against. */
     if(!c[3]) w.partial=0;
   });
+  return wrote;
 }
 /* Note which way the learner answered, for the digital indicators. Tapping a
    choice, typing on the on-screen keyboard, placing tiles, dragging a clock
@@ -9125,6 +9212,41 @@ function acsfNoteMode(q){
   if(!TEST||!TEST.ev) return;
   const m=acsfInputMode(q);
   if(m) TEST.ev.modes[m]=(TEST.ev.modes[m]||0)+1;
+}
+/* One line of the run written down: the question as it was put, what the
+   learner answered, and the features that answer was counted against. It is
+   what the teacher panel prints when a teacher asks to see the working behind
+   a level, so it holds only what a person reading it needs and nothing of the
+   machinery: no step keys, no claim rows.
+     Only in a level check. Practice runs produce no report to print, and their
+   evidence is not kept. */
+function acsfNoteQuestion(step,q,r){
+  if(!TEST||!TEST.ev||!TEST.acsf) return;
+  const sh=questionShown(q);
+  const open=isOpenQ(q);
+  TEST.ev.qs.push({
+    game:gameNameFor(step&&step.type),
+    label:sh.label||'', ask:sh.text||'', icon:sh.icon||'',
+    heard:speechFor(q)||'',
+    /* Four choices and a bank of tiles are both what the learner was given to
+       work with, and they are named apart because the tiles are printed as a
+       set: the screen shuffles them, and printing them in the bank's own order
+       beside the expected answer would read as the answer having been on
+       offer in order. */
+    options:(sh.options||[]).slice(0,12), tiles:!!sh.tiles,
+    ans:String(r.ans==null?'':r.ans).trim(),
+    // An open question has no right answer to print. Asking a learner what
+    // they want to learn and then printing one answer as the correct one
+    // would be the panel contradicting the round.
+    right:open?'':String((q&&q.answer)==null?'':q.answer),
+    open:open,
+    /* Three outcomes that all look like a wrong answer in the tally and are
+       not the same thing to a teacher: the clock ran out, Submit was pressed
+       over an untouched question, or an answer was given and was wrong. */
+    how:r.timedOut?'timeout':!r.gave?'blank':r.tier,
+    again:!!(q&&q.retryOf),
+    feats:r.feats||[]
+  });
 }
 
 /* One step's identity, for remembering which have been dealt lately. */
@@ -9243,7 +9365,13 @@ function testRecord(tier,pts,timedOut,ans){
   if(timedOut) TEST.ev.timeouts++;
   else if(!gave) TEST.ev.blanks=(TEST.ev.blanks||0)+1;
   else { TEST.ev.attempts++; acsfNoteMode(currentStudentQ); }
-  acsfCredit(step,tier,currentStudentQ,ans);
+  const credited=acsfCredit(step,tier,currentStudentQ,ans);
+  // The question, the answer and what the answer counted towards, kept for the
+  // teacher's evidence list. After the crediting rather than before it, so the
+  // list names the features that were really written against and not the ones
+  // the step would have claimed with every stage still open.
+  acsfNoteQuestion(step,currentStudentQ,
+    {tier:open?'open':tier, ans:ans, timedOut:!!timedOut, gave:gave, feats:credited});
   // And whether a wrong answer at Stage A has earned a second ask. Here rather
   // than inside acsfCredit because this is where timedOut and answerGiven are
   // already in hand, and both are part of the decision.
@@ -9682,7 +9810,7 @@ function acsfProfile(ev,isLevelCheck){
 /* The same thing as text, for pasting into an assessor analysis sheet or a
    progress assessment. Kept deliberately plain: no box drawing, no colour,
    nothing that survives a paste badly. */
-function acsfCopyText(prof){
+function acsfCopyText(prof,ev){
   if(!prof) return '';
   const out=['WordLink level check: indicative ACSF profile',
     new Date().toLocaleString(),
@@ -9709,8 +9837,38 @@ function acsfCopyText(prof){
       out.push('');
     });
   });
+  /* The questions themselves, when the teacher has them open on the screen.
+     What is copied is what is being read: a teacher who has asked for the
+     working gets it in the paste as well, and one who has not is not handed
+     sixty questions they did not ask for. */
+  const qs=(ev&&ev.qs)||[];
+  if(qs.length){
+    out.push('THE QUESTIONS THIS RUN ASKED');
+    out.push(qs.length+' questions, in the order they were asked. This includes what the',
+             'learner typed, which in some rounds is their name, date of birth or phone number.','');
+    qs.forEach(function(e,i){
+      out.push('  '+(i+1)+'. '+e.game+'   '+acsfHowText(e)+(e.again?'   (asked again)':''));
+      if(e.label) out.push('     '+e.label);
+      const ask=(acsfPlainIcon(e.icon)+' '+(e.ask||'')).trim();
+      if(ask) out.push('     '+ask);
+      if(e.heard) out.push('     Said out loud: "'+e.heard+'"');
+      if(e.options&&e.options.length)
+        out.push('     '+(e.tiles?'Tiles to arrange: ':'On offer: ')+e.options.join(' | '));
+      out.push('     Answered: '+(e.ans||'(nothing)'));
+      if(e.how!=='correct'&&!e.open&&e.right) out.push('     Expected: '+e.right);
+      (e.feats||[]).forEach(function(f){
+        out.push('       - .'+f.ind+' '+acsfLvlText(f.lvl)+'  '+f.text);
+      });
+      out.push('');
+    });
+  }
   return out.join('\n');
 }
+/* The picture beside a prompt is sometimes the prompt: the word to copy, the
+   sign to read, the amount to pay. It is markup on the screen and pastes as
+   nothing at all, so what is pasted is the words inside it. A drawing with no
+   words in it leaves nothing behind, which is the truth about it. */
+function acsfPlainIcon(ic){ return String(ic||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim(); }
 function acsfNum(n){ return n===Math.floor(n)?String(n):n.toFixed(1); }
 /* What the pair of numbers after a feature means, in words, because on their
    own they do not say what was counted. A feature with questions of its own is
@@ -9743,7 +9901,12 @@ const acsfStore=(function(){
   catch(e){ mem={}; }
   return {
     get:function(k){ try{ return mem?(mem[k]||null):localStorage.getItem(k); }catch(e){ return null; } },
-    set:function(k,v){ try{ if(mem) mem[k]=v; else localStorage.setItem(k,v); }catch(e){} }
+    /* Says whether the write landed. A device with no room left throws here,
+       and the caller has something to give back rather than nothing to do. */
+    set:function(k,v){
+      try{ if(mem) mem[k]=v; else localStorage.setItem(k,v); return true; }
+      catch(e){ return false; }
+    }
   };
 })();
 function acsfSaveRun(){
@@ -9755,14 +9918,28 @@ function acsfSaveRun(){
   if(!TEST.acsf) return;
   runs.unshift({at:Date.now(), levelCheck:!!TEST.acsf, score:myScore,
                 label:(testStep()||{}).label||'', ev:TEST.ev});
-  acsfStore.set(ACSF_STORE_KEY,JSON.stringify(runs.slice(0,ACSF_STORE_MAX)));
+  runs=runs.slice(0,ACSF_STORE_MAX);
+  /* The questions are most of what a saved run weighs, many times over the
+     verdicts they support, and a device with no room left throws rather than
+     quietly dropping a field. Losing five profiles to keep one transcript
+     would be the wrong way round, so the transcripts are given back one at a
+     time, oldest first, and the profiles stay. The newest run's own questions
+     go last and on a copy, because the panel on the screen is reading them. */
+  let give=runs.length;
+  while(give-- >0&&!acsfStore.set(ACSF_STORE_KEY,JSON.stringify(runs))){
+    let i=runs.length-1;
+    while(i>=0&&!((runs[i].ev||{}).qs||[]).length) i--;
+    if(i<0) break;
+    if(i===0) runs[0]=Object.assign({},runs[0],{ev:Object.assign({},runs[0].ev,{qs:[]})});
+    else runs[i].ev.qs=[];
+  }
 }
 function acsfLastRun(){
   try{ return (JSON.parse(acsfStore.get(ACSF_STORE_KEY)||'[]')||[])[0]||null; }
   catch(e){ return null; }
 }
 
-let acsfShown=null;
+let acsfShown=null, acsfShownEv=null;
 function openAcsfPanel(){
   // Straight off the run when there is one, out of storage when the page has
   // been reloaded since. Either way the page is built from the evidence, so
@@ -9772,6 +9949,7 @@ function openAcsfPanel(){
   const run=live||acsfLastRun();
   if(!run||!run.ev||!run.ev.asked){ showToast('Finish a test first'); return; }
   acsfShown=acsfProfile(run.ev,run.levelCheck);
+  acsfShownEv=run.ev;
   renderAcsfPanel(acsfShown,run);
   showScreen('screen-test-acsf');
 }
@@ -9842,13 +10020,126 @@ function renderAcsfPanel(prof,run){
     body.appendChild(box);
   });
   body.scrollTop=0;
+  renderAcsfEvidence(run.ev);
+}
+
+/* ── LEVEL CHECK — THE EVIDENCE ──
+   The run itself, question by question, in the order it was asked. The rows
+   above are what the app concluded; this is what it concluded from, so a
+   teacher who disagrees with a level can see the questions that produced it
+   and the answers the learner gave, and take it up with the learner rather
+   than with the app.
+     Off until it is asked for. Most readings of this page want the profile,
+   and sixty questions printed under it is a different document, so it is a
+   choice the teacher makes rather than something they scroll past. */
+let acsfEvidenceOn=false;
+function acsfHowText(e){
+  return e.how==='timeout'?'Time ran out':
+         e.how==='blank'?'Nothing entered':
+         e.how==='open'?'Any answer counts':
+         e.how==='partial'?'Partly right':
+         e.how==='correct'?'Right':'Wrong';
+}
+/* The same four states the indicator rows use, so a colour means one thing on
+   the whole page. An open question and an unanswered one are both grey: there
+   is nothing to be right or wrong about in either. */
+function acsfHowClass(e){
+  return e.how==='correct'?'yes':e.how==='partial'?'part':
+         e.how==='wrong'?'no':'none';
+}
+function renderAcsfEvidence(ev){
+  const box=document.getElementById('acsf-evidence');
+  const btn=document.getElementById('acsf-ev-btn');
+  box.innerHTML='';
+  const qs=(ev&&ev.qs)||[];
+  /* A run saved before the questions were kept has a profile and no evidence.
+     Offering a button that opens an empty page would read as a fault, so the
+     button is simply not there. */
+  btn.style.display=qs.length?'':'none';
+  acsfEvidenceOn=false;
+  box.hidden=true;
+  btn.textContent='📄 Show the questions';
+  if(!qs.length) return;
+  const head=acsfEl('div','acsf-ev-head');
+  head.appendChild(acsfEl('h3',null,'The questions this run asked'));
+  head.appendChild(acsfEl('p',null,qs.length+' questions, in the order they were asked. '
+    +'Each one shows what was on the screen, what was said out loud, what the learner '
+    +'answered, and which performance features the answer was counted against.'));
+  /* Some rounds ask for a name, a date of birth, a phone number, and the
+     answer to those is printed here as it was typed. It stays on this device
+     like the rest of the run, but a printed sheet does not, so it is said
+     before the printing rather than discovered after it. */
+  head.appendChild(acsfEl('p',null,'It includes what the learner typed. Some rounds ask '
+    +'for a name, a date of birth or a phone number, so treat a printed copy as you would '
+    +'any other page carrying a learner\u2019s details.'));
+  box.appendChild(head);
+  qs.forEach(function(e,i){
+    const card=acsfEl('div','acsf-q '+acsfHowClass(e));
+    const top=acsfEl('div','acsf-q-top');
+    top.appendChild(acsfEl('span','acsf-q-n',String(i+1)));
+    top.appendChild(acsfEl('span','acsf-q-game',e.game));
+    // A second ask is a fact about the question, not a demerit: Pre Level 1 is
+    // performance with support, and a teacher reading the row above it has
+    // already been told the better attempt is the one that stands.
+    if(e.again) top.appendChild(acsfEl('span','acsf-q-again','Asked again'));
+    top.appendChild(acsfEl('span','acsf-q-verdict',acsfHowText(e)));
+    card.appendChild(top);
+    if(e.label) card.appendChild(acsfEl('div','acsf-q-label',e.label));
+    if(e.ask||e.icon){
+      const ask=acsfEl('div','acsf-q-ask');
+      // The picture is half of some prompts and all of a few, so it is printed
+      // as it was shown rather than described.
+      if(e.icon){ const ic=acsfEl('span','acsf-q-icon'); ic.innerHTML=e.icon; ask.appendChild(ic); }
+      if(e.ask) ask.appendChild(document.createTextNode(e.ask));
+      card.appendChild(ask);
+    }
+    if(e.heard) card.appendChild(acsfEl('div','acsf-q-said','Said out loud: “'+e.heard+'”'));
+    if(e.options&&e.options.length)
+      card.appendChild(acsfEl('div','acsf-q-opts',
+        (e.tiles?'Tiles to arrange: ':'On offer: ')+e.options.join('   ·   ')));
+    const ans=acsfEl('div','acsf-q-ans');
+    ans.appendChild(acsfEl('span','k','Answered'));
+    ans.appendChild(acsfEl('span','v',e.ans||'(nothing)'));
+    card.appendChild(ans);
+    // The right answer earns its line only where the learner did not give it.
+    // Printed beside a right answer it is the same word twice.
+    if(e.how!=='correct'&&!e.open&&e.right){
+      const rt=acsfEl('div','acsf-q-ans right');
+      rt.appendChild(acsfEl('span','k','Expected'));
+      rt.appendChild(acsfEl('span','v',e.right));
+      card.appendChild(rt);
+    }
+    if(e.feats&&e.feats.length){
+      const ul=acsfEl('ul','acsf-why');
+      e.feats.forEach(function(f){
+        const li=acsfEl('li');
+        li.appendChild(acsfEl('span','lv','.'+f.ind+' '+acsfLvlText(f.lvl)+': '));
+        li.appendChild(document.createTextNode(f.text));
+        ul.appendChild(li);
+      });
+      card.appendChild(ul);
+    }
+    box.appendChild(card);
+  });
+}
+function toggleAcsfEvidence(){
+  const box=document.getElementById('acsf-evidence');
+  acsfEvidenceOn=!acsfEvidenceOn;
+  box.hidden=!acsfEvidenceOn;
+  document.getElementById('acsf-ev-btn').textContent=
+    acsfEvidenceOn?'📄 Hide the questions':'📄 Show the questions';
+  // Printing takes the page as it stands, and so does Copy, so a teacher who
+  // has opened the questions gets them on the sheet and one who has not does
+  // not. Bring the list into view rather than leaving the page looking
+  // unchanged with the whole of it below the fold.
+  if(acsfEvidenceOn) box.scrollIntoView({block:'start'});
 }
 /* Plain text, for pasting into an assessor analysis sheet or a progress
    assessment. execCommand is the fallback rather than the exception: the
    clipboard API needs a secure context, and this app is opened from a QR code
    on a classroom projector as often as from https. */
 function copyAcsfProfile(){
-  const txt=acsfCopyText(acsfShown);
+  const txt=acsfCopyText(acsfShown,acsfEvidenceOn?acsfShownEv:null);
   if(!txt){ showToast('Nothing to copy'); return; }
   const done=function(){ showToast('Copied'); };
   if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -10143,6 +10434,71 @@ function setQTextLang(lang){
   if(lang){ el.setAttribute('lang',lang); el.setAttribute('dir',GAME_RTL_LANGS.has(lang)?'rtl':'ltr'); }
   else { el.removeAttribute('lang'); el.removeAttribute('dir'); }
 }
+/* What a question says on the screen: the line naming the round, the prompt
+   itself, the picture that stands in place of one, the options offered, and
+   the language the prompt is written in for the rounds that show it in the
+   learner's own. Two screens read this now, the learner's answer screen and
+   the evidence list on the teacher panel, and an evidence list that worded a
+   question differently from the way it was put to the learner would be worse
+   than none, so the wording is decided here once and read twice. */
+function questionShown(q){
+  if(!q) return {label:'',text:'',lang:null,icon:'',options:null,tiles:false};
+  const isMc=Array.isArray(q.choices)&&q.choices.length>0;
+  const isTile=!isMc&&(q.type==='unscramble'||q.type==='gramscramble'||q.type==='speak'||q.type==='phbuild');
+  const isTranslate=!isMc&&q.type==='translate';
+  const isClock=q.type==='clockset', isShop=q.type==='shop', isForm=q.type==='form';
+  const label=
+    q.label?q.label:
+    q.qword?(isMc?'TAP THE QUESTION WORD':'LISTEN — TYPE THE QUESTION WORD'):
+    q.type==='mc'?'MULTIPLE CHOICE — tap the correct answer':
+    isMc?(
+      q.type==='sentence'?'TAP THE MISSING WORD':
+      q.type==='letter'?'LISTEN — TAP THE LETTER':
+      q.type==='oddone'?'TAP THE ONE THAT IS DIFFERENT':
+      q.type==='phgap'?'LISTEN — TAP THE MISSING SOUND':
+      q.type==='phword'?'LISTEN TO THE SOUNDS — TAP THE WORD':
+      q.type==='translate'?'TAP THE ENGLISH SENTENCE':
+      q.type==='speak'?'LISTEN — TAP THE ANSWER TO THE QUESTION':
+      q.type==='unscramble'?'LISTEN — TAP THE SENTENCE IN THE RIGHT ORDER':
+      q.type==='gramscramble'?'TAP THE SENTENCE IN THE RIGHT ORDER':
+      'LISTEN — TAP THE PICTURE'):
+    isClock?'CLOCK — drag the hands to the right time':
+    isShop?(q.mode==='change'?'MONEY — tap coins to make your change':'MONEY — tap coins to pay the right amount'):
+    isForm?'FORM — put each answer in the right box':
+    isTile?(q.label||(q.type==='gramscramble'?'GRAMMAR — arrange words in order':q.type==='phbuild'?'BUILD THE WORD — put the sounds in order':q.type==='speak'?'SPEAKING — listen, then build your answer':'UNSCRAMBLE — arrange the word tiles')):
+    isTranslate?'TRANSLATE — type the English sentence':
+    q.type==='typein'?(q.label||'TYPE THE ANSWER'):
+    q.type==='sentence'?'SENTENCE — type the missing word':'WORD — listen and spell it';
+  let text,lang=null;
+  if(isTranslate){
+    lang=localStorage.getItem('translateLang')||'vi';
+    text=q.translations&&q.translations[lang]?q.translations[lang]:(q.en||q.answer);
+  } else if(isMc){
+    if(q.type==='mc') text=q.question||(q.icon?'👆 Tap the correct answer':'');
+    else if(q.type==='sentence') text=q.display;
+    else if(q.type==='oddone') text='Which one is different?';
+    else if(q.type==='letter') text='🔊 Listen, then tap the letter';
+    else if(q.type==='phgap') text='🔊 '+q.family+' — which sound is missing?';
+    else if(q.type==='phword') text='🔊 '+q.family+' — listen, then tap the word';
+    else if(q.type==='gramscramble') text='Which sentence is correct?';
+    else if(q.type==='speak') text=q.question;
+    else if(q.type==='unscramble') text=q.question||'🔊 Listen, then tap the sentence in the right order';
+    else if(q.type==='translate'){
+      lang=localStorage.getItem('translateLang')||'vi';
+      text=q.translations&&q.translations[lang]?q.translations[lang]:(q.en||q.answer);
+    } else text='🔊 Listen, then tap the answer';
+  } else {
+    text=q.question?q.question:
+      q.type==='phbuild'?('🔊 '+q.family+' — put the sounds in order'):
+      isTile?'Put the words in the correct order:':q.type==='sentence'?q.display:'🔊 Listen carefully…';
+  }
+  // The tiles a learner arranges are the options they were given, the same as
+  // four choices are, so the evidence list can print either without asking
+  // which kind of round it was looking at.
+  const words=isTile?(Array.isArray(q.words)?q.words:Object.values(q.words||{})):null;
+  return {label:label, text:text, lang:lang, icon:q.icon||(q.type==='word'&&!isMc?emo(q.word):''),
+          options:isMc?q.choices.slice():words?words.slice():null, tiles:!!words};
+}
 function showStudentQuestion(q,startedAt,dur){
   // Multiplayer students get silence to focus on the host; the solo player is
   // looking at this screen themselves, so keep the calm game music going.
@@ -10176,64 +10532,17 @@ function showStudentQuestion(q,startedAt,dur){
   // Shown when there is something to hear, which is the same question as what
   // studentSpeak would say: speechFor answers it once for both.
   document.getElementById('s-hear-btn').style.display=speechFor(q)?'':'none';
-  document.getElementById('s-q-type').textContent=
-    q.label?q.label:
-    q.qword?(isMc?'TAP THE QUESTION WORD':'LISTEN — TYPE THE QUESTION WORD'):
-    q.type==='mc'?'MULTIPLE CHOICE — tap the correct answer':
-    isMc?(
-      q.type==='sentence'?'TAP THE MISSING WORD':
-      q.type==='letter'?'LISTEN — TAP THE LETTER':
-      q.type==='oddone'?'TAP THE ONE THAT IS DIFFERENT':
-      q.type==='phgap'?'LISTEN — TAP THE MISSING SOUND':
-      q.type==='phword'?'LISTEN TO THE SOUNDS — TAP THE WORD':
-      q.type==='translate'?'TAP THE ENGLISH SENTENCE':
-      q.type==='speak'?'LISTEN — TAP THE ANSWER TO THE QUESTION':
-      q.type==='unscramble'?'LISTEN — TAP THE SENTENCE IN THE RIGHT ORDER':
-      q.type==='gramscramble'?'TAP THE SENTENCE IN THE RIGHT ORDER':
-      'LISTEN — TAP THE PICTURE'):
-    isClock?'CLOCK — drag the hands to the right time':
-    isShop?(q.mode==='change'?'MONEY — tap coins to make your change':'MONEY — tap coins to pay the right amount'):
-    isForm?'FORM — put each answer in the right box':
-    isTile?(q.label||(q.type==='gramscramble'?'GRAMMAR — arrange words in order':q.type==='phbuild'?'BUILD THE WORD — put the sounds in order':q.type==='speak'?'SPEAKING — listen, then build your answer':'UNSCRAMBLE — arrange the word tiles')):
-    isTranslate?'TRANSLATE — type the English sentence':
-    q.type==='typein'?(q.label||'TYPE THE ANSWER'):
-    q.type==='sentence'?'SENTENCE — type the missing word':'WORD — listen and spell it';
+  const shown=questionShown(q);
+  document.getElementById('s-q-type').textContent=shown.label;
   // For a picture round, don't show the answer's own picture as the prompt.
-  document.getElementById('s-q-emoji').innerHTML=q.icon||(q.type==='word'&&!isMc?emo(q.word):'');
-  if(isTranslate){
-    const lang=localStorage.getItem('translateLang')||'vi';
-    const t=q.translations&&q.translations[lang]?q.translations[lang]:(q.en||q.answer);
-    document.getElementById('s-q-text').textContent=t;
-    setQTextLang(lang);
-    document.getElementById('student-ans-input').placeholder='Type the English sentence…';
-  } else if(isMc){
-    let mcPrompt,mcLang=null;
-    if(q.type==='mc') mcPrompt=q.question||(q.icon?'👆 Tap the correct answer':'');
-    else if(q.type==='sentence') mcPrompt=q.display;
-    else if(q.type==='oddone') mcPrompt='Which one is different?';
-    else if(q.type==='letter') mcPrompt='🔊 Listen, then tap the letter';
-    else if(q.type==='phgap') mcPrompt='🔊 '+q.family+' — which sound is missing?';
-    else if(q.type==='phword') mcPrompt='🔊 '+q.family+' — listen, then tap the word';
-    else if(q.type==='gramscramble') mcPrompt='Which sentence is correct?';
-    else if(q.type==='speak') mcPrompt=q.question;
-    else if(q.type==='unscramble') mcPrompt=q.question||'🔊 Listen, then tap the sentence in the right order';
-    else if(q.type==='translate'){
-      mcLang=localStorage.getItem('translateLang')||'vi';
-      mcPrompt=q.translations&&q.translations[mcLang]?q.translations[mcLang]:(q.en||q.answer);
-    } else mcPrompt='🔊 Listen, then tap the answer';
-    document.getElementById('s-q-text').textContent=mcPrompt;
-    setQTextLang(mcLang);
-  } else {
-    document.getElementById('s-q-text').textContent=
-      q.question?q.question:
-      q.type==='phbuild'?('🔊 '+q.family+' — put the sounds in order'):
-      isTile?'Put the words in the correct order:':q.type==='sentence'?q.display:'🔊 Listen carefully…';
-    setQTextLang(null);
-    // A typed round can say what belongs in the box: "45.50", "7:15", your
-    // own name. On a screen this small the placeholder is most of the
-    // instruction, so it is worth more than one generic line.
-    document.getElementById('student-ans-input').placeholder=q.placeholder||'Type your answer…';
-  }
+  document.getElementById('s-q-emoji').innerHTML=shown.icon;
+  document.getElementById('s-q-text').textContent=shown.text;
+  setQTextLang(shown.lang);
+  // A typed round can say what belongs in the box: "45.50", "7:15", your own
+  // name. On a screen this small the placeholder is most of the instruction,
+  // so it is worth more than one generic line.
+  if(isTranslate) document.getElementById('student-ans-input').placeholder='Type the English sentence…';
+  else if(!isMc) document.getElementById('student-ans-input').placeholder=q.placeholder||'Type your answer…';
   if(isMc) renderMcChoices(q);
   if(isTile){
     const words=Array.isArray(q.words)?q.words:Object.values(q.words||{});
