@@ -29,10 +29,10 @@ legible script are also not claimed, because that is `tracing.html` and paper.
 
 | Status | Features |
 |---|---|
-| ✅ had it | 32 |
+| ✅ had it | 31 |
 | 📊 from the run | 17 |
 | 🔧 extended | 8 |
-| 🆕 built | 61 |
+| 🆕 built | 62 |
 | ❌ not assessed | 14 |
 | **Total** | **132** |
 
@@ -65,7 +65,7 @@ prints *on the second ask* beside the feature, which is what the Stage B
 wording *"may require prompting"* describes. Stage A only, one per feature.
 
 The run therefore has no fixed length. Measured over full runs: **17
-questions** for a learner who shows nothing, **60** for one who clears every
+questions** for a learner who shows nothing, **58** for one who clears every
 stage, and **34** for one who answers wrong throughout, where every Stage A
 feature comes back once. `node tools/checks/check.js run` prints them.
 
@@ -111,8 +111,22 @@ where the question is the gap sentence itself.
 
 Each step also deals only what the stage it serves names: whole dollars and no
 cents at Stage A, *up* and *down* and not *behind*, whole hours and not quarter
-hours, a short list of extremely familiar words rather than *necklace* and
-*humid*, and question words rather than *Do you work?*
+hours, the words Copy It copies rather than *necklace*, *humid*, *back* or
+*tie*, and question words rather than *Do you work?*
+
+Spell a Word dictates the words Copy It copies, and nothing else. Filtering the
+themed banks down to their shorter words was the first attempt and it still
+reached *back* and *tie*: a bank of fruit, clothing and body parts is not the
+vocabulary the framework has in mind, however hard the list is filtered. Its
+own examples are *"extremely familiar, short words ... e.g. big, fun, stop"*,
+*"stop, go, car, dog"* and *"Copies appropriate word under picture, e.g. pen,
+table"*, and the Binh scenario notes he knew *"stop, go, but not toilet"*. That
+register is survival and classroom vocabulary, which is what `COPY_WORDS` holds.
+
+Spell a Word also lost its Stage A claim. Its wording is *"**Copies** a very
+limited number of highly familiar words"* and this round dictates: there is no
+model on the screen to copy from, and hearing a word and writing it is the
+harder task. Copy It carries it now, which is the round that does it.
 
 A feature no pool step can reach is not listed on the panel at all. "Not asked
 in this run" says another run might have asked it, and for a feature the level
@@ -282,7 +296,7 @@ cap note, not in a line that reads as a gap in the run.
 |---|---|---|---|
 | 1 | Copies a very limited number of extremely familiar words | 🆕 built | Copy It |
 | 2 | Copies first and last name | 🆕 built | Copy It: your name |
-| 3 | Copies a very limited number of highly familiar words, but may have spelling inaccuracies | ✅ had it | All Spelling |
+| 3 | Copies a very limited number of highly familiar words, but may have spelling inaccuracies | 🆕 built | Copy It |
 | 4 | Copies text, but demonstrates lack of consistency between upper and lower case | 🆕 built | Big and Small Letters; Copy It (a copy with the wrong case marks partly correct) |
 
 ### `PLB1.06` — Displays limited vocabulary, grammatical accuracy and understanding of conventions, Pre Level 1 Stage B

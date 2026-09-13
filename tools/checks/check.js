@@ -947,9 +947,17 @@ check('register', 'the level check stays at the register it is for', async ctx =
           }
         });
       }
+      /* The level check dictates the words Copy It copies, and no others.
+         Filtering the themed banks down to their shorter words was the first
+         attempt and it still reached "back" and "tie": fruit, clothing and
+         body parts are not the vocabulary the framework has in mind, however
+         hard the list is filtered. Its own examples are "big, fun, stop" and
+         "stop, go, car, dog", which is what COPY_WORDS holds. */
       if (st.type === 'spelling') {
         poolWords(st).forEach(function (w) {
-          if (SPELL_CORE.indexOf(w) < 0) over.push(acsfStepKey(st) + ' dictates "' + w + '"');
+          if (COPY_WORDS.indexOf(w) < 0) {
+            over.push(acsfStepKey(st) + ' dictates "' + w + '", which is not a word Copy It uses');
+          }
         });
       }
       if (st.type === 'questionwords') {

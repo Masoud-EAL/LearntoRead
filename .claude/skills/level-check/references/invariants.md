@@ -486,6 +486,77 @@ option gave itself away in text before audio was ever added, and it was the one 
 not be given. It is asked the way it happens now: *You arrive at class in the
 morning*.
 
+### 12e. The register is named in the documents, not guessed at from word length
+*check: `register`*
+
+> "Level check asked me to type back and tie. Neither one is as common as pre
+> level requires."
+
+Both came out of a list written for this rule the first time round, which took
+the themed spelling banks and kept their shorter words. Short is not the test.
+A bank of fruit, clothing, weather and body parts is not the vocabulary the
+framework has in mind however hard it is filtered, and filtering it produced
+"back", "tie" and "hip" in place of "necklace" and "humid".
+
+The document says what the register is, several times, and the words are worth
+quoting because they settle the argument:
+
+- `.06` Stage B: "Attempts to write extremely familiar, short words by sounding
+  out and beginning to use sound-letter relationships, **e.g. big, fun, stop**"
+- Reading sample activities: "Reads word on cue card with visuals ... **e.g.
+  stop, go, car, dog**"; "Links extremely familiar everyday pictures and signs
+  with corresponding words, **e.g. exit, hospital, no smoking**"
+- Writing sample activities: "Copies appropriate word under picture, **e.g.
+  pen, table**"
+- And Binh, in the document's own scenario: "understood some words that were
+  extremely familiar to him **stop, go, but not toilet**".
+
+That is survival and classroom vocabulary, and the app already had a list of
+exactly it: `COPY_WORDS`, the twenty words Copy It shows. Spell a Word dictates
+those and nothing else in the level check. One list for both rounds, so the
+next person to change it changes it once.
+
+The standalone game still holds every themed word. A game is for practising the
+hard ones; an assessment is not, which is the same answer rule 12 gave the
+elementary sentences and rule 12a gave subtraction.
+
+**The general rule: when a report says content is above the band, go and read
+what the band says, and take the register from its examples rather than from a
+proxy like length.** Length was already rejected once, in rule 12, for the
+opposite reason.
+
+Spell a Word lost its Stage A claim at the same time, and that is the half
+nobody reported. Its wording is "**Copies** a very limited number of highly
+familiar words, but may have spelling inaccuracies", and this round dictates:
+there is no model on the screen to copy from, and hearing a word and writing it
+is the harder task. Copy It carries it now. A claim whose first word describes a
+different task than the round performs is rule 5 wearing different clothes.
+
+Moving it broke `reachable`, and fixing that turned up a second fault
+underneath. Both are worth knowing.
+
+The one the check caught: every remaining `.06` Stage A claim was marked partial, so the stage
+could not be awarded to anybody and `.06` stopped at Stage A on a perfect run.
+That is rule 8a, and the check caught it the same day it was written. The row
+is not partial on Copy It. The flag on its neighbours says a copy made on a
+keyboard is not a copy made with a pencil, which is a fair caveat about the
+checklist's **Legibility** features; this row sits under **Spelling**, where
+the concern is whether the letters come out right, and a keyboard shows that
+exactly. Spell a Word had carried it unflagged for the same reason.
+
+The one found while fixing it, which no check holds and which is why it is
+written down here: `partial` was whichever claim reached the feature first. Two steps
+can show one feature and disagree about it, and "Copies text, but demonstrates
+lack of consistency between upper and lower case" is claimed partial by Copy It
+and solid by Big and Small Letters. Whichever was dealt first set the flag, so
+whether `.06` could be awarded turned on the order of the deal. A feature stays
+partial only while every step that showed it was partial. `acsfAwardCeiling`
+already read it that way off the claim map, so the verdict and the bar it is
+judged against had drifted, which rule 8c says is the pair that must not. With
+the row above made solid, `reachable` passes either way, so this one is a
+latent fault put right rather than a failure repaired: the next claim map
+change could have landed on it.
+
 ### 12d. A wrong answer at Stage A earns one second ask
 *check: `retry`, and the run lengths under `run` and `spread`*
 

@@ -2753,23 +2753,6 @@ const SPELL_CLOTHES=['shirt','jumper','jacket','coat','dress','skirt','pants','j
   'scarf','gloves','belt','tie','glasses','sunglasses','watch','bag','backpack','umbrella',
   'ring','bracelet','necklace','wallet'];
 const SPELL_BODY=['head','eye','ear','nose','mouth','tooth','tongue','neck','shoulder','arm','elbow','wrist','hand','finger','thumb','chest','stomach','back','hip','leg','knee','ankle','foot','toe'];
-/* The words the level check dictates, drawn from the themed lists above.
-   Spell a Word is right to hold every word it holds, because a game is for
-   practising the hard ones. An assessment is not. The two features this round is evidence
-   for say "a very limited number of highly familiar words" and "a very limited
-   number of extremely familiar words", and "humid", "necklace", "watermelon",
-   "wrist" and "stomach" are none of those: a learner who can write their own
-   name and the word "bus" was being marked down on vocabulary the feature
-   never asked for.
-   Short, everyday, and picturable. Days and months are deliberately absent:
-   they are extremely familiar but "Wednesday" and "February" are long enough
-   to defeat a pre-level speller, and the level check already sees days and
-   months through Put In Order and Find the Date. */
-const SPELL_CORE=['one','two','three','four','five','six','seven','eight','nine','ten',
-  'hot','cold','warm','cool','sunny','rainy','windy',
-  'apple','banana','orange','grape','lemon','pear','mango',
-  'shirt','coat','dress','pants','socks','shoes','hat','cap','bag','belt','tie',
-  'head','eye','ear','nose','mouth','hand','arm','leg','foot','back','neck','toe','hip','knee'];
 const UNSCRAMBLE_SENTENCES=[
   'My name is David.','My last name is Johnson.','My full name is David Johnson.',
   'I am 30 years old.','My birthday is on 15 June 1995.','I am from Vietnam.',
@@ -4073,6 +4056,15 @@ const PF_COPY_A=[
   ['02','PLA','Responds to modelling by copying action',1]];
 const PF_COPY_WORD=PF_COPY_A.concat([
   ['05','PLA','Copies letters of the alphabet and short whole words that are clearly presented',1],
+  /* Moved off Spell a Word, which dictates rather than copies: this round puts
+     the word on the screen and takes it back typed, which is the feature.
+       Not partial, and it is the one row here that is not. The flag on its
+     neighbours says a copy made on a keyboard is not a copy made with a
+     pencil, and that is a fair caveat about the checklist's Legibility
+     features. This one sits under Spelling, and its concern is whether the
+     letters come out right, which a keyboard shows exactly. Spell a Word
+     carried it unflagged for the same reason before it moved. */
+  ['06','PLA','Copies a very limited number of highly familiar words, but may have spelling inaccuracies'],
   ['05','PLA','Copies single words left to right and top to bottom',1],
   ['06','PLA','Copies a very limited number of extremely familiar words',1],
   ['06','PLA','Copies text, but demonstrates lack of consistency between upper and lower case',1]]);
@@ -4905,10 +4897,19 @@ function poolFor(type,from){
   if(type==='clothes') return [...questionBank.clothes];
   /* Spell a Word holds every themed list, which is right for a game and wrong
      for an assessment: the level check was dictating "humid", "necklace" and
-     "watermelon" against two features whose own words are "highly familiar"
-     and "extremely familiar". `from` asks for the short list instead. */
+     "watermelon" against a feature whose own words are "a very limited number
+     of extremely familiar words".
+       The first attempt at this filtered the themed lists down to their
+     shorter words, and it still reached "back" and "tie", because a bank of
+     fruit, clothing and body parts is not the vocabulary the framework has in
+     mind however hard it is filtered. The document names its own register
+     several times over: "extremely familiar, short words ... e.g. big, fun,
+     stop", "e.g. stop, go, car, dog", "Copies appropriate word under picture,
+     e.g. pen, table", and Binh knew "stop, go, but not toilet". That is
+     survival and classroom vocabulary, and COPY_WORDS is already exactly it.
+     One list for both rounds: Copy It shows the word and this one says it. */
   if(type==='spelling') return from
-    ?allSpelling.filter(function(q){ return SPELL_CORE.indexOf(q.answer)>=0; })
+    ?COPY_WORDS.map(function(w){ return {type:'word', word:w, answer:w}; })
     :allSpelling;
   if(type==='custom') return [...questionBank.custom];
   if(type==='unscramble') return [...questionBank.unscramble];
@@ -7764,8 +7765,13 @@ const ACSF_CLAIMS={
     ['06','PLB','Uses capital letters and full stops accurately in sentences adapted from a model'],
     ['06','PLB','Leaves spaces between words'],
   ]},
+  /* No Stage A row. Its wording is "COPIES a very limited number of highly
+     familiar words", and this round dictates: there is no model on the screen
+     to copy from, and hearing a word and writing it is the harder task. It
+     belongs to Copy It, which is what PF_COPY_WORD carries it as now.
+     Crediting a copying feature off a dictation marked a learner down for
+     something they were never asked to do. */
   'spelling':{base:[
-    ['06','PLA','Copies a very limited number of highly familiar words, but may have spelling inaccuracies'],
     /* Not the Level 1 row above this one either. Spelling a dictated word is
        writing a word the app chose; that feature is about a learner reaching
        for a bank of words of their own to give personal details or meet a
@@ -9073,6 +9079,16 @@ function acsfCredit(step,tier,q,ans){
     s.seen++; s.right+=worth;
     const w=w0||(s.why[c[2]]={n:0,ok:0,partial:!!c[3]});
     w.n++; w.ok+=worth;
+    /* A feature two steps can show stays partial only while every step that
+       showed it was partial. It used to be whichever claim arrived first, so
+       "Copies text, but demonstrates lack of consistency between upper and
+       lower case" came out partial when Copy It was dealt before Big and Small
+       Letters and solid when it was not, and whether .06 could be awarded at
+       all turned on the order of the deal.
+         acsfAwardCeiling already reads it this way, off the claim map: a level
+       is solid if any claim of it is. The two have to agree, because one is
+       the verdict and the other is the bar it is judged against. */
+    if(!c[3]) w.partial=0;
   });
 }
 /* Note which way the learner answered, for the digital indicators. Tapping a
