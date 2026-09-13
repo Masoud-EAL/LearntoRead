@@ -377,6 +377,97 @@ read, not that a price was located.
 Grep for `i%` in the generators when a report says a question keeps coming back.
 Any bank that picks its kind that way deals only kind 0 to the level check.
 
+### 12c. An option a learner cannot read is not a question about the indicator
+*check: `options`*
+
+> "Written options on listening, numeracy and digital items. A PLA learner
+> cannot read Goodbye / Please / Good morning, so reading failures are recorded
+> against .08 to .13."
+
+Every round outside Reading was answered by reading its options: a greeting
+with four written replies, a picture of a laptop with *charger / mouse /
+laptop / camera*, an arrow with *left / behind / up / right*. A learner at
+Stage A cannot read any of it, so the wrong answer went down against listening,
+numeracy or digital when what failed was reading. Every indicator was
+confounded with `.03` and `.04`.
+
+`q.hearOpts` puts a chip on each option that speaks it. The option's own tap
+still answers on the first tap, which is the contract every round has, so the
+chip is a plain span inside the button that stops the click from reaching it.
+It does not count as a replay: `TEST.ev.replays` stands for asking to hear the
+**question** again, which is one of the three things `.02` reads as a learning
+strategy, and hearing an option is reading help.
+
+**The flag is set by the round, not worked out from the indicator**, and this
+is the part to get right. Whether hearing an option hands the answer over is a
+fact about the round: on a greeting it is the help a Stage A learner needs; on
+Sight Words, where the task is to match a word you have just heard to the way
+it is written, it *is* the answer. Same for Letter Names, Tap the Number, and
+the ordinals round that says "Tap the first one" out loud. Where a bank already
+puts a picture on the option, as Listen and Do does through `q.art`, the
+picture is the help and the chip would be the leak.
+
+The check holds both halves: a round that speaks its options may not speak its
+answer, and a step whose claims all fall in `.08` to `.13` may not leave an
+option that can only be read. A numeral, a time, an amount and an ordinal
+symbol are not reading: recognising them is the numeracy feature itself.
+
+It also caught what the report did not mention. "Good morning." was answered by
+"Good morning." was answered by the greeting handed straight back, so the
+option gave itself away in text before audio was ever added, and it was the one item a chip could
+not be given. It is asked the way it happens now: *You arrive at class in the
+morning*.
+
+### 12d. A wrong answer at Stage A earns one second ask
+*check: `retry`, and the run lengths under `run` and `spread`*
+
+> "Ask each PLA feature twice. Do it only when the learner cannot answer
+> correctly the first time. Today one slip on a three-feature stage closes the
+> indicator at NYA."
+
+A stage is judged at three quarters. A Stage A stage of three features with one
+wrong answer is 2 of 3, which reads `part`, and `acsfReviewStages` closes the
+indicator there: reported NYA, and never asked Stage B. One mistap ended an
+indicator.
+
+**A second ask is not a second observation. It is the same observation,
+revised**, and the better of the two attempts stands. That is not generosity.
+The whole of Pre Level 1 is described as performance with support. The
+Performance Variables Grid puts the learner "with an expert/mentor where highly
+structured support and modelling is provided", and the Stage B features
+themselves read "may require prompting". A second ask is the prompt, and
+`acsfWhyCount` prints "on the second ask" so a teacher reads what happened.
+
+Revising rather than appending is also what keeps the evidence one observation
+per feature, which is rule 3's shape and what `acsfEvidenceAt`'s `full` test
+depends on. It is scoped to `q.retryOf`: the repeats the run makes on purpose
+(rule 5b) keep accumulating.
+
+What does not earn one, each for a reason already in this file:
+
+- A blank or a timeout. No answer is not a wrong answer (rule 4).
+- A partly correct answer. It is already worth half, and the `sloppy` run is
+  partial nearly everywhere, so retrying partials would re-ask most of the
+  typed rounds in the test.
+- A round whose answer cannot change between two asks: My Learning, and any
+  declined answer (rule 5a).
+- Write Two Sentences, by name (rule 5b).
+- Stage B. That is the stage a learner reached by showing Stage A, and the
+  question there is whether they can go further, not whether they slipped.
+
+One per feature ever, which is what makes the run terminate.
+
+**The trap.** A feature is marked asked the moment it is dealt, so the stage
+reads as fully shown in the very round the learner got it wrong, and
+`acsfReviewStages` would close it before the second ask was ever put to them.
+A stage with a second ask still owed is not finished being asked, and the
+review skips it. Without that line the retry queue is built, drained and
+ignored, and nothing about the verdict changes.
+
+Run lengths say it is working: a perfect run and a sloppy run are unchanged at
+60, because neither produces a wrong answer; a run answered wrong throughout
+goes from 17 to 34.
+
 ### 13. The odd one out is clearly odd
 *check: `oddone`*
 

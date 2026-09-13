@@ -814,6 +814,12 @@ check('register', 'the level check stays at the register it is for', async ctx =
   // to do. So the rules are about source and task, not word counts.
   const out = await ctx.page.evaluate(() => {
     const bad = [];
+    // Every answer a step can deal, drawn wide enough to see the whole list.
+    const poolWords = function (st) {
+      let qs = [];
+      try { qs = testQuestions(st, 60); } catch (e) { return []; }
+      return [...new Set(qs.map(q => String(q.answer || '').toLowerCase()))];
+    };
     // 1. Nothing in the pool comes from the elementary banks. They are written
     //    to exercise longer words; a pre-level learner is not assessed by
     //    them, they are defeated by them. Level 1 evidence bought at that
@@ -865,10 +871,135 @@ check('register', 'the level check stays at the register it is for', async ctx =
       });
     });
     [...new Set(sums)].forEach(k => bad.push(k + ' asks the learner to subtract'));
+    /* 4. A step serving a Stage A feature deals only what that feature names.
+          Every one of these was a question credited to a stage above the one
+          it belonged to: "6 dollars and 50 cents" against "whole dollar
+          monetary amounts up to $10", a price of $10.50 against the same
+          words, "behind" against a feature whose own example is "up, down",
+          "3:45" against "digital time in whole hours", "necklace" against "a
+          very limited number of extremely familiar words", and "Do you work?"
+          against "recognises frequently used question words, e.g. who, what".
+          A stage is not a rough band. It is a list of what may be asked. */
+    const over = [];
+    ACSF_POOL.forEach(function (st) {
+      /* Read against the features doing the claiming, not against every step
+         that happens to show a number. Which Comes First deals the sentence
+         "I have lunch at 12:30." and its feature is "Follows print from left
+         to right and top to bottom": the clock in it is not what the learner
+         is being asked about, and flagging it would be the check inventing a
+         rule the framework never wrote.
+           Both stages, not just Stage A. "Digital time in whole hours" is a
+         Stage B feature, and the quarter hours were being credited to it. */
+      const claims = acsfClaimsFor(st);
+      /* Money at Stage A only. Every Stage A money feature says "whole dollar"
+         in its own words, three times over, and that is what was being broken.
+         Stage B is where cents belong and its features say so: "Monetary
+         amounts up to $100, e.g. 50c, $24.50", "= $25.20". */
+      const money = claims.some(c => c[1] === 'PLA' && /whole dollar/.test(c[2].toLowerCase()));
+      // Time at any stage, because the feature itself names the limit and it
+      // happens to sit at Stage B: "Digital time in whole hours".
+      const time = claims.some(c => /whole hours/.test(c[2].toLowerCase()));
+      if (!money && !time) return;
+      let qs = [];
+      try { qs = testQuestions(st, 10); if (st.mc) attachMcChoices(qs, st.type); }
+      catch (e) { return; }
+      const k = acsfStepKey(st);
+      qs.forEach(function (q) {
+        const said = String(q.say || '');
+        const face = [q.answer].concat(q.choices || []).join(' ');
+        if (money && (/\bcents?\b/i.test(said) || /\d+\.(?!00\b)\d\d/.test(face))) {
+          over.push(k + ' deals an amount with cents: ' + (said || face).slice(0, 40));
+        }
+        if (time && /\b\d{1,2}:(?!00\b)\d\d/.test(face)) {
+          over.push(k + ' deals a time that is not a whole hour: ' + face.slice(0, 40));
+        }
+      });
+    });
+    // The word lists, where the fault is what the bank holds and not the draw.
+    ACSF_POOL.forEach(function (st) {
+      if (st.type === 'position' && !st.from) {
+        poolWords(st).forEach(function (w) {
+          if (w !== 'up' && w !== 'down') {
+            over.push(acsfStepKey(st) + ' deals the position word "' + w + '"');
+          }
+        });
+      }
+      if (st.type === 'spelling') {
+        poolWords(st).forEach(function (w) {
+          if (SPELL_CORE.indexOf(w) < 0) over.push(acsfStepKey(st) + ' dictates "' + w + '"');
+        });
+      }
+      if (st.type === 'questionwords') {
+        poolWords(st).forEach(function (w) {
+          if (WH_WORDS.indexOf(w) < 0) {
+            over.push(acsfStepKey(st) + ' asks for "' + w + '", which is not a question word');
+          }
+        });
+      }
+    });
+    [...new Set(over)].forEach(x => bad.push(x));
     return { bad: bad, pool: ACSF_POOL.length };
   });
   say('  ' + out.pool + ' pool steps checked for source, task and arithmetic');
   out.bad.forEach(x => bad('register: ' + x));
+});
+
+/* "A learner at Pre Level 1 Stage A cannot read Goodbye / Please / Good
+   morning." The listening, numeracy and digital rounds were answered by
+   reading their options, so a reading failure was recorded against .08 to .13
+   and every indicator was confounded with .03 and .04. An option now speaks
+   when its chip is tapped, or carries a picture, or is a numeral. */
+check('options', 'an option a pre-level learner cannot read can be heard', async ctx => {
+  const out = await ctx.page.evaluate(() => {
+    const bad = [];
+    // Indicators where reading the option is not the thing being measured.
+    const NONREADING = ['08', '09', '10', '11', '12', '13'];
+    ACSF_POOL.forEach(function (st) {
+      let qs = [];
+      try { qs = testQuestions(st, 8); if (st.mc) attachMcChoices(qs, st.type); }
+      catch (e) { return; }
+      const claims = acsfClaimsFor(st);
+      const nonReading = claims.length &&
+        claims.every(c => NONREADING.indexOf(c[0]) >= 0);
+      qs.forEach(function (q) {
+        const opts = q.choices || [];
+        if (!opts.length) return;
+        /* 1. Hearing an option may not hand the answer over. Sight Words says
+              "that" and asks which written word it is; speaking the options
+              would let a learner match sound to sound and never read. */
+        if (q.hearOpts) {
+          const said = normalize(speechFor(q) || '');
+          const ans = normalize(q.answer || '');
+          if (ans && said && said.indexOf(ans) >= 0) {
+            bad.push(acsfStepKey(st) + ' speaks its options and its own answer: "' +
+                     String(q.question || '').slice(0, 40) + '"');
+          }
+        }
+        /* 2. Every option of a round that is not about reading has to be
+              reachable without reading it: a drawing the bank supplied, a
+              picture from the emoji map, a numeral, or the chip. */
+        if (!nonReading) return;
+        const pics = opts.map(w => (q.art && q.art[w]) || emo(w));
+        const allPics = pics.every(Boolean) && !q.textOnly &&
+                        !pics.some((e, i) => pics.indexOf(e) !== i);
+        opts.forEach(function (w) {
+          /* A numeral, a time, an amount or an ordinal symbol is not something
+             the learner has to read: recognising it is the numeracy feature
+             itself ("Matches 0 to 10 symbols with oral name", "Recognise oral
+             ordinal numbers from 1st to 3rd"). Words are the problem. */
+          const numeric = !/[a-z]/i.test(String(w)) ||
+                          /^\d+(st|nd|rd|th)$/i.test(String(w).trim()) ||
+                          /^\d[\d:.$ ]*(am|pm)?$/i.test(String(w).trim());
+          if (q.hearOpts || allPics || numeric) return;
+          bad.push(acsfStepKey(st) + ' asks the learner to read "' + w +
+                   '" to answer a question about .' + claims[0][0]);
+        });
+      });
+    });
+    return { bad: [...new Set(bad)], pool: ACSF_POOL.length };
+  });
+  say('  ' + out.pool + ' pool steps checked for an option that can only be read');
+  out.bad.forEach(x => bad('options: ' + x));
 });
 
 check('spread', 'no one game fills the level check', async ctx => {
@@ -910,6 +1041,135 @@ check('spread', 'no one game fills the level check', async ctx => {
       if (out.labels[k] > MAX) bad('spread (' + how + '): ' + k + ' came up ' + out.labels[k] + ' times');
     });
   }
+});
+
+/* "One slip on a three-feature stage closes the indicator at NYA." A Stage A
+   stage of three features with one wrong answer is 2 of 3, which is under the
+   three-quarters bar, so acsfReviewStages closed the indicator and the learner
+   was reported NYA and never asked Stage B. A second ask is what the whole of
+   Pre Level 1 is described as needing: "may require prompting" is in the Stage
+   B features themselves. */
+check('retry', 'a wrong answer at Stage A earns one second ask, and only one', async ctx => {
+  // A learner who is right about everything except the first ask of Reading
+  // .03 and .04 at Stage A, and right when asked again. They must climb.
+  const out = await ctx.page.evaluate(missTwice => {
+    const play = function (retryGoesRight) {
+      soloMode = true; myScore = 0;
+      TEST = newTestGame('solo', 'test:level');
+      const retried = [], seen = {};
+      let guard = 0, thirds = [];
+      while (!testFinished() && guard++ < 90) {
+        testStartRound();
+        const qs = (soloQuestions || []).slice();
+        if (!qs.length) break;
+        TEST.tally = []; TEST.roundPts = 0;
+        qs.forEach(function (q, i) {
+          soloQIdx = i; currentStudentQ = q;
+          const st = (TEST.roundSteps || [])[i] || {};
+          const again = q.retryOf || null;
+          if (again) {
+            retried.push(again.slice());
+            // A feature may not come back a third time.
+            again.forEach(function (k) {
+              if (seen[k]) thirds.push(k);
+              seen[k] = 1;
+            });
+          }
+          // Does this question stand for a Stage A reading feature?
+          const reading = ((q.acsf || acsfClaimsFor(st)) || [])
+            .some(c => (c[0] === '03' || c[0] === '04') && c[1] === 'PLA');
+          const miss = reading && (!again || !retryGoesRight);
+          let a;
+          if (miss) a = 'zzzz';
+          else {
+            a = q.answer;
+            if (isOpenQ(q)) a = (q.choices || []).find(c => (q.declines || []).indexOf(c) < 0) || q.answer;
+            if (q.freeText) a = 'My name is Ali. I am from Iraq.';
+          }
+          const tier = isOpenQ(q) ? 'correct'
+            : miss ? 'wrong'
+            : (typeinTier(q, a) || (normalize(a) === normalize(q.answer) ? 'correct' : 'wrong'));
+          testRecord(tier, tier === 'correct' ? 10 : 0, false, a);
+        });
+        testEndRound();
+        TEST.round++;
+      }
+      return {
+        asked: TEST.ev.asked,
+        retries: retried.length,
+        thirds: [...new Set(thirds)],
+        left: (TEST.plan.retry || []).length,
+        // Queued against actually asked. A second ask that is queued and then
+        // quietly thrown away is the same to the learner as never having one,
+        // and it does not show up as a leftover: dropping it empties the queue
+        // too. Drawing a single candidate and abandoning the retry when it
+        // collided with the question they just missed lost about one run in
+        // five this way.
+        queued: Object.keys(TEST.plan.retried).length,
+        asked2: [...new Set([].concat.apply([], retried))].length,
+        done: Object.assign({}, TEST.plan.done),
+        prompted: Object.keys(TEST.ev.byInd).reduce(function (n, ind) {
+          const lv = TEST.ev.byInd[ind].PLA || { why: {} };
+          return n + Object.keys(lv.why).filter(k => lv.why[k].prompted).length;
+        }, 0)
+      };
+    };
+    /* The same learner, but every second ask is offered the very question
+       they just missed as its first candidate. A bank does collide on its own
+       (a dozen signs, and the draw is a shuffle), and when it did, a retry
+       that took one candidate and gave up on a collision lost the second ask
+       without trace. Forced here so it is not left to chance. */
+    const real = window.testQuestions;
+    const last = {};
+    window.testQuestions = function (step, n) {
+      const got = real(step, n) || [];
+      const k = acsfStepKey(step);
+      const dup = last[k];
+      if (dup && n > 1) got.unshift(Object.assign({}, dup));
+      else if (dup && n === 1) return [Object.assign({}, dup)];
+      if (got.length) last[k] = got[got.length - 1];
+      return got;
+    };
+    let collided;
+    try { collided = play(true); } finally { window.testQuestions = real; }
+    return { rescued: play(true), stuck: play(false), collided: collided };
+  }, false);
+
+  const r = out.rescued, k = out.stuck;
+  say('  slipped once then right: ' + r.asked + ' questions, ' + r.retries +
+      ' second asks, .03 Stage A ' + (r.done['03|PLA'] || 'open'));
+  say('  wrong both times:        ' + k.asked + ' questions, ' + k.retries +
+      ' second asks, .03 Stage A ' + (k.done['03|PLA'] || 'open'));
+
+  if (!r.retries) bad('retry: a wrong answer at Stage A earned no second ask');
+  const c = out.collided;
+  say('  every second ask offered the missed question first: ' + c.asked2 +
+      ' of ' + c.queued + ' features still got one');
+  [r, k, c].forEach(x => {
+    if (x.asked2 < x.queued) {
+      bad('retry: ' + (x.queued - x.asked2) + ' of ' + x.queued +
+          ' features earned a second ask and never got one');
+    }
+  });
+  ['03', '04'].forEach(ind => {
+    if (r.done[ind + '|PLA'] !== 'yes') {
+      bad('retry: .' + ind + ' Stage A came back "' + (r.done[ind + '|PLA'] || 'open') +
+          '" for a learner who slipped once and was right when asked again');
+    }
+    if (k.done[ind + '|PLA'] === 'yes') {
+      bad('retry: .' + ind + ' Stage A was awarded to a learner who was wrong both times');
+    }
+  });
+  if (!r.prompted) bad('retry: nothing on the panel records that a feature took a second ask');
+  ['03', '04'].forEach(ind => {
+    if (c.done[ind + '|PLA'] !== 'yes') {
+      bad('retry: .' + ind + ' Stage A came back "' + (c.done[ind + '|PLA'] || 'open') +
+          '" when the second ask was offered the missed question first');
+    }
+  });
+  r.thirds.forEach(x => bad('retry: ' + x + ' was asked a third time'));
+  k.thirds.forEach(x => bad('retry: ' + x + ' was asked a third time'));
+  if (r.left) bad('retry: ' + r.left + ' second asks were still queued when the run ended');
 });
 
 check('variants', 'every ordinary Test Yourself ladder still finishes', async ctx => {

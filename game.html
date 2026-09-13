@@ -1124,6 +1124,31 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .mc-choice .mc-label{font-size:1.3rem;word-break:break-word;text-align:center;}
 .mc-choice.mc-text .mc-label{font-size:1.65rem;}
 .mc-choice.mc-sentence .mc-label{font-size:1.2rem;line-height:1.4;font-family:'Nunito',sans-serif;font-weight:700;}
+/* ── Hear this option ──
+   A learner at Pre Level 1 Stage A cannot read "Goodbye" or "charger", so a
+   round about listening, numbers or a device was being answered by reading and
+   the wrong answer was recorded against the wrong indicator. The chip speaks
+   its own option. It sits in the corner rather than in the column so the row
+   of choices is still sized as one, and the button keeps its left padding
+   clear of it so a wrapped sentence cannot run underneath.
+   A plain span, not a nested button: the option's own tap still answers on the
+   first tap, which is the contract every other round has. */
+.mc-choice{position:relative;}
+.mc-choice.has-say{padding-left:42px;}
+/* A one-word option is set large, and the chip takes the width it needs from
+   somewhere: "Goodbye." was breaking after the y. A word split across two
+   lines is unreadable for a learner who is still assembling words out of
+   letters, so where the chip is there the text is set to fit beside it. */
+.mc-choice.has-say.mc-text .mc-label{font-size:1.25rem;}
+.mc-choice.has-say .mc-label{word-break:normal;overflow-wrap:break-word;text-wrap:balance;}
+.mc-say{position:absolute;left:0;top:0;width:42px;height:100%;display:flex;
+  align-items:center;justify-content:center;font-size:1.4rem;line-height:1;
+  border-right:1px solid rgba(255,255,255,.12);border-radius:14px 0 0 14px;
+  opacity:.75;cursor:pointer;}
+.mc-say:hover{opacity:1;background:rgba(255,255,255,.07);}
+.mc-say:active{transform:scale(.9);}
+:root[data-app-h~="lt440"] .mc-choice.has-say{padding-left:34px;}
+:root[data-app-h~="lt440"] .mc-say{width:34px;font-size:1.1rem;}
 .mc-choice.selected{border-color:var(--gold);background:rgba(245,166,35,.12);}
 .mc-choice.mc-correct{border-color:var(--green);background:rgba(0,200,83,.18);}
 .mc-choice.mc-wrong{border-color:var(--accent);background:rgba(233,69,96,.15);}
@@ -2634,6 +2659,9 @@ const ELEMENTARY_SENTENCE_BLANKS=[
    exactly one correct answer, so the multiple-choice options never contain a
    second word that would also fit (e.g. no "When" alongside "How" for
    "How do you go to class?"). */
+/* The question words themselves, so "is this one" is decided once from the
+   word rather than written beside each question. */
+const WH_WORDS=['who','what','where','when','why','which','whose','how'];
 const QUESTION_WORD_QUESTIONS=[
   {q:'How are you today?',alts:['When','Why','Who']},
   {q:'What is your name?',alts:['Who','Why','When']},
@@ -2725,6 +2753,23 @@ const SPELL_CLOTHES=['shirt','jumper','jacket','coat','dress','skirt','pants','j
   'scarf','gloves','belt','tie','glasses','sunglasses','watch','bag','backpack','umbrella',
   'ring','bracelet','necklace','wallet'];
 const SPELL_BODY=['head','eye','ear','nose','mouth','tooth','tongue','neck','shoulder','arm','elbow','wrist','hand','finger','thumb','chest','stomach','back','hip','leg','knee','ankle','foot','toe'];
+/* The words the level check dictates, drawn from the themed lists above.
+   Spell a Word is right to hold every word it holds, because a game is for
+   practising the hard ones. An assessment is not. The two features this round is evidence
+   for say "a very limited number of highly familiar words" and "a very limited
+   number of extremely familiar words", and "humid", "necklace", "watermelon",
+   "wrist" and "stomach" are none of those: a learner who can write their own
+   name and the word "bus" was being marked down on vocabulary the feature
+   never asked for.
+   Short, everyday, and picturable. Days and months are deliberately absent:
+   they are extremely familiar but "Wednesday" and "February" are long enough
+   to defeat a pre-level speller, and the level check already sees days and
+   months through Put In Order and Find the Date. */
+const SPELL_CORE=['one','two','three','four','five','six','seven','eight','nine','ten',
+  'hot','cold','warm','cool','sunny','rainy','windy',
+  'apple','banana','orange','grape','lemon','pear','mango',
+  'shirt','coat','dress','pants','socks','shoes','hat','cap','bag','belt','tie',
+  'head','eye','ear','nose','mouth','hand','arm','leg','foot','back','neck','toe','hip','knee'];
 const UNSCRAMBLE_SENTENCES=[
   'My name is David.','My last name is Johnson.','My full name is David Johnson.',
   'I am 30 years old.','My birthday is on 15 June 1995.','I am from Vietnam.',
@@ -3157,12 +3202,17 @@ function genShopQuestions(n,from,small){
   for(let i=0;i<(n||8);i++){
     const item=SHOP_ITEMS[Math.floor(Math.random()*SHOP_ITEMS.length)];
     if(kind===1||(kind===0&&i%2===0)){
-      // Pay the exact amount. Prices land in the unit's 50–100 range, in 50c
-      // steps so the 50c piece stays in play. `small` moves the whole game
-      // under $10, which is where Stage A of the checklist lives: "monetary
-      // amounts up to $10", "coins and notes up to $10". Without it that half
-      // of the indicator could not be reached at all.
-      const cents=small?(randInt(1,9)*100+(Math.random()<0.5?50:0))
+      /* Pay the exact amount. Prices land in the unit's 50-100 range, in 50c
+         steps so the 50c piece stays in play. `small` moves the whole game
+         under $10, which is where Stage A of the checklist lives.
+           And under $10 it is whole dollars, because all four Stage A features
+         this round is evidence for say so in their own words: "whole dollar
+         monetary amounts up to $10", "whole dollar Australian coins and notes
+         up to $10", "Matches whole dollar Australian notes and coins up to $10
+         in monetary amount". A learner was being asked for $6.50 against them.
+         The 50c piece is still in play above $10, where the feature is
+         "Monetary amounts up to $100, e.g. 50c, $24.50". */
+      const cents=small?randInt(1,9)*100
                        :((50+Math.floor(Math.random()*50))*100+(Math.random()<0.5?50:0));
       out.push({type:'shop',mode:'pay',cents:cents,answer:moneyAnswer(cents),
         icon:'<div class="shop-item">'+item.emoji+'<span class="shop-name">'+item.name
@@ -3272,16 +3322,27 @@ function genNumeralWriteQuestions(n,hi){
         question:'🔊 Write this number', placeholder:'e.g. '+(hi>10?'25':'5'),
         answer:String(v)});
     } else if(mode===1){
-      const d=DENOMS.filter(function(x){ return x.c<=hi*100; });
+      /* Whole dollars only at the lower range. The Stage A features this round
+         is evidence for say "whole dollar coins and notes up to $10" and
+         "whole dollar monetary amounts up to $10", three times over; a 10c
+         piece is not one of them. The ceiling alone let every coin through,
+         because 10c is under $10. */
+      const d=DENOMS.filter(function(x){
+        return x.c<=hi*100&&(hi>10||x.c%100===0); });
       const pick=d[randInt(0,d.length-1)];
       out.push({type:'typein', label:'WRITE THE AMOUNT', noListen:true,
         icon:'<img src="icons/money-'+pick.file+'.svg" alt="" style="height:64px;">',
-        question:'Write what this is worth', placeholder:'e.g. 2 or 0.50',
+        question:'Write what this is worth',
+        placeholder:hi>10?'e.g. 2 or 0.50':'e.g. 2',
         answer:moneyAnswer(pick.c)});
     } else {
-      const cents=randInt(1,hi)*100+(Math.random()<0.5?50:0);
+      // Same rule, and the 50 was being added at both ranges: "6 dollars and
+      // 50 cents" was dictated against "whole dollar monetary amounts up to
+      // $10". Cents belong to the Stage B feature, which names $25.20.
+      const cents=randInt(1,hi)*100+(hi>10&&Math.random()<0.5?50:0);
       out.push({type:'typein', label:'WRITE THE AMOUNT', say:moneySpoken(cents),
-        question:'🔊 Write this amount of money', placeholder:'e.g. 25.50',
+        question:'🔊 Write this amount of money',
+        placeholder:hi>10?'e.g. 25.50':'e.g. 5.00',
         answer:moneyAnswer(cents)});
     }
   }
@@ -3412,14 +3473,17 @@ function genTableQuestions(n,from){
     const cap=Math.min(hi,20);
     const locate=from===2?false:(from===0||from===1)?true:((i+offset)%2===0);
     if(locate){
-      // Locate a price. Four rows, and the prices differ from each other or
-      // two options read the same and a learner tapping the "wrong" one has
-      // in fact answered correctly. Cents are in play here, which is where
-      // "Monetary amounts up to $100, e.g. 50c, $24.50" lives.
+      /* Locate a price. Four rows, and the prices differ from each other or
+         two options read the same and a learner tapping the "wrong" one has
+         in fact answered correctly.
+           Cents belong to Stage B, which is where "Monetary amounts up to
+         $100, e.g. 50c, $24.50" lives. They were in play at both ranges, so a
+         $1.50 and a $10.50 were being shown against the Stage A feature whose
+         own words are "whole dollar monetary amounts up to $10". */
       const seen={}, rows=[];
       shuffle(LIST_ITEMS.slice()).slice(0,4).forEach(function(it){
         let c;
-        do { c=randInt(1,cap)*100+(Math.random()<0.5?50:0); } while(seen[c]);
+        do { c=randInt(1,cap)*100+(hi>10&&Math.random()<0.5?50:0); } while(seen[c]);
         seen[c]=1;
         rows.push({name:it[1], emoji:it[0], plural:it[2], cents:c});
       });
@@ -3496,20 +3560,33 @@ function genDigitalTimeQuestions(n,from){
   const pickHour=function(ampm){
     return ampm==='AM'?randInt(6,11):ampm==='PM'?randInt(1,8):randInt(1,12);
   };
+  /* `from` names the round the caller wants, rather than where an alternation
+     starts. It was `Math.min(base+(i%2),2)`, so a step asking for whole hours
+     dealt quarter hours on every odd draw, and `i%2===0` chose tapped or typed
+     from the draw index rather than from the step. The level check deals a
+     step one question at a time, so which of the two a learner met was decided
+     by where the dedupe landed, which is the shape invariant 12b names.
+       0 is the standalone game and keeps its mix: both halves, and the quarter
+     hours and am/pm that are worth practising and that `getQuestions` can only
+     reach here, since it draws every generated bank at 0. 1 is whole hours
+     tapped and 2 is whole hours typed: between them they are the whole of the
+     one feature this bank claims, "digital time in whole hours", and they are
+     the two the pool asks for. */
+  const mix=base===0, typed=base===2;
   for(let i=0;i<(n||8);i++){
-    const step=Math.min(base+ (i%2), 2);
-    const ampm=step>=2?(Math.random()<0.5?'AM':'PM'):'';
+    const hard=mix&&i%2===1;
+    const ampm=hard?(Math.random()<0.5?'AM':'PM'):'';
     const h=pickHour(ampm);
-    const m=step===0?0:[0,15,30,45][randInt(0,3)];
+    const m=hard?[0,15,30,45][randInt(0,3)]:0;
     const shown=fmtDigital(h,m)+(ampm?' '+ampm:'');
     const spoken=digitalWords(h,m)+(ampm?partOfDay(h,ampm):'');
-    if(i%2===0){
+    if(mix?i%2===0:!typed){
       // Hear it, tap the clock that shows it.
       const alts=[];
       let guard=0;
       while(alts.length<3&&guard++<60){
-        const ap=step>=2?(Math.random()<0.5?'AM':'PM'):'';
-        const c=fmtDigital(pickHour(ap),step===0?0:[0,15,30,45][randInt(0,3)])+(ap?' '+ap:'');
+        const ap=hard?(Math.random()<0.5?'AM':'PM'):'';
+        const c=fmtDigital(pickHour(ap),hard?[0,15,30,45][randInt(0,3)]:0)+(ap?' '+ap:'');
         if(c!==shown&&alts.indexOf(c)<0) alts.push(c);
       }
       out.push({type:'mc', say:spoken, question:'🔊 Which one shows this time?',
@@ -3519,7 +3596,7 @@ function genDigitalTimeQuestions(n,from){
       // time down in figures rather than only pick it out of four.
       out.push({type:'typein', label:'WRITE THE TIME', say:spoken,
         question:'🔊 Write this time in numbers',
-        placeholder:step>=2?'e.g. 7:15 PM':'e.g. 7:15', answer:shown.toLowerCase()});
+        placeholder:hard?'e.g. 7:15 PM':'e.g. 7:00', answer:shown.toLowerCase()});
     }
   }
   return out;
@@ -3551,7 +3628,11 @@ function genCalendarQuestions(n){
     const correct=askDay?dow:name;
     const alts=askDay?shuffle(SPELL_DAYS.filter(function(d){ return d!==dow; })).slice(0,3)
                      :shuffle(SPELL_MONTHS.filter(function(m){ return m!==name; })).slice(0,3);
-    out.push({type:'mc', noListen:true, icon:grid,
+    /* The round says nothing out loud, so a chip on each option gives nothing
+       away: what the learner has to work out is which day the date falls on,
+       and that is in the calendar, not in the option. Reading "Wednesday" was
+       a second task nobody asked for. */
+    out.push({type:'mc', noListen:true, icon:grid, hearOpts:true,
       question:askDay?('What day is '+name+' '+date+'?'):'Which month is this?',
       answer:correct.toLowerCase(), choices:shuffle([correct].concat(alts))});
   }
@@ -3595,7 +3676,7 @@ function genOrdinalQuestions(n,from){
     } else {
       const correct=ORDINALS[pos];
       const alts=shuffle(ORDINALS.slice(0,top).filter(function(o){ return o!==correct; })).slice(0,3);
-      out.push({type:'mc', say:'Which one is marked?', icon:icon,
+      out.push({type:'mc', say:'Which one is marked?', icon:icon, hearOpts:true,
         question:'🔊 Which one is marked?',
         answer:correct, choices:shuffle([correct].concat(alts))});
     }
@@ -3626,13 +3707,22 @@ const POSITIONS=[
   {w:'in front', art:'🚶‍➡️📦', q:'Where is the box?'},
   {w:'behind',   art:'📦🚶‍➡️', q:'Where is the box?'},
 ];
-function genPositionQuestions(n){
+/* `from` names the stage, because the two stages name different words. Stage A
+   is "extremely simple relative position words accompanied by gestures, e.g.
+   up, down", and up and down is the whole of it; left, right, in front and
+   behind are the Stage B line. Drawing all six at Stage A credited the Stage A
+   feature off a "behind" question, which is a word that feature does not name.
+   Two options is the right size for the Stage A round rather than a shortfall:
+   there are two words, and Safe or Private already deals a two-option round. */
+function genPositionQuestions(n,from){
   const out=[];
+  const src=from?POSITIONS:POSITIONS.filter(function(p){
+    return p.w==='up'||p.w==='down'; });
   for(let i=0;i<(n||8);i++){
-    const pick=POSITIONS[randInt(0,POSITIONS.length-1)];
-    const alts=shuffle(POSITIONS.filter(function(p){ return p.w!==pick.w; })).slice(0,3)
+    const pick=src[randInt(0,src.length-1)];
+    const alts=shuffle(src.filter(function(p){ return p.w!==pick.w; })).slice(0,3)
                 .map(function(p){ return p.w; });
-    out.push({type:'mc', say:pick.q,
+    out.push({type:'mc', say:pick.q, hearOpts:true,
       icon:'<span style="font-size:3rem;letter-spacing:2px;">'+pick.art+'</span>',
       question:'🔊 '+pick.q,
       answer:pick.w, choices:shuffle([pick.w].concat(alts))});
@@ -3743,7 +3833,7 @@ function genDeviceQuestions(n,from){
       const alts=shuffle(DEVICES.filter(function(x){ return x.n!==d.n; })).slice(0,3)
                   .map(function(x){ return x.use; });
       out.push({type:'mc', say:'What is a '+d.n+' for?',
-        icon:deviceArt(d),
+        icon:deviceArt(d), hearOpts:true,
         question:'🔊 What is this for?',
         answer:d.use.toLowerCase(), choices:shuffle([d.use].concat(alts))});
     } else {
@@ -3753,7 +3843,7 @@ function genDeviceQuestions(n,from){
          stops there. Saying "which one is the keyboard" named the answer, and
          a learner could pick the right word without ever looking at the icon. */
       out.push({type:'mc', say:'What is this called?',
-        icon:deviceArt(d),
+        icon:deviceArt(d), hearOpts:true,
         question:'🔊 What is this called?',
         answer:d.n, choices:shuffle([d.n].concat(alts))});
     }
@@ -3786,7 +3876,7 @@ function genSymbolQuestions(n){
        before the learner has answered it. The shorter question is also the
        easier one to read, which this audience needs. */
     out.push({type:'mc', say:'What is this?',
-      icon:'<span class="digi-key">'+d.s+'</span>',
+      icon:'<span class="digi-key">'+d.s+'</span>', hearOpts:true,
       question:'🔊 What is this?',
       answer:d.n.toLowerCase(), choices:shuffle([d.n].concat(alts))});
   }
@@ -3848,13 +3938,13 @@ const PROMPTS=[
    in two. Same shape as the copy-a-word report. */
 function genPromptQuestions(n,from){
   const dialogs=PROMPTS.map(function(p){
-    return {type:'mc', say:p.t+'. '+p.b, acsf:[PF_PROMPT],
+    return {type:'mc', say:p.t+'. '+p.b, acsf:[PF_PROMPT], hearOpts:true,
       icon:'<div class="digi-dialog"><div class="dd-title">'+p.t+'</div><div class="dd-body">'+p.b+'</div></div>',
       question:'🔊 What should you do?',
       answer:p.a.toLowerCase(), choices:shuffle([p.a].concat(p.alts))};
   });
   const cares=DEVICE_CARE.map(function(c){
-    return {type:'mc', say:c.q, question:'🔊 '+c.q, acsf:[PF_CARE],
+    return {type:'mc', say:c.q, question:'🔊 '+c.q, acsf:[PF_CARE], hearOpts:true,
       answer:c.a.toLowerCase(), choices:shuffle([c.a].concat(c.alts))};
   });
   const pick=from===0?dialogs:from===1?cares:dialogs.concat(cares);
@@ -3897,7 +3987,7 @@ function genSafeQuestions(n,from){
       const correct=it.safe?'Safe to share':'Keep it private';
       out.push({type:'mc', say:'Can you share this with anyone? '+it.t,
         icon:'<span style="font-size:2.6rem;">'+(it.safe?'🙂':'🔒')+'</span>',
-        question:'🔊 '+it.t, answer:correct.toLowerCase(),
+        question:'🔊 '+it.t, answer:correct.toLowerCase(), hearOpts:true,
         choices:shuffle([correct, it.safe?'Keep it private':'Safe to share'])});
     } else {
       // A code you copy exactly, digit for digit. The checklist calls it a
@@ -4204,7 +4294,13 @@ function genNoticeQuestions(n){
    learner who cannot yet hear it should still be able to work at it, but the
    audio is the task. */
 const GREETINGS=[
-  {say:'Good morning.',       a:'Good morning.',   alts:['Good night.','Thank you.','Goodbye.']},
+  /* Not "Good morning." answered by "Good morning.". A reply that is the
+     greeting handed straight back is answered by matching two identical lines,
+     which is rule 9's second form: the option gives itself away, and a learner
+     who understands none of it scores. It is also the one item a chip on the
+     options could not be given, because hearing them would hand it over twice.
+     The exchange is worth keeping, so it is asked the way it happens. */
+  {say:'You arrive at class in the morning.', a:'Good morning.', alts:['Good night.','Thank you.','Goodbye.']},
   {say:'How are you?',        a:'I am fine, thank you.', alts:['My name is Ali.','It is Monday.','Good night.']},
   {say:'Thank you.',          a:"You're welcome.", alts:['Good morning.','See you tomorrow.','How are you?']},
   {say:'I am going home now.', a:'Goodbye.', alts:['Good morning.','Thank you.','Please.']},
@@ -4224,7 +4320,11 @@ function genGreetingQuestions(n){
   const out=[], pool=shuffle(GREETINGS.slice());
   for(let i=0;i<(n||8);i++){
     const g=pool[i%pool.length];
-    out.push({type:'mc', say:g.say, question:'🔊 '+g.say,
+    /* A chip on each option, because hearing the four replies is exactly the
+       help a Stage A learner needs and none of them is the greeting handed
+       back. See the note on the bank above, and the `options` check, which is
+       what keeps a mirrored exchange from being added beside them. */
+    out.push({type:'mc', say:g.say, question:'🔊 '+g.say, hearOpts:true,
       answer:g.a.toLowerCase(), choices:shuffle([g.a].concat(g.alts))});
   }
   return out;
@@ -4383,7 +4483,7 @@ function genMyLearningQuestions(n,from){
     const rest=shuffle(chipRow(a.list).filter(function(t){ return NO_ANSWER_OPTS.indexOf(t)<0; }));
     const opts=shuffle(rest.slice(0,4-Math.min(1,none.length)).concat(none.slice(0,1)));
     out.push({type:'mc', say:a.q, question:'🔊 '+a.q, textOnly:true, anyAnswer:true,
-      declines:NO_ANSWER_OPTS, acsf:a.acsf||[],
+      hearOpts:true, declines:NO_ANSWER_OPTS, acsf:a.acsf||[],
       answer:opts[0].toLowerCase(), choices:opts});
   }
   return out;
@@ -4689,7 +4789,13 @@ function buildBank(){
   questionBank.questionwords=QUESTION_WORD_QUESTIONS.map(function(item){
     const blank=item.q.split(/\s+/)[0];                 // first word = the question word
     const sentence=item.q.replace(/^\S+/,'___');         // blank it out for display
-    return {type:'sentence',qword:true,noListen:true,sentence:sentence,blank:blank,display:sentence,answer:blank.toLowerCase(),alts:item.alts.slice()};
+    /* Which of these is actually a question word, read off the word itself
+       rather than marked on ten items by hand, so a question added below
+       cannot arrive untagged. The level check asks for these only: the feature
+       it credits names "who, what", and a question opening on an auxiliary is
+       not evidence of recognising one. */
+    return {type:'sentence',qword:true,noListen:true,wh:WH_WORDS.indexOf(blank.toLowerCase())>=0,
+      sentence:sentence,blank:blank,display:sentence,answer:blank.toLowerCase(),alts:item.alts.slice()};
   });
   questionBank.numbers=SPELL_NUMBERS.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
   questionBank.numbers1120=SPELL_NUMBERS_11_20.map(w=>({type:'word',word:w,answer:w.toLowerCase()}));
@@ -4749,13 +4855,19 @@ function buildBank(){
 const SPECIAL_GAMES=['target'];
 function isSpecialGame(t){ return SPECIAL_GAMES.indexOf(t)>=0; }
 
-function poolFor(type){
+function poolFor(type,from){
   if(isSpecialGame(type)) return [];
   const allSpelling=[...questionBank.numbers,...questionBank.days,...questionBank.months,...questionBank.weather,...questionBank.fruits,...questionBank.body,...questionBank.clothes];
   if(isPhonicsType(type)) return [...questionBank[type]];
   if(type==='beginner') return [...questionBank.beginner];
   if(type==='elementary') return [...questionBank.elementary];
-  if(type==='questionwords') return [...questionBank.questionwords];
+  /* The level check asks for the question words only. The bank also holds ten
+     questions opening on an auxiliary, "Do you work?" and "Can she drive?",
+     which are worth practising and are what the grammar section wants, but
+     they were being credited to ".04 Recognises frequently used question
+     words, e.g. who, what", which is not a feature about auxiliaries. */
+  if(type==='questionwords') return questionBank.questionwords
+    .filter(function(q){ return from?q.wh:true; });
   if(type==='numbers') return [...questionBank.numbers];
   if(type==='numbers1120') return [...questionBank.numbers1120];
   if(type==='numbers2199') return [...questionBank.numbers2199];
@@ -4765,7 +4877,13 @@ function poolFor(type){
   if(type==='fruits') return [...questionBank.fruits];
   if(type==='body') return [...questionBank.body];
   if(type==='clothes') return [...questionBank.clothes];
-  if(type==='spelling') return allSpelling;
+  /* Spell a Word holds every themed list, which is right for a game and wrong
+     for an assessment: the level check was dictating "humid", "necklace" and
+     "watermelon" against two features whose own words are "highly familiar"
+     and "extremely familiar". `from` asks for the short list instead. */
+  if(type==='spelling') return from
+    ?allSpelling.filter(function(q){ return SPELL_CORE.indexOf(q.answer)>=0; })
+    :allSpelling;
   if(type==='custom') return [...questionBank.custom];
   if(type==='unscramble') return [...questionBank.unscramble];
   if(type==='gramscramble') return [...questionBank.gramscramble];
@@ -4858,7 +4976,7 @@ const GEN_BANKS={
   digitaltime:  function(n,f){ return genDigitalTimeQuestions(n,f); },
   calendar:     function(n){ return genCalendarQuestions(n); },
   ordinals:     function(n,f){ return genOrdinalQuestions(n,f); },
-  position:     function(n){ return genPositionQuestions(n); },
+  position:     function(n,f){ return genPositionQuestions(n,f); },
   devices:      function(n,f){ return genDeviceQuestions(n,f); },
   digisymbols:  function(n){ return genSymbolQuestions(n); },
   prompts:      function(n,f){ return genPromptQuestions(n,f); },
@@ -4938,7 +5056,13 @@ function genDistinctCount(type){
   return (GEN_SIZES[type]=seen.size);
 }
 
-function getQuestions(type,limit){
+/* `from` is the round a caller wants, for the fixed banks that hold more than
+   one. It was only ever forwarded to the generated banks, so a pool step could
+   name a round of a fixed bank and be given the whole bank instead, silently:
+   the same class of fault as a generator choosing its round from the draw
+   index. Undefined means the whole bank, which is what every ordinary caller
+   passes and what every one of them wants. */
+function getQuestions(type,limit,from){
   // Dice games have no questions at all — they run their own screens.
   if(isSpecialGame(type)) return [];
   if(isGenBank(type)) return drawGen(type,limit,0);
@@ -4961,7 +5085,7 @@ function getQuestions(type,limit){
     shuffle(mixed);
     return mixed.slice(0,limit);
   }
-  const pool=poolFor(type);
+  const pool=poolFor(type,from);
   shuffle(pool);
   // Copies, not the bank's own questions. poolFor copies the array but not what
   // is in it, so these are the very objects buildBank made — and attachMcChoices
@@ -7653,11 +7777,20 @@ const ACSF_CLAIMS={
     ['10','PLA','Matches whole dollar Australian notes and coins up to $10 in monetary amount'],
     ['10','PLA','Names Australian coins and notes up to $10'],
   ]}},
-  'position':{base:[
-    ['09','PLA','Shows some recognition of extremely simple relative position words accompanied by gestures, e.g. up, down'],
-    ['11','PLA','Uses personally relevant informal language and gestures to convey very simple numeracy-based information, e.g.: today, tomorrow, yesterday pointing and saying up and down one, two, three five dollars'],
-    ['11','PLB','Uses personally relevant informal language and gestures to convey very simple numeracy-based information, (Choose three from these example): days of the week, months, own birthday, up, down, left, right, in front, behind twenty-five first, second, third round, straight, big, small forty dollars, fifty cents'],
-  ]},
+  /* Split by `from` because the two stages name different words, and the round
+     now deals only the ones its stage names. The Stage A rows say "up, down"
+     and nothing else, so they hang off the round that asks for up and down;
+     the Stage B row is the one that lists left, right, in front and behind.
+     On `base` they were both credited off whichever of the six the draw
+     happened to land on. */
+  'position':{base:[],
+    byFrom:{0:[
+      ['09','PLA','Shows some recognition of extremely simple relative position words accompanied by gestures, e.g. up, down'],
+      ['11','PLA','Uses personally relevant informal language and gestures to convey very simple numeracy-based information, e.g.: today, tomorrow, yesterday pointing and saying up and down one, two, three five dollars'],
+    ],
+    1:[
+      ['11','PLB','Uses personally relevant informal language and gestures to convey very simple numeracy-based information, (Choose three from these example): days of the week, months, own birthday, up, down, left, right, in front, behind twenty-five first, second, third round, straight, big, small forty dollars, fifty cents'],
+    ]}},
   'shop':{base:[],byFrom:{1:[
     ['09','PLB','Australian coins and notes'],
     ['09','PLB','Monetary amounts up to $100, e.g. 50c, $24.50'],
@@ -7808,7 +7941,7 @@ const ACSF_POOL=[
   {type:'sightwords',mc:true},{type:'direction',mc:true},
   // Reading
   {type:'signs',mc:true},{type:'oddone',mc:true},{type:'sms',mc:true},
-  {type:'notice',mc:true},{type:'questionwords',mc:true},{type:'beginner',mc:true},
+  {type:'notice',mc:true},{type:'questionwords',mc:true,from:1},{type:'beginner',mc:true},
   /* Not the elementary sentence bank. "The cook ___ a good look at the food on
      the stove", "The nation ___ a new station for the next generation" — those
      are written to exercise longer words, and a pre-level learner is not being
@@ -7820,7 +7953,7 @@ const ACSF_POOL=[
   // Writing
   {type:'copyword',mc:false,from:0},{type:'copyword',mc:false,from:1},
   {type:'copyword',mc:false,from:2},
-  {type:'spelling',mc:false},{type:'numeralwrite',mc:false,from:0},
+  {type:'spelling',mc:false,from:1},{type:'numeralwrite',mc:false,from:0},
   {type:'numeralwrite',mc:false,from:1},{type:'punctuation',mc:true,from:0},
   {type:'punctuation',mc:false,from:1},{type:'modelsentence',mc:false,from:0},
   /* Grammar Unscramble is not here. Its only claim was the Level 1 "uses basic
@@ -7834,8 +7967,9 @@ const ACSF_POOL=[
   {type:'addup',mc:false,from:0},{type:'addup',mc:false,from:1},
   {type:'addmoney',mc:false,from:0},{type:'addmoney',mc:false,from:1},
   {type:'ordering',mc:false,from:0},{type:'ordering',mc:false,from:1},
-  {type:'placevalue',mc:true},{type:'ordinals',mc:true,from:0},{type:'position',mc:true},
-  {type:'digitaltime',mc:true,from:0},{type:'digitaltime',mc:false,from:2},
+  {type:'placevalue',mc:true},{type:'ordinals',mc:true,from:0},
+  {type:'position',mc:true,from:0},{type:'position',mc:true,from:1},
+  {type:'digitaltime',mc:true,from:1},{type:'digitaltime',mc:false,from:2},
   {type:'calendar',mc:true},
   // Using a device
   {type:'devices',mc:true},{type:'devices',mc:true,from:1},{type:'digisymbols',mc:true},
@@ -7885,7 +8019,7 @@ function acsfWalked(){
 function acsfNewPlan(){
   const stage={};
   acsfWalked().forEach(function(i){ stage[i]=acsfFirstStage(i); });
-  return {stage:stage, asked:{}, done:{}, qs:{}};
+  return {stage:stage, asked:{}, done:{}, qs:{}, retry:[], retried:{}};
 }
 /* The first stage an indicator has any questions for. Almost always PLA; this
    skips a stage the pool simply cannot ask so an indicator is not closed for
@@ -8032,6 +8166,13 @@ function acsfReviewStages(){
   const sig=acsfSignalRows(TEST.ev);
   acsfOpenStages().forEach(function(o){
     const key=o.ind+'|'+o.lvl;
+    /* A stage with a second ask still owed is not finished being asked, so it
+       is not judged yet. Without this the retry could never work: the feature
+       is marked asked the moment it is dealt, so the stage reads as fully
+       shown in the very round the learner got it wrong, and would be closed
+       here before its second ask was ever put to them. */
+    if(plan.retry.some(function(r){
+      return r.feats.some(function(k){ return k.indexOf(key+'|')===0; }); })) return;
     const e=acsfEvidenceAt(o.ind,o.lvl,TEST.ev.byInd,sig)||{seen:0,right:0,why:{}};
     const meta=ACSF_INDICATORS[o.ind];
     const enough=acsfEnough(e);
@@ -8095,6 +8236,54 @@ function acsfNoteAsked(step,q){
     if(!acsfStageOpen(c[0],c[1])) return;
     TEST.plan.asked[c[0]+'|'+c[1]+'|'+c[2]]=1;
   });
+}
+
+/* ── ONE SECOND ASK AT STAGE A ──
+   A stage is judged at three quarters, and a Stage A stage of three features
+   with one wrong answer is 2 of 3. That reads `part`, acsfReviewStages closes
+   the indicator, and the learner is reported NYA and never asked Stage B. One
+   mistap ended an indicator, which is not a thing any assessor would do.
+
+   So a wrong answer at Stage A earns one more go at that feature, and the
+   better of the two attempts stands. That is not generosity: the whole of Pre
+   Level 1 is described as performance with support. The Performance Variables
+   Grid puts the learner "with an expert/mentor where highly structured support
+   and modelling is provided", and the Stage B features themselves read "may
+   require prompting". A second ask is the prompt, and the panel says so.
+
+   Stage A only. Stage B is the stage a learner has already shown Stage A to
+   reach, and the question there is whether they can go further, not whether
+   they slipped.
+
+   What does not earn one, and why each is here rather than in a comment
+   somewhere downstream:
+     - A blank or a timeout. No answer is not a wrong answer (rule 4), and
+       asking again is not going to produce one.
+     - A partly correct answer. It is already worth half, and the sloppy run,
+       right letters and no capitals, is partial nearly everywhere, so retrying
+       partials would re-ask most of the typed rounds in the test.
+     - A round whose answer cannot change between two asks: My Learning, and
+       anything the learner declined (rule 5a). Asking somebody their goal
+       twice is not two observations.
+     - Write Two Sentences. It is the slowest question in the test and rule 5b
+       names it by name.
+   One per feature, ever, which is also what makes the run terminate. */
+function acsfNoteRetry(step,q,tier,timedOut,ans){
+  if(!TEST||!TEST.plan) return;
+  if(tier!=='wrong'||timedOut) return;
+  if(!answerGiven(q,ans)) return;
+  if(isOpenQ(q)||q&&q.freeText) return;
+  if(q&&q.declines&&q.declines.some(function(d){ return normalize(d)===normalize(ans); })) return;
+  const plan=TEST.plan, feats=[];
+  ((q&&q.acsf)||acsfClaimsFor(step)).forEach(function(c){
+    if(c[1]!=='PLA') return;
+    if(plan.done[c[0]+'|PLA']||plan.stage[c[0]]!=='PLA') return;
+    const key=c[0]+'|PLA|'+c[2];
+    if(plan.retried[key]) return;
+    plan.retried[key]=1;
+    feats.push(key);
+  });
+  if(feats.length) plan.retry.push({step:step, feats:feats, was:qKey(q)});
 }
 /* What the round card says a level check is doing, in place of a rung label. */
 function acsfProgressLabel(){
@@ -8808,7 +8997,11 @@ function acsfCredit(step,tier,q,ans){
      the question however many of that stage's features it happens to show.
      The staircase's mercy rule counts questions; `seen` counts features, and
      one question can carry several. */
-  if(TEST.plan){
+  /* A second ask is not a second question against the stage. plan.qs arms the
+     mercy rule, and letting a retry advance it would close stages sooner,
+     which is the opposite of what the retry is for. */
+  const again=(q&&q.retryOf)||null;
+  if(TEST.plan&&!again){
     const once={};
     claims.forEach(function(c){
       const pk=c[0]+'|'+c[1];
@@ -8827,9 +9020,24 @@ function acsfCredit(step,tier,q,ans){
     const worth=c[4]?(!declined&&tier==='correct'?1:0):half;
     const b=TEST.ev.byInd[c[0]]||(TEST.ev.byInd[c[0]]={});
     const s=b[c[1]]||(b[c[1]]={seen:0,right:0,why:{}});
-
+    const w0=s.why[c[2]];
+    /* The feature this question was dealt a second time to settle. The second
+       answer revises the first rather than being counted beside it: one
+       observation per feature, which is the shape everything downstream reads
+       (rule 3), and the better of the two attempts is the one that stands.
+       `prompted` is what the panel prints, because "shown, on the second ask"
+       is a true and useful thing for a teacher to know, and it is the same
+       thing the Stage B features mean by "may require prompting".
+         Only where the question carries retryOf. The repeats the run makes on
+       purpose, three signs and three messages and Copy the Name once for each
+       stage, keep accumulating: those are separate observations (rule 5b). */
+    if(again&&w0&&again.indexOf(c[0]+'|'+c[1]+'|'+c[2])>=0){
+      if(worth>w0.ok){ s.right+=worth-w0.ok; w0.ok=worth; }
+      w0.prompted=1;
+      return;
+    }
     s.seen++; s.right+=worth;
-    const w=s.why[c[2]]||(s.why[c[2]]={n:0,ok:0,partial:!!c[3]});
+    const w=w0||(s.why[c[2]]={n:0,ok:0,partial:!!c[3]});
     w.n++; w.ok+=worth;
   });
 }
@@ -8879,7 +9087,7 @@ function acsfStepKey(st){ return st.type+(st.mc?'|mc':'|w')+(st.from!=null?'|'+s
    round in one draw is drawn again rather than dealing a short round. */
 function testQuestions(step,n){
   const draw=()=>isGenBank(step.type)?drawGen(step.type,n,step.from||0)
-                                     :getQuestions(step.type,n);
+                                     :getQuestions(step.type,n,step.from);
   let qs=draw();
   for(let i=0;qs.length<n&&i<4;i++) qs=qs.concat(draw());
   return qs.slice(0,n);
@@ -8894,7 +9102,37 @@ function testStartRound(){
     // bank, so the options are attached per question: within a round a tap
     // round and a typed round can sit side by side.
     qs=[];
-    acsfPickNext(TEST_PER_ROUND).forEach(function(st){
+    /* Second asks first, and they take a slot in the round rather than adding
+       one, so a learner who is finding it hard gets a shorter round of
+       questions they have already met rather than a longer one.
+       A retry is dropped where the stage has closed since it was queued,
+       because every path that puts a question in front of a learner is gated
+       on the staircase and not just the picker (rule 7), and where the bank
+       hands back
+       the very question that was just missed, because asking the identical
+       question again is not a second observation (rule 11). */
+    const again=(TEST.plan&&TEST.plan.retry||[]).splice(0,TEST_PER_ROUND);
+    again.forEach(function(r){
+      const live=r.feats.filter(function(k){
+        const ind=k.slice(0,2);
+        return !TEST.plan.done[ind+'|PLA']&&TEST.plan.stage[ind]==='PLA'; });
+      if(!live.length) return;
+      /* Drawn several and the first that is not the question they just got
+         wrong. Asking the identical question again is not a second
+         observation (rule 11), but taking one draw and dropping the retry
+         when it collided lost the second ask silently: a bank of a dozen
+         signs collides often enough that a learner could be closed at Stage A
+         holding a second ask that was thrown away. Only a bank that cannot
+         deal anything else drops it now. */
+      const q=testQuestions(r.step,4).find(function(x){ return qKey(x)!==r.was; });
+      if(!q) return;
+      if(r.step.mc) attachMcChoices([q],r.step.type);
+      // No acsfNoteAsked: the feature was marked asked the first time, and
+      // marking it again would say nothing.
+      q.retryOf=live;
+      qs.push(q); TEST.roundSteps.push(r.step);
+    });
+    acsfPickNext(TEST_PER_ROUND-qs.length).forEach(function(st){
       const q=testQuestions(st,1)[0];
       if(!q) return;
       if(st.mc) attachMcChoices([q],st.type);
@@ -8956,6 +9194,10 @@ function testRecord(tier,pts,timedOut,ans){
   else if(!gave) TEST.ev.blanks=(TEST.ev.blanks||0)+1;
   else { TEST.ev.attempts++; acsfNoteMode(currentStudentQ); }
   acsfCredit(step,tier,currentStudentQ,ans);
+  // And whether a wrong answer at Stage A has earned a second ask. Here rather
+  // than inside acsfCredit because this is where timedOut and answerGiven are
+  // already in hand, and both are part of the decision.
+  acsfNoteRetry(step,currentStudentQ,tier,timedOut,ans);
   // Also keep the run's answers by skill, for the report at the end. A rung is
   // a game, and every game belongs to one skill (GAME_INFO), so a ladder that
   // climbs through several games crosses several skills — the whole-app test
@@ -9302,7 +9544,8 @@ function acsfRow(ind,byInd,sig){
       }
       Object.keys(s.why||{}).forEach(function(k){
         row.why.push({lvl:lvl,text:k,n:s.why[k].n,ok:s.why[k].ok,
-                      partial:!!s.why[k].partial,run:s.why[k].run||null});
+                      partial:!!s.why[k].partial,run:s.why[k].run||null,
+                      prompted:!!s.why[k].prompted});
       });
     } else if(climbing&&acsfAllFeatures(ind,lvl).length&&acsfLvlNo(lvl)<=acsfLvlNo(meta.ceiling)){
       // Features exist at this level and none of them was asked, so there is
@@ -9426,7 +9669,13 @@ function acsfNum(n){ return n===Math.floor(n)?String(n):n.toFixed(1); }
    went near says that instead of a number. */
 function acsfWhyCount(w){
   if(w.notAsked) return 'not asked in this run';
-  return acsfNum(w.ok)+' of '+w.n+(typeof w.run==='string'?' '+w.run:'');
+  /* A feature the learner missed and was asked again says so. Pre Level 1 is
+     described throughout as performance with support, and the Stage B features
+     themselves read "may require prompting", so a teacher reading "on the
+     second ask" is reading the thing the framework asks them to notice, not a
+     demerit. Saying nothing would print a plain pass over two attempts. */
+  return acsfNum(w.ok)+' of '+w.n+(typeof w.run==='string'?' '+w.run:'')
+    +(w.prompted?', on the second ask':'');
 }
 
 /* ══════════════ LEVEL CHECK — THE PANEL ══════════════
@@ -9993,16 +10242,33 @@ function renderMcChoices(q){
     const pic=emo(word);
     const btn=document.createElement('button');
     const isSentence=!art&&!pic&&/\s/.test(word);
-    btn.className='mc-choice'+((art||(usePics&&pic))?'':' mc-text')+(isSentence?' mc-sentence':'');
+    /* A round says whether its options may be heard. It is not worked out here
+       because the answer is about the round and not about the indicator: on a
+       greeting, hearing "Goodbye" is the help a Stage A learner needs, and on
+       Sight Words, where the task is to match a word you already heard to the
+       way it is written, hearing the options is the whole answer. Where the
+       picture already carries the option, the picture is the help. */
+    const say=q.hearOpts&&!art&&!(usePics&&pic);
+    btn.className='mc-choice'+((art||(usePics&&pic))?'':' mc-text')
+      +(isSentence?' mc-sentence':'')+(say?' has-say':'');
     btn.dataset.word=word;
+    const chip=say?'<span class="mc-say" aria-hidden="true">🔊</span>':'';
     if(art){
-      btn.innerHTML='<span class="mc-pic">'+art+'</span><span class="mc-label">'+word+'</span>';
+      btn.innerHTML=chip+'<span class="mc-pic">'+art+'</span><span class="mc-label">'+word+'</span>';
     } else if(usePics&&pic){
-      btn.innerHTML='<span class="mc-pic">'+pic+'</span><span class="mc-label">'+word+'</span>';
+      btn.innerHTML=chip+'<span class="mc-pic">'+pic+'</span><span class="mc-label">'+word+'</span>';
     } else {
-      btn.innerHTML='<span class="mc-label">'+word+'</span>';
+      btn.innerHTML=chip+'<span class="mc-label">'+word+'</span>';
     }
     btn.onclick=()=>selectMc(word,btn);
+    if(say){
+      const s=btn.querySelector('.mc-say');
+      /* Not counted as a replay. TEST.ev.replays stands for asking to hear the
+         question again, which is one of the three things .02 reads as a
+         learning strategy; hearing an option is reading help, and counting it
+         there would put a second meaning on the same number. */
+      s.addEventListener('click',function(e){ e.stopPropagation(); speakTTS(word); });
+    }
     box.appendChild(btn);
   });
 }

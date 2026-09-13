@@ -56,9 +56,18 @@ questions for `.03` are never put to a learner who has not shown Stage A `.03`.
 That holds even when a question dealt for another indicator happens to claim a
 level the run has not reached: the claim is not counted.
 
+A wrong answer at Stage A is asked once more, from a different question in the
+same bank, and the better of the two attempts stands: a stage of three features
+with one slip in it was 2 of 3, under the three-quarters bar, so a single
+mistap closed the indicator at NYA and Stage B was never asked. The second
+answer revises the first rather than being counted beside it, and the panel
+prints *on the second ask* beside the feature, which is what the Stage B
+wording *"may require prompting"* describes. Stage A only, one per feature.
+
 The run therefore has no fixed length. Measured over full runs: **17
-questions** for a learner who shows nothing, and **60** for one who clears
-every stage. `node tools/checks/check.js run` prints both.
+questions** for a learner who shows nothing, **60** for one who clears every
+stage, and **34** for one who answers wrong throughout, where every Stage A
+feature comes back once. `node tools/checks/check.js run` prints them.
 
 Two kinds of question are deliberately outside the pool:
 
@@ -80,6 +89,23 @@ Two kinds of question are deliberately outside the pool:
 
 Grammar Unscramble is also out: its only claim was the Level 1 *"uses basic
 structures and limited verb tenses"*, which went when Level 1 Writing did.
+
+## Reading is not asked for twice
+
+A round outside Reading does not make the learner read to answer it. The
+listening, numeracy and digital rounds were all answered by reading their
+options. A greeting had four written replies, and a picture of a laptop had
+*charger / mouse / laptop / camera*, so a learner at Stage A who cannot read
+them had the wrong answer recorded against `.08` to `.13` when what failed was
+`.03`. Those options now carry a chip that speaks them, or a picture, or are a
+numeral. They stay silent wherever hearing the option would hand the answer
+over: Sight Words, Tap the Number, Letter Names, and anything whose task is
+matching a spoken form to a written one. There the reading *is* the feature.
+
+Each step also deals only what the stage it serves names: whole dollars and no
+cents at Stage A, *up* and *down* and not *behind*, whole hours and not quarter
+hours, a short list of extremely familiar words rather than *necklace* and
+*humid*, and question words rather than *Do you work?*
 
 A feature no pool step can reach is not listed on the panel at all. "Not asked
 in this run" says another run might have asked it, and for a feature the level

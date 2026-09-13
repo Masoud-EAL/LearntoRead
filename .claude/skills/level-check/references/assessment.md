@@ -106,12 +106,33 @@ A screenshot of the teacher panel is a dense thing. What to look at first:
 - **An indicator with far more questions than its neighbours** is rule 5: the
   picker and the round disagree about what the step showed.
 
+## A second ask at Stage A
+
+A wrong answer at Stage A is asked once more, from a different question in the
+same bank, and the better of the two attempts stands. The second answer revises
+the first rather than being counted beside it, so a feature is still one
+observation, and the panel prints "on the second ask" beside it.
+
+This is not the app being generous. Pre Level 1 is described throughout as
+performance with support: the Performance Variables Grid puts the learner
+"with an expert/mentor where highly structured support and modelling is
+provided", and the Stage B features themselves read "may require prompting".
+A teacher reading "shown, on the second ask" is reading the thing the framework
+asks them to notice.
+
+Stage A only, one per feature, and only for a wrong answer that was actually
+given: not a blank, not a timeout, not a partly correct answer, not a question
+whose answer cannot change between two asks. Rule 12d in `invariants.md` has
+the whole list and the reason for each.
+
 ## Run length
 
 There is no fixed length, by design. Measured over full runs: about 18
 questions for a learner who shows nothing, and about 68 for one who clears every
 stage. Both moved up when `.12` started asking its Stage B questions, which no
-run had ever reached.
+run had ever reached. A learner who answers wrong throughout is asked about
+twice as many as one who answers nothing, because every Stage A feature they
+miss comes back once.
 `node tools/checks/check.js run` prints both, so if a change moves them you
 will see it. `ACSF_MAX_QUESTIONS` (150) is a guard against a bank that cannot
 deal what a stage still needs, not a target.
