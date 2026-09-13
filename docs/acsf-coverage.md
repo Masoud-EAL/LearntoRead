@@ -102,6 +102,13 @@ numeral. They stay silent wherever hearing the option would hand the answer
 over: Sight Words, Tap the Number, Letter Names, and anything whose task is
 matching a spoken form to a written one. There the reading *is* the feature.
 
+Every round also reads its visible question aloud, so a numeracy or digital
+item is not answered by reading. "How many tens in 17?" and "How much is Rice?"
+were text on a screen and nothing else; the table and the numeral stay there to
+be read, because that is the task, but the question is now spoken and carries a
+Hear it again button. The one round still silent when tapped is Question Words,
+where the question is the gap sentence itself.
+
 Each step also deals only what the stage it serves names: whole dollars and no
 cents at Stage A, *up* and *down* and not *behind*, whole hours and not quarter
 hours, a short list of extremely familiar words rather than *necklace* and

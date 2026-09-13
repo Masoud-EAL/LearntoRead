@@ -416,7 +416,34 @@ separately:
 Put In Order showed its instruction and never said it. A learner who can order
 coins perfectly well had no way to find out that ordering was the task. Three
 other rounds were silent the same way: Tens and Ones, Find the Date, and Copy
-the Code. So: a round outside Reading and Writing says what to do out loud.
+the Code.
+
+Fixing those four bank by bank was the instance and not the rule, and the
+reporter found the rest on the next run:
+
+> "Also how many tens in ... If it's numeracy, it shouldn't be solely reliant
+> on reading. How much is ... is also just text. The question should be
+> spoken."
+
+The rule is **every round reads its visible question aloud**, and it lives in
+one line of `speechFor`. What was there said "a multiple choice round with
+nothing of its own to say has nothing to say: there is no field below that
+would be right to read out", and that is the mistake: there is one, and it is
+`Q.question`. Reading it aloud cannot give anything away, because a learner
+looking at the screen has it already. That is the same reasoning `leaks` uses
+to allow a spoken prompt that matches what is written.
+
+The instruction is not the text under test. The table, the sign, the message,
+the model word and the calendar are, and they stay on the screen to be read.
+Question Words is the one round still silent when tapped, and rightly: there
+the question field is the gap sentence itself, so reading it out would be
+reading the item.
+
+`noListen` changed meaning with it. Seventeen rounds carry it, and every one
+set it to stop the old guessing branches reading the wrong thing: the word you
+are copying, the sentence you are ordering. None set it to keep an instruction
+secret. It means "do not guess what this round would say" now, and the visible
+question is still read. Banks that speak went from 40 to 53.
 
 Put In Order was silent because it carried `mute`, which was the blunt way to
 stop `speechFor` falling through to its unscramble branch, where it reads
@@ -426,7 +453,9 @@ answer applied to the instruction as well, and `mute` has no users left.
 
 The check holds three halves now: a round that speaks its options may not speak
 its answer; a step whose claims all fall in `.08` to `.13` may not leave an
-option that can only be read; and such a step says what to do out loud. A
+option that can only be read; and such a step says what to do out loud. The
+last of those is a floor under the `speechFor` rule rather than the whole of
+it, because the pool is not every round in the app. A
 numeral, a time, an amount and an ordinal symbol are not reading: recognising
 them is the numeracy feature itself, which is also why Tens and Ones speaks its
 question and not its options.
@@ -443,6 +472,13 @@ that shape is `unscramble`, so the padding came from the sentence bank. Three
 options that are not orderings at all point at the answer as plainly as any
 spoken leak, and `leaks` now holds that every option of an ordering round is
 the same tiles in a different order. A round with two real options offers two.
+
+Removing that padding uncovered a third: `buildOrderChoices` told its options
+apart by the raw string while the answer is marked with `normalize`, and for
+number tiles those disagree. "3 33 63" and "33 3 63" are different orderings
+and both normalize to "33363", so one of the wrong options was marked correct.
+It is rule 9's "$3.20 and $320 are one option" in a bank nobody had looked at
+for it, and it is why options are deduped the way they are marked.
 
 It also caught what the report did not mention. "Good morning." was answered by
 "Good morning." was answered by the greeting handed straight back, so the

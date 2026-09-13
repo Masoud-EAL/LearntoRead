@@ -5151,11 +5151,16 @@ function attachMcChoices(questions,type){
 function buildOrderChoices(q){
   const correct=q.answer;
   const words=Array.isArray(q.words)&&q.words.length?q.words:correct.trim().split(/\s+/);
-  const seen=new Set([correct]),wrong=[];
+  /* Told apart the way the answer is marked, which is `normalize`, and not by
+     the raw string. The two are not the same for number tiles: "3 33 63" and
+     "33 3 63" are different orderings and both normalize to "33363", so one of
+     the wrong options was marked correct. Same fault as "$3.20" and "$320"
+     being one option, in a bank nobody had looked at for it. */
+  const seen=new Set([normalize(correct)]),wrong=[];
   let tries=0;
   while(wrong.length<3&&tries<60){
-    const s=shuffle([...words]).join(' ');
-    if(!seen.has(s)){ seen.add(s); wrong.push(s); }
+    const s=shuffle([...words]).join(' '), k=normalize(s);
+    if(!seen.has(k)){ seen.add(k); wrong.push(s); }
     tries++;
   }
   /* Two tiles have exactly two orderings, and three have six, so a short list
@@ -10616,9 +10621,23 @@ function speechFor(Q){
      noListen for exactly that reason. */
   if(Q.qword) return (Array.isArray(Q.choices)&&Q.choices.length)?null
                     :(Q.sentence||'').replace('___',Q.blank);
-  // Everything past here is a round that has to be guessed at, and noListen is
-  // how a round says not to.
-  if(Q.noListen) return null;
+  /* The visible question, read out. It is the answer to "what should a round
+     with nothing of its own to say, say": the thing already on the screen.
+     Reading it aloud cannot give anything away, because a learner looking at
+     the screen has it already, which is the same reasoning `leaks` uses to
+     allow a prompt that matches what is written.
+       This is what was missing. "How many tens in 17?" and "How much is Rice?"
+     are numeracy questions, and a learner who could do the numeracy was being
+     stopped by the reading. The instruction is not the text under test: the
+     table, the sign, the message, the model word and the calendar are, and
+     they stay on the screen to be read. */
+  const asked=typeof Q.question==='string'?Q.question.replace(/^🔊\s*/,'').trim():'';
+  /* `noListen` means "do not guess what this round would say", not "say
+     nothing". Every round below this line is one the old branches would have
+     guessed at, and each of the seventeen rounds carrying the flag set it to
+     stop the wrong thing being read: the word you are copying, the sentence
+     you are ordering. None of them set it to keep their instruction secret. */
+  if(Q.noListen) return asked||null;
   if(Q.type==='letter') return Q.letter;
   if(Q.type==='oddone') return 'Tap the one that does not belong.';
   // Money speaks its instruction: the amount is the whole task, and on a short
@@ -10627,11 +10646,13 @@ function speechFor(Q){
   // a pre-reader gets it at all. Form stays a reading task; the clock is the
   // listening half of the time unit, so it speaks the target as "half past seven".
   if(Q.type==='shop') return moneySpeech(Q.question);
-  if(Q.type==='form') return null;
+  // The form speaks its instruction and not its chips: which detail goes in
+  // which field is the task, and the chips are on the screen to be read.
+  if(Q.type==='form') return asked||null;
   if(Q.type==='clockset') return 'Set the clock to '+Q.words;
-  // A multiple choice round with nothing of its own to say has nothing to say:
-  // there is no field below that would be right to read out.
-  if(Q.type==='mc') return null;
+  // A multiple choice round says its question. There is no field below this
+  // one that would be right to read out, but the question itself always is.
+  if(Q.type==='mc') return asked||null;
   // Speaking asks the question out loud — that is the whole prompt. The answer
   // is what the learner is building, so it is never spoken here.
   const text=Q.type==='sentence'?Q.sentence.replace('___',Q.blank):Q.type==='unscramble'?Q.sentence:Q.type==='speak'?Q.question:Q.word;
