@@ -407,10 +407,42 @@ the ordinals round that says "Tap the first one" out loud. Where a bank already
 puts a picture on the option, as Listen and Do does through `q.art`, the
 picture is the help and the chip would be the leak.
 
-The check holds both halves: a round that speaks its options may not speak its
-answer, and a step whose claims all fall in `.08` to `.13` may not leave an
-option that can only be read. A numeral, a time, an amount and an ordinal
-symbol are not reading: recognising them is the numeracy feature itself.
+**The prompt is the same rule seen from the other side**, and it was reported
+separately:
+
+> "What about 'smallest to biggest'. Shouldn't the instructions be read to the
+> user?"
+
+Put In Order showed its instruction and never said it. A learner who can order
+coins perfectly well had no way to find out that ordering was the task. Three
+other rounds were silent the same way: Tens and Ones, Find the Date, and Copy
+the Code. So: a round outside Reading and Writing says what to do out loud.
+
+Put In Order was silent because it carried `mute`, which was the blunt way to
+stop `speechFor` falling through to its unscramble branch, where it reads
+`q.sentence` and `q.sentence` is the tiles already in order. Naming what to
+speak, `say: prompt`, is the fix. Silencing the round was a rule about the
+answer applied to the instruction as well, and `mute` has no users left.
+
+The check holds three halves now: a round that speaks its options may not speak
+its answer; a step whose claims all fall in `.08` to `.13` may not leave an
+option that can only be read; and such a step says what to do out loud. A
+numeral, a time, an amount and an ordinal symbol are not reading: recognising
+them is the numeracy feature itself, which is also why Tens and Ones speaks its
+question and not its options.
+
+The same report turned up two more faults in the same round, which is the usual
+shape. Ordering 5c, 10c and 50c was being credited to a Stage A feature whose
+own words are "whole dollar notes and coins up to $10", and the `register` rule
+that catches "$6.50" had missed "50c" because it read only for a decimal point.
+And the four options were "3 9", "9 3", "I was tired on Sunday night." and
+"She is from Vietnam too.": two tiles have only two orderings, and
+`buildOrderChoices` padded the rest out of `poolFor(q.type)`, where `q.type` is
+the *shape* of the question and not the bank it came from. For Put In Order
+that shape is `unscramble`, so the padding came from the sentence bank. Three
+options that are not orderings at all point at the answer as plainly as any
+spoken leak, and `leaks` now holds that every option of an ordering round is
+the same tiles in a different order. A round with two real options offers two.
 
 It also caught what the report did not mention. "Good morning." was answered by
 "Good morning." was answered by the greeting handed straight back, so the

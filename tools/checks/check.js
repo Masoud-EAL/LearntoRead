@@ -565,8 +565,26 @@ check('leaks', 'no question speaks or shows its own answer, and no two options c
             }
             const dup = norm.filter((c, i) => norm.indexOf(c) !== i);
             if (dup.length) out.push(g + ': duplicate options [' + q.choices.join(' | ') + ']');
+            /* Every option of an ordering round is the same tiles in a
+               different order. Put In Order offered "3 9", "9 3", "I was
+               tired on Sunday night." and "She is from Vietnam too.", because
+               two tiles have only two orderings and the rest were padded from
+               the bank that shares this question's *shape* rather than its
+               content. Three options that are not orderings at all point at
+               the answer as plainly as any spoken leak. */
+            if (q.type === 'unscramble' || q.type === 'gramscramble') {
+              const tiles = function (x) {
+                return String(x).trim().split(/\s+/).map(w => normalize(w)).sort().join(' ');
+              };
+              const want = tiles(ans);
+              const odd = q.choices.filter(c => tiles(c) !== want);
+              if (odd.length) {
+                out.push(g + ': ' + odd.length + ' of [' + q.choices.join(' | ') +
+                         '] are not orderings of ' + ans);
+              }
+            }
           }
-          if (/🔊|hear|listen/i.test(asked) && !say && !q.mute) {
+          if (/🔊|hear|listen/i.test(asked) && !say) {
             out.push(g + ': asks the learner to listen but plays nothing. ' + asked.trim());
           }
         });
@@ -907,8 +925,13 @@ check('register', 'the level check stays at the register it is for', async ctx =
       qs.forEach(function (q) {
         const said = String(q.say || '');
         const face = [q.answer].concat(q.choices || []).join(' ');
-        if (money && (/\bcents?\b/i.test(said) || /\d+\.(?!00\b)\d\d/.test(face))) {
-          over.push(k + ' deals an amount with cents: ' + (said || face).slice(0, 40));
+        // "$6.50" and "50c" are the same fault wearing different clothes, and
+        // reading only for a decimal point let Put In Order deal 5c, 10c and
+        // 50c against "whole dollar notes and coins up to $10".
+        const spoken = /\bcents?\b/i.test(said);
+        const shown = /\d+\.(?!00\b)\d\d/.test(face) || /\b\d{1,2}c\b/.test(face);
+        if (money && (spoken || shown)) {
+          over.push(k + ' deals an amount with cents: ' + (spoken ? said : face).slice(0, 40));
         }
         if (time && /\b\d{1,2}:(?!00\b)\d\d/.test(face)) {
           over.push(k + ' deals a time that is not a whole hour: ' + face.slice(0, 40));
@@ -962,6 +985,15 @@ check('options', 'an option a pre-level learner cannot read can be heard', async
       const nonReading = claims.length &&
         claims.every(c => NONREADING.indexOf(c[0]) >= 0);
       qs.forEach(function (q) {
+        /* 3. And the same for the prompt. A round outside Reading and Writing
+              says what to do out loud: "Smallest to biggest" was shown and
+              never spoken, so a learner who could order coins perfectly well
+              had no way to learn that ordering was the task. The options half
+              of this rule is below; they are one rule seen from two sides. */
+        if (nonReading && !speechFor(q)) {
+          bad.push(acsfStepKey(st) + ' never says what to do: "' +
+                   String(q.question || q.label || '').slice(0, 40) + '"');
+        }
         const opts = q.choices || [];
         if (!opts.length) return;
         /* 1. Hearing an option may not hand the answer over. Sight Words says

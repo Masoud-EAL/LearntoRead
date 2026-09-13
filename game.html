@@ -3396,7 +3396,14 @@ function genOrderQuestions(n,hi,kind){
     } else if(k==='months'){
       const st=randInt(0,9); items=SPELL_MONTHS.slice(st,st+3); prompt='Put the months in order';
     } else if(k==='money'){
-      const d=shuffle(DENOMS.filter(function(x){ return x.c<=hi*100; })).slice(0,3)
+      /* Whole dollars at the lower range, because the Stage A feature says so
+         in its own words: "Orders: Australian whole dollar notes and coins up
+         to $10 AND two whole numbers between 1 and 10". Ordering 5c, 10c and
+         50c was being credited to it. Cents belong to Stage B, whose feature
+         is "Orders in increasing value: Australian whole dollar notes and
+         coins AND three whole numbers between 1 and 100". */
+      const d=shuffle(DENOMS.filter(function(x){
+        return x.c<=hi*100&&(hi>10||x.c%100===0); })).slice(0,3)
               .sort(function(a,b){ return a.c-b.c; });
       items=d.map(function(x){ return x.label; }); prompt='Smallest to biggest';
     } else {
@@ -3405,7 +3412,14 @@ function genOrderQuestions(n,hi,kind){
       items=Object.keys(set).map(Number).sort(function(a,b){ return a-b; }).map(String);
       prompt='Smallest to biggest';
     }
-    out.push({type:'unscramble', noListen:true, mute:true, label:'PUT IN ORDER — drag the tiles',
+    /* The instruction is the whole of the question here: the tiles say what
+       they are, and "Smallest to biggest" says what to do with them. Muting
+       the round left a learner who cannot read it with no way to find out.
+         `mute` was the blunt way to stop speechFor falling through to its
+       unscramble branch, which reads q.sentence, and q.sentence is the tiles
+       already in order. Naming what to speak is the fix; silencing everything
+       was a rule about the answer applied to the instruction as well. */
+    out.push({type:'unscramble', say:prompt, label:'PUT IN ORDER: drag the tiles',
       tileNoun:'order', tileHint:'Tap (or drag) to put them in order',
       sentence:items.join(' '),
       words:shuffle(items.slice()), question:prompt, answer:items.join(' ')});
@@ -3426,9 +3440,16 @@ function genPlaceValueQuestions(n){
     [String(askTens?ones:tens),String(v).slice(0,1),String(v).slice(1),
      String(randInt(0,9))].forEach(function(x){ if(c.length<4&&c.indexOf(x)<0) c.push(x); });
     while(c.length<4){ const x=String(randInt(0,9)); if(c.indexOf(x)<0) c.push(x); }
-    out.push({type:'mc', noListen:true,
+    const ask='How many '+(askTens?'tens':'ones')+' in '+v+'?';
+    // Said, not only shown. The numeral is the picture and the question is the
+    // instruction: a learner who cannot read "How many tens" is being asked a
+    // reading question about a numeracy feature.
+    /* No chip on the options: they are single digits, and a digit is not
+       something a learner has to read. Speaking them would also read "4" over
+       a question about 41, which is the answer said out loud. */
+    out.push({type:'mc', say:ask,
       icon:'<span style="'+NUM_BIG+'">'+v+'</span>',
-      question:'How many '+(askTens?'tens':'ones')+' in '+v+'?',
+      question:'🔊 '+ask,
       answer:correct, choices:shuffle(c)});
   }
   return out;
@@ -3632,8 +3653,11 @@ function genCalendarQuestions(n){
        away: what the learner has to work out is which day the date falls on,
        and that is in the calendar, not in the option. Reading "Wednesday" was
        a second task nobody asked for. */
-    out.push({type:'mc', noListen:true, icon:grid, hearOpts:true,
-      question:askDay?('What day is '+name+' '+date+'?'):'Which month is this?',
+    const ask=askDay?('What day is '+name+' '+date+'?'):'Which month is this?';
+    // Said as well as shown, for the same reason the options are: the calendar
+    // is the task and reading the question is not part of it.
+    out.push({type:'mc', say:ask, icon:grid, hearOpts:true,
+      question:'🔊 '+ask,
       answer:correct.toLowerCase(), choices:shuffle([correct].concat(alts))});
   }
   return out;
@@ -3994,9 +4018,11 @@ function genSafeQuestions(n,from){
       // risk protection code; on a phone it is the PIN, and copying one
       // correctly is the skill.
       const code=String(randInt(1000,9999));
-      out.push({type:'typein', label:'COPY THE CODE', noListen:true,
+      /* The instruction is spoken but the code is not: "Type this code" says
+         what to do, and reading the digits off the screen is the task. */
+      out.push({type:'typein', label:'COPY THE CODE', say:'Type this code',
         icon:'<span class="digi-code">'+code+'</span>',
-        question:'Type this code', placeholder:'4 numbers', answer:code});
+        question:'🔊 Type this code', placeholder:'4 numbers', answer:code});
     }
   }
   return out;
@@ -5132,12 +5158,15 @@ function buildOrderChoices(q){
     if(!seen.has(s)){ seen.add(s); wrong.push(s); }
     tries++;
   }
-  // Very short sentences can't yield 3 distinct re-orderings — pad with other
-  // sentences from the same bank so there are always four options.
-  if(wrong.length<3){
-    const pool=shuffle(poolFor(q.type).map(x=>x.answer));
-    for(const a of pool){ if(wrong.length>=3) break; if(!seen.has(a)){ seen.add(a); wrong.push(a); } }
-  }
+  /* Two tiles have exactly two orderings, and three have six, so a short list
+     cannot fill four options. It used to be padded out of `poolFor(q.type)`,
+     but `q.type` is the shape of the question and not the bank it came from:
+     for Put In Order that is 'unscramble', so the padding came from the
+     sentence bank and the learner was asked whether "3 9", "9 3", "I was
+     tired on Sunday night." or "She is from Vietnam too." was smallest to
+     biggest. Three of the four were not orderings at all, which hands the
+     answer over as surely as any other leak.
+     A round with two real options offers two. Safe or Private already does. */
   let prompt=shuffle([...words]).join(' ');
   if(prompt===correct&&words.length>1) prompt=shuffle([...words]).join(' ');
   q.promptText=prompt;
@@ -10568,9 +10597,12 @@ function speechFor(Q){
   if(!Q) return null;
   // Arranging words already on the screen is reading, not listening.
   if(Q.type==='gramscramble'||Q.type==='translate') return null;
-  // Some rounds must never speak, because the thing that would be spoken is
-  // the answer: putting numbers in order is the obvious one.
-  if(Q.mute) return null;
+  /* There was a `mute` flag here, for rounds where the thing that would be
+     spoken is the answer, and putting numbers in order was its only user. It
+     silenced the instruction along with the tiles, so "Smallest to biggest"
+     was shown to learners who cannot read it and never said. The answer to
+     "this round would speak the wrong thing" is to say what it should speak,
+     which is the next line, not to silence it. */
   // A question can carry its own spoken line. The banks below this one each
   // speak a different part of themselves (the word, the sentence, the money
   // instruction), which worked while every bank was one of a known handful.
