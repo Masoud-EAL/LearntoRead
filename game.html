@@ -9925,8 +9925,9 @@ function acsfSaveRun(){
      would be the wrong way round, so the transcripts are given back one at a
      time, oldest first, and the profiles stay. The newest run's own questions
      go last and on a copy, because the panel on the screen is reading them. */
-  let give=runs.length;
-  while(give-- >0&&!acsfStore.set(ACSF_STORE_KEY,JSON.stringify(runs))){
+  while(!acsfStore.set(ACSF_STORE_KEY,JSON.stringify(runs))){
+    // The oldest transcript still stored. Nothing left to give back means the
+    // device is full of something else and the save is not going to land.
     let i=runs.length-1;
     while(i>=0&&!((runs[i].ev||{}).qs||[]).length) i--;
     if(i<0) break;
