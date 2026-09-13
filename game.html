@@ -1591,6 +1591,10 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .acsf-acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
   position:sticky;bottom:0;padding:10px 0 4px;background:var(--bg);
   box-shadow:0 -10px 18px var(--bg);}
+/* Its own line above the buttons, and quiet: it answers a question a teacher
+   would otherwise only think to ask after the paper came out. */
+.acsf-acts-note{flex-basis:100%;text-align:center;font-size:.72rem;color:var(--muted);
+  margin-bottom:2px;}
 /* Printing is how this reaches a paper sheet, so the page has to stop being a
    dark app and become a document: no screen furniture, black on white, and a
    core skill kept whole on one page wherever it will fit. */
@@ -1628,11 +1632,13 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
      a block that does not break, so they never meet a page edge. */
   .acsf-wrap,.acsf-body,.acsf-evidence{display:block!important;max-width:none;
     overflow:visible!important;max-height:none!important;}
-  /* Said again, louder, for the same reason it is said on the screen: the line
-     above is important enough to beat the browser's rule for the hidden
-     attribute, and printing the questions nobody asked for is the one thing
-     this panel must not do behind a teacher's back. */
-  .acsf-evidence[hidden]{display:none!important;}
+  /* Paper is not the screen, and it is the thing that leaves the building. The
+     button decides what a teacher scrolls through and what goes into a paste;
+     the printed sheet is the one that gets filed and taken to the learner, and
+     it carries the verdicts and the questions behind them every time, opened
+     on screen or not. Stated against [hidden] as well, because that is the
+     rule it has to beat. */
+  .acsf-evidence,.acsf-evidence[hidden]{display:block!important;}
   .acsf-wrap>*{margin-bottom:12px;}
   .acsf-body>.acsf-group{margin-bottom:14px;}
   .acsf-evidence>.acsf-q{margin-bottom:8px;}
@@ -2474,6 +2480,9 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
          printed and copied with the rest once they have. -->
     <div class="acsf-evidence" id="acsf-evidence" hidden></div>
     <div class="acsf-acts">
+      <!-- The sheet carries the questions whether or not they are showing, so
+           the screen says so rather than letting the printer say it. -->
+      <p class="acsf-acts-note" id="acsf-ev-note">Printing always includes the questions and answers.</p>
       <button class="btn btn-teal btn-sm" id="acsf-ev-btn" onclick="toggleAcsfEvidence()">📄 Show the questions</button>
       <button class="btn btn-teal btn-sm" onclick="copyAcsfProfile()">📋 Copy</button>
       <button class="btn btn-teal btn-sm" onclick="window.print()">🖨 Print</button>
@@ -3234,12 +3243,55 @@ const DENOMS=[
   {c:500,file:'5d',label:'$5'},    {c:1000,file:'10d',label:'$10'},
   {c:2000,file:'20d',label:'$20'}, {c:5000,file:'50d',label:'$50'},
 ];
+/* What a thing costs decides when it can be named. There were ten items here
+   and every one of them was something that costs tens of dollars, while the
+   Stage A round pays one to nine whole dollars, so the level check spent its
+   money questions asking a learner to pay three dollars for shoes. A price an
+   adult cannot believe stops being a question about recognising money and
+   becomes a puzzle about what the app meant.
+     Read the List already knew this and capped its prices at $20 for it: "$98
+   for a loaf of bread would be the first thing an adult noticed instead." A
+   cap is enough there because that bank only ever names groceries. This one
+   pays up to $99.50, so instead of a cap each item says what it plausibly
+   costs and the round names something that fits the price it has just set.
+   Australian and everyday at both ends: a supermarket shelf under $10, and the
+   things a household buys once above it. The ranges overlap and leave no gap
+   between $1 and $100, counted in the fifty cent steps a change round deals,
+   which is what `prices` checks: the first thing it caught was a seam at $9.50
+   between the groceries and everything dearer. */
 const SHOP_ITEMS=[
-  {emoji:'👟',name:'shoes'},   {emoji:'🧥',name:'a jacket'}, {emoji:'🎒',name:'a bag'},
-  {emoji:'☂️',name:'an umbrella'}, {emoji:'🍳',name:'a frying pan'}, {emoji:'🧺',name:'a laundry basket'},
-  {emoji:'🪑',name:'a chair'}, {emoji:'📚',name:'books'},    {emoji:'🕰️',name:'a clock'},
-  {emoji:'🚲',name:'a bicycle'},
+  {emoji:'🍌',name:'bananas',           low:1,  high:6},
+  {emoji:'🧴',name:'soap',              low:1,  high:6},
+  {emoji:'🥛',name:'milk',              low:2,  high:5},
+  {emoji:'🍞',name:'bread',             low:2,  high:7},
+  {emoji:'🍎',name:'apples',            low:2,  high:8},
+  {emoji:'🍚',name:'rice',              low:2,  high:10},
+  {emoji:'🧦',name:'socks',             low:2,  high:10},
+  {emoji:'🫖',name:'tea',               low:3,  high:8},
+  {emoji:'🥚',name:'eggs',              low:4,  high:10},
+  {emoji:'☂️',name:'an umbrella',        low:10, high:25},
+  {emoji:'🧺',name:'a laundry basket',  low:10, high:25},
+  {emoji:'📚',name:'books',             low:10, high:40},
+  {emoji:'🕰️',name:'a clock',            low:12, high:45},
+  {emoji:'🍳',name:'a frying pan',      low:15, high:45},
+  {emoji:'🎒',name:'a bag',             low:15, high:60},
+  {emoji:'🪑',name:'a chair',           low:25, high:100},
+  {emoji:'👟',name:'shoes',             low:30, high:100},
+  {emoji:'🧥',name:'a jacket',          low:30, high:100},
+  {emoji:'🚲',name:'a bicycle',         low:60, high:100},
 ];
+/* Something this price could buy. The ranges cover every amount these rounds
+   deal, so the nearest fit is a backstop rather than a working part: it keeps
+   a learner looking at a believable shelf rather than an empty one if a future
+   price lands outside them all, and `prices` fails the moment that is true. */
+function shopItemFor(cents){
+  const d=cents/100;
+  const fits=SHOP_ITEMS.filter(function(it){ return d>=it.low&&d<=it.high; });
+  if(fits.length) return fits[Math.floor(Math.random()*fits.length)];
+  return SHOP_ITEMS.slice().sort(function(a,b){
+    return (d<a.low?a.low-d:d-a.high)-(d<b.low?b.low-d:d-b.high);
+  })[0];
+}
 function money(cents){ return '$'+(cents/100).toFixed(2); }
 /* The answer string drops the dollar sign — normalize() strips it anyway, so
    "$67.50" and "67.50" already compare equal; this just keeps stored answers tidy. */
@@ -3280,7 +3332,6 @@ function genShopQuestions(n,from,small){
   const out=[];
   const kind=from||0;
   for(let i=0;i<(n||8);i++){
-    const item=SHOP_ITEMS[Math.floor(Math.random()*SHOP_ITEMS.length)];
     if(kind===1||(kind===0&&i%2===0)){
       /* Pay the exact amount. Prices land in the unit's 50-100 range, in 50c
          steps so the 50c piece stays in play. `small` moves the whole game
@@ -3294,7 +3345,8 @@ function genShopQuestions(n,from,small){
          "Monetary amounts up to $100, e.g. 50c, $24.50". */
       const cents=small?randInt(1,9)*100
                        :((50+Math.floor(Math.random()*50))*100+(Math.random()<0.5?50:0));
-      out.push({type:'shop',mode:'pay',cents:cents,answer:moneyAnswer(cents),
+      const item=shopItemFor(cents);
+      out.push({type:'shop',mode:'pay',cents:cents,answer:moneyAnswer(cents),item:item.name,
         icon:'<div class="shop-item">'+item.emoji+'<span class="shop-name">'+item.name
              +'</span><span class="price-tag">'+money(cents)+'</span></div>',
         question:'Pay '+money(cents)+' for '+item.name});
@@ -3315,8 +3367,11 @@ function genShopQuestions(n,from,small){
       const span=(n.max-n.min)/100;
       const price=(Math.floor(Math.random()*span)*100)+n.min+(Math.random()<0.5?50:0);
       const change=n.cents-price;
+      // Named for the price on the tag, not for the note handed over: what is
+      // being bought is what costs $8.50, whatever it was paid with.
+      const item=shopItemFor(price);
       out.push({type:'shop',mode:'change',cents:change,paid:n.cents,price:price,
-        answer:moneyAnswer(change),
+        answer:moneyAnswer(change),item:item.name,
         // Show the note handed over as well as the price — the sum only makes
         // sense if you can see both sides of it.
         icon:'<div class="shop-item">'+item.emoji+'<span class="shop-name">'+item.name
@@ -10093,6 +10148,7 @@ function renderAcsfEvidence(ev){
      Offering a button that opens an empty page would read as a fault, so the
      button is simply not there. */
   btn.style.display=qs.length?'':'none';
+  document.getElementById('acsf-ev-note').style.display=qs.length?'':'none';
   acsfEvidenceOn=false;
   box.hidden=true;
   btn.textContent='📄 Show the questions';

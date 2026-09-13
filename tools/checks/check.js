@@ -451,11 +451,19 @@ check('printable', 'the teacher panel prints as a document, not as an app', asyn
     openAcsfPanel();
   });
   await page.emulateMedia({ media: 'print' });
+  /* The sheet carries both halves whether or not the questions were opened on
+     the screen first. It is the copy that gets filed and taken to the learner,
+     and a teacher who presses Print without having scrolled has still asked
+     for the report, not for half of it. */
   const shut = await page.evaluate(() => ({
+    hidden: document.getElementById('acsf-evidence').hidden,
     list: getComputedStyle(document.getElementById('acsf-evidence')).display,
+    blocks: document.querySelectorAll('#acsf-evidence .acsf-q').length,
     acts: getComputedStyle(document.querySelector('.acsf-acts')).display
   }));
-  if (shut.list !== 'none') bad('printable: the questions print before anyone asks for them');
+  if (!shut.hidden) bad('printable: the questions are open on screen before anyone asks for them');
+  if (shut.list === 'none') bad('printable: the questions do not print unless they were opened on screen first');
+  if (!shut.blocks) bad('printable: there are no questions on the page to print');
   if (shut.acts !== 'none') bad('printable: the buttons print with the report');
   const out = await page.evaluate(() => {
     toggleAcsfEvidence();
@@ -513,7 +521,7 @@ check('printable', 'the teacher panel prints as a document, not as an app', asyn
       (out.bad.length ? ': ' + out.bad[0] : ''));
   out.bad.forEach(x => bad('printable: ' + x));
   out.over.forEach(x => bad('printable: ' + x + ' is wider than the paper'));
-  if (out.list === 'none') bad('printable: the questions do not print once they are shown');
+  if (out.list === 'none') bad('printable: the questions stopped printing once they were shown');
   if (out.qBg !== 'rgb(255, 255, 255)') bad('printable: a question prints on ' + out.qBg + ', not white paper');
   if (out.rowBg !== 'rgb(255, 255, 255)') bad('printable: an indicator prints on ' + out.rowBg + ', not white paper');
   if (out.qInk !== 'rgb(0, 0, 0)') bad('printable: a question prints in ' + out.qInk + ', not black ink');
@@ -530,6 +538,46 @@ check('printable', 'the teacher panel prints as a document, not as an app', asyn
   if (pages < 2) bad('printable: the whole report came out on ' + pages + ' page');
   page.errs.forEach(e => bad('printable: ' + e));
   await page.close();
+});
+
+/* What is on the price tag has to be something that price would buy. Read the
+   List has known this since it was written, capping its groceries at $20; Shop
+   did not, and paid three dollars for shoes through every Stage A round the
+   level check asks. */
+check('prices', 'a shop round names something its price would buy', async ctx => {
+  const out = await ctx.page.evaluate(() => {
+    const bad = [], by = {};
+    SHOP_ITEMS.forEach(it => { by[it.name] = it; });
+    // Every round this bank can deal: paying and counting change, under $10
+    // and over it, and the exact rounds the level check asks for by number.
+    [['shop', 0], ['shop', 1], ['shop', 2],
+     ['shopsmall', 0], ['shopsmall', 1], ['shopsmall', 2]].forEach(function (pair) {
+      const qs = GEN_BANKS[pair[0]](40, pair[1]) || [];
+      qs.forEach(function (q) {
+        const it = by[q.item];
+        if (!it) { bad.push(pair[0] + ' named "' + q.item + '", which is not a shop item'); return; }
+        // The price on the tag, which for a change round is what the thing
+        // cost and not the note that was handed over.
+        const d = (q.mode === 'change' ? q.price : q.cents) / 100;
+        if (d < it.low || d > it.high) {
+          bad.push(pair[0] + ': ' + money(q.mode === 'change' ? q.price : q.cents) +
+                   ' for ' + q.item + ', which costs $' + it.low + ' to $' + it.high);
+        }
+      });
+    });
+    /* And no gap anywhere the prices can land: every whole dollar and fifty
+       cents from $1 to $100 has something that could cost it. A gap is not a
+       wrong question today, it is the nearest fit quietly standing in for one,
+       which is how "three dollars for shoes" reads in the first place. */
+    const gaps = [];
+    for (let c = 100; c <= 10000; c += 50) {
+      if (!SHOP_ITEMS.some(it => c / 100 >= it.low && c / 100 <= it.high)) gaps.push(money(c));
+    }
+    return { bad: bad, gaps: gaps.slice(0, 6), items: SHOP_ITEMS.length };
+  });
+  say('  ' + out.items + ' items priced, 240 rounds dealt across both ranges');
+  out.bad.slice(0, 8).forEach(x => bad('prices: ' + x));
+  if (out.gaps.length) bad('prices: nothing in the shop costs ' + out.gaps.join(', '));
 });
 
 check('ordering', 'no indicator is awarded a level without the one below it', async ctx => {

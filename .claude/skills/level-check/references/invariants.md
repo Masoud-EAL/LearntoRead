@@ -302,10 +302,14 @@ Three things decide whether it is worth having:
   out again beside it. The claim map says what a step could show; only the
   crediting knows what this run let it show, and printing the first as evidence
   would be putting working on the page that never happened.
-- **It is a choice, not a scroll.** Shut until the teacher asks for it, because
-  the profile is the document and sixty questions stapled behind it is a
-  different one. Copy and Print both take the page as it stands, so the teacher
-  who opened it gets it on the sheet and the one who did not is not handed it.
+- **It is a choice on the screen, and never on paper.** Shut until the teacher
+  asks for it, because the profile is what most readings of the page want and
+  sixty questions under it is a lot of scrolling. Copy follows the screen for
+  the same reason: a paste into an assessor sheet is rarely the place for the
+  whole run. Printing does not. The sheet is the copy that gets filed and taken
+  to the learner, and a teacher who presses Print has asked for the report, not
+  for half of it, so it carries both halves every time. The screen says so
+  above the buttons rather than leaving the printer to say it.
 
 The transcript is also most of what a saved run weighs. When the device has no
 room left, `acsfSaveRun` gives the transcripts back one at a time, oldest first,
@@ -698,6 +702,36 @@ orange, lemon and cherry are colours as well as fruit.
 Whether a category is clearly nameable is not computable, so the check makes
 the judgement impossible to skip: a new category fails until someone has
 thought about every pairing it creates and recorded that in the check.
+
+### 13a. A price is one the thing could cost
+*check: `prices`*
+
+> "Pay 3 dollars for shoes. Shoes should be changed with tea. Shoes being $3
+> doesn't make any sense."
+
+One word in one round, and underneath it every Stage A money question in the
+level check. `SHOP_ITEMS` was ten things that cost tens of dollars, drawn at
+random against a price the round had already set, and Stage A pays one to nine
+whole dollars because its features say "whole dollar monetary amounts up to
+$10". Shoes for $3, a bicycle for $5, a chair for $2.
+
+A price an adult cannot believe stops being a question about recognising money
+and becomes a puzzle about what the app meant, which is the same fault as an
+option a learner cannot read: the question is no longer about the thing it is
+evidence for.
+
+Read the List had the rule already and the comment to go with it, capping its
+groceries at $20 because "$98 for a loaf of bread would be the first thing an
+adult noticed instead". A cap is enough there, where the bank only names
+groceries. Shop pays up to $99.50, so each item carries what it plausibly
+costs and the round names something that fits the price: groceries under $10,
+the things a household buys once above it.
+
+The half of this worth remembering is the gap. Ranges that cover the prices you
+were thinking of leave seams where the ones you were not thinking of land, and
+a seam is not a visibly wrong question, it is the nearest fit quietly standing
+in for one. `prices` walks every fifty cents from $1 to $100 and found $9.50
+between the groceries and everything dearer within a minute of being written.
 
 ### 14. A picture is the thing it names
 *no check, judgement*
