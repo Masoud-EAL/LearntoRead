@@ -590,9 +590,36 @@ quoting because they settle the argument:
   extremely familiar to him **stop, go, but not toilet**".
 
 That is survival and classroom vocabulary, and the app already had a list of
-exactly it: `COPY_WORDS`, the twenty words Copy It shows. Spell a Word dictates
-those and nothing else in the level check. One list for both rounds, so the
-next person to change it changes it once.
+exactly it: `COPY_WORDS`, the twenty words Copy It shows. Spell a Word dictated
+those and nothing else for a while, on the reasoning that one register serves
+both rounds and one list is one thing to change.
+
+The register was right and the sharing was wrong, which the next report found:
+
+> "I saw the word rent in listen and spell it. Isn't that still too hard for
+> pre-level?" · "Please remove. Only ask: pen, pencil, home, name, bus. This is
+> enough for spelling."
+
+`rent` is in fact one of the easier words there, four letters and four sounds
+with the same final blend as the document's own example `stop`, and it is
+survival vocabulary for anyone renting here. What the question exposed is not
+the word but the sharing: **the same word is a different question in each
+round.** Copy It leaves it on the screen and asks for it letter by letter;
+dictation says it once and takes the screen away. A register that is right for
+the easier task is not automatically right for the harder one, and the feature
+this round claims names its own size as well as its own register, "a very
+limited number of extremely familiar words, which may have spelling
+inaccuracies". `SPELL_WORDS` is that number: five, classroom and survival, and
+`COPY_WORDS` keeps all twenty for the round that shows them.
+
+Two things about that feature are worth keeping in mind before this list is
+narrowed or widened again. A near miss is not a fail, because "may have
+spelling inaccuracies" is in the feature and `spellTier` marks it partial. And
+phonic regularity is not the bar the feature sets: half of `COPY_WORDS` cannot
+be sounded out letter by letter (`city`, `name`, `home`, `time`, `work`,
+`door`, `open`, `exit`), and trimming a list to the words that can would be a
+stricter rule than the checklist asks for, which is the mistake this rule was
+written about in the first place.
 
 The standalone game still holds every themed word. A game is for practising the
 hard ones; an assessment is not, which is the same answer rule 12 gave the

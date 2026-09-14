@@ -111,17 +111,22 @@ where the question is the gap sentence itself.
 
 Each step also deals only what the stage it serves names: whole dollars and no
 cents at Stage A, *up* and *down* and not *behind*, whole hours and not quarter
-hours, the words Copy It copies rather than *necklace*, *humid*, *back* or
+hours, five dictated words rather than *necklace*, *humid*, *back* or
 *tie*, and question words rather than *Do you work?*
 
-Spell a Word dictates the words Copy It copies, and nothing else. Filtering the
+Spell a Word dictates five words: *pen, pencil, home, name, bus*. Filtering the
 themed banks down to their shorter words was the first attempt and it still
 reached *back* and *tie*: a bank of fruit, clothing and body parts is not the
-vocabulary the framework has in mind, however hard the list is filtered. Its
-own examples are *"extremely familiar, short words ... e.g. big, fun, stop"*,
-*"stop, go, car, dog"* and *"Copies appropriate word under picture, e.g. pen,
-table"*, and the Binh scenario notes he knew *"stop, go, but not toilet"*. That
-register is survival and classroom vocabulary, which is what `COPY_WORDS` holds.
+vocabulary the framework has in mind, however hard the list is filtered. The
+twenty words Copy It shows were the second, and they hold the right register:
+its own examples are *"extremely familiar, short words ... e.g. big, fun,
+stop"*, *"stop, go, car, dog"* and *"Copies appropriate word under picture,
+e.g. pen, table"*, and the Binh scenario notes he knew *"stop, go, but not
+toilet"*. What that missed is that the two rounds are not the same task. Copy
+It leaves the word on the screen; dictation takes it away, so the same word is
+a harder question here, and the feature this round claims asks for *"a very
+limited number of extremely familiar words"*. Five is that number, and they are
+the classroom and survival words a teacher would pick.
 
 Spell a Word also lost its Stage A claim. Its wording is *"**Copies** a very
 limited number of highly familiar words"* and this round dictates: there is no

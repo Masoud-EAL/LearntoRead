@@ -4177,6 +4177,21 @@ function genSafeQuestions(n,from){
    about once the handwriting is set aside. */
 const COPY_WORDS=['bus','shop','milk','name','home','work','food','door','week','city',
   'bank','card','time','help','open','stop','exit','road','rent','post'];
+/* What the level check dictates, which is not what it asks a learner to copy.
+   The two rounds shared one list for a while, on the reasoning that one
+   register serves both, and the register was right. The task is not the same,
+   though: Copy It leaves the word on the screen and asks for it letter by
+   letter, while this one says it once and takes the screen away, so the same
+   word is a different question in each.
+     Five words, and the teacher's own list: "pen, pencil, home, name, bus.
+   This is enough for spelling." It is enough because of what the round claims,
+   which is one feature, PLB.06, "Writes a very limited number of extremely
+   familiar words, which may have spelling inaccuracies". A very limited number
+   is the feature's own wording, classroom and survival vocabulary is its own
+   register ("Copies appropriate word under picture, e.g. pen, table"), and a
+   near miss still counts, because "may have spelling inaccuracies" is written
+   into the feature and spellTier marks it partial. */
+const SPELL_WORDS=['pen','pencil','home','name','bus'];
 
 /* ── COPY IT ──
    from 0: single words, shown and typed.
@@ -5058,10 +5073,15 @@ function poolFor(type,from){
      several times over: "extremely familiar, short words ... e.g. big, fun,
      stop", "e.g. stop, go, car, dog", "Copies appropriate word under picture,
      e.g. pen, table", and Binh knew "stop, go, but not toilet". That is
-     survival and classroom vocabulary, and COPY_WORDS is already exactly it.
-     One list for both rounds: Copy It shows the word and this one says it. */
+     survival and classroom vocabulary. COPY_WORDS was that list for both
+     rounds for a time, and the register it holds is still right; what it is
+     not is the same task. Dictation takes the word off the screen, so the
+     level check says five of them and nothing else, which is what a feature
+     reading "a very limited number of extremely familiar words" asks for.
+     The standalone game still holds every themed word: a game is for
+     practising the hard ones, an assessment is not. */
   if(type==='spelling') return from
-    ?COPY_WORDS.map(function(w){ return {type:'word', word:w, answer:w}; })
+    ?SPELL_WORDS.map(function(w){ return {type:'word', word:w, answer:w}; })
     :allSpelling;
   if(type==='custom') return [...questionBank.custom];
   if(type==='unscramble') return [...questionBank.unscramble];

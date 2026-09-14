@@ -1222,18 +1222,24 @@ check('register', 'the level check stays at the register it is for', async ctx =
           }
         });
       }
-      /* The level check dictates the words Copy It copies, and no others.
-         Filtering the themed banks down to their shorter words was the first
-         attempt and it still reached "back" and "tie": fruit, clothing and
-         body parts are not the vocabulary the framework has in mind, however
-         hard the list is filtered. Its own examples are "big, fun, stop" and
-         "stop, go, car, dog", which is what COPY_WORDS holds. */
+      /* The level check dictates five words and no others. Filtering the
+         themed banks down to their shorter words was the first attempt and it
+         still reached "back" and "tie": fruit, clothing and body parts are not
+         the vocabulary the framework has in mind, however hard the list is
+         filtered. Copying the words Copy It shows was the second, and it held
+         the right register while missing that dictation is the harder task:
+         the word is gone off the screen, and the feature this round claims
+         asks for "a very limited number of extremely familiar words". */
       if (st.type === 'spelling') {
         poolWords(st).forEach(function (w) {
-          if (COPY_WORDS.indexOf(w) < 0) {
-            over.push(acsfStepKey(st) + ' dictates "' + w + '", which is not a word Copy It uses');
+          if (SPELL_WORDS.indexOf(w) < 0) {
+            over.push(acsfStepKey(st) + ' dictates "' + w + '", which is not one of the five');
           }
         });
+        if (SPELL_WORDS.length > 6) {
+          over.push('the level check dictates ' + SPELL_WORDS.length +
+                    ' words, which is no longer "a very limited number"');
+        }
       }
       if (st.type === 'questionwords') {
         poolWords(st).forEach(function (w) {
