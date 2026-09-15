@@ -353,6 +353,56 @@ own rule for the `hidden` attribute, so the questions printed for a teacher who
 had never opened them. Anything `!important` enough to change layout is
 `!important` enough to resurrect something hidden.
 
+### 8f. The same test, whoever pressed Start
+*check: `classroom`*
+
+> "Check level check in teacher mode. Is everything updated and working like the
+> solo games? I have only worked on the solo mode recently."
+
+Nothing was. A teacher could pick Level Check in the class lobby, press Start,
+and every phone in the room sat on the waiting screen: `startStudentTest`
+refused any test with no ladder, and a level check has none by design. The ones
+that would have started were worse than stopped. The seconds came from a box
+solo seeds from `defaultSecsFor` and the teacher's lobby never did, so the same
+assessment ran on 40 seconds alone and 30 in class, and the report prints the
+timeouts that buys as something the learner could not manage. The card at the
+end carried the button to the profile only on the ending a learner reaches
+alone, so a run sat in class was saved to the device where nothing could open
+it, which is the whole of what a class sits a level check for. The teacher's own
+two screens described Test Yourself: ten rounds of three from every game, a rod
+filling against a round count the check runs straight past, "17/10" beside a
+learner's name.
+
+One cause under all of it. Every decision made about the level check since it was
+split out of Test Yourself was written into the solo path, and the class path
+still held the shape of the game it was forked from. **The mode decides who
+pressed Start. It decides nothing else about the test**: not the questions, not
+the clock, not the length, not where the evidence ends up. Anywhere the two
+paths work something out separately, they will drift, and the one nobody is
+looking at is the one that rots.
+
+The parts that genuinely differ are few enough to name: the room resets the
+scores and says go, the teacher watches a track instead of answering, and the
+class ending waits on the projector. Everything else reads one function. The
+teacher's screens read `gameInfoFor`, the same name and blurb the learner's start
+card shows, rather than a third description written beside them; both pickers read
+`baseSecsFor`; both endings carry `.test-acsf-btn`.
+
+One thing the class path cannot share, and it is worth knowing why. A level check
+holds its staircase and its evidence in memory, and the room stores neither, so a
+phone that reloaded part-way has nothing to resume from. It sits the check again,
+from round one and nought points. Carrying on from the published round number
+would deal every skill from its first stage again and then stop early against
+`TEST_ROUNDS`, which belongs to the other test: a short run wearing a full
+profile's clothes.
+
+**Still open, and a teacher's call rather than a bug.** The class ending ranks
+the room on the points a level check happens to score, podium and all. Points are
+already the learner-facing frame in solo, so this is the class-game ceremony
+applied consistently rather than something teacher mode invented, but an
+assessment projected as a leaderboard is a different thing from a game projected
+as one.
+
 ---
 
 ## Question quality

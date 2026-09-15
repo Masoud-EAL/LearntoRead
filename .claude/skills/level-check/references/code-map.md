@@ -93,6 +93,29 @@ still credited every other level it happened to claim.
 why: the elementary sentence bank, Grammar Unscramble. Read them before adding
 anything back.
 
+## The same check, sat in a class
+
+A teacher can start a level check from the class lobby, and then it is the same
+run on the learner's phone with a room around it. The room carries points and
+progress and never the evidence, so the profile stays on the device that sat it.
+
+```
+startTestClass                         10475   teacher: reset, say go, watch
+  hostSeconds / baseSecsFor      8840 / 8832   the clock, shared with solo
+  renderTestHostHead                   10462   what the teacher's screen says
+startStudentTest                       10501   phone: the room said go
+  (no ladder: a level check is not resumed, it is sat again)
+writeTestProgress                      10554   score, round, and for a level
+  acsfSettled                           8288   check skills settled and asked
+renderTestTrack                        10580   the teacher's track
+showTestCard                           10366   both endings; .test-acsf-btn
+                                               reaches the profile from either
+```
+
+`classroom` is the check. Anything worked out separately on the two paths will
+drift, so the rule is one function read twice: `gameInfoFor` for the names,
+`baseSecsFor` for the clock, `acsfSettled` for progress.
+
 ## Shared machinery a level-check fix keeps landing in
 
 These are not assessment code, but a level check runs on them, so a fix here

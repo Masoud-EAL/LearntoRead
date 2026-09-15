@@ -2430,10 +2430,16 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
            Only after a level check. An ordinary Test Yourself run reaches six
            or seven of the twelve indicators, and a profile built from that is
            the half-honest thing this button exists to avoid. -->
-      <button class="btn btn-ghost btn-sm" id="test-acsf-btn" onclick="openAcsfPanel()">📋 For your teacher</button>
+      <button class="btn btn-ghost btn-sm test-acsf-btn" onclick="openAcsfPanel()">📋 For your teacher</button>
       <button class="btn btn-ghost btn-sm" onclick="quitTestGame()">← Choose another game</button>
     </div>
     <div class="test-acts class-only">
+      <!-- The profile is the whole point of a level check, and it is on this
+           device: the room carries points and progress, never the evidence. Sat
+           in class the run was saved where nothing could open it, because this
+           button lived only on the ending a learner reaches alone. The teacher
+           it is for is standing in the room. -->
+      <button class="btn btn-ghost btn-sm test-acsf-btn" onclick="openAcsfPanel()">📋 For your teacher</button>
       <div class="test-wait">Waiting for the teacher to show the scores…</div>
     </div>
   </div>
@@ -2447,12 +2453,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
      they have scored — and the button that ends it. -->
 <div class="screen" id="screen-test-host">
   <div class="tgt-wrap">
-    <div class="tgt-banner"><span class="lbl">Test Yourself</span><span class="val" id="test-host-skill">every game</span></div>
+    <div class="tgt-banner"><span class="lbl" id="test-host-name">Test Yourself</span><span class="val" id="test-host-skill">every game</span></div>
     <div class="tgt-col card" style="padding:16px;">
       <p class="step-label game">🎯 The class</p>
       <div class="tgt-track scrollable" id="test-host-track" style="max-height:52vh;"></div>
       <div class="tgt-count" id="test-host-count"></div>
-      <div class="tgt-count" style="margin-top:4px;">Everyone works at their own level, <span id="test-host-rounds">10</span> rounds each.</div>
+      <div class="tgt-count" style="margin-top:4px;" id="test-host-len">Everyone works at their own level, 10 rounds each.</div>
     </div>
     <div class="tgt-col">
       <div class="tgt-actions">
@@ -6480,9 +6486,15 @@ function updateQCountDisplay(){
     return;
   }
   if(isTestType(selectedQType)){
-    disp.textContent='Each learner works through '+TEST_ROUNDS+' rounds of '+TEST_PER_ROUND
-      +' questions at their own level, from '+testSkillLabel(selectedQType).toLowerCase()
-      +'. Your screen shows the class as they go.';
+    /* A level check has no fixed length and no rung, so the sentence written
+       for Test Yourself describes neither. It reads the game's own blurb, the
+       same one the learner's start card carries, rather than a third account
+       of the test written out here. */
+    disp.textContent=(isLevelCheck(selectedQType)
+      ?gameInfoFor(selectedQType).blurb
+      :'Each learner works through '+TEST_ROUNDS+' rounds of '+TEST_PER_ROUND
+        +' questions at their own level, from '+testSkillLabel(selectedQType).toLowerCase()+'.')
+      +' Your screen shows the class as they go.';
     return;
   }
   const c=countFor(selectedQType,limit);
@@ -8268,6 +8280,15 @@ function acsfOpenStages(){
   });
   return out;
 }
+/* How far through a level check a learner is, for the one screen that has to
+   show it as a proportion. There is no fixed length to measure against, and a
+   rod drawn against a round count fills up a third of the way in and then sits
+   there. What there is instead: every skill's staircase stops when it has
+   settled, and the share that have stopped is honest. */
+function acsfSettled(){
+  const all=acsfWalked().length;
+  return {done:Math.max(0,all-acsfOpenStages().length), of:all};
+}
 /* What a step is worth right now: the features it would show that an open
    stage still needs. A step serving three indicators at once outranks one
    serving a single feature, which is what keeps the run from being eleven
@@ -8798,12 +8819,26 @@ function mcAppliesTo(type){
   if(sec) return sec.banks.some(b=>mcAppliesTo(b));
   return type==='all'&&ALL_BANKS.some(b=>mcAppliesTo(b));
 }
-function soloSeconds(){
-  const el=document.getElementById('solo-t-limit');
+/* The base a game runs on, read from the picker that is starting it. An empty
+   or silly box falls back to whatever this game starts from, not to the
+   app-wide 30, or clearing it would quietly shorten a level check.
+     A level check does not read the box at all. Its seconds row is hidden in
+   both pickers, so the field only ever holds whatever the last game left in it,
+   and running the assessment on that base shortens the measurement: answers
+   time out and the report prints the timeouts as something the learner could
+   not manage. Solo seeded the field from defaultSecsFor and the teacher's
+   lobby never did, so the same test ran at 40 seconds alone and at 30 in class.
+   One answer now, and neither picker can disagree with it. */
+function baseSecsFor(type,el){
+  if(isLevelCheck(type)) return defaultSecsFor(type);
   const v=el?parseInt(el.value,10):NaN;
-  // An empty or silly box falls back to whatever this game starts from, not
-  // to the app-wide 30, or clearing it would quietly shorten a level check.
-  return (v>=10&&v<=120)?v:defaultSecsFor(soloSelectedType);
+  return (v>=10&&v<=120)?v:defaultSecsFor(type);
+}
+function soloSeconds(){
+  return baseSecsFor(soloSelectedType,document.getElementById('solo-t-limit'));
+}
+function hostSeconds(){
+  return baseSecsFor(selectedQType,document.getElementById('t-limit'));
 }
 function soloTabFor(type){
   return document.querySelector('#screen-solo-setup .q-type-tab[data-type="'+type+'"]');
@@ -10333,9 +10368,18 @@ function showTestCard(score,final){
   const step=testStep();
   const scr=document.getElementById('screen-test-round');
   scr.dataset.state=!final?'round':(TEST.mode==='class'?'class-final':'solo-final');
-  // Only a level check has a profile behind this button.
-  const ab=document.getElementById('test-acsf-btn');
-  if(ab) ab.style.display=TEST.acsf?'':'none';
+  /* The card is named for the test being sat. It said "Test Yourself" over a
+     level check in both modes, which is the other game's name on this one's
+     result. */
+  const lb=scr.querySelector('.logo-bar');
+  if(lb) lb.innerHTML='WordLink <span>'+(TEST.acsf?'📋':'🎯')+'</span> '
+    +(gameInfoFor(TEST.type).name||'Test Yourself');
+  // Only a level check has a profile behind this button, and both endings
+  // offer it: a run sat in class is saved on this device exactly as a solo one
+  // is, and it is the reason the class sat the check at all.
+  scr.querySelectorAll('.test-acsf-btn').forEach(function(b){
+    b.style.display=TEST.acsf?'':'none';
+  });
   document.getElementById('test-round-no').textContent=
     final?'Test finished'
       // A level check runs until every indicator has stopped, so there is no
@@ -10410,11 +10454,26 @@ function quitTestGame(){
 
 /* ── the class room ── */
 
+/* What the teacher's screen says the class is sitting. A level check is not
+   Test Yourself and is not one skill: it walks every skill and stops when each
+   one has settled, so there is no rung to name and no number of rounds to
+   promise. The name and the label are the game's own, the same two the
+   learner's start card shows, rather than a third description written here. */
+function renderTestHostHead(type){
+  const info=gameInfoFor(type), walk=isLevelCheck(type);
+  document.getElementById('test-host-name').textContent=info.name||'Test Yourself';
+  document.getElementById('test-host-skill').textContent=
+    walk?'every skill':testSkillLabel(type);
+  document.getElementById('test-host-len').textContent=walk
+    ?'Everyone works through their own skills, and finishes when every one of them has settled.'
+    :'Everyone works at their own level, '+TEST_ROUNDS+' rounds each.';
+}
+
 /* Teacher: everyone starts together, then works at their own pace and their
    own level. Modelled on startTargetGame, which is the app's other self-paced
    class game. */
 function startTestClass(){
-  const secs=Math.max(10,Math.min(120,parseInt(document.getElementById('t-limit').value)||30));
+  const secs=hostSeconds();
   TEST=newTestGame('host',selectedQType);
   TEST.secs=secs;
   roomRef.child('players').once('value',snap=>{
@@ -10433,8 +10492,7 @@ function startTestClass(){
   // student left mid-question by a previous round must not be dragged back.
   roomRef.update({status:'playing',game:'test',testType:selectedQType,testSecs:secs,
     currentQuestion:null,questionIdx:-1,revealed:false,midLeaderboard:false,correctAnswer:''});
-  document.getElementById('test-host-skill').textContent=testSkillLabel(selectedQType);
-  document.getElementById('test-host-rounds').textContent=TEST_ROUNDS;
+  renderTestHostHead(selectedQType);
   showScreen('screen-test-host');
   watchTestPlayers();
 }
@@ -10442,7 +10500,11 @@ function startTestClass(){
 /* Student: the room said "go". From here the phone runs its own test. */
 function startStudentTest(room){
   const t=room.testType;
-  if(!ladderFor(t)) return;
+  /* A level check has no ladder, by design: it walks a staircase per skill
+     instead. This guard was written when a ladder was the only kind of test
+     there was, so a teacher could pick Level Check in the lobby, press Start,
+     and every phone in the room would sit on the waiting screen. */
+  if(!isLevelCheck(t)&&!ladderFor(t)) return;
   TEST=newTestGame('class',t);
   TEST.secs=room.testSecs||TIMER_DURATION;
   stopMusic();
@@ -10452,6 +10514,28 @@ function startStudentTest(room){
     if(!TEST||TEST.mode!=='class') return;
     const p=s.val()||{};
     myScore=p.score||0;
+    if(TEST.acsf){
+      /* A level check has no rung to come back to. Its staircase and its
+         evidence are held in memory and nothing the room stores can rebuild
+         them, so a phone that reloaded part-way sits the check again rather
+         than carrying on from a round number with an empty plan, which would
+         ask every skill from its first stage and then be cut off against a
+         round count that belongs to the other test. The points go back with
+         it, or the run would be scored twice.
+           A learner who had already finished keeps the run this device saved:
+         that is the one the report behind the card is built from, and an empty
+         evidence set would read "0 questions, every skill checked". */
+      if(p.tstate==='done'){
+        const last=acsfLastRun();
+        if(last&&last.ev){ TEST.ev=last.ev; myScore=last.score||myScore; }
+        showTestCard(0,true);
+        return;
+      }
+      myScore=0;
+      TEST.round=1;
+      testStartRound();
+      return;
+    }
     TEST.round=Math.max(1,(p.round||0)+1);
     TEST.level=Math.max(0,Math.min(TEST.ladder.length-1,p.level||0));
     if(p.tstate==='done'||TEST.round>TEST_ROUNDS){
@@ -10471,6 +10555,14 @@ function writeTestProgress(final){
   if(!TEST||TEST.mode!=='class'||!roomRef||!playerId) return;
   const update={score:myScore,round:TEST.round,level:TEST.level,
                 tstate:final?'done':'playing'};
+  /* A level check stands on no rung and counts towards no number of rounds, so
+     the two fields the teacher's track is drawn from say nothing about one.
+     What it has instead is a staircase per skill, each stopping when it has
+     settled, and how many have is a real fraction of a real total. */
+  if(TEST.acsf){
+    const st=acsfSettled();
+    update.settled=st.done; update.skills=st.of; update.asked=TEST.ev.asked;
+  }
   if(final) update.finishedAt=firebase.database.ServerValue.TIMESTAMP;
   roomRef.child('players/'+playerId).update(update);
 }
@@ -10481,24 +10573,33 @@ function testRoster(players){
   return Object.keys(players||{}).sort().map((id,i)=>{
     const p=players[id]||{};
     return {id:id,name:(p.name||'').trim(),round:p.round||0,level:p.level||0,
-            score:p.score||0,tstate:p.tstate||'playing',color:tgtColor(i)};
+            score:p.score||0,tstate:p.tstate||'playing',color:tgtColor(i),
+            settled:p.settled||0,skills:p.skills||0,asked:p.asked||0};
   }).filter(p=>p.name);
 }
 function renderTestTrack(el,roster){
   if(!el||!TEST) return;
+  /* A level check is measured in skills settled, not in rounds done. Against
+     TEST_ROUNDS a rod was full a third of the way through a check and stayed
+     there, and the count beside it read "17/10". */
+  const walk=!!TEST.acsf;
   el.innerHTML='';
   roster.forEach(p=>{
-    const pct=Math.min(p.round/TEST_ROUNDS,1)*100;
-    const step=testStepAt(TEST.ladder,p.level);
+    const pct=walk?(p.skills?Math.min(p.settled/p.skills,1)*100:0)
+                  :Math.min(p.round/TEST_ROUNDS,1)*100;
+    const step=walk?null:testStepAt(TEST.ladder,p.level);
     const row=document.createElement('div');
     row.className='tgt-row test-row'+(p.tstate==='done'?' done':'');
     row.innerHTML='<span class="nm"><span class="who"></span><span class="rung"></span></span>'
       +'<span class="tgt-bar"><span class="tgt-rod" style="background:'+p.color+';width:'+pct+'%"></span></span>'
       +'<span class="tot"><span class="pts"></span><span class="rnd"></span></span>';
     row.querySelector('.who').textContent=p.name;
-    row.querySelector('.rung').textContent=step?step.label:'';
+    row.querySelector('.rung').textContent=walk
+      ?(p.tstate==='done'?'':p.skills?p.settled+' of '+p.skills+' skills settled':'starting')
+      :(step?step.label:'');
     row.querySelector('.pts').textContent='⭐ '+p.score;
-    row.querySelector('.rnd').textContent=p.tstate==='done'?'finished':p.round+'/'+TEST_ROUNDS;
+    row.querySelector('.rnd').textContent=p.tstate==='done'?'finished'
+      :walk?p.asked+' questions':p.round+'/'+TEST_ROUNDS;
     el.appendChild(row);
   });
 }

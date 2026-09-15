@@ -59,6 +59,7 @@ NODE_PATH=/opt/node22/lib/node_modules node tools/checks/check.js
 | `retry` | a wrong answer at Stage A earns one second ask and only one, the better attempt stands, and the panel records that it took two | "Ask each PLA feature twice. Do it only when the learner cannot answer correctly the first time." |
 | `spread` | no single game is dealt more than four times in one run, and a perfect run stays inside its question budget | "Why did I get 5 or maybe 6 copy a word questions?"; "too many questions or repeated questions of the same type in perfect runs" |
 | `variants` | all twelve ordinary Test Yourself ladders still finish with full rounds | regression guard for the path that is not the level check |
+| `classroom` | a level check a teacher starts in a class room is the one a learner sits alone: every phone deals it, on the same clock, the same questions, the same length, ending at a card that still reaches the report, while the teacher's screens name it and promise it no rounds | "I have only worked on the solo mode recently, so I want to make sure the teacher mode is also working": a teacher could pick Level Check in the lobby and press Start, and every phone in the room stayed on the waiting screen |
 | `links` | re-running `build-links.py` changes nothing, then puts the tree back | the generated stubs, sitemap and sw.js are checked in and drift silently |
 
 ## probe

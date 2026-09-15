@@ -113,9 +113,9 @@ const bad = m => PROBLEMS.push(m);
    finished evidence. The app is driven through its own round functions rather
    than through clicks: a robot dragging a clock hand tests the robot, not the
    assessment. `boot` and `run` do use the real UI. */
-const PLAY = function (how, reportSrc) {
-  soloMode = true; myScore = 0;
-  TEST = newTestGame('solo', 'test:level');
+const PLAY = function (how, reportSrc, mode) {
+  soloMode = (mode || 'solo') === 'solo'; myScore = 0;
+  TEST = newTestGame(mode || 'solo', 'test:level');
   const seen = [], perStep = {};
   let guard = 0;
   while (!testFinished() && guard++ < 90) {
@@ -165,10 +165,10 @@ const PLAY = function (how, reportSrc) {
 
 /* Run PLAY inside the page. `report` is a function serialised as source, so it
    runs in the page too and can reach the app's own helpers. */
-function play(page, how, report) {
-  return page.evaluate(([playSrc, how, reportSrc]) => {
-    return (new Function('return (' + playSrc + ')'))()(how, reportSrc);
-  }, [PLAY.toString(), how, report.toString()]);
+function play(page, how, report, mode) {
+  return page.evaluate(([playSrc, how, reportSrc, mode]) => {
+    return (new Function('return (' + playSrc + ')'))()(how, reportSrc, mode);
+  }, [PLAY.toString(), how, report.toString(), mode || 'solo']);
 }
 
 /* --------------------------------------------------------------- the checks */
@@ -1530,6 +1530,141 @@ check('variants', 'every ordinary Test Yourself ladder still finishes', async ct
     else if (r.short) bad('variants: ' + r.v + ' dealt ' + r.short + ' short rounds');
     else if (!r.asked) bad('variants: ' + r.v + ' asked nothing');
   });
+});
+
+/* Nothing in here ever reached the classroom, and it rotted quietly: every
+   decision made about the level check since it was split out of Test Yourself
+   went into the solo path alone. A teacher could pick Level Check in the lobby
+   and press Start, and the guard on the phone's side, written when a ladder was
+   the only kind of test there was, turned the whole room away. The ones
+   that did start would have sat a shorter clock and finished at a card with no
+   way to the report. So this is the sweep for one sentence: the mode decides
+   who pressed Start, and nothing else about the test. */
+check('classroom', 'a level check sat in class is the test sat alone, and ends with its report', async ctx => {
+  const out = await ctx.page.evaluate(() => {
+    const bad = [];
+    const $ = id => document.getElementById(id);
+
+    /* Every test the teacher's picker can start is one a phone really starts.
+       Put to startStudentTest itself rather than to a copy of its guard here:
+       a check that re-states the rule it is checking passes whatever the app
+       does with it. The room is a stub, so the phone runs the part that is its
+       own: the guard, the clock, and the first round dealt. */
+    const realRoom = roomRef, realPlayer = playerId, realSolo = soloMode;
+    const asPlayer = (saved, room) => {
+      playerId = 'p1'; soloMode = false;
+      roomRef = { child: () => ({ once: (e, cb) => cb({ val: () => saved }), update: () => {} }) };
+      TEST = null; soloQuestions = []; myScore = 0;
+      try { startStudentTest(room); } catch (e) { bad.push('startStudentTest threw: ' + e.message); }
+      clearInterval(studentTimerInt);
+      try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (e) {}
+      return TEST;
+    };
+    [...document.querySelectorAll('#screen-teacher-lobby .q-type-tab')]
+      .map(t => t.dataset.type).filter(t => t && isTestType(t))
+      .forEach(t => {
+        const game = asPlayer({}, { testType: t, testSecs: defaultSecsFor(t) });
+        if (!game) bad.push('the teacher can start ' + t + ', and no phone in the room deals it');
+        else if (!soloQuestions.length) bad.push(t + ' started in class and dealt no first question');
+      });
+
+    /* A phone that reloaded part-way through a level check has nothing in the
+       room to pick up: the staircase and the evidence were in memory. It sits
+       the check again, from round one and from nought points, rather than
+       carrying on from a round number it can only be cut off against. */
+    const resumed = asPlayer({ round: 7, level: 0, score: 90, tstate: 'playing' },
+                             { testType: 'test:level', testSecs: ACSF_SECS });
+    if (resumed) {
+      if (resumed.round !== 1) bad.push('a reloaded level check resumed at round ' + resumed.round);
+      if (myScore !== 0) bad.push('a level check sat again carried ' + myScore + ' points into the new run');
+      if (resumed.secs !== ACSF_SECS) bad.push('a class level check deals on ' + resumed.secs + 's, not ' + ACSF_SECS);
+    }
+    roomRef = realRoom; playerId = realPlayer; soloMode = realSolo; TEST = null;
+
+    // The same clock, whatever either picker's hidden seconds box was left at.
+    selectedQType = 'test:level'; soloSelectedType = 'test:level';
+    $('t-limit').value = '10'; $('solo-t-limit').value = '10';
+    if (hostSeconds() !== ACSF_SECS) {
+      bad.push('a level check runs on ' + hostSeconds() + 's in class, not ' + ACSF_SECS);
+    }
+    if (soloSeconds() !== hostSeconds()) {
+      bad.push('a level check runs on ' + soloSeconds() + 's alone and ' + hostSeconds() + 's in class');
+    }
+
+    // The teacher's two screens name the test, and promise it no length.
+    updateQCountDisplay();
+    const lobby = $('q-count-display').textContent;
+    if (/\d+ rounds/.test(lobby)) bad.push('the lobby promises a level check a fixed number of rounds: ' + lobby);
+    renderTestHostHead('test:level');
+    if ($('test-host-name').textContent !== gameInfoFor('test:level').name) {
+      bad.push('the host screen calls a level check "' + $('test-host-name').textContent + '"');
+    }
+    if (/\d+ rounds/.test($('test-host-len').textContent)) {
+      bad.push('the host screen promises a level check rounds: ' + $('test-host-len').textContent);
+    }
+    // and the ordinary test keeps the wording it had.
+    renderTestHostHead('test:*');
+    if (!/10 rounds each/.test($('test-host-len').textContent)) {
+      bad.push('Test Yourself lost its round count from the host screen');
+    }
+
+    // The track measures a level check in skills settled, not against a round
+    // count it will run straight past.
+    TEST = newTestGame('host', 'test:level');
+    const el = document.createElement('div');
+    renderTestTrack(el, [{ id: 'a', name: 'Ana', round: 17, level: 0, score: 30,
+                           tstate: 'playing', color: '#fff', settled: 4, skills: 12, asked: 51 }]);
+    const rowText = el.textContent, rod = el.querySelector('.tgt-rod').style.width;
+    if (rowText.indexOf('/' + TEST_ROUNDS) >= 0) {
+      bad.push('the host track counts a level check against ' + TEST_ROUNDS + ' rounds: ' + rowText);
+    }
+    if (Math.round(parseFloat(rod)) !== 33) {
+      bad.push('the rod for 4 of 12 skills settled is ' + rod);
+    }
+
+    // Both endings offer the report, and only after a level check.
+    const btnsOn = () => [...document.querySelectorAll('#screen-test-round .test-acsf-btn')]
+      .filter(b => b.getClientRects().length > 0).length;
+    const seen = {};
+    ['solo', 'class'].forEach(m => {
+      myScore = 0;
+      TEST = newTestGame(m, 'test:level');
+      TEST.ev.asked = 5;
+      showTestCard(0, true);
+      seen[m] = btnsOn();
+      if (seen[m] !== 1) {
+        bad.push('the ' + m + ' ending offers ' + seen[m] + ' ways to the report, not one');
+      }
+      TEST = newTestGame(m, 'test:*');
+      showTestCard(0, true);
+      if (btnsOn()) bad.push('an ordinary ' + m + ' test offers the teacher panel');
+    });
+
+    return { bad: bad, lobby: lobby, rowText: rowText };
+  });
+  say('  track row: ' + out.rowText);
+  out.bad.forEach(bad);
+
+  /* And the run itself. Same pool, same staircase, same length, same evidence:
+     the class run is only a solo run somebody else started. */
+  const report = (ev, prof) => ({
+    asked: ev.asked,
+    withEvidence: Object.keys(ev.byInd).length,
+    walked: acsfWalked().length,
+    finished: !acsfOpenStages().length
+  });
+  const solo = await play(ctx.page, 'right', report, 'solo');
+  const klass = await play(ctx.page, 'right', report, 'class');
+  say('  perfect run: ' + solo.asked + ' questions alone, ' + klass.asked + ' in class');
+  if (!klass.finished) bad('classroom: a level check sat in class did not settle every skill');
+  if (klass.withEvidence < klass.walked) {
+    bad('classroom: a class run ended with evidence for only ' + klass.withEvidence +
+        ' of ' + klass.walked + ' indicators');
+  }
+  if (klass.asked !== solo.asked) {
+    bad('classroom: the same perfect run is ' + solo.asked + ' questions alone and ' +
+        klass.asked + ' in class');
+  }
 });
 
 check('coverage', 'the coverage totals match the rows they count', async () => {
