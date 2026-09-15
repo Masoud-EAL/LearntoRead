@@ -3450,7 +3450,11 @@ function genNumeralWriteQuestions(n,hi){
   hi=hi||10;
   const out=[];
   for(let i=0;i<(n||8);i++){
-    const mode=i%3;
+    /* Drawn, not indexed. Each range's feature names all three in one line
+       ("numbers from 0 to 10 as number symbols value of Australian whole dollar
+       coins and notes up to $10 whole dollar monetary amounts up to $10"), and a
+       run dealt one question, so it only ever wrote the number. */
+    const mode=randInt(0,2);
     if(mode===0){
       const v=randInt(0,hi);
       out.push({type:'typein', label:'WRITE THE NUMBER', say:numWord(v),
@@ -3520,11 +3524,24 @@ function genAddQuestions(n,hi,money){
    100" and "Orders days of the week and months of the year" at Stage B.
    Tiles, because ordering is a thing you do rather than a thing you pick: the
    tile engine already exists for the sentence games and takes any word list. */
-function genOrderQuestions(n,hi,kind){
-  hi=hi||10;
+/* `from` names the round, both axes of it together, the way Read the List does.
+   0 is Stage A: whole dollars and two numbers under ten. 1 is Stage B's money
+   and numbers. 2 is Stage B's other feature, the days and the months. Nothing at
+   all is the whole bank, for the game.
+
+   It was one axis, the range, with the kind taken from the draw index. A level
+   check deals one question, so `i` was always 0 and every Put In Order it dealt
+   was numbers, while the step claimed "Orders days of the week and months of the
+   year" as well and had it credited off an answer about numbers. */
+const ORDER_ROUNDS={0:{hi:10,kinds:['num','money']},
+                    1:{hi:100,kinds:['num','money']},
+                    2:{hi:100,kinds:['days','months']}};
+function genOrderQuestions(n,from){
+  const r=ORDER_ROUNDS[from]||{hi:100,kinds:['num','money','days','months']};
+  const hi=r.hi;
   const out=[];
   for(let i=0;i<(n||8);i++){
-    const k=kind||['num','money','days','months'][i%(hi<=10?2:4)];
+    const k=r.kinds[randInt(0,r.kinds.length-1)];
     let items,prompt;
     if(k==='days'){
       const st=randInt(0,3); items=SPELL_DAYS.slice(st,st+3); prompt='Put the days in order';
@@ -3569,7 +3586,9 @@ function genPlaceValueQuestions(n){
   const out=[];
   for(let i=0;i<(n||8);i++){
     const v=randInt(11,99), tens=Math.floor(v/10), ones=v%10;
-    const askTens=i%2===0;
+    // Drawn, not indexed. The feature is "place value for ones and tens" and a
+    // run dealt one question, so it only ever asked the tens half of it.
+    const askTens=Math.random()<0.5;
     const correct=String(askTens?tens:ones);
     const c=[correct];
     [String(askTens?ones:tens),String(v).slice(0,1),String(v).slice(1),
@@ -3780,7 +3799,9 @@ function genCalendarQuestions(n){
     const grid='<table class="calendar"><caption>'+name+'</caption><tr>'
       +SPELL_DAYS.map(function(d){ return '<th>'+d.slice(0,3)+'</th>'; }).join('')
       +'</tr><tr>'+cells+'</tr></table>';
-    const askDay=i%2===0;
+    // Drawn, not indexed. "Days of the week, months of the year and personal key
+    // dates" is one feature, and the months half of it was never asked.
+    const askDay=Math.random()<0.5;
     const correct=askDay?dow:name;
     const alts=askDay?shuffle(SPELL_DAYS.filter(function(d){ return d!==dow; })).slice(0,3)
                      :shuffle(SPELL_MONTHS.filter(function(m){ return m!==name; })).slice(0,3);
@@ -3821,7 +3842,11 @@ function genOrdinalQuestions(n,from){
   const out=[], top=(from?5:3);
   for(let i=0;i<(n||8);i++){
     const pos=randInt(0,top-1);
-    const hear=i%2===1;
+    /* Drawn, not indexed. The feature is "Recognise **oral** ordinal numbers from
+       1st to 3rd", and the half that says "Tap the first one" out loud is the one
+       that shows it; at one question a draw, `i` was always 0 and that half was
+       never dealt. */
+    const hear=Math.random()<0.5;
     const row=ORD_FACES.slice(0,top).map(function(f,ix){
       return '<span class="ord-fig'+(ix===pos?' ord-hit':'')+'">'+f+'</span>';
     }).join('<span class="ord-arrow">›</span>');
@@ -3900,22 +3925,36 @@ function genPositionQuestions(n,from){
 
    Everything here is drawn rather than photographed, and named in the words
    an adult would use out loud. */
+/* `use` is the job, said out loud as the question: "Which one do you use to take
+   a photo?". `alsoDoes` names the devices that could fairly be given the same
+   answer, and they are kept out of the options: a learner who taps the phone when
+   asked what takes a photo has not made a mistake about devices, and marking it
+   wrong is the same fault as an odd one out that is not clearly odd. A device
+   with no `use` is never the answer to a purpose question, only a distractor,
+   because its job overlaps too many others to have one right answer: a laptop is
+   for work and for watching and for typing, and so is a screen. */
 const DEVICES=[
-  {n:'phone',   e:'📱', use:'To call someone'},
-  {n:'laptop',  e:'💻', use:'To do work and write'},
+  {n:'phone',   e:'📱', use:'to call someone', alsoDoes:['laptop']},
+  {n:'laptop',  e:'💻'},
   /* Not the tablet emoji: it is a phone with an arrow beside it, so on a
      small screen it and the phone above are the same picture, and the round
      came down to a coin toss between two right-looking answers. */
-  {n:'screen',  e:'🖥️', use:'To read and watch'},
-  {n:'printer', e:'🖨️', use:'To put it on paper'},
-  {n:'camera',  e:'📷', use:'To take a photo'},
-  {n:'keyboard',e:'⌨️', use:'To type'},
-  {n:'mouse',   art:mouseArt, use:'To point and click'},
-  {n:'headphones',e:'🎧',use:'To listen'},
+  {n:'screen',  e:'🖥️'},
+  {n:'printer', e:'🖨️', use:'to put it on paper'},
+  {n:'camera',  e:'📷', use:'to take a photo', alsoDoes:['phone','laptop']},
+  {n:'keyboard',e:'⌨️', use:'to type', alsoDoes:['phone','laptop']},
+  {n:'mouse',   art:mouseArt, use:'to point and click'},
+  {n:'headphones',e:'🎧',use:'to listen', alsoDoes:['phone','laptop','screen']},
   /* Drawn, not an emoji: see chargerArt below for why none of them will do. */
-  {n:'charger', art:chargerArt, use:'To give it power'},
-  {n:'wifi',    e:'📶', use:'To get on the internet'},
+  {n:'charger', art:chargerArt, use:'to give it power'},
+  /* No `use`: "to get on the internet" is the phone's and the laptop's answer as
+     much as the wifi bars', and Screen Symbols already asks this glyph by name. */
+  {n:'wifi',    e:'📶'},
 ];
+const DEVICE_USES=DEVICES.filter(function(d){ return !!d.use; });
+function deviceByName(n){
+  return DEVICES.filter(function(d){ return d.n===n; })[0];
+}
 /* A charger, drawn rather than borrowed from the emoji set. No emoji is a
    charger: the plug on its own is a two-pin wall plug, which is the thing an
    appliance has, not the thing that comes in the box with a phone. What a
@@ -3980,22 +4019,48 @@ function chargerArt(cls){
    digital devices"; and at Stage B "Begins to understand the purpose of some
    extremely familiar digital devices and software". */
 /* Most items are an emoji; one is a drawing. Both arrive as markup, so the
-   rounds below never have to know which is which. */
-function deviceArt(d){
-  return d.art?d.art():'<span style="font-size:3.4rem;">'+d.e+'</span>';
+   rounds below never have to know which is which. Options want the small size
+   the other picture rounds use, so the class is the caller's to name. */
+function deviceArt(d,cls){
+  /* On an option the size belongs to .mc-pic, which is what every other picture
+     round leaves it to; only the prompt, which has no rule of its own, names one. */
+  return d.art?d.art(cls)
+    :cls?'<span>'+d.e+'</span>'
+        :'<span style="font-size:3.4rem;">'+d.e+'</span>';
+}
+function deviceArtMap(names){
+  const m={};
+  names.forEach(function(n){ m[n]=deviceArt(deviceByName(n),'dev-art-sm'); });
+  return m;
 }
 function genDeviceQuestions(n,from){
-  const out=[], purpose=!!from;
+  const out=[];
   for(let i=0;i<(n||8);i++){
-    const d=DEVICES[randInt(0,DEVICES.length-1)];
-    if(purpose&&i%2===1){
-      const alts=shuffle(DEVICES.filter(function(x){ return x.n!==d.n; })).slice(0,3)
-                  .map(function(x){ return x.use; });
-      out.push({type:'mc', say:'What is a '+d.n+' for?',
-        icon:deviceArt(d), hearOpts:true,
-        question:'🔊 What is this for?',
-        answer:d.use.toLowerCase(), choices:shuffle([d.use].concat(alts))});
+    /* `from` names the round: 0 the naming one, 1 the purpose one, and nothing
+       at all alternates, for the game that deals ten in a row. It was `i%2`,
+       the draw index, which is the fault rule 12b already named for Read the
+       List. The level check deals one question per step, so `i` was always 0
+       and the step carrying the two purpose features dealt naming on every run:
+       a report claiming the learner knows what a device is for off a question
+       that never asked. */
+    const purpose=from===1||(from==null&&i%2===1);
+    if(purpose){
+      /* The ask is turned round, so the answer is a picture. Offering four
+         written purposes ("To do work and write", "To put it on paper") was
+         twenty-four words of phrase English to hold before the first tap, and a
+         learner who knows every device could fail it on the English alone. Said
+         once and tapped as a picture, it is eight words, and knowing which
+         device does the job is still what it takes to answer. */
+      const d=DEVICE_USES[randInt(0,DEVICE_USES.length-1)];
+      const alts=shuffle(DEVICES.filter(function(x){
+        return x.n!==d.n&&(d.alsoDoes||[]).indexOf(x.n)<0;
+      })).slice(0,3).map(function(x){ return x.n; });
+      const words=shuffle([d.n].concat(alts));
+      out.push({type:'mc', say:'Which one do you use '+d.use+'?',
+        question:'🔊 Which one do you use '+d.use+'?',
+        art:deviceArtMap(words), answer:d.n, choices:words});
     } else {
+      const d=DEVICES[randInt(0,DEVICES.length-1)];
       const alts=shuffle(DEVICES.filter(function(x){ return x.n!==d.n; })).slice(0,3)
                   .map(function(x){ return x.n; });
       /* The picture is the question, so the audio reads the question out and
@@ -4057,32 +4122,29 @@ function genSymbolQuestions(n){
    not shown they can keep a device working. */
 const PF_PROMPT=['13','PLB','Recognises and responds to a limited number of digital prompts or alerts, texts and symbols'];
 const PF_CARE  =['13','PLB','Demonstrates an extremely limited capacity to maintain digital devices'];
+/* Trimmed to the alerts this band actually names: ".13 Recognises and responds
+   to a limited number of digital prompts or alerts". Nine came out, and they are
+   worth listing because the reason is the same for all of them. "No data left",
+   "Aeroplane mode is on" and "Check it is you" need a concept before they need a
+   tap, and the concept is above the band: knowing that mobile data and wifi are
+   two different things is not the same as recognising an alert. "Update ready",
+   "Changes not kept", "Photos are ready" and "Card not accepted" had no wrong
+   answer to give: installing an update now is as reasonable as later, and the
+   round only marked "Later" right because the other three options were absurd.
+   What is left is what a phone says to an adult in an ordinary week. */
 const PROMPTS=[
   {t:'Battery low',        b:'10% left',                 a:'Charge it',    alts:['Delete it','Print it','Call someone']},
   {t:'No internet',        b:'You are not connected',    a:'Turn on wifi', alts:['Charge it','Take a photo','Save the file']},
-  {t:'Delete this photo?', b:'This cannot be undone',    a:'Cancel',       alts:['Charge it','Turn it off','Print it']},
+  {t:'Delete this photo?', b:'Are you sure?',            a:'Cancel',       alts:['Charge it','Turn it off','Print it']},
   {t:'Storage full',       b:'No room for new photos',   a:'Delete some',  alts:['Charge it','Turn on wifi','Call someone']},
-  {t:'Update ready',       b:'Do you want to install it now?', a:'Later', alts:['Delete it','Print it','Take a photo']},
-  {t:'Changes not kept',   b:'What do you want to do?',  a:'Save',         alts:['Delete it','Charge it','Turn it off']},
   {t:'Wrong password',     b:'Try again',                a:'Type it again',alts:['Charge it','Print it','Turn on wifi']},
-  /* Seven was not enough for a ten question game, so it dealt three of them
-     twice. These are the rest of the notices an adult meets on a phone in a
-     week, and none of them names its own answer. */
   {t:'Missed call',        b:'You did not answer',       a:'Call back',    alts:['Charge it','Print it','Take a photo']},
   {t:'New message',        b:'Someone has written to you', a:'Read it',    alts:['Charge it','Print it','Turn on wifi']},
   {t:'Someone is calling', b:'Do you want to talk?',     a:'Answer it',    alts:['Delete it','Print it','Save the file']},
-  {t:'Check it is you',    b:'We sent six numbers to your phone', a:'Type the numbers', alts:['Take a photo','Turn it off','Delete some']},
-  {t:'Phone locked',       b:'This phone is closed',     a:'Type your PIN',alts:['Charge it','Print it','Call someone']},
-  {t:'Aeroplane mode is on',b:'You cannot call or use the internet', a:'Turn it off', alts:['Charge it','Take a photo','Print it']},
-  {t:'No data left',       b:'You have used all of it this month', a:'Turn on wifi', alts:['Charge it','Print it','Take a photo']},
-  {t:'Something went wrong',b:'The app stopped',         a:'Try again',    alts:['Charge it','Print it','Take a photo']},
-  {t:'Card not accepted',  b:'The shop cannot take this one', a:'Use another card', alts:['Take a photo','Charge it','Print it']},
-  {t:'Cannot print',       b:'The printer is empty',     a:'Put paper in it', alts:['Charge it','Turn on wifi','Take a photo']},
+  {t:'Phone locked',       b:'You cannot use it now',    a:'Type your PIN',alts:['Charge it','Print it','Call someone']},
   {t:'Unknown number',     b:'You do not know who this is', a:'Do not answer', alts:['Tell them your PIN','Send them money','Give them your card']},
   {t:'Alarm',              b:'It is time to get up',     a:'Turn it off',  alts:['Take a photo','Print it','Call someone']},
-  {t:'Photos are ready',   b:'They are on the computer now', a:'Print them', alts:['Charge it','Turn on wifi','Call someone']},
-];
-/* Both halves in one shuffle, so a game is a mix rather than a run of notices
+];/* Both halves in one shuffle, so a game is a mix rather than a run of notices
    followed by a run of problems. Shuffled and sliced, the way a fixed bank is
    dealt: it used to walk the list with i%length, which is what padded a ten
    question game out of seven.
@@ -4097,14 +4159,25 @@ const PROMPTS=[
    in two. Same shape as the copy-a-word report. */
 function genPromptQuestions(n,from){
   const dialogs=PROMPTS.map(function(p){
-    return {type:'mc', say:p.t+'. '+p.b, acsf:[PF_PROMPT], hearOpts:true,
+    /* A title that is already a question keeps its own mark: joined blind, "Delete
+       this photo?" and its line came out as "Delete this photo?. Are you sure?". */
+    return {type:'mc', say:p.t.replace(/[.?!]$/,'')+'. '+p.b, acsf:[PF_PROMPT], hearOpts:true,
       icon:'<div class="digi-dialog"><div class="dd-title">'+p.t+'</div><div class="dd-body">'+p.b+'</div></div>',
       question:'🔊 What should you do?',
       answer:p.a.toLowerCase(), choices:shuffle([p.a].concat(p.alts))};
   });
+  /* Pictures, not written options. This half asked the longest questions in the
+     test and then answered them in sentences: "The screen is black and it will
+     not turn on. What is wrong?" over "The battery is flat", "It is upside
+     down". Twenty-nine words to hold, against a band whose own listening
+     features stop at "extremely simple sentences", and every one of them scored
+     against .13, so a learner who could keep a phone working perfectly well lost
+     the digital indicator on the English. One short clause and four pictures
+     asks the same thing. */
   const cares=DEVICE_CARE.map(function(c){
-    return {type:'mc', say:c.q, question:'🔊 '+c.q, acsf:[PF_CARE], hearOpts:true,
-      answer:c.a.toLowerCase(), choices:shuffle([c.a].concat(c.alts))};
+    const words=shuffle([c.a].concat(c.alts));
+    return {type:'mc', say:c.q, question:'🔊 '+c.q, acsf:[PF_CARE],
+      art:instrArtMap(words), answer:c.a.toLowerCase(), choices:words};
   });
   const pick=from===0?dialogs:from===1?cares:dialogs.concat(cares);
   return shuffle(pick).slice(0,n||6);
@@ -4114,40 +4187,54 @@ function genPromptQuestions(n,from){
    and that a learner can put right themselves. Dealt by genPromptQuestions
    above, alongside the notices. */
 const DEVICE_CARE=[
-  {q:'The screen is black and it will not turn on. What is wrong?', a:'The battery is flat', alts:['It is too loud','The wifi is off','It is upside down']},
-  {q:'You cannot hear anything. What do you check?',                a:'The sound',           alts:['The battery','The printer','The camera']},
-  {q:'Nothing will load. What do you check?',                       a:'The internet',        alts:['The sound','The camera','The keyboard']},
-  {q:'The battery is nearly empty. What do you do?',                a:'Plug in the charger', alts:['Turn up the sound','Take a photo','Delete a photo']},
-  {q:'You are going out. How do you keep the battery?',             a:'Turn the screen off', alts:['Turn the sound up','Open more apps','Take more photos']},
-  {q:'The phone is very slow. What do you do?',                     a:'Close some apps',     alts:['Take a photo','Turn the sound up','Print it']},
-  {q:'The phone will not charge. What do you check?',               a:'The cable',           alts:['The sound','The camera','The printer']},
-  {q:'The screen is dirty. What do you do?',                        a:'Clean it with a cloth',alts:['Charge it','Turn it off','Take a photo']},
-  {q:'You are in class. What do you do with your phone?',           a:'Turn the sound off',  alts:['Turn the sound up','Call someone','Take a photo']},
-];
-/* ── SAFE OR NOT SAFE, AND THE CODE ──
+  {q:'The battery is nearly empty. What do you do?', a:'charger',   alts:['bin','camera','printer']},
+  {q:'It will not turn on. What do you check?',      a:'battery',   alts:['camera','printer','bin']},
+  {q:'You cannot hear anything. What do you tap?',   a:'sound on',  alts:['camera','printer','bin']},
+  {q:'Nothing will load. What do you tap?',          a:'internet',  alts:['camera','printer','bin']},
+  {q:'The class has started. What do you tap?',      a:'sound off', alts:['sound on','camera','printer']},
+  {q:'The phone is full. What do you tap?',          a:'bin',       alts:['camera','printer','sound on']},
+];/* ── SAFE OR NOT SAFE, AND THE CODE ──
    ".12 Copies simple risk protection code" and ".12 Begins to understand
    there are risks associated with providing information". The first is a
    copying task with a PIN; the second is the only judgement call in the app,
    and the answers are deliberately unambiguous at this level. */
+/* Each item carries a picture of the item. It used to carry 🙂 or 🔒 chosen
+   from the answer, which over two options is the answer printed on the screen,
+   and `leaks` reads speech and options and never looked at the icon. */
 const SAFE_ITEMS=[
-  {t:'Your bank PIN',            safe:false}, {t:'Your first name',        safe:true},
-  {t:'Your password',            safe:false}, {t:'Your favourite colour',  safe:true},
-  {t:'Your bank card number',    safe:false}, {t:'The suburb you live in', safe:true},
-  {t:'A photo of your passport', safe:false}, {t:'Your class day',         safe:true},
+  {t:'Your bank PIN',            e:'🔢', safe:false},
+  {t:'Your password',            e:'🔑', safe:false},
+  {t:'Your bank card number',    e:'💳', safe:false},
+  {t:'A photo of your passport', e:'🛂', safe:false},
+  {t:'Your first name',          e:'🧑', safe:true},
+  {t:'Your class day',           e:'📅', safe:true},
+  {t:"Your teacher's name",      e:'👩‍🏫', safe:true},
+  {t:'Your favourite colour',    e:'🎨', safe:true},
 ];
-/* `from` chooses the kind, the same way Copy It does: 0 copies the code, 1
+/* Not "The suburb you live in", which was in this list as safe. Plenty of adults
+   would say telling a stranger where you live is exactly what you do not do, and
+   they are not wrong. An option that is arguable is rule 13's odd one that is not
+   clearly odd: the round stops being about the risk and becomes about guessing
+   which answer the app had in mind. */
+const SAFE_YESNO={Yes:'<span>👍</span>', No:'<span>👎</span>'};/* `from` chooses the kind, the same way Copy It does: 0 copies the code, 1
    judges what is safe to share. One kind per step, so a run asks each once
    instead of dealing codes over and over to reach the other half. */
 function genSafeQuestions(n,from){
   const out=[];
   for(let i=0;i<(n||8);i++){
     if(from){
+      /* Yes or no, with a picture on each. "Safe to share" against "Keep it
+         private" asked for a judgement about risk in phrases the band does not
+         have: sixteen words to hold, and the two options are the hardest English
+         on the card. The judgement itself is what the feature names ("Begins to
+         understand there are risks associated with providing information"), so
+         the ask stays and the English goes. Two options, because the feature is a
+         yes or no and a third would be a distractor invented to pad it. */
       const it=SAFE_ITEMS[randInt(0,SAFE_ITEMS.length-1)];
-      const correct=it.safe?'Safe to share':'Keep it private';
-      out.push({type:'mc', say:'Can you share this with anyone? '+it.t,
-        icon:'<span style="font-size:2.6rem;">'+(it.safe?'🙂':'🔒')+'</span>',
-        question:'🔊 '+it.t, answer:correct.toLowerCase(), hearOpts:true,
-        choices:shuffle([correct, it.safe?'Keep it private':'Safe to share'])});
+      out.push({type:'mc', say:'Can you share this? '+it.t,
+        icon:'<span style="font-size:2.6rem;">'+it.e+'</span>',
+        question:'🔊 '+it.t, answer:it.safe?'yes':'no',
+        art:SAFE_YESNO, choices:shuffle(['Yes','No'])});
     } else {
       // A code you copy exactly, digit for digit. The checklist calls it a
       // risk protection code; on a phone it is the PIN, and copying one
@@ -4285,7 +4372,12 @@ const CASE_NAMES=['Ali','Fatima','Nada','Hassan','Maria','Omar','Linh','Sara'];
 function genCaseQuestions(n,from){
   const out=[];
   for(let i=0;i<(n||8);i++){
-    if(from&&i%2===1){
+    /* `from` names the round: 0 tells the two forms of a letter apart, 1 writes
+       a name with its capital, and nothing at all alternates for the game. It
+       was `from&&i%2===1`, so the step the pool declares as the writing one
+       dealt the tapping round on every run and was credited with both of the
+       .06 rows anyway. */
+    if(from===1||(from==null&&i%2===1)){
       // A name is the word every learner has to get the capital right on.
       const nm=CASE_NAMES[randInt(0,CASE_NAMES.length-1)];
       out.push({type:'typein', label:'WRITE IT WITH A CAPITAL', noListen:true,
@@ -4323,7 +4415,11 @@ function genDirectionQuestions(n){
     const words=src[randInt(0,src.length-1)].replace(/[.?!]/g,'').split(/\s+/);
     if(words.length<3) continue;
     const line='<span class="dir-line">'+words.map(function(w){ return '<span>'+w+'</span>'; }).join('')+'</span>';
-    const ask=i%2===0;
+    /* Which end to ask for is drawn, not taken from the draw index. Both ends
+       stand for the one feature this round has ("Follows print from left to
+       right and top to bottom"), but a level check deals one question, so `i`
+       was always 0 and the round asked "which word is first?" every time. */
+    const ask=Math.random()<0.5;
     const correct=ask?words[0]:words[words.length-1];
     // A sentence can say the same word twice, and two identical options mean
     // a learner tapping the "wrong" one has in fact answered correctly.
@@ -4370,7 +4466,8 @@ function genPunctuationQuestions(n,from){
   for(let i=0;i<(n||8);i++){
     const raw=src[randInt(0,src.length-1)].replace(/[.?!]+$/,'');
     const good=raw.charAt(0).toUpperCase()+raw.slice(1)+'.';
-    if(from&&i%2===1){
+    // `from` names the round, 0 tapped and 1 written, for the reason above.
+    if(from===1||(from==null&&i%2===1)){
       // Write it properly, rather than picking the one that is.
       out.push({type:'typein', label:'ADD THE CAPITAL AND THE FULL STOP', noListen:true,
         icon:'<span class="copy-model">'+raw.toLowerCase()+'</span>',
@@ -4459,7 +4556,9 @@ function genNoticeQuestions(n){
       +(N.p?'<div class="nt-p">'+N.p+'</div>':'')+'</div>';
     const opts=[['What is this notice about?',N.h],['When is it?',N.d]];
     if(N.p) opts.push(['How much is it?',N.p]);
-    const pick=opts[i%opts.length];
+    // Drawn rather than walked: dealt one at a time, i%opts.length is always the
+    // first of the three, so the heading question was the only one a run saw.
+    const pick=opts[randInt(0,opts.length-1)];
     const alts=[N.h,N.l,N.d,N.p].filter(function(x){ return x&&x!==pick[1]; }).slice(0,3);
     out.push({type:'mc', noListen:true, icon:html, question:pick[0],
       answer:pick[1].toLowerCase(), choices:shuffle([pick[1]].concat(alts))});
@@ -4522,21 +4621,33 @@ function genGreetingQuestions(n){
    step oral or pictorial instruction to activate or deactivate tool".
    The learner hears an instruction and taps the thing it names, so following
    it is the answer rather than a description of it. */
-const INSTRUCTIONS=[
+/* Two halves, and `from` names which. The .13 claim is "Follows a single step
+   oral or pictorial instruction to activate or deactivate **tool**", and it sat
+   on the whole bank while seven of the twelve items were a book, a pen, a bag, a
+   chair and a door. Tapping a bag is not activating a tool, so a run could show
+   the feature without ever putting a control in front of the learner. The
+   objects stay: they are what .08's "short extremely familiar instructions"
+   asks for, and they are the easier half of the game. */
+const INSTRUCTION_THINGS=[
   {say:'Tap the book.',        a:'book',    alts:['pen','bag','chair']},
   {say:'Tap the pen.',         a:'pen',     alts:['book','cup','door']},
   {say:'Open the door.',       a:'door',    alts:['window','book','bag']},
-  {say:'Tap the phone.',       a:'phone',   alts:['laptop','camera','headphones']},
+  {say:'Tap the bag.',         a:'bag',     alts:['chair','book','cup']},
+  {say:'Tap the chair.',       a:'chair',   alts:['door','bag','window']},
+  {say:'Tap the cup.',         a:'cup',     alts:['book','pen','bag']},
+  {say:'Tap the window.',      a:'window',  alts:['door','chair','cup']},
+];
+/* Every one of these turns something on or off, which is what the feature names.
+   "Tap the phone." was here and is not: tapping a picture of a phone among a
+   laptop and a camera is naming a device, which is the Devices round's job. */
+const INSTRUCTION_TOOLS=[
   {say:'Turn the sound on.',   a:'sound on',alts:['sound off','battery','internet']},
   {say:'Turn the sound off.',  a:'sound off',alts:['sound on','internet','settings']},
   {say:'Turn on the internet.',a:'internet',alts:['battery','bin','camera']},
   {say:'Charge the battery.',  a:'charger', alts:['bin','search','message']},
   {say:'Take a photo.',        a:'camera',  alts:['headphones','keyboard','printer']},
   {say:'Put it in the bin.',   a:'bin',     alts:['save','home','play']},
-  {say:'Tap the bag.',         a:'bag',     alts:['chair','book','cup']},
-  {say:'Tap the chair.',       a:'chair',   alts:['door','bag','window']},
-];
-/* The picture is the support the checklist asks for ("supported with a
+];/* The picture is the support the checklist asks for ("supported with a
    prompt", "supported with gestures"); the word beside it is what makes the
    answer a distinct thing rather than an emoji, which normalize() would
    strip to nothing and mark every option correct. */
@@ -4558,8 +4669,10 @@ function instrArtMap(words){
   words.forEach(function(w){ m[w]=instrArt(w); });
   return m;
 }
-function genInstructionQuestions(n){
-  const out=[], pool=shuffle(INSTRUCTIONS.slice()).slice(0,n||8);
+function genInstructionQuestions(n,from){
+  const src=from===0?INSTRUCTION_THINGS:from===1?INSTRUCTION_TOOLS
+                    :INSTRUCTION_THINGS.concat(INSTRUCTION_TOOLS);
+  const out=[], pool=shuffle(src.slice()).slice(0,n||8);
   pool.forEach(function(it){
     const words=shuffle([it.a].concat(it.alts));
     out.push({type:'mc', say:it.say, question:'🔊 '+it.say,
@@ -5169,7 +5282,7 @@ const GEN_BANKS={
   numeralwrite: function(n,f){ return genNumeralWriteQuestions(n,f?100:10); },
   addup:        function(n,f){ return genAddQuestions(n,f?100:10,false); },
   addmoney:     function(n,f){ return genAddQuestions(n,f?100:10,true); },
-  ordering:     function(n,f){ return genOrderQuestions(n,f?100:10); },
+  ordering:     function(n,f){ return genOrderQuestions(n,f); },
   placevalue:   function(n){ return genPlaceValueQuestions(n); },
   tableread:    function(n,f){ return genTableQuestions(n,f); },
   digitaltime:  function(n,f){ return genDigitalTimeQuestions(n,f); },
@@ -5188,7 +5301,7 @@ const GEN_BANKS={
   modelsentence:function(n,f){ return genSentenceQuestions(n,f); },
   notice:       function(n){ return genNoticeQuestions(n); },
   greetings:    function(n){ return genGreetingQuestions(n); },
-  instructions: function(n){ return genInstructionQuestions(n); },
+  instructions: function(n,f){ return genInstructionQuestions(n,f); },
   mylearning:   function(n,from){ return genMyLearningQuestions(n,from); },
 };
 const RETIRED_GAMES={devicecare:'prompts'};
@@ -5220,7 +5333,12 @@ function drawGen(type,n,from){
      avoiding what the game has already shown, so a bank that has run out of
      fresh questions still deals rather than dealing nothing. */
   for(let pass=0;pass<4&&out.length<want;pass++){
-    const batch=GEN_BANKS[type](Math.max(want*3,12),from||0);
+    /* `from` is passed on as it came, not coerced to 0: undefined means the
+       caller wants whatever the bank deals by default, which for a bank holding
+       two rounds is the mix. Coercing it here made "no round asked for" and
+       "round 0" the same request, so every generated bank dealt only its first
+       round outside the level check. */
+    const batch=GEN_BANKS[type](Math.max(want*3,12),from);
     for(let i=0;i<batch.length&&out.length<want;i++){
       const k=qKey(batch[i]);
       if(keys.has(k)) continue;
@@ -5255,16 +5373,19 @@ function genDistinctCount(type){
   return (GEN_SIZES[type]=seen.size);
 }
 
-/* `from` is the round a caller wants, for the fixed banks that hold more than
-   one. It was only ever forwarded to the generated banks, so a pool step could
-   name a round of a fixed bank and be given the whole bank instead, silently:
-   the same class of fault as a generator choosing its round from the draw
-   index. Undefined means the whole bank, which is what every ordinary caller
-   passes and what every one of them wants. */
+/* `from` is the round a caller wants. It reaches both kinds of bank now. For a
+   fixed bank it was once dropped, so a pool step could name a round and be given
+   the whole bank instead; for a generated one it was pinned to 0 here, which is
+   the same fault from the other end. Round 0 and "no round asked for" are not the
+   same request, and treating them as one meant the Devices game never asked what
+   a device is for, What Should You Do? never dealt a device problem, and Safe or
+   Private never dealt the judgement, in every game outside the level check.
+   Undefined means the whole bank, which is what every ordinary caller passes and
+   what every one of them wants. */
 function getQuestions(type,limit,from){
   // Dice games have no questions at all — they run their own screens.
   if(isSpecialGame(type)) return [];
-  if(isGenBank(type)) return drawGen(type,limit,0);
+  if(isGenBank(type)) return drawGen(type,limit,from);
   // Both word-pronunciation banks are drawn fresh so the families, the words
   // and the round shapes vary between games.
   if(isPhonicsType(type)) return genPhonicsQuestions(type,limit);
@@ -7610,7 +7731,7 @@ const TEST_LADDERS={
   digital:[
     {type:'devices',     mc:true,  from:0, label:'Name the device'},
     {type:'digisymbols', mc:true,  label:'What the button does'},
-    {type:'instructions',mc:true,  label:'Listen, then do what it says'},
+    {type:'instructions',mc:true,  from:1, label:'Listen, then do what it says'},
     {type:'prompts',     mc:true,  label:'A message on the screen — what to do'},
     {type:'devices',     mc:true,  from:1, label:'What the device is for'},
     {type:'safeinfo',    mc:false, from:0, label:'Copy the code'},
@@ -7875,11 +7996,15 @@ const ACSF_CLAIMS={
   'direction':{base:[
     ['04','PLA','Follows print from left to right and top to bottom'],
   ]},
-  'casematch':{base:[
-    ['04','PLA','Recognises different forms of the same letters, e.g. upper and lower case'],
-    ['06','PLA','Copies text, but demonstrates lack of consistency between upper and lower case'],
-    ['06','PLB','Uses upper and lower case in extremely familiar words, e.g. own name'],
-  ]},
+  /* Split by round, because the two rounds show different things: telling the
+     big letter from the small one is recognising a form, and writing a name with
+     its capital is producing one. They were listed together on `base`, so the
+     step the pool declares as the writing step promised the staircase both .06
+     rows and then dealt the tapping round. */
+  'casematch':{base:[],
+    byFrom:{0:[['04','PLA','Recognises different forms of the same letters, e.g. upper and lower case']],
+            1:[['06','PLA','Copies text, but demonstrates lack of consistency between upper and lower case'],
+               ['06','PLB','Uses upper and lower case in extremely familiar words, e.g. own name']]}},
   'clothes':{base:[
     ['04','PLA','Recognises a small bank of extremely familiar words supported by pictures'],
   ]},
@@ -7966,11 +8091,16 @@ const ACSF_CLAIMS={
     ['08','PLA','Understands some extremely familiar requests for basic information'],
     ['08','PLB','Understands requests for limited personal information'],
   ]},
+  /* The .13 row hangs off `from`, because only the tool half shows it: the
+     objects half asks a learner to tap a book, which evidences .08 and nothing
+     about activating a tool. Same shape as What Should You Do?, and the same
+     reason: `base` describes what the bank could show, and the staircase needs
+     what this step will show. */
   'instructions':{base:[
     ['08','PLA','Understands some short extremely familiar instructions supported with a prompt'],
     ['08','PLB','Understands extremely familiar and explicit instructions supported with gestures'],
-    ['13','PLA','Follows a single step oral or pictorial instruction to activate or deactivate tool'],
-  ]},
+  ],
+    byFrom:{1:[['13','PLA','Follows a single step oral or pictorial instruction to activate or deactivate tool']]}},
   'numbertap':{base:[
     ['09','PLA','Shows some recognition of whole numbers up to 10 (including 0)'],
     ['09','PLB','Whole numbers up to 100 (including 0)'],
@@ -8024,11 +8154,14 @@ const ACSF_CLAIMS={
     ['10','PLA','Adds two whole dollar monetary amounts, up to a total of $10 or less'],
     ['10','PLB','Adds two whole dollar monetary amounts, up to a total of $100 or less (with no carrying)'],
   ]},
-  'ordering':{base:[
-    ['10','PLA','Orders: Australian whole dollar notes and coins up to $10 AND two whole numbers between 1 and 10'],
-    ['10','PLB','Orders days of the week and months of the year'],
-    ['10','PLB','Orders in increasing value: Australian whole dollar notes and coins AND three whole numbers between 1 and 100'],
-  ]},
+  /* Three rounds, three features, and `from` names which. Not in ACSF_RANGED any
+     more: its `from` carries the kind as well as the range now, so the split is
+     written out here where both axes are visible together rather than half in one
+     mechanism and half implied by the other. Read the List is the same shape. */
+  'ordering':{base:[],
+    byFrom:{0:[['10','PLA','Orders: Australian whole dollar notes and coins up to $10 AND two whole numbers between 1 and 10']],
+            1:[['10','PLB','Orders in increasing value: Australian whole dollar notes and coins AND three whole numbers between 1 and 100']],
+            2:[['10','PLB','Orders days of the week and months of the year']]}},
   'placevalue':{base:[
     ['10','PLB','Understands place value for ones and tens'],
   ]},
@@ -8068,13 +8201,15 @@ const ACSF_CLAIMS={
    numbers to 10, which is the Stage A feature; at from 1 it asks to 100,
    which is the Stage B one. Claiming both from either would say a learner
    recognised numbers to 100 when they were only ever shown numbers to 10.
-   The banks that alternate their modes within a single draw (Copy It, Big and
-   Small Letters, Capitals and Full Stops, Safe or Private) genuinely do show
-   both halves in one round, so they are not listed here. */
+   Copy It and Safe or Private are not here because their `from` already names
+   the round outright. Big and Small Letters and Capitals and Full Stops used to
+   be excused on the grounds that they "show both halves in one round", which was
+   true of a ten question game and false of the level check, which deals one
+   question: both now name their round through `from` as well. */
 /* Read the List is not here any more: its `from` carries a round kind as well
    as a range, so the split is written out in its `byFrom` where both axes are
    visible together, rather than half here and half implied. */
-const ACSF_RANGED={numbertap:1,numeralwrite:1,addup:1,addmoney:1,ordering:1,devices:1};
+const ACSF_RANGED={numbertap:1,numeralwrite:1,addup:1,addmoney:1,devices:1};
 
 /* A step is {type, mc, from} — the shape the ladders already use — so this
    answers for a level-check band, an ordinary Test Yourself rung, and the
@@ -8179,6 +8314,7 @@ const ACSF_POOL=[
   {type:'addup',mc:false,from:0},{type:'addup',mc:false,from:1},
   {type:'addmoney',mc:false,from:0},{type:'addmoney',mc:false,from:1},
   {type:'ordering',mc:false,from:0},{type:'ordering',mc:false,from:1},
+  {type:'ordering',mc:false,from:2},
   {type:'placevalue',mc:true},{type:'ordinals',mc:true,from:0},
   {type:'position',mc:true,from:0},{type:'position',mc:true,from:1},
   {type:'digitaltime',mc:true,from:1},{type:'digitaltime',mc:false,from:2},
@@ -8187,7 +8323,7 @@ const ACSF_POOL=[
   {type:'devices',mc:true},{type:'devices',mc:true,from:1},{type:'digisymbols',mc:true},
   {type:'prompts',mc:true,from:0},{type:'prompts',mc:true,from:1},
   {type:'safeinfo',mc:false,from:0},{type:'safeinfo',mc:false,from:1},
-  {type:'instructions',mc:true},
+  {type:'instructions',mc:true,from:1},
   // Learning
   {type:'mylearning',mc:true,from:0},
   {type:'greetings',mc:true},
