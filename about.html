@@ -80,14 +80,33 @@
   .card.plain { font-size: 1.12rem; line-height: 1.8; }
   .card.plain p { margin-bottom: 14px; }
 
+  /* The buttons are the page's real navigation for a learner who cannot yet
+     read the paragraphs around them, so they sit in a row of their own rather
+     than at the end of a sentence. */
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+
   /* Selector carries `.card a` so it outranks the link colour above — as a
      bare `.cta` it lost, and the label rendered blue on a blue pill. */
   .card a.cta {
-    display: inline-block; margin-top: 6px;
+    display: inline-flex; align-items: center; gap: 10px; min-height: 52px;
     font-family: 'Fredoka One', cursive; font-size: 1.05rem; font-weight: 400;
     background: var(--accent2); color: white; text-decoration: none;
     padding: 12px 26px; border-radius: 40px;
     box-shadow: 0 4px 14px rgba(74,144,217,0.4);
+  }
+  /* Colour and icon are what tell one pill from another before the label can
+     be read, so each destination keeps its own pair. */
+  .card a.cta.warm {
+    background: var(--accent1); box-shadow: 0 4px 14px rgba(244,132,95,0.4);
+  }
+  .card a.cta.cool {
+    background: var(--teal); box-shadow: 0 4px 14px rgba(43,170,138,0.4);
+  }
+  .cta-icon { font-size: 1.2rem; line-height: 1; }
+  /* On a phone a ragged half row reads as one broken button, so each pill
+     takes the full width and stacks. */
+  @media (max-width: 480px) {
+    .cta-row a.cta { flex: 1 1 100%; justify-content: center; }
   }
   .note {
     font-size: 0.85rem; color: var(--mid); border-left: 3px solid var(--light);
@@ -123,7 +142,13 @@
       — Dari, Vietnamese, Chinese, Urdu, Khmer, Burmese, Hindi, Arabic or Thai.</p>
     <p>You can use it on your phone. Take your time. Go back as many times as
       you like.</p>
-    <a class="cta" href="index.html">Start reading →</a>
+    <div class="cta-row">
+      <a class="cta" href="index.html"><span class="cta-icon" aria-hidden="true">📖</span>Start reading</a>
+      <a class="cta warm" href="tracing.html"><span class="cta-icon" aria-hidden="true">✏️</span>Trace letters</a>
+      <a class="cta cool" href="game.html?mode=solo"><span class="cta-icon" aria-hidden="true">🎮</span>Practise with games</a>
+      <a class="cta warm" href="index.html?section=speaking"><span class="cta-icon" aria-hidden="true">🗣️</span>Speaking practice</a>
+      <a class="cta cool" href="game.html?mode=solo&amp;game=test:level"><span class="cta-icon" aria-hidden="true">📋</span>Check your level</a>
+    </div>
   </div>
 
   <div class="card">
@@ -192,6 +217,12 @@
     <p>Nothing needs installing. It runs in a browser, works on cheap phones, and
       keeps working offline once a learner has opened it, which matters when data
       is scarce.</p>
+
+    <div class="cta-row">
+      <a class="cta" href="game.html?mode=teacher"><span class="cta-icon" aria-hidden="true">👩‍🏫</span>Classroom game</a>
+      <a class="cta cool" href="game.html?mode=solo&amp;game=test:level"><span class="cta-icon" aria-hidden="true">📋</span>Level check</a>
+      <a class="cta warm" href="index.html"><span class="cta-icon" aria-hidden="true">📖</span>Try it as a learner</a>
+    </div>
 
     <h3>Where it fits</h3>
     <p>The content sits at roughly <strong>ACSF pre-level to Level 1</strong> for
