@@ -420,6 +420,17 @@ The commonest way a question stops measuring anything. Two forms:
   were the same option and both marked correct. The rent message uses `$230`
   now. The check counts how many options match the answer after normalising; it
   must be exactly one.
+- **In the picture.** Safe or Private drew its icon from the answer, 🙂 for safe
+  and 🔒 for private, over two options. The padlock was the answer printed above
+  the question, and every rule here read the speech and the options and none of
+  them had ever looked at the icon.
+
+  The rule is narrower than "the icon must not predict the answer", because where
+  the picture **is** the question it predicts the answer and is right to: Devices
+  shows a keyboard and asks what it is called. The tell is a round whose written
+  question already carries the item, and whose pictures are fewer than its
+  questions and line up one for one with the answers it has to give. That is a
+  picture of the answer and nothing else, and it is what `leaks` holds now.
 
 ### 10. Audio and its replay button agree
 *check: `audio`*
@@ -504,6 +515,43 @@ read, not that a price was located.
 
 Grep for `i%` in the generators when a report says a question keeps coming back.
 Any bank that picks its kind that way deals only kind 0 to the level check.
+
+It was reported a second time from the other end, as a question about difficulty
+rather than about repetition:
+
+> "How much are other skills like reading and listening involved in answering the
+> digital literacy questions?"
+
+Devices chose between naming a device and saying what it is for on `i%2`, so the
+pool step that carries "Begins to understand the purpose of some commonly used
+digital devices and software" at both `.12` and `.13` dealt the naming round on
+every run, and `acsfNoteAsked` marked both features shown off the answer. Not a
+repeat this time, and nothing on the screen looked wrong: the report a teacher
+read simply said something about the learner that had never been asked.
+
+`rounds` is the check, and the reason none of the others caught it is the lesson:
+**`options`, `integrity` and `spread` all deal a pool step eight or twenty
+questions at a time, and a run deals it one.** Dealt eight, every one of these
+banks looks right. So the check deals each step forty times at one question and
+four times at twenty and compares: a round that is a third or a half of a long
+draw and never once appears in a single draw is a round chosen by the draw index.
+The share is what keeps a bank of a hundred prices out of it.
+
+It found the same fault in eight more banks in one run, which is rule 20 working.
+The fix divides in two, and which half applies is decided by the claim map, not by
+the bank:
+
+- **Where the claims differ per kind, `from` names the kind** and `byFrom` splits
+  them. Put In Order claimed "Orders days of the week and months of the year" off
+  a step that could only ever deal numbers. Big and Small Letters and Capitals and
+  Full Stops both had a pool step declared as the writing one that dealt the
+  tapping round. All three were excused in a comment for showing "both halves in
+  one round", which is true of a ten question game and false of a level check.
+- **Where one feature covers every kind, the kind is drawn rather than indexed**,
+  so a single draw can be any of them. Which Comes First only ever asked for the
+  first word, Tens and Ones only the tens, Find the Date only the day, Write the
+  Number only the number, Read the Notice only the heading, and First, Second,
+  Third only the half that is not the spoken one its feature names.
 
 ### 12c. An option a learner cannot read is not a question about the indicator
 *check: `options`*
@@ -613,6 +661,57 @@ It also caught what the report did not mention. "Good morning." was answered by
 option gave itself away in text before audio was ever added, and it was the one item a chip could
 not be given. It is asked the way it happens now: *You arrive at class in the
 morning*.
+
+### 12f. A chip on the option moves the confound, it does not remove it
+*no check, judgement. The measurement below is the method*
+
+> "How much are other skills like reading and listening involved in answering the
+> digital literacy questions? Aren't the questions too difficult and dependent on
+> things other than digital literacy?"
+
+Rule 12c put `q.hearOpts` on every option outside Reading, so nothing has to be
+read. What it did not do is make anything shorter. Count what a learner has to
+take in to answer one question, the spoken prompt plus every option, because an
+option that is heard is an option that has to be held:
+
+| round | before | after |
+|---|---|---|
+| Name the device | 8 | 8 |
+| Screen symbols | 10 | 8 |
+| Safe or private | 16 | 7 |
+| What is it for | 24 | 8 |
+| Notice, what should you do | 26 | 17 |
+| Device problem | 29 | 8 |
+
+Twenty-nine words is "The screen is black and it will not turn on. What is wrong?"
+over four options like "It is upside down". The band it was testing says, at `.08`
+Stage A, "Understands extremely familiar social exchanges using single words", and
+at Stage B "phrases and occasional, extremely simple sentences". `prompts` claims
+only `.13`, so a learner who lost it on the English had that written down as a
+digital literacy failure and nothing else: every indicator confounded with `.08`
+this time instead of with `.03` and `.04`.
+
+The fix is the one Listen and Do already used: **say it once, answer it with a
+picture.** "Which one do you use to take a photo?" over four device drawings asks
+the same thing as four written purposes and costs a third of the words. Where a
+bank had no picture for an answer, `INSTRUCTION_ART` usually already did.
+
+Two things this rule is not:
+
+- **It is not a word cap.** Run the same count over the whole pool and the
+  heaviest rounds left are Read the Sign, Screen Messages, Read the Notice,
+  greetings and the punctuation round, at 12 to 27 words. In every one of those
+  the text **is** the thing under test, and `.13` PLB 5 names it outright:
+  "digital prompts or alerts, **texts** and symbols". So the notice keeps its
+  dialog and its 17 words, and only its register was trimmed.
+- **It is not about making questions easy.** Safe or Private went from "Safe to
+  share" against "Keep it private" to yes and no with a thumb on each, and the
+  judgement it asks for did not change. What went was the English wrapped around
+  it.
+
+The general rule: **when an indicator's questions are the longest in the test, the
+indicator is measuring the length.** Count the words before arguing about the
+wording.
 
 ### 12e. The register is named in the documents, not guessed at from word length
 *check: `register`*

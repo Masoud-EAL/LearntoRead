@@ -439,9 +439,9 @@ cap note, not in a line that reads as a gap in the run.
 
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
-| 1 | Begins to understand the purpose of some commonly used digital devices and software | 🆕 built | Using a Device: what is it for |
+| 1 | Begins to understand the purpose of some commonly used digital devices and software | 🆕 built | Using a Device: which one do you use to ... |
 | 2 | Begins to use an extremely limited number of digital devices and software applications | 📊 from the run | works the app on a phone or tablet |
-| 3 | Begins to understand there are risks associated with providing information | 🆕 built | Using a Device: safe or not safe |
+| 3 | Begins to understand there are risks associated with providing information | 🆕 built | Using a Device: can you share this? |
 
 ### `PLA1.13` — Knowledge, use and application of digital literacy skills, Pre Level 1 Stage A
 
@@ -450,14 +450,14 @@ cap note, not in a line that reads as a gap in the run.
 | 1 | Begins to recognise extremely familiar digital devices | 🆕 built | Using a Device: which device |
 | 2 | Begins to recognise extremely familiar digital symbols | 🆕 built | Using a Device: screen symbols |
 | 3 | Uses an extremely limited range of digital letters and symbols | 🆕 built | Write the Number with symbols / typed answers |
-| 4 | Follows a single step oral or pictorial instruction to activate or deactivate tool | 🆕 built | Listen and Do: turn it on or off |
+| 4 | Follows a single step oral or pictorial instruction to activate or deactivate tool | 🆕 built | Listen and Do: the sound, the internet, the charger, the bin |
 | 5 | Begins to use digital peripherals | 📊 from the run | taps, types, drags, picks coins |
 
 ### `PLB1.13` — Knowledge, use and application of digital literacy skills, Pre Level 1 Stage B
 
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
-| 1 | Begins to understand the purpose of some extremely familiar digital devices and software | 🆕 built | Using a Device: what is it for |
+| 1 | Begins to understand the purpose of some extremely familiar digital devices and software | 🆕 built | Using a Device: which one do you use to ... |
 | 2 | Demonstrates an extremely limited capacity to maintain digital devices | 🆕 built | What Should You Do? (the device-problem half) |
 | 3 | Begins to navigate extremely simple digital screen | 📊 from the run | moves between screens in the app |
 | 4 | Uses an extremely limited number of digital devices and software applications | 📊 from the run | works the app on a phone or tablet |

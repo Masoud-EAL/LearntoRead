@@ -863,6 +863,36 @@ check('leaks', 'no question speaks or shows its own answer, and no two options c
             out.push(g + ': asks the learner to listen but plays nothing. ' + asked.trim());
           }
         });
+        /* The picture identifies the question, not the answer. Safe or Private
+           took its icon straight from the answer, 🙂 for safe and 🔒 for private,
+           over two options, so the padlock was the answer printed above the
+           question. Every rule above reads the speech and the options; none of
+           them had ever looked at the icon.
+
+           Where the picture IS the question it identifies the answer too, and
+           rightly: a device round shows a keyboard and asks what it is called.
+           So the tell is narrower than "the icon predicts the answer". It is a
+           round whose written question already carries the item, and whose
+           pictures are fewer than its questions and line up one for one with the
+           answers it has to give. That is a picture of the answer and nothing
+           else. */
+        const iconed = (qs || []).filter(q => q.icon);
+        if (iconed.length > 3) {
+          const icons = new Set(iconed.map(q => String(q.icon)));
+          const prompts = new Set(iconed.map(q => String(q.question || '')));
+          const answers = new Set(iconed.map(q => normalize(String(q.answer == null ? '' : q.answer))));
+          const seen = {};
+          let tells = true;
+          iconed.forEach(function (q) {
+            const k = String(q.icon), a = normalize(String(q.answer == null ? '' : q.answer));
+            if (seen[k] === undefined) seen[k] = a; else if (seen[k] !== a) tells = false;
+          });
+          if (tells && icons.size > 1 && icons.size === answers.size && icons.size < prompts.size) {
+            out.push(g + ' [' + from + ']: ' + icons.size + ' pictures over ' + prompts.size +
+                     ' questions, one for each of its ' + answers.size +
+                     ' answers. The picture is a picture of the answer');
+          }
+        }
       });
     });
     return { out: [...new Set(out)], n: n };
@@ -935,6 +965,62 @@ check('repeats', 'no bank repeats inside a run, and the launch count is a real c
       bad('repeats: ' + r.g + ' promises "' + r.line + '" but only ' + r.distinct + ' exist');
     }
   });
+});
+
+check('rounds', 'a step deals the round it names, however many you ask for', async ctx => {
+  /* "Why did I get five copy a word questions?" was a step's claims disagreeing
+     with what its round showed. This is the same disagreement one level down, and
+     it hid for as long as it did because every other check deals a pool step eight
+     or twenty questions at a time while a run deals it one.
+
+     Devices chose between naming a device and saying what it is for on `i%2`, the
+     draw index. Ask for twelve and you see both; ask for one and `i` is 0 and you
+     see naming, every single time. The step that carries the two "understands the
+     purpose" features dealt the naming round on every run in production, and the
+     staircase marked both features shown off the answer.
+
+     So: deal each step the way a run deals it, and the way a game deals it, and
+     compare. A round the step deals often when asked for many and never once when
+     asked for one is a round chosen by the draw index. The share is what keeps a
+     bank of a hundred prices out of it: each sum or amount is a few percent of the
+     draw, while a round kind is a third or a half of it. */
+  const SHARE = 0.15;      // below this it is content varying, not a round kind
+  const DRAWS = 40;
+  const out = await ctx.page.evaluate(([share, draws]) => {
+    const bad = [];
+    /* What a round IS, rather than what this draw of it says: its answer shape,
+       the label above it, and the opening of the question. The prices and sums
+       that vary inside one round stay inside one key that way. */
+    const key = q => (q.type || 'mc') + ' | ' + (q.label || '') + ' | ' +
+      String(q.question || '').replace(/<[^>]*>/g, ' ').trim().split(/\s+/).slice(0, 4).join(' ');
+    ACSF_POOL.forEach(function (st) {
+      const one = {}, many = {};
+      let total = 0;
+      for (let i = 0; i < draws; i++) {
+        // Dealt fresh each time: the no-repeat memory is what let the odd purpose
+        // question through now and then, which is the sort of luck that turns a
+        // broken step into a flaky one instead of a failing one.
+        resetGenSeen();
+        try { testQuestions(st, 1).forEach(q => { one[key(q)] = 1; }); } catch (e) { return; }
+      }
+      for (let i = 0; i < 4; i++) {
+        resetGenSeen();
+        try {
+          testQuestions(st, 20).forEach(q => { many[key(q)] = (many[key(q)] || 0) + 1; total++; });
+        } catch (e) { return; }
+      }
+      if (!total) return;
+      Object.keys(many).forEach(function (k) {
+        if (one[k] || many[k] / total < share) return;
+        bad.push(acsfStepKey(st) + ' deals "' + k.split(' | ').pop() + '" as ' +
+                 Math.round(many[k] / total * 100) + '% of a long draw and never once ' +
+                 'in ' + draws + ' single draws');
+      });
+    });
+    return { bad: bad, pool: ACSF_POOL.length };
+  }, [SHARE, DRAWS]);
+  say('  ' + out.pool + ' pool steps dealt ' + DRAWS + ' times one at a time and four times twenty at a time');
+  out.bad.forEach(x => bad('rounds: ' + x));
 });
 
 check('oddone', 'the odd one out is clearly odd', async ctx => {
