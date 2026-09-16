@@ -150,9 +150,7 @@ const PLAY = function (how, reportSrc, mode) {
           a = String(a).toLowerCase().replace(/ /g, '');
         }
       }
-      const tier = how === 'blank' ? 'wrong'
-        : isOpenQ(q) ? 'correct'
-        : (typeinTier(q, a) || (normalize(a) === normalize(q.answer) ? 'correct' : 'wrong'));
+      const tier = how === 'blank' ? 'wrong' : answerTier(q, a);
       testRecord(tier, tier === 'correct' ? 10 : 0, false, a);
     });
     testEndRound();
@@ -580,6 +578,109 @@ check('prices', 'a shop round names something its price would buy', async ctx =>
   if (out.gaps.length) bad('prices: nothing in the shop costs ' + out.gaps.join(', '));
 });
 
+check('money', 'an amount is marked as an amount, however it is written', async ctx => {
+  const out = await ctx.page.evaluate(() => {
+    const bad = [], seen = [];
+    // Marked the way the app marks it, through the app's own function.
+    const mark = (q, typed) => answerTier(q, typed);
+    /* Every way of writing one amount that a learner might reasonably write,
+       and the ways that are a different amount. The reported bug is the first
+       line of the first list: a $2 coin whose answer was "2.00" and whose box
+       said "e.g. 2". */
+    const forms = c => {
+      const ok = [moneyAnswer(c), '$' + moneyAnswer(c)];
+      const no = [];
+      if (c % 100 === 0) {
+        ok.push(String(c / 100), '$' + String(c / 100), (c / 100) + ' dollars');
+      }
+      if (c < 100) {
+        const cc = (c < 10 ? '0' : '') + c;
+        ok.push('0.' + cc, '.' + cc, c + 'c', c + ' cents');
+      } else if (c % 100) {
+        ok.push(Math.floor(c / 100) + ' dollars and ' + (c % 100) + ' cents');
+        // The digits with the point taken out: the string the letters test used
+        // to read as the same answer.
+        no.push(String(c));
+      } else {
+        no.push(String(c));
+      }
+      no.push(moneyAnswer(c + 100), moneyAnswer(c >= 200 ? c - 100 : c + 1000));
+      return { ok: ok, no: no };
+    };
+    /* A shape read off the round's own placeholder, with this question's amount
+       written into it. The placeholder is an example, and an example a round
+       will not accept is the fault one step before the marking. */
+    const asShown = (eg, c) => {
+      if (eg.indexOf('$') >= 0) return '$' + moneyAnswer(c);
+      if (/c$/.test(eg)) return c < 100 ? c + 'c' : null;
+      if (eg.indexOf('.') >= 0) return moneyAnswer(c);
+      return c % 100 === 0 ? String(c / 100) : null;   // bare is dollars
+    };
+
+    // Every step of the pool that takes an amount, and both ranges of each.
+    [['numeralwrite', 0], ['numeralwrite', 1], ['addmoney', 0], ['addmoney', 1],
+     ['shopsmall', 1], ['shopsmall', 2], ['shop', 1], ['shop', 2]].forEach(pair => {
+      const qs = (GEN_BANKS[pair[0]](30, pair[1]) || []).filter(q => q.money);
+      if (!qs.length && pair[0] !== 'numeralwrite') {
+        bad.push(pair[0] + ' from ' + pair[1] + ' deals no money question');
+      }
+      qs.forEach(q => {
+        const want = moneyCents(q.answer);
+        if (!want) { bad.push(pair[0] + ': the answer "' + q.answer + '" is not an amount'); return; }
+        const c = want.cents; seen.push(c);
+        const f = forms(c);
+        f.ok.forEach(w => {
+          if (mark(q, w) !== 'correct') {
+            bad.push(pair[0] + ': "' + w + '" is not marked right for ' + money(c));
+          }
+        });
+        f.no.forEach(w => {
+          if (mark(q, w) === 'correct') {
+            bad.push(pair[0] + ': "' + w + '" is marked right for ' + money(c));
+          }
+        });
+        /* The numeral read and the unit missed. Half marks, because telling a
+           20c coin from a $20 note is the feature this round is evidence for. */
+        if (c < 100 && mark(q, String(c)) !== 'partial') {
+          bad.push(pair[0] + ': "' + c + '" for ' + money(c) + ' is ' +
+                   mark(q, String(c)) + ', not half marks');
+        }
+        (String(q.placeholder || '').replace(/^e\.g\.\s*/, '').split(/\s+or\s+/))
+          .filter(Boolean).forEach(eg => {
+            if (!moneyCents(eg)) {
+              bad.push(pair[0] + ': the box shows "' + eg + '", which is not an amount');
+              return;
+            }
+            const w = asShown(eg, c);
+            if (w && mark(q, w) !== 'correct') {
+              bad.push(pair[0] + ': the box shows "' + eg + '" and "' + w +
+                       '" is marked wrong for ' + money(c));
+            }
+          });
+      });
+    });
+
+    /* And the sweep: a round that takes a typed amount and was never flagged is
+       marked as letters, which is the whole of this bug. */
+    Object.keys(GEN_BANKS).forEach(t => {
+      [0, 1, 2].forEach(f => {
+        let qs = [];
+        try { qs = GEN_BANKS[t](8, f) || []; } catch (e) { return; }
+        qs.forEach(q => {
+          if (q.money || (q.type !== 'typein' && q.type !== 'shop')) return;
+          const text = String(q.question || '') + ' ' + String(q.say || '');
+          if (/\$|\bcents?\b|\bdollars?\b/.test(text) || /^\d+\.\d{2}$/.test(q.answer || '')) {
+            bad.push(t + ' asks for an amount ("' + q.question + '") and is not marked as money');
+          }
+        });
+      });
+    });
+    return { bad: [...new Set(bad)], n: seen.length, amounts: [...new Set(seen)].length };
+  });
+  say('  ' + out.n + ' money questions marked, ' + out.amounts + ' different amounts');
+  out.bad.slice(0, 10).forEach(x => bad('money: ' + x));
+});
+
 check('ordering', 'no indicator is awarded a level without the one below it', async ctx => {
   const out = await ctx.page.evaluate(() => {
     // Every combination of per-level verdicts, including levels never asked.
@@ -688,7 +789,7 @@ check('gating', 'a failed indicator is never asked, or credited, above its stage
         cl.filter(c => acsfStageOpen(c[0], c[1]))
           .forEach(c => { askedAt[c[0] + '|' + c[1]] = 1; });
         const a = reading ? 'zzzz' : q.answer;
-        const tier = isOpenQ(q) ? 'correct' : (reading ? 'wrong' : (typeinTier(q, a) || 'correct'));
+        const tier = reading ? 'wrong' : answerTier(q, a);
         testRecord(tier, tier === 'correct' ? 10 : 0, false, a);
       });
       testEndRound();
@@ -1493,9 +1594,7 @@ check('retry', 'a wrong answer at Stage A earns one second ask, and only one', a
             if (isOpenQ(q)) a = (q.choices || []).find(c => (q.declines || []).indexOf(c) < 0) || q.answer;
             if (q.freeText) a = 'My name is Ali. I am from Iraq.';
           }
-          const tier = isOpenQ(q) ? 'correct'
-            : miss ? 'wrong'
-            : (typeinTier(q, a) || (normalize(a) === normalize(q.answer) ? 'correct' : 'wrong'));
+          const tier = miss ? 'wrong' : answerTier(q, a);
           testRecord(tier, tier === 'correct' ? 10 : 0, false, a);
         });
         testEndRound();
@@ -1596,8 +1695,7 @@ check('variants', 'every ordinary Test Yourself ladder still finishes', async ct
           TEST.tally = []; TEST.roundPts = 0;
           qs.forEach(function (q, i) {
             soloQIdx = i; currentStudentQ = q; asked++;
-            const tier = isOpenQ(q) ? 'correct'
-              : (typeinTier(q, q.answer) || (normalize(q.answer) === normalize(q.answer) ? 'correct' : 'wrong'));
+            const tier = answerTier(q, q.answer);
             testRecord(tier, 10, false, q.answer);
           });
           testEndRound();

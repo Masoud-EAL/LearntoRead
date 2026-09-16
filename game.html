@@ -3299,9 +3299,37 @@ function shopItemFor(cents){
   })[0];
 }
 function money(cents){ return '$'+(cents/100).toFixed(2); }
-/* The answer string drops the dollar sign — normalize() strips it anyway, so
-   "$67.50" and "67.50" already compare equal; this just keeps stored answers tidy. */
+/* The stored answer drops the dollar sign. What a learner writes is read by
+   moneyCents, which knows every way of writing the same amount, so the form
+   kept here is only the tidy one to show back. */
 function moneyAnswer(cents){ return (cents/100).toFixed(2); }
+
+/* An amount as somebody writes it, in cents, or null when what they wrote is
+   not an amount at all.
+     normalize() cannot do this job and was doing it: it is the app's "same
+   letters" test, it strips the dollar sign and the decimal point, and so "2.00"
+   arrives as the digits 200 while "2" stays "2". A $2 coin was marked wrong for
+   everyone who wrote what the box's own example, "e.g. 2", asked for.
+     `bare` is a whole number with no sign, no point and no unit word. A bare
+   number is dollars, which is what the app asks for, but it is flagged: "50"
+   against a 50c coin is the numeral read and the unit missed, and that is worth
+   half rather than nothing. */
+function moneyCents(s){
+  const t=String(s==null?'':s).toLowerCase().trim().replace(/\s+/g,' ');
+  // "23 dollars and 50 cents" is how the round says it out loud, so it is also
+  // a way a learner writes it down.
+  const both=t.match(/^\$?\s*(\d+)\s*dollars?\s*(?:and\s*)?(\d{1,2})\s*(?:c|cents?)$/);
+  if(both) return {cents:parseInt(both[1],10)*100+parseInt(both[2],10), bare:false};
+  const m=t.match(/^\$?\s*(\d*)(?:\.(\d{1,2}))?\s*(dollars?|cents?|c)?$/);
+  if(!m||(!m[1]&&!m[2])) return null;
+  const whole=m[1]?parseInt(m[1],10):0;
+  const frac=m[2]?parseInt((m[2]+'0').slice(0,2),10):0;
+  const unit=m[3]||'';
+  const bare=!unit&&!m[2]&&t.indexOf('$')<0;
+  // "50c" and "50 cents" name the coin the way the coin does.
+  if(unit&&unit.charAt(0)==='c') return {cents:whole, bare:false};
+  return {cents:whole*100+frac, bare:bare};
+}
 
 /* Speech engines make a mess of "$50.50": depending on the voice it comes out
    as "dollar fifty point five zero" or drops the sign altogether. Spelling the
@@ -3352,7 +3380,7 @@ function genShopQuestions(n,from,small){
       const cents=small?randInt(1,9)*100
                        :((50+Math.floor(Math.random()*50))*100+(Math.random()<0.5?50:0));
       const item=shopItemFor(cents);
-      out.push({type:'shop',mode:'pay',cents:cents,answer:moneyAnswer(cents),item:item.name,
+      out.push({type:'shop',mode:'pay',cents:cents,money:true,answer:moneyAnswer(cents),item:item.name,
         icon:'<div class="shop-item">'+item.emoji+'<span class="shop-name">'+item.name
              +'</span><span class="price-tag">'+money(cents)+'</span></div>',
         question:'Pay '+money(cents)+' for '+item.name});
@@ -3376,7 +3404,7 @@ function genShopQuestions(n,from,small){
       // Named for the price on the tag, not for the note handed over: what is
       // being bought is what costs $8.50, whatever it was paid with.
       const item=shopItemFor(price);
-      out.push({type:'shop',mode:'change',cents:change,paid:n.cents,price:price,
+      out.push({type:'shop',mode:'change',cents:change,paid:n.cents,price:price,money:true,
         answer:moneyAnswer(change),item:item.name,
         // Show the note handed over as well as the price — the sum only makes
         // sense if you can see both sides of it.
@@ -3475,7 +3503,7 @@ function genNumeralWriteQuestions(n,hi){
       const d=DENOMS.filter(function(x){
         return x.c<=hi*100&&(hi>10||x.c%100===0); });
       const pick=d[randInt(0,d.length-1)];
-      out.push({type:'typein', label:'WRITE THE AMOUNT', noListen:true,
+      out.push({type:'typein', label:'WRITE THE AMOUNT', money:true, noListen:true,
         icon:'<img src="icons/money-'+pick.file+'.svg" alt="" style="height:64px;">',
         question:'Write what this is worth',
         placeholder:hi>10?'e.g. 2 or 0.50':'e.g. 2',
@@ -3485,7 +3513,7 @@ function genNumeralWriteQuestions(n,hi){
       // 50 cents" was dictated against "whole dollar monetary amounts up to
       // $10". Cents belong to the Stage B feature, which names $25.20.
       const cents=randInt(1,hi)*100+(hi>10&&Math.random()<0.5?50:0);
-      out.push({type:'typein', label:'WRITE THE AMOUNT', say:moneySpoken(cents),
+      out.push({type:'typein', label:'WRITE THE AMOUNT', money:true, say:moneySpoken(cents),
         question:'🔊 Write this amount of money',
         placeholder:hi>10?'e.g. 25.50':'e.g. 5.00',
         answer:moneyAnswer(cents)});
@@ -3514,7 +3542,7 @@ function genAddQuestions(n,hi,money){
     }
     const sum=a+b;
     if(money){
-      out.push({type:'typein', label:'ADD THE MONEY', say:'What is '+numWord(a)+' dollars plus '+numWord(b)+' dollars?',
+      out.push({type:'typein', label:'ADD THE MONEY', money:true, say:'What is '+numWord(a)+' dollars plus '+numWord(b)+' dollars?',
         question:'🔊 $'+a+' + $'+b+' = ?', placeholder:'e.g. 7', answer:String(sum)});
     } else {
       out.push({type:'typein', label:'ADD IT UP', say:'What is '+numWord(a)+' plus '+numWord(b)+'?',
@@ -9176,16 +9204,10 @@ function showSoloResult(submittedAns,correctAns,timeLeft,timedOut){
   } else if(isSpellingQ(currentStudentQ)){
     tier=spellTier(submittedAns,correctAns);
     pts=spellPoints(tier,timeLeft);
-  } else if(isOpenQ(currentStudentQ)){
-    tier=(submittedAns||'').trim()?'correct':'wrong';
-    pts=tier==='correct'?100:0;
-  } else if(typeinTier(currentStudentQ,submittedAns)){
-    tier=typeinTier(currentStudentQ,submittedAns);
-    pts=spellPoints(tier,timeLeft);
   } else {
-    const isCorrect=normalize(submittedAns)===normalize(correctAns);
-    pts=isCorrect?100+Math.max(0,Math.round((timeLeft||0)*50)):0;
-    tier=isCorrect?'correct':'wrong';
+    tier=answerTier(currentStudentQ,submittedAns,correctAns);
+    // An open question has no clock to beat: the answer is the learner's own.
+    pts=isOpenQ(currentStudentQ)?(tier==='correct'?100:0):spellPoints(tier,timeLeft);
   }
   myScore+=pts;
   testRecord(tier,pts,timedOut,submittedAns);
@@ -11576,9 +11598,8 @@ function showStudentResult(correctAnswer){
       tier=spellTier(myAnswer,correctAnswer);
       pts=spellPoints(tier,myData.timeLeft);
     } else {
-      const isCorrect=normalize(myAnswer)===normalize(correctAnswer);
-      pts=isCorrect?100+Math.max(0,Math.round((myData.timeLeft||0)*50)):0;
-      tier=isCorrect?'correct':'wrong';
+      tier=answerTier(currentStudentQ,myAnswer,correctAnswer);
+      pts=isOpenQ(currentStudentQ)?(tier==='correct'?100:0):spellPoints(tier,myData.timeLeft);
     }
     myScore+=pts;
     document.getElementById('result-icon').textContent=tier==='correct'?'🎉':tier==='partial'?'🌟':'😔';
@@ -11889,7 +11910,23 @@ function normalize(s){return(s||'').toLowerCase().trim().replace(/[^a-z0-9]/g,''
 /* A round about the learner's own goal has no wrong answer, and marking one
    as wrong would be both untrue and unkind. */
 function isOpenQ(q){ return !!(q&&q.anyAnswer); }
+/* Two amounts are the same amount when they come to the same number of cents,
+   however they are written. "$2", "2" and "2.00" are one answer, and "200" is
+   not: it is the string the letters test used to accept for $2. */
+function moneyTier(q,ans){
+  const want=moneyCents(q&&q.answer), got=moneyCents(ans);
+  if(!want||!got) return 'wrong';
+  if(got.cents===want.cents) return 'correct';
+  /* "50" written against a 50c coin. Half marks, not full: telling a 20c coin
+     from a $20 note is the performance feature being measured here, and a
+     marker that reads a bare number either way has stopped measuring it. */
+  if(got.bare&&want.cents<100&&got.cents===want.cents*100) return 'partial';
+  return 'wrong';
+}
 function typeinTier(q,ans){
+  // Before the `typein` guard: a shop round is answered from a coin tray and is
+  // still an amount being marked.
+  if(q&&q.money) return moneyTier(q,ans);
   // `exact` applies to tapped rounds too: the punctuation round's options are
   // four spellings of one sentence and only one of them is written correctly.
   if(!q||(q.type!=='typein'&&!q.exact)) return null;
@@ -11959,6 +11996,19 @@ function typeinTier(q,ans){
     return normalize(a)===normalize(b)?'partial':'wrong';
   }
   return null;
+}
+/* What an answer is worth, for every round that does not bring its own marking
+   (translation and spelling do). One function, because the phone marks its own
+   answer whether the learner is sitting alone or in a class room, and the two
+   had drifted: the class path went straight to the letters test and never
+   reached the tier ladder at all, so the same answer was worth different things
+   depending on who pressed Start.
+     `correct` is the answer as the round published it, which is q.answer by
+   another road. */
+function answerTier(q,ans,correct){
+  if(isOpenQ(q)) return (ans||'').trim()?'correct':'wrong';
+  const want=(correct===undefined||correct===null)?(q&&q.answer):correct;
+  return typeinTier(q,ans)||(normalize(ans)===normalize(want)?'correct':'wrong');
 }
 function isSpellingQ(q){
   return !!q && (q.type==='word'||q.type==='sentence') && !(Array.isArray(q.choices)&&q.choices.length);
