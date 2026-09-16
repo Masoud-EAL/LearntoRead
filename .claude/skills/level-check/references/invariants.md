@@ -909,6 +909,51 @@ a seam is not a visibly wrong question, it is the nearest fit quietly standing
 in for one. `prices` walks every fifty cents from $1 to $100 and found $9.50
 between the groceries and everything dearer within a minute of being written.
 
+### 13b. An amount is marked as an amount, not as letters
+*check: `money`*
+
+> "I just saw one question in level check, that had a 2 dollar coin, and only
+> accepted 2.00 as the answer, not $2 or 2."
+
+`normalize()` is the app's "same letters" test and it was marking money. It
+strips the dollar sign and the decimal point, so `2.00` arrives as the digits
+`200` while `2` stays `2`, and a learner who wrote the right amount was marked
+wrong, scored nothing, and had `.09` and `.11` recorded as not shown. The
+comment above `moneyAnswer` said the sign did not matter because normalize
+strips it, which is the half of it that is true: it makes `$67.50` equal
+`67.50`, and it never made `2` equal `2.00`.
+
+`moneyCents` reads an amount the way somebody writes one, and `moneyTier` marks
+two amounts the same when they come to the same number of cents. Every round
+that takes a typed amount carries `q.money`, which is what reaches the marker
+before the `typein` guard, so the shop rounds are included too.
+
+The instance was one coin and the rule was in four rounds, each wrong in its
+own direction. Add the Money was the mirror image: its answer is `8`, so `$8`
+was right and `8.00` was wrong. The dictated round says "two dollars" and took
+only `2.00`. The 50c coin took only `0.50`, never `50c`.
+
+**A bare number is dollars, and that is a judgement worth keeping.** `50`
+against a 50c coin is half marks, not full: the numeral was read and the unit
+was missed. Marking it right would be kinder for one question and would stop
+the round measuring what it is evidence for, because four of the ten
+denominations share their digits with another one and telling a 20c coin from
+a $20 note is the performance feature. This is rule 9's shape seen from the
+marking side: an answer that cannot be got wrong is not evidence.
+
+**The example under the box is a promise.** The round printed `e.g. 2` and
+then marked `2` wrong, which is rule 16a ("an example scores full marks under
+its own rule") one step earlier: a placeholder is an example too. `money`
+rebuilds each question's amount in the shape its own placeholder shows and
+requires that shape to mark correct.
+
+The last part of it is rule 8f again, found while fixing this. The class path
+had its own `normalize(a)===normalize(b)` and never reached the tier ladder at
+all, so the same answer was worth different things depending on who pressed
+Start. `answerTier` is the one place now, read by the phone alone and the phone
+in a room, and by the check harness, which had been keeping a third copy of the
+rule inside its own simulated learner.
+
 ### 14. A picture is the thing it names
 *no check, judgement*
 

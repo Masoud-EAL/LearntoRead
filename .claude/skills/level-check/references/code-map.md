@@ -124,7 +124,9 @@ changes every game:
 | what | where | why it matters |
 |---|---|---|
 | `normalize(s)` | 10525 | the app's "same letters" test. Strips everything but a-z0-9, which is why `$3.20` and `$320` were once the same answer |
+| `answerTier(q,ans)` | grep | what an ordinary answer is worth. The one place an answer is marked, read by the solo path, the class path and the checks, so a marking rule cannot be written out twice |
 | `typeinTier(q,ans)` | 10540 | correct / partial / wrong for a typed answer, including capitals, spacing and sentence counting |
+| `moneyCents(s)` / `moneyTier(q,ans)` | grep | an amount as somebody writes it, in cents, and the marking that follows from it. `q.money` is what sends a round here instead of to the letters test |
 | `speechFor(Q)` | 9943 | the single answer to "does this round speak, and what". The replay button is shown iff this is truthy: one decision, one place |
 | `questionShown(q)` | 10424 | what a question says on the screen: its label, its prompt, its picture, its options. The answer screen and the teacher's evidence list both read it, so a transcript cannot word a question differently from the way it was put |
 | `showStudentQuestion` | 9489 | draws the question; line 9521 is the replay button |
