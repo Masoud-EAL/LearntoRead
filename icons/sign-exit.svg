@@ -1,46 +1,50 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
      viewBox="0 0 100 100">
-  <!-- AS 2293 / ISO 7010 E002. The composition is the point and it is easy to
-       get wrong: the doorway is a white panel and the running figure is the
-       green ground showing through it, not a white figure standing on green.
-       His leading hand reaches the door's right edge and both feet cross the
-       door altogether, which is what says he is on his way out of it.
+  <!-- AS 2293 / ISO 7010 E002. Two things about it are easy to get wrong.
 
-       The figure is drawn once and stamped twice: a white copy with a fatter
-       stroke, then the green copy over it. Inside the door the white copy is
-       invisible; where a foot crosses onto the green it is left showing as the
-       keyline that keeps the foot readable. One shape, so the two can never
-       drift apart, and the keyline is kept to about half a unit a side: at one
-       and a half it doubled the apparent weight of the two limbs that leave
-       the door and the man looked like he was lunging.
+       The composition: the doorway is a white panel and the running figure is
+       the green ground showing through it, not a white figure standing on
+       green. His leading hand reaches the door's right edge and both feet
+       cross the door altogether, which is what says he is on his way out.
 
-       Two measured departures from the photograph, both for the size this is
-       shown at. The limbs are 5.2 where the photograph's are nearer 3.8, and
-       the head is 4.9 where it is nearer 4.2: at 86px in a question prompt the
-       true proportions come out as wire. Everything else, the joints, the
-       door, the arrow, is where the photograph puts it. -->
+       The limbs: they are tapered filled shapes, wide at the shoulder and hip,
+       narrower at the hand and foot, and they end in a flat shoe or hand
+       rather than a round cap. Drawn as uniform round-capped strokes, which is
+       the obvious way and was the way here three times, the figure comes out
+       as wire whatever width the strokes are given. The paths below are
+       generated from the joint positions and a width at each joint, measured
+       off the photograph.
+
+       The figure is drawn once and stamped twice: a white copy carrying a
+       hairline stroke, then the green copy over it. Inside the door the white
+       is invisible; where a foot leaves the door it is the keyline that keeps
+       the foot readable. One shape, so the two cannot drift apart.
+
+       The head is 4.9 where the photograph's is nearer 4.2: at the 86px this
+       renders in a question prompt the true proportion comes out too small to
+       read as a head. Everything else is where the photograph puts it. -->
   <rect x="0.5" y="11.5" width="99" height="77" rx="9" fill="#fff"/>
   <rect x="3.5" y="14.5" width="93" height="71" rx="7" fill="#00843d"/>
   <!-- the doorway -->
   <rect x="17.5" y="22" width="37" height="60.8" fill="#fff"/>
   <defs>
     <g id="runner">
-      <circle cx="40.2" cy="31.1" r="4.9" stroke="none"/>
-      <!-- the torso carries its own width: it is a body, not a limb, and it
-           never leaves the door so it needs no keyline -->
-      <path d="M38.4,37 L36.3,57.2" fill="none" stroke-width="9.4"/>
-      <g fill="none">
-        <path d="M34.4,38.6 L24.5,40.3 L20.3,46.2"/>
-        <path d="M41.8,38.8 L46.8,45.3 L54.5,47.4"/>
-        <path d="M36.3,57.2 L36.5,68.2 L45.8,79.3 L49.5,80.6"/>
-        <path d="M36.3,57.2 L24.8,64.3 L15.2,65.9 L9.5,68.6"/>
-      </g>
+      <circle cx="40.2" cy="31.1" r="4.9"/>
+      <!-- torso -->
+      <path d="M34.4,35.8 L32.5,46.2 L30.9,57.2 L38.3,58.6 L40.7,47.8 L42.8,37.4 Z"/>
+      <!-- trailing arm, back and then hanging, ending in a fist -->
+      <path d="M35,35.8 L23.2,38.2 L18.8,44.5 L17.3,47.2 L21.5,49.2 L22.4,46.7 L25.8,42.4 L35.8,41 Z"/>
+      <!-- leading arm, bent at the elbow, flat hand at the door's edge -->
+      <path d="M39.3,40.3 L45.7,47 L52.8,48.9 L54.9,49.7 L56.3,45.5 L54,44.9 L48.3,43 L43.1,36.9 Z"/>
+      <!-- trailing leg, pushing off, shoe flat and pointing back -->
+      <path d="M33.7,54.9 L23.5,61.8 L13.8,64.3 L8.1,65.7 L9.9,71.1 L15,68.9 L25.5,66.8 L37.1,60.3 Z"/>
+      <!-- leading leg, thigh down and shin out to the front foot -->
+      <path d="M31.3,58 L33.3,69.4 L43,80.4 L48.3,83.5 L50.9,78.5 L46.2,76.4 L38.7,67 L37.9,57.2 Z"/>
     </g>
   </defs>
   <use href="#runner" xlink:href="#runner" fill="#fff" stroke="#fff"
-       stroke-width="6.6" stroke-linecap="butt" stroke-linejoin="round"/>
-  <use href="#runner" xlink:href="#runner" fill="#00843d" stroke="#00843d"
-       stroke-width="5.2" stroke-linecap="butt" stroke-linejoin="round"/>
+       stroke-width="2.4" stroke-linejoin="round"/>
+  <use href="#runner" xlink:href="#runner" fill="#00843d"/>
   <!-- direction arrow -->
   <path d="M59.1,45.6 L75.6,45.6 L75.6,36.3 L92.6,50.5 L75.6,64.7 L75.6,56 L59.1,56 Z" fill="#fff"/>
 </svg>
