@@ -1,24 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- AS 2293 / ISO 7010 E002 style: green ground, white running figure
-       passing through a doorway, with a direction arrow. -->
-  <rect x="2" y="20" width="96" height="60" rx="6" fill="#0f8a4a"/>
-  <g fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- AS 2293 / ISO 7010 E002: green ground, white running figure passing
+       through a doorway, with a direction arrow.
+
+       The figure is drawn with thick round-capped strokes so it reads as the
+       solid silhouette the real sign uses. The limbs have to be long and
+       clearly apart to survive it: at 6.5 units of stroke on an 8 unit thigh
+       the legs merged and the man read as kneeling. One arm forward and one
+       trailing, one knee up and one leg pushing off behind. -->
+  <rect x="2" y="13" width="96" height="74" rx="8" fill="#00843d"/>
+  <rect x="5.5" y="16.5" width="89" height="67" rx="5" fill="none" stroke="#fff"
+        stroke-width="1.8" opacity=".85"/>
+  <circle cx="23" cy="27" r="6" fill="#fff"/>
+  <g fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
     <!-- torso -->
-    <path d="M27,42 L31,55"/>
-    <!-- leading leg, bent forward -->
-    <path d="M31,55 L38,61 L37,72"/>
-    <!-- trailing leg, pushing off behind -->
-    <path d="M31,55 L23,61 L15,58"/>
-    <!-- leading arm -->
-    <path d="M29,46 L37,43"/>
-    <!-- trailing arm -->
-    <path d="M28,46 L20,50"/>
+    <path d="M24,34 L28,49"/>
+    <!-- leading leg: knee up in front, shin down to the foot -->
+    <path d="M28,49 L39,52 L41,68"/>
+    <!-- trailing leg: pushing off, heel up behind -->
+    <path d="M28,49 L18,57 L9,54"/>
+    <!-- leading arm, forward -->
+    <path d="M26,38 L37,35"/>
+    <!-- trailing arm, behind -->
+    <path d="M25,39 L14,45"/>
   </g>
-  <circle cx="26" cy="35" r="5.5" fill="#fff"/>
-  <!-- doorway the figure is running out through -->
-  <path d="M50,26 L66,26 L66,74 L50,74" fill="none" stroke="#fff" stroke-width="4.5"
+  <!-- the doorway the figure is running out through -->
+  <path d="M50,22 L64,22 L64,78 L50,78" fill="none" stroke="#fff" stroke-width="6.5"
         stroke-linejoin="round" stroke-linecap="round"/>
   <!-- direction arrow -->
-  <path d="M74,50 L92,50 M85,42 L93,50 L85,58" fill="none" stroke="#fff" stroke-width="5"
-        stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M70,44 L84,44 L84,35 L96,50 L84,65 L84,56 L70,56 Z" fill="#fff"/>
 </svg>

@@ -1183,6 +1183,82 @@ check('oddone', 'the odd one out is clearly odd', async ctx => {
   out.bad.forEach(x => bad('oddone: ' + x));
 });
 
+check('signs', 'every sign is the Australian form, wordless, and precached', async ctx => {
+  // "Some of the signs in level check and the game are different from
+  // Australian signs and may be interpreted in different ways. They can be
+  // especially challenging for pre learners who do not work on them."
+  //
+  // Three of the eleven drawings ran the prohibition band from lower left to
+  // upper right. ISO 7010 and AS 1319 run it the other way, and it was wrong
+  // in all three, because the line was written out once per file: rule 20 in
+  // its usual shape. No Parking drew its P as a <text> element, so the sign
+  // changed shape on any device without Arial.
+  //
+  // The wordless line is the bank's own rule, from the comment above SIGNS:
+  // "a sign that says EXIT tests nothing, but a green running figure asks the
+  // learner to read the meaning." A drawing carrying its own answer in letters
+  // is answered by matching two strings, which is a different task from
+  // reading the sign, and a different task again for a learner who has letters
+  // than for one who has none. The photo this set was redrawn from had "Bus
+  // Stop" written across the bus stop flag, which is why the line is here.
+  const signs = await ctx.page.evaluate(() =>
+    SIGNS.map(s => ({ icon: s.icon, answer: s.answer, alts: s.alts })));
+  const dir = path.join(ROOT, 'icons');
+  const files = fs.readdirSync(dir).filter(f => /^sign-.+\.svg$/.test(f));
+  const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
+  let bands = 0;
+
+  signs.forEach(function (s) {
+    const name = 'sign-' + s.icon + '.svg';
+    const file = path.join(dir, name);
+    if (!fs.existsSync(file)) {
+      bad('signs: ' + s.answer + ' has no drawing at icons/' + name);
+      return;
+    }
+    // Comments carry the reasoning, including the words this check forbids on
+    // the face of a sign, so they come out before anything is read.
+    const body = fs.readFileSync(file, 'utf8').replace(/<!--[\s\S]*?-->/g, '');
+
+    if (/<text[\s>]|<tspan[\s>]/.test(body)) {
+      bad('signs: ' + name + ' draws with a <text> element. Draw it as a path: ' +
+          'on a device without that font the shape of the sign changes');
+    }
+    const shown = (body.match(/>[^<>]+</g) || []).join(' ').toLowerCase();
+    [s.answer].concat(s.alts).forEach(function (w) {
+      if (shown.indexOf(w.toLowerCase()) >= 0) {
+        bad('signs: ' + name + ' has "' + w + '" written on it, which is one of its own ' +
+            'options. A sign carrying its answer in words is answered by matching ' +
+            'letter shapes, not by reading the sign');
+      }
+    });
+
+    (body.match(/<line[^>]*>/g) || []).forEach(function (ln) {
+      const num = a => Number((ln.match(new RegExp(a + '="([-\\d.]+)"')) || [])[1]);
+      const x1 = num('x1'), y1 = num('y1'), x2 = num('x2'), y2 = num('y2');
+      if (![x1, y1, x2, y2].every(Number.isFinite)) return;
+      // Short or axis-aligned lines are detail, not the band.
+      if (Math.abs(x2 - x1) < 8 || Math.abs(y2 - y1) < 8) return;
+      bands++;
+      if ((x2 - x1) * (y2 - y1) <= 0) {
+        bad('signs: the band on ' + name + ' runs lower left to upper right. ' +
+            'ISO 7010 and AS 1319 run it upper left to lower right, which is the way ' +
+            'it appears on the street');
+      }
+    });
+
+    if (sw.indexOf('./icons/' + name) < 0) {
+      bad('signs: icons/' + name + ' is not in the sw.js precache list, so a learner ' +
+          'who opens the game offline gets a question with no picture');
+    }
+  });
+
+  const used = signs.map(s => 'sign-' + s.icon + '.svg');
+  files.filter(f => used.indexOf(f) < 0).forEach(function (f) {
+    bad('signs: icons/' + f + ' is not used by any sign in SIGNS');
+  });
+  say('  ' + signs.length + ' signs, ' + files.length + ' drawings, ' + bands + ' prohibition bands');
+});
+
 check('propernouns', 'a name keeps its capital in the answer and in the hint', async ctx => {
   // "Months need a capital first letter. Both hint and correct answer should
   // be fixed."

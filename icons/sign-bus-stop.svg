@@ -1,22 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- A bus-stop flag on a pole: side-on bus over a route-number strip.
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 100">
+  <!-- A bus-stop flag on a pole: a front-on bus over the white route-number
+       panel. An earlier version was drawn front-on, read as a train, and was
+       turned side-on for it; the fault was the missing windscreen and lights,
+       not the angle, so it is front-on again with both.
+
        Australian stop flags differ by state operator, so this keeps to the
        form they share rather than imitating any one authority's branding.
-       The previous version read as a train, being drawn front-on. -->
-  <!-- pole -->
-  <rect x="45" y="62" width="9" height="34" fill="#8a949e"/>
-  <!-- sign panel -->
-  <rect x="13" y="5" width="74" height="60" rx="6" fill="#1a4f8a"/>
-  <!-- bus body, side view: slanted windscreen at the front (right) -->
-  <path d="M22,20 L66,20 Q75,20 78,28 L78,44 L22,44 Z" fill="#fff"/>
-  <!-- side windows -->
-  <rect x="27" y="24" width="12" height="10" rx="2" fill="#1a4f8a"/>
-  <rect x="42" y="24" width="12" height="10" rx="2" fill="#1a4f8a"/>
-  <!-- windscreen -->
-  <path d="M57,24 L66,24 Q71,24 73,30 L73,34 L57,34 Z" fill="#1a4f8a"/>
-  <!-- wheels -->
-  <circle cx="34" cy="45" r="6.5" fill="#fff" stroke="#1a4f8a" stroke-width="3"/>
-  <circle cx="67" cy="45" r="6.5" fill="#fff" stroke="#1a4f8a" stroke-width="3"/>
-  <!-- route-number strip -->
-  <rect x="22" y="53" width="56" height="7" rx="3" fill="#fff" opacity=".85"/>
+       The pole is a stub: .sign-pic fixes the height and lets the width
+       follow, so every pixel spent on pole is taken off the flag.
+
+       No lettering, and the route panel is left blank. Every other sign in
+       this bank is wordless on purpose: a sign that carries its own answer in
+       text is answered by matching letter shapes, which is a different task
+       from reading the sign. -->
+  <rect x="4" y="2" width="12" height="96" rx="3" fill="#8a949e"/>
+  <rect x="12" y="4" width="90" height="92" rx="9" fill="#fff"/>
+  <rect x="15" y="7" width="84" height="86" rx="6.5" fill="#0d5bb5"/>
+  <!-- bus, front on: windscreen and headlights are what stop it reading as a train -->
+  <rect x="34" y="14" width="46" height="45" rx="8" fill="#fff"/>
+  <rect x="40" y="21" width="34" height="15" rx="3.5" fill="#0d5bb5"/>
+  <rect x="40" y="43" width="9.5" height="6" rx="2.4" fill="#0d5bb5"/>
+  <rect x="64.5" y="43" width="9.5" height="6" rx="2.4" fill="#0d5bb5"/>
+  <rect x="36" y="59" width="11" height="5.5" rx="2.2" fill="#fff"/>
+  <rect x="67" y="59" width="11" height="5.5" rx="2.2" fill="#fff"/>
+  <!-- route-number panel -->
+  <rect x="26" y="70" width="62" height="16" rx="3.5" fill="#fff"/>
 </svg>

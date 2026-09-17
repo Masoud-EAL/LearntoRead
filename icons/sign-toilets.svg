@@ -1,12 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect x="8" y="8" width="84" height="84" rx="8" fill="#1a4f8a"/>
-  <circle cx="33" cy="28" r="7" fill="#fff"/>
-  <rect x="26" y="38" width="14" height="26" rx="4" fill="#fff"/>
-  <rect x="28" y="63" width="4.5" height="18" fill="#fff"/>
-  <rect x="33.5" y="63" width="4.5" height="18" fill="#fff"/>
-  <circle cx="67" cy="28" r="7" fill="#fff"/>
-  <path d="M67,37 L79,66 L55,66 Z" fill="#fff"/>
-  <rect x="61" y="66" width="4.5" height="15" fill="#fff"/>
-  <rect x="68.5" y="66" width="4.5" height="15" fill="#fff"/>
-  <rect x="49" y="18" width="2.5" height="64" fill="#fff" opacity=".55"/>
+  <rect x="3" y="3" width="94" height="94" rx="12" fill="#fff"/>
+  <rect x="6" y="6" width="88" height="88" rx="9.5" fill="#0d5bb5"/>
+  <!-- divider -->
+  <rect x="48.6" y="15" width="2.8" height="70" rx="1.4" fill="#fff" opacity=".8"/>
+  <!-- left figure -->
+  <circle cx="30" cy="25" r="7.6" fill="#fff"/>
+  <path d="M24,36 h12 a5.5,5.5 0 0 1 5.5,5.5 v17.5 h-23 v-17.5 a5.5,5.5 0 0 1 5.5,-5.5 z" fill="#fff"/>
+  <rect x="22" y="59" width="7.4" height="23" rx="2" fill="#fff"/>
+  <rect x="30.6" y="59" width="7.4" height="23" rx="2" fill="#fff"/>
+  <!-- right figure -->
+  <circle cx="70" cy="25" r="7.6" fill="#fff"/>
+  <path d="M70,35 a8.5,6.5 0 0 0 -8.5,5.5 L52,66 h36 L78.5,40.5 A8.5,6.5 0 0 0 70,35 z" fill="#fff"/>
+  <rect x="63" y="66" width="6.6" height="16" rx="2" fill="#fff"/>
+  <rect x="70.4" y="66" width="6.6" height="16" rx="2" fill="#fff"/>
 </svg>

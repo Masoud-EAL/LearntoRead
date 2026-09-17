@@ -1,30 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- The yellow A-frame board that actually stands on the floor in
-       Australian shopping centres, hospitals and workplaces — far more
-       recognisable to a learner than the AS 1319 warning triangle. -->
-  <!-- rear panel, just showing behind the fold -->
-  <path d="M64,14 L74,14 L88,88 L76,88 Z" fill="#d4a017" stroke="#2d2a26"
+  <!-- The yellow A-frame board that actually stands on the floor in Australian
+       shopping centres, hospitals and workplaces, rather than the AS 1319
+       triangle on its own: handle cut through the top, and the warning
+       triangle carried on the face.
+
+       The figure sits inside that triangle now instead of on the bare board,
+       and the triangle is the real constraint: its interior is a wedge, so a
+       limb drawn out to the side at head height leaves the sign altogether.
+       Every point below is inside the wedge with room for half the stroke.
+       The board is only gently tapered so the triangle can be large, and the
+       figure is low in it, where the width is. -->
+  <!-- rear panel, folded back, just showing past the front one -->
+  <path d="M68,11 L76,11 L89,90 L79,90 Z" fill="#d9a800" stroke="#1a1a1a"
         stroke-width="3.5" stroke-linejoin="round"/>
-  <!-- front panel -->
-  <path d="M32,14 L68,14 L82,88 L18,88 Z" fill="#f5c518" stroke="#2d2a26"
-        stroke-width="4" stroke-linejoin="round"/>
-  <!-- hinge at the top -->
-  <path d="M32,14 L68,14" stroke="#2d2a26" stroke-width="4" stroke-linecap="round"/>
-  <!-- Slipping figure. Kept to five bold, well-separated strokes: at the size
-       this renders in game (~90px) any finer articulation turns to mush. -->
-  <circle cx="62" cy="31" r="6" fill="#2d2a26"/>
-  <g fill="none" stroke="#2d2a26" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-    <!-- torso, tipping backwards -->
-    <path d="M59,38 L48,51"/>
-    <!-- the leg that slips out in front, thrown up -->
-    <path d="M48,51 L31,45"/>
-    <!-- trailing leg, folding under -->
-    <path d="M48,51 L50,65 L41,68"/>
-    <!-- arms flung out -->
-    <path d="M56,42 L68,37"/>
-    <path d="M55,43 L45,36"/>
+  <!-- front panel, with the handle cut through it -->
+  <path fill="#ffd100" stroke="#1a1a1a" stroke-width="4" stroke-linejoin="round" fill-rule="evenodd"
+        d="M28,6 L72,6 A3,3 0 0 1 75,8.6 L88,88 A2.6,2.6 0 0 1 85.4,91 L14.6,91 A2.6,2.6 0 0 1 12,88 L25,8.6 A3,3 0 0 1 28,6 Z
+           M38,12.5 L62,12.5 A4.3,4.3 0 0 1 62,21.1 L38,21.1 A4.3,4.3 0 0 1 38,12.5 Z"/>
+  <!-- feet -->
+  <rect x="11" y="90" width="15" height="6.5" rx="2.8" fill="#1a1a1a"/>
+  <rect x="74" y="90" width="15" height="6.5" rx="2.8" fill="#1a1a1a"/>
+  <!-- warning triangle on the face -->
+  <path d="M50,26 L80,80 L20,80 Z" fill="#ffd100" stroke="#1a1a1a"
+        stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- the figure going over backwards: body on a diagonal, the leading leg
+       thrown out, the trailing leg folded under, both arms up -->
+  <circle cx="53" cy="51" r="4.6" fill="#1a1a1a"/>
+  <g fill="none" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50.5,55 L44,64"/>
+    <path d="M44,64 L31,68"/>
+    <path d="M44,64 L50,72 L41,75"/>
+    <path d="M49,57 L41,52"/>
+    <path d="M51,55 L60,51"/>
   </g>
-  <!-- spill on the floor -->
-  <path d="M30,78 q7,-5 14,0 q7,5 14,0 q6,-4 12,0" fill="none" stroke="#2d2a26"
-        stroke-width="3.5" stroke-linecap="round"/>
+  <!-- the spill underfoot -->
+  <path d="M28,77 q6,-3.5 12,0 q6,3.5 12,0 q5,-2.6 10,0" fill="none"
+        stroke="#1a1a1a" stroke-width="3.2" stroke-linecap="round"/>
 </svg>

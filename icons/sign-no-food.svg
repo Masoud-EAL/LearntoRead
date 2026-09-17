@@ -1,8 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="42" fill="#fff" stroke="#d32f2f" stroke-width="9"/>
-  <rect x="28" y="26" width="4.5" height="20" fill="#4a4a4a"/>
-  <rect x="35" y="26" width="4.5" height="20" fill="#4a4a4a"/>
-  <path d="M26,44 q7,7 14,0 L36,74 L30,74 Z" fill="#4a4a4a"/>
-  <path d="M66,26 q10,4 10,20 q0,8 -6,9 L68,74 L62,74 L60,55 q-6,-1 -6,-9 q0,-16 10,-20 Z" fill="#4a4a4a"/>
-  <line x1="21" y1="79" x2="79" y2="21" stroke="#d32f2f" stroke-width="9" stroke-linecap="round"/>
+  <rect x="2" y="2" width="96" height="96" rx="11" fill="#fff" stroke="#c9ced4" stroke-width="2"/>
+  <!-- fork, three tines -->
+  <g fill="#1a1a1a">
+    <rect x="31" y="24" width="3.8" height="16" rx="1.4"/>
+    <rect x="36.6" y="24" width="3.8" height="16" rx="1.4"/>
+    <rect x="42.2" y="24" width="3.8" height="16" rx="1.4"/>
+    <path d="M30,37 L47,37 L47,42 C47,46.5 44.8,49.4 41.3,50.3 L41.3,74 A2.6,2.6 0 0 1 35.7,74 L35.7,50.3
+             C32.2,49.4 30,46.5 30,42 Z"/>
+    <!-- knife: straight spine on the left, blade bulging right -->
+    <path d="M60,24 Q67.5,29 67.5,41 Q67.5,47.5 63.2,49.6 L63.2,74 A2.6,2.6 0 0 1 57.6,74 L57.6,24 Z"/>
+  </g>
+  <circle cx="50" cy="50" r="37" fill="none" stroke="#e11b22" stroke-width="9.5"/>
+  <line x1="23.8" y1="23.8" x2="76.2" y2="76.2" stroke="#e11b22" stroke-width="9.5" stroke-linecap="butt"/>
 </svg>

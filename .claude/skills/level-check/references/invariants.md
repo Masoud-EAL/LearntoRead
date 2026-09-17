@@ -968,6 +968,49 @@ banks last time.
 one, and phonics rounds opt out entirely: a picture beside "cat" hands over the
 answer without any decoding.
 
+### 14a. A sign is drawn the way Australia draws it, carries no words, and has one reading
+*check: `signs`*
+
+> "Some of the signs in level check and the game are different from Australian
+> signs and may be interpreted in different ways. They can be especially
+> challenging for pre learners who do not work on them."
+
+Rule 14 asks whether a picture is the thing it names. A sign asks something
+harder, because a sign is a convention before it is a picture, and a learner
+who has not been taught the convention has only the drawing to go on. Three
+separate ways it was failing, and the first is the one that generalises:
+
+**The form was not the one on the street.** The prohibition band ran from lower
+left to upper right on all three ring signs. ISO 7010 and AS 1319 run it the
+other way. It was wrong three times because the line was written out once per
+file, which is rule 20 wearing a protractor, and no rule here had ever looked
+at a drawing at all. Everything above this line reads the speech, the options
+and the question; the picture was only ever checked by eye.
+
+**The drawing depended on a font.** No Parking set its P as a `<text>` element
+in Arial, so a device without Arial substituted a face and the sign changed
+shape. Letters and digits on a sign are paths.
+
+**Words on the face of a sign are not a sign.** This one was already the bank's
+own rule, in the comment above `SIGNS`: "a sign that says EXIT tests nothing,
+but a green running figure asks the learner to read the meaning." It nearly
+went the other way. The photographs these eleven were redrawn from are the real
+Australian signs, and the real bus stop flag says **Bus Stop** across it. Drawn
+that way, the question is answered by noticing that two strings look alike,
+which is a different task from reading the sign, and a different task again for
+a learner who has some letters than for one who has none: the same question
+measuring two different things depending on who sits it. The flag keeps the
+bus, the pole and the blank route panel, which is what makes it Australian, and
+loses the two words. `signs` holds it so the argument is not had twice.
+
+**What is still true after all of that, and is judgement.** Two of the eleven
+are not wholly symbolic and cannot be made so without ceasing to be the
+Australian sign. No Parking cannot be answered without reading a Roman letter.
+No Food Or Drink names a drink its picture does not show, because the real sign
+puts that in words underneath. Both are kept, because the alternative is
+teaching a learner a sign they will not meet, and both are worth knowing about
+before reading anything into a wrong answer on either.
+
 ### 15. A question asks what it means to ask
 *no check, judgement*
 
