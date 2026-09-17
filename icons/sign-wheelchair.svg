@@ -1,10 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- The International Symbol of Access, which is made of flat-ended bars and
+       has more parts than a seated stick figure: the head sits on a neck, the
+       armrest and the thigh are two separate bars with the ground showing
+       between them, the shin drops and then turns back up into a footplate,
+       and the wheel is an open ring rather than a closed hoop. Closed, it
+       reads as somebody sitting inside a circle; the gap at the upper right is
+       where the body passes in front of the wheel. -->
   <rect x="3" y="3" width="94" height="94" rx="12" fill="#fff"/>
   <rect x="6" y="6" width="88" height="88" rx="9.5" fill="#0d5bb5"/>
-  <circle cx="41" cy="24" r="7.8" fill="#fff"/>
-  <!-- back, seat and legs, then the footrest -->
-  <path d="M41,34 L41,55 L63,55 L69,74" fill="none" stroke="#fff" stroke-width="8"
-        stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- the wheel -->
-  <circle cx="47" cy="64" r="19" fill="none" stroke="#fff" stroke-width="6.5"/>
+  <circle cx="40.8" cy="21" r="6.2" fill="#fff"/>
+  <g fill="none" stroke="#fff" stroke-linecap="butt" stroke-linejoin="miter">
+    <!-- neck and back -->
+    <path d="M40.5,25 L39.4,57.5" stroke-width="5.6"/>
+    <!-- armrest -->
+    <path d="M40,43.5 L59.1,43.5" stroke-width="5.5"/>
+    <!-- thigh, shin, footplate -->
+    <path d="M38,55.4 L63.6,55.4 L70.9,74.6 L82.8,70.3" stroke-width="6.2"/>
+    <!-- the wheel, open where the body crosses it -->
+    <path d="M59.9,76.7 A21.1,21.1 0 1 1 41.6,45" stroke-width="5.9"/>
+  </g>
 </svg>
