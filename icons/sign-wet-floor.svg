@@ -1,39 +1,64 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- The yellow A-frame board that actually stands on the floor in Australian
-       shopping centres, hospitals and workplaces, rather than the AS 1319
-       triangle on its own: handle cut through the top, and the warning
-       triangle carried on the face.
+  <!-- The yellow A-frame board that stands on the floor in Australian shopping
+       centres, hospitals and workplaces.
 
-       The figure sits inside that triangle now instead of on the bare board,
-       and the triangle is the real constraint: its interior is a wedge, so a
-       limb drawn out to the side at head height leaves the sign altogether.
-       Every point below is inside the wedge with room for half the stroke.
-       The board is only gently tapered so the triangle can be large, and the
-       figure is low in it, where the width is. -->
-  <!-- rear panel, folded back, just showing past the front one -->
-  <path d="M68,11 L76,11 L89,90 L79,90 Z" fill="#d9a800" stroke="#1a1a1a"
-        stroke-width="3.5" stroke-linejoin="round"/>
-  <!-- front panel, with the handle cut through it -->
-  <path fill="#ffd100" stroke="#1a1a1a" stroke-width="4" stroke-linejoin="round" fill-rule="evenodd"
-        d="M28,6 L72,6 A3,3 0 0 1 75,8.6 L88,88 A2.6,2.6 0 0 1 85.4,91 L14.6,91 A2.6,2.6 0 0 1 12,88 L25,8.6 A3,3 0 0 1 28,6 Z
-           M38,12.5 L62,12.5 A4.3,4.3 0 0 1 62,21.1 L38,21.1 A4.3,4.3 0 0 1 38,12.5 Z"/>
-  <!-- feet -->
-  <rect x="11" y="90" width="15" height="6.5" rx="2.8" fill="#1a1a1a"/>
-  <rect x="74" y="90" width="15" height="6.5" rx="2.8" fill="#1a1a1a"/>
-  <!-- warning triangle on the face -->
-  <path d="M50,26 L80,80 L20,80 Z" fill="#ffd100" stroke="#1a1a1a"
-        stroke-width="4.5" stroke-linejoin="round"/>
-  <!-- the figure going over backwards: body on a diagonal, the leading leg
-       thrown out, the trailing leg folded under, both arms up -->
-  <circle cx="53" cy="51" r="4.6" fill="#1a1a1a"/>
-  <g fill="none" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M50.5,55 L44,64"/>
-    <path d="M44,64 L31,68"/>
-    <path d="M44,64 L50,72 L41,75"/>
-    <path d="M49,57 L41,52"/>
-    <path d="M51,55 L60,51"/>
+       Four things the previous drawing had wrong. The board is moulded plastic
+       and carries no black outline at all, only its own lighter and darker
+       yellows. Its feet are a notch cut out of the bottom edge, not two blocks
+       stuck under it. The triangle is an outline with the board showing
+       through, not a filled panel. And the figure faces the other way: head up
+       and to the left, one arm thrown up to the right, both feet shot out to
+       the right, which is what a slip looks like.
+
+       The photograph's triangle is about a third of the board and its figure
+       about half the triangle. Held to that, at the 86px this renders in a
+       question prompt the figure would be 20px and the limbs under 2px, so the
+       triangle and the figure are both enlarged within the board. That is the
+       one departure; the pose, the proportions of the board and the shape of
+       the spill are the photograph's. -->
+  <!-- rear panel, folded back behind the front one -->
+  <path d="M63,11 L71,11 L87,88 L79,88 Z" fill="#e0ac00"/>
+  <!-- front panel: a tapered board with the handle cut through the top and the
+       feet notched out of the bottom edge -->
+  <path fill="#ffd100" fill-rule="evenodd"
+        d="M29,6 L65,6 A3.5,3.5 0 0 1 68.4,8.8 L81.5,88 A3,3 0 0 1 78.5,91.5 L15.5,91.5 A3,3 0 0 1 12.5,88 L25.6,8.8 A3.5,3.5 0 0 1 29,6 Z
+           M38,10.5 L56,10.5 A3.4,3.4 0 0 1 56,17.3 L38,17.3 A3.4,3.4 0 0 1 38,10.5 Z
+           M34.5,91.5 A14,9 0 0 1 61.5,91.5 Z"/>
+  <!-- mouldings: the lip around the handle and the bevel down each edge -->
+  <g fill="none" stroke="#e0ac00" stroke-width="1.2" stroke-linecap="round">
+    <path d="M34.5,8.6 L59.6,8.6"/>
+    <path d="M33.4,19.6 L60.9,19.6"/>
+    <path d="M27.9,23 L15.6,86"/>
+    <path d="M66.1,23 L78.4,86"/>
   </g>
-  <!-- the spill underfoot -->
-  <path d="M28,77 q6,-3.5 12,0 q6,3.5 12,0 q5,-2.6 10,0" fill="none"
-        stroke="#1a1a1a" stroke-width="3.2" stroke-linecap="round"/>
+  <!-- the warning triangle, an outline with the board showing through. Its own
+       stroke eats into the usable interior, so every point below clears the
+       inner edge, not the centre line: the first attempt cleared the centre
+       line and the raised arm came out through the border. -->
+  <path d="M48,26 L72,69 L24,69 Z" fill="none" stroke="#1a1a1a"
+        stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- Going over backwards: head up and to the left, one arm flung up to the
+       right and one down to the left, the leading leg shot out level to the
+       right and the trailing leg dropping to the floor, so the two make a V.
+       The limbs have to be long for that to read. Drawn short they all left
+       the body inside a few units of each other, merged at this stroke width
+       and the figure came out as someone kneeling. -->
+  <circle cx="43" cy="47" r="3" fill="#1a1a1a"/>
+  <g fill="none" stroke="#1a1a1a" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M45,50 L49.5,55" stroke-width="4.8"/>
+    <g stroke-width="3.2">
+      <path d="M44.5,51 L36.5,57"/>
+      <path d="M46.5,49.5 L54.3,44.5"/>
+    </g>
+    <g stroke-width="3.4">
+      <path d="M49.5,55 L56,55.5 L61.5,57"/>
+      <path d="M49.5,55 L52,58.5 L54.5,62.5"/>
+    </g>
+  </g>
+  <!-- the spill: a puddle, not a wavy line -->
+  <path fill="#1a1a1a"
+        d="M33.5,62.2 C36,61.1 38.8,61.4 41,62.2 C43.8,63.2 46.4,63 49,62
+           C51.2,61.3 54,61.6 55.6,62.3 C57.8,62.8 59,63.2 58.4,63.9
+           C56.8,64.7 53.4,64.4 50.2,64.2 C46.4,64 43.6,64.7 40.4,65
+           C37.2,65.2 34.6,65 33.2,64.2 C32,63.6 32.2,62.6 33.5,62.2 Z"/>
 </svg>
