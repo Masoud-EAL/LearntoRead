@@ -1003,6 +1003,25 @@ measuring two different things depending on who sits it. The flag keeps the
 bus, the pole and the blank route panel, which is what makes it Australian, and
 loses the two words. `signs` holds it so the argument is not had twice.
 
+**An option that is also a reading of the picture marks a learner wrong for
+reading the sign right.** This is the half of the report that is not about
+drawing at all, and it was in five of the eleven. A green cross is what
+Australian pharmacies put on the shopfront, and "Chemist" was on offer against
+the first aid sign. A red disc says stop, and "Stop and wait" was on offer
+against No Entry. A figure going over backwards says no running; a running
+figure says do not run; and a vehicle drawn front on has a windscreen and
+lights whether it runs on a road or on rails, so "Train station" sat under the
+bus. In each one the learner who read the sign correctly could tap an option
+that said what they had read, and have it written down against `.03` and `.04`
+as a failure to read.
+
+It is rule 13 in another bank and it takes rule 13's answer, because no script
+can be told whether "Chemist" is a fair reading of a green cross: that is a
+fact about Australia, not about the file. `signs` carries the reviewed option
+set for every sign, and changing an option or adding a sign fails until
+somebody has looked at the drawing again and written the new set down. The
+judgement still has to be made. It just cannot be skipped.
+
 **What is still true after all of that, and is judgement.** Two of the eleven
 are not wholly symbolic and cannot be made so without ceasing to be the
 Australian sign. No Parking cannot be answered without reading a Roman letter.
@@ -1010,6 +1029,12 @@ No Food Or Drink names a drink its picture does not show, because the real sign
 puts that in words underneath. Both are kept, because the alternative is
 teaching a learner a sign they will not meet, and both are worth knowing about
 before reading anything into a wrong answer on either.
+
+"Restaurant" under No Food Or Drink was looked at and kept. A knife and fork on
+its own does mean a place to eat, on the service signs along a highway here,
+but the band is drawn across this one and the band is the whole difference
+between the two readings. An option that is only a reading of the picture with
+part of the picture ignored is a distractor doing its job.
 
 ### 15. A question asks what it means to ask
 *no check, judgement*

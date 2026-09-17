@@ -1201,6 +1201,32 @@ check('signs', 'every sign is the Australian form, wordless, and precached', asy
   // reading the sign, and a different task again for a learner who has letters
   // than for one who has none. The photo this set was redrawn from had "Bus
   // Stop" written across the bus stop flag, which is why the line is here.
+  // The options are the other half of the report, and no script can judge
+  // them: whether "Chemist" is a fair reading of a green cross is a fact about
+  // Australia, not about the file. Five of them were readings of their own
+  // picture, so a learner who read the sign correctly was marked wrong. A green
+  // cross is what Australian pharmacies put on the shopfront; a red disc says
+  // stop; a figure going over backwards says no running; a running figure says
+  // do not run; and a vehicle drawn front on has a windscreen and lights
+  // whether it runs on a road or on rails.
+  //
+  // So this does what `oddone` does with its categories: it makes the judgement
+  // impossible to skip. Changing an option, or adding a sign, fails here until
+  // somebody has looked at the drawing again and written the new set down.
+  const REVIEWED = {
+    'no-smoking':  ['No cooking', 'No matches', 'No smoking', 'Smoking area'],
+    'no-parking':  ['Bus parking', 'No parking', 'Parking here', 'Pay to park'],
+    'no-entry':    ['Come in', 'Do not enter', 'One way', 'Push the door'],
+    'wet-floor':   ['Clean the floor', 'Mind the step', 'Swimming pool', 'Wet floor'],
+    'danger':      ['Danger', 'Information', 'Question', 'Turn left'],
+    'first-aid':   ['Add here', 'First aid', 'Hospital car park', 'Staff only'],
+    'exit':        ['Entry only', 'Exit this way', 'Fire alarm', 'Sports room'],
+    'toilets':     ['Changing room', 'Family room', 'Toilets', 'Waiting room'],
+    'wheelchair':  ['Bicycle parking', 'Hospital', 'No wheelchairs', 'Wheelchair access'],
+    'no-food':     ['Free lunch', 'No food or drink', 'Restaurant', 'Wash your hands'],
+    'bus-stop':    ['Bus stop', 'Car park', 'No buses', 'Taxi rank'],
+  };
+
   const signs = await ctx.page.evaluate(() =>
     SIGNS.map(s => ({ icon: s.icon, answer: s.answer, alts: s.alts })));
   const dir = path.join(ROOT, 'icons');
@@ -1218,6 +1244,19 @@ check('signs', 'every sign is the Australian form, wordless, and precached', asy
     // Comments carry the reasoning, including the words this check forbids on
     // the face of a sign, so they come out before anything is read.
     const body = fs.readFileSync(file, 'utf8').replace(/<!--[\s\S]*?-->/g, '');
+
+    const offered = [s.answer].concat(s.alts).sort().join(' / ');
+    if (!REVIEWED[s.icon]) {
+      bad('signs: ' + s.icon + ' has not been through an options review. Look at the ' +
+          'drawing and ask of every option whether it is a fair reading of that picture ' +
+          'in Australia, then write the set into REVIEWED in this check');
+    } else if (REVIEWED[s.icon].join(' / ') !== offered) {
+      bad('signs: the options on ' + s.icon + ' have changed since they were reviewed.\n' +
+          '      reviewed: ' + REVIEWED[s.icon].join(' / ') + '\n' +
+          '      now:      ' + offered + '\n' +
+          '      Look at the drawing again: an option that is also a correct reading of ' +
+          'that picture marks a learner wrong for reading the sign right');
+    }
 
     if (/<text[\s>]|<tspan[\s>]/.test(body)) {
       bad('signs: ' + name + ' draws with a <text> element. Draw it as a path: ' +
@@ -1250,6 +1289,10 @@ check('signs', 'every sign is the Australian form, wordless, and precached', asy
       bad('signs: icons/' + name + ' is not in the sw.js precache list, so a learner ' +
           'who opens the game offline gets a question with no picture');
     }
+  });
+
+  Object.keys(REVIEWED).filter(k => !signs.some(s => s.icon === k)).forEach(function (k) {
+    bad('signs: ' + k + ' is reviewed in this check but is no longer in SIGNS');
   });
 
   const used = signs.map(s => 'sign-' + s.icon + '.svg');
