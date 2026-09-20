@@ -1087,14 +1087,26 @@ function playDemo() {
 document.getElementById('watchBtn').addEventListener('click', playDemo);
 
 /* ══════════════ SPEECH ══════════════ */
+/* resume() before speaking, and cancel on the way out: a phone pauses the
+   speech engine when the page goes into the background and does not reliably
+   start it again, and every later word is then accepted and never heard.
+   This page carries its own copy because it is the one page that does not
+   load phonics.js, where speakUtterance() does the same for the rest. */
 function speak(text) {
   try {
     speechSynthesis.cancel();
+    speechSynthesis.resume();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-AU'; u.rate = 0.8;
     speechSynthesis.speak(u);
   } catch (e) { /* TTS unavailable */ }
 }
+document.addEventListener('visibilitychange', () => {
+  try {
+    if (document.visibilityState === 'hidden') speechSynthesis.cancel();
+    else speechSynthesis.resume();
+  } catch (e) { /* TTS unavailable */ }
+});
 document.getElementById('hearBtn').addEventListener('click', () => speak(spokenName()));
 document.getElementById('wordPill').addEventListener('click', () => {
   const u = unit();

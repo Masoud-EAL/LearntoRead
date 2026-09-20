@@ -443,6 +443,35 @@ in three places, so a bank added later matched none of them. `speechFor(Q)` is
 now the only answer to "does this round speak, and what", and the button is
 shown iff it returns something.
 
+### 10a. The app has one way to speak, and it wakes the engine first
+*check: `speech`*
+
+> "I was in the games, in the words part, and the pronunciation did not play
+> even though my phone volume was up, so I could not choose the right option."
+
+Not the phone. A phone pauses the speech engine whenever the page goes into
+the background, which for a learner means a notification, the lock screen, a
+call, or a look at a translation app, and it does not reliably start again.
+Nothing in the app called `resume()`, so every word after that was handed to a
+paused engine: `speak()` accepts it, no error is raised, and the music comes
+back on its own because the audio context is resumed by name. The phone sounds
+healthy and the words are silent, "Hear it again" included, which is the only
+way out a learner who cannot read the question has.
+
+The cause under it is the usual one: there was no single place that said
+something out loud. `cancel()` and then `speak()` was written out fourteen
+times over, and every copy assumed the engine was awake. `speakUtterance(utt)`
+in `phonics.js` is the only one now, `tracing.html` excepted, which is the one
+page that does not load it and carries the same two lines with a note saying
+why.
+
+Two silences of the same kind live there with it: `getVoices()` is empty until
+the device loads its list, so it is asked for on the way in and again when the
+browser says it changed, and a phone will not speak at all until the first
+utterance comes from a touch, so the first touch anywhere opens the engine. A
+class game's first question arrives from the room rather than from the
+learner's finger, and it was being lost.
+
 ### 11. No question repeats inside a run, and a count on screen is a real count
 *check: `repeats`*
 

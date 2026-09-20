@@ -2177,7 +2177,6 @@ function isMobileDevice() {
     if (voiceSel) voiceSel.style.display = 'none';
   }
 })();
-if (window.speechSynthesis) { window.speechSynthesis.onvoiceschanged = function() {}; }
 
 /* ══════════════════════════════════════════
    SECTION SWITCH
@@ -2683,24 +2682,22 @@ function speakCurrent(wp) {
   const btn = document.getElementById(wp + '-audioBtn');
   const lbl = document.getElementById(wp + '-audioLbl');
   if (!window.speechSynthesis) { alert('Try Chrome or Edge for audio.'); return; }
-  window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(word);
   utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
   applyVoice(utt);
   btn.classList.add('speaking'); lbl.textContent = 'Listening…';
   utt.onend = utt.onerror = () => { btn.classList.remove('speaking'); lbl.textContent = 'Hear the word'; };
-  window.speechSynthesis.speak(utt);
+  speakUtterance(utt);
   s.seen.add(`${s.familyIdx}-${s.wordIdx}`);
 }
 
 function speakRaw(text, onEnd, rate) {
   if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(text);
   utt.rate = rate !== undefined ? rate : speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
   applyVoice(utt);
   utt.onend = utt.onerror = () => { if (onEnd) onEnd(); };
-  window.speechSynthesis.speak(utt);
+  speakUtterance(utt);
 }
 
 function setSpeed(rate, el) {
@@ -2816,7 +2813,6 @@ function playExampleWord() {
   var btn  = document.getElementById('examplePlayBtn');
   var lbl  = document.getElementById('examplePlayLbl');
   if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(word);
   utt.rate = pIsSent ? 0.85 : speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
   applyVoice(utt);
@@ -2826,7 +2822,7 @@ function playExampleWord() {
     btn.classList.remove('speaking');
     lbl.textContent = pIsSent ? 'Hear the sentence' : 'Hear the word';
   };
-  window.speechSynthesis.speak(utt);
+  speakUtterance(utt);
 }
 
 function startPracticeWords() {
@@ -2972,13 +2968,12 @@ function playCorrectWord() {
   var word = pWords[pIdx];
   var btn  = document.getElementById('correctVoiceBtn');
   if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(word);
   utt.rate = pIsSent ? 0.85 : speechRate; utt.pitch = 1.0; utt.lang = 'en-AU';
   applyVoice(utt);
   btn.classList.add('speaking');
   utt.onend = utt.onerror = function() { btn.classList.remove('speaking'); };
-  window.speechSynthesis.speak(utt);
+  speakUtterance(utt);
 }
 
 function goBackToRecord() { showRecord(); }
@@ -3083,7 +3078,6 @@ function cvPlayQuestion(autoRecord) {
   var btn  = document.getElementById('cvQuestionPlayBtn');
   var lbl  = document.getElementById('cvQuestionPlayLbl');
   if (!window.speechSynthesis) { if (autoRecord) cvShowRecord(true); return; }
-  window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(item.q);
   utt.rate = 0.85; utt.pitch = 1.05; utt.lang = 'en-AU';
   applyVoice(utt);
@@ -3095,7 +3089,7 @@ function cvPlayQuestion(autoRecord) {
     // Once the question has been heard, start recording automatically.
     if (autoRecord) cvShowRecord(true);
   };
-  window.speechSynthesis.speak(utt);
+  speakUtterance(utt);
 }
 
 /* ── PHASE 1: Record ── */
@@ -3236,21 +3230,19 @@ function cvPlayMyRecording() {
 function cvPlayModelAnswer() {
   var item = cvItems[cvIdx];
   if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(getModelAnswer(item));
   utt.rate = 0.85; utt.pitch = 1.0; utt.lang = 'en-AU';
   applyVoice(utt);
-  window.speechSynthesis.speak(utt);
+  speakUtterance(utt);
 }
 
 function cvPlayModelAnswer2() {
   var item = cvItems[cvIdx];
   if (!item.model2 || !window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(item.model2);
   utt.rate = 0.85; utt.pitch = 1.0; utt.lang = 'en-AU';
   applyVoice(utt);
-  window.speechSynthesis.speak(utt);
+  speakUtterance(utt);
 }
 
 function cvAdvance() {
@@ -3500,13 +3492,12 @@ function testPlayCorrectWord() {
   var btn  = document.getElementById('testCorrectVoiceBtn');
   var isSent = (testSection === 'sent0' || testSection === 'sent1');
   if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(word);
   utt.rate = isSent ? 0.85 : speechRate; utt.pitch = 1.0; utt.lang = 'en-AU';
   applyVoice(utt);
   btn.classList.add('speaking');
   utt.onend = utt.onerror = function(){ btn.classList.remove('speaking'); };
-  window.speechSynthesis.speak(utt);
+  speakUtterance(utt);
 }
 
 function testJudge(correct) {
@@ -3557,11 +3548,10 @@ function testPlayResult(i) {
   var word = testResults[i].word;
   var isSent = (testSection === 'sent0' || testSection === 'sent1');
   if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(word);
   utt.rate = isSent ? 0.85 : speechRate; utt.pitch = 1.0; utt.lang = 'en-AU';
   applyVoice(utt);
-  window.speechSynthesis.speak(utt);
+  speakUtterance(utt);
 }
 
 /* ══════════════════════════════════════════
@@ -4141,7 +4131,6 @@ function buildConversation() {
 
 function speakSentence(text, btn) {
   if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(text);
   utt.rate = sentenceRate; utt.pitch = 1.0; utt.lang = 'en-AU';
   applyVoice(utt);
@@ -4149,7 +4138,7 @@ function speakSentence(text, btn) {
     btn.classList.add('speaking');
     utt.onend = utt.onerror = function() { btn.classList.remove('speaking'); };
   }
-  window.speechSynthesis.speak(utt);
+  speakUtterance(utt);
 }
 
 /* ══════════════════════════════════════════
@@ -4409,7 +4398,6 @@ function spSpeakUnit(u, el) {
 function spellingSpeak() {
   if (!window.speechSynthesis) return;
   spStopHintSound();
-  window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(spAnswer());
   utt.rate = spIsSent ? sentenceRate : speechRate;
   utt.pitch = 1.0; utt.lang = 'en-AU';
@@ -4420,7 +4408,7 @@ function spellingSpeak() {
   utt.onend = utt.onerror = function() {
     btn.classList.remove('speaking'); lbl.textContent = 'Hear it again';
   };
-  window.speechSynthesis.speak(utt);
+  speakUtterance(utt);
 }
 
 /* ── HELP, ONE STEP AT A TIME ──────────────

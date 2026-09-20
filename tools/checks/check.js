@@ -1040,6 +1040,83 @@ check('audio', 'Hear it again appears exactly where a round speaks', async ctx =
   out.mism.forEach(bad);
 });
 
+check('speech', 'a word is still heard after the app has been away', async ctx => {
+  // "The pronunciation did not play, even with the volume up, so I could not
+  // pick the right option." A phone pauses the speech engine when the page
+  // goes into the background and does not reliably start it again; every
+  // word after that was accepted and never heard, while the music came back
+  // because the audio context is resumed by name. Nothing on the screen said
+  // so, on a round whose whole task is to tap the word you just heard.
+  //
+  // Half of this check is a sweep: cancel() and then speak() was written out
+  // fourteen times over, and one copy fixed would have left thirteen live.
+  const stray = [];
+  ['index.html', 'game.html'].forEach(f => {
+    const src = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    const n = (src.match(/speechSynthesis\.speak\(/g) || []).length;
+    if (n) stray.push('speech: ' + f + ' speaks directly ' + n + ' time' + (n === 1 ? '' : 's') +
+                      ' instead of through speakUtterance(), so it cannot wake the engine first');
+  });
+  // The tracing page carries its own copy because it is the one page that
+  // does not load phonics.js. It still has to wake the engine.
+  const tracing = fs.readFileSync(path.join(ROOT, 'tracing.html'), 'utf8');
+  if (!/speechSynthesis\.resume\(\)/.test(tracing)) {
+    stray.push('speech: tracing.html speaks without resuming the engine first');
+  }
+  stray.forEach(bad);
+
+  // The other half is the phone: pause the engine the way a notification
+  // does, come back, and see whether the next word and the replay button are
+  // heard.
+  const page = await ctx.browser.newPage({ viewport: { width: 420, height: 860 } });
+  await page.addInitScript(() => {
+    // An engine that behaves like a phone's: paused while the page is away,
+    // and dropping anything handed to it while it is.
+    let paused = false;
+    const log = [];
+    window.__speech = { log, get paused() { return paused; }, pause() { paused = true; } };
+    Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: {
+      get speaking() { return false; }, get pending() { return false; },
+      get paused() { return paused; },
+      getVoices() { return []; },
+      speak(u) { log.push({ text: u.text, heard: !paused }); },
+      cancel() {}, pause() { paused = true; }, resume() { paused = false; },
+      addEventListener() {}, removeEventListener() {}
+    } });
+  });
+  await page.goto(ctx.base + '/game.html?mode=solo&game=sightwords', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => typeof ACSF_POOL !== 'undefined', null, { timeout: 15000 });
+  const out = await page.evaluate(async () => {
+    soloSelectedType = 'sightwords'; soloMode = true; mcMode = true;
+    startSoloGame();
+    const first = window.__speech.log.length;
+    // The phone goes away: a notification, the lock screen, a call.
+    window.speechSynthesis.pause();
+    Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+    Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+    window.__speech.log.length = 0;
+    soloNextQuestion();          // the next word the round deals
+    const next = window.__speech.log.slice();
+    window.__speech.log.length = 0;
+    studentReplay();             // and the learner pressing Hear it again
+    const again = window.__speech.log.slice();
+    try { clearInterval(studentTimerInt); } catch (e) {}
+    return { first: first, next: next, again: again };
+  });
+  await page.close();
+  if (!out.first) bad('speech: the first question of a words game said nothing at all');
+  [['the next question', out.next], ['Hear it again', out.again]].forEach(([what, said]) => {
+    if (!said.length) bad('speech: ' + what + ' said nothing after the app came back');
+    else if (said.some(s => !s.heard)) {
+      bad('speech: ' + what + ' ("' + said[0].text + '") was handed to a paused engine after the ' +
+          'app came back, so the learner heard nothing');
+    }
+  });
+  say('  3 pages swept for a stray speak(), and a words round played across a background pause');
+});
+
 check('repeats', 'no bank repeats inside a run, and the launch count is a real count', async ctx => {
   const rows = await ctx.page.evaluate(() => {
     return Object.keys(GEN_BANKS).map(function (g) {

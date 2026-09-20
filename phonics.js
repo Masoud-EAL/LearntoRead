@@ -558,6 +558,76 @@ function applyVoice(utt) {
 }
 
 /* ══════════════════════════════════════════
+   SAYING IT OUT LOUD
+   Every place in the app that speaks comes through here. The pair it replaces
+   was written out fourteen times over, cancel() and then speak(), and every
+   copy assumed the engine was awake.
+
+   A phone pauses the speech engine when the page goes into the background:
+   a notification, the lock screen, a call, a look at a translation app. It
+   does not reliably start again on the way back. Nothing about that is
+   visible: speak() still accepts the words, no error is raised, and the music
+   returns on its own because the audio context is resumed by name. The
+   learner comes back to a question whose whole task is to tap the word they
+   were meant to hear, turns the volume up, presses Hear it again, and gets
+   silence.
+
+   So: wake it, every time, before anything is said. resume() is called
+   whether or not `paused` is set, because several phones report that wrong,
+   and it costs nothing on an engine that is already running.
+══════════════════════════════════════════ */
+function speakUtterance(utt) {
+  const s = window.speechSynthesis;
+  if (!s) return;
+  // cancel() first: one voice at a time, and the utterance just asked for is
+  // the one the learner is waiting on.
+  try { s.cancel(); s.resume(); } catch (e) { /* engine not ready */ }
+  s.speak(utt);
+}
+
+if (window.speechSynthesis) {
+  document.addEventListener('visibilitychange', function () {
+    try {
+      // On the way out, drop what was being said: resuming a backlog would
+      // read out words from a question the learner has already moved past.
+      // On the way back, leave the engine running so the next press is heard.
+      if (document.visibilityState === 'hidden') window.speechSynthesis.cancel();
+      else window.speechSynthesis.resume();
+    } catch (e) { /* engine not ready */ }
+  });
+
+  /* Two more silences that are not the phone's fault.
+
+     getVoices() is empty until the device has loaded its list, and the list
+     arrives after the page does. Asking for it once on the way in, and again
+     when the browser says it has changed, is what starts that load. Without
+     it the first word of a session is read by whatever voice the phone
+     defaults to, which on a learner's phone is often not an English one.
+
+     And a phone will not speak at all until the first utterance comes from a
+     touch. A learner practising alone taps Start, so that one is covered, but
+     a question in a class arrives from the room rather than from their
+     finger, and the first one was lost. An empty utterance on the first touch
+     anywhere opens the engine, and costs nothing on a device that did not
+     need it. */
+  try {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = function () {
+      try { window.speechSynthesis.getVoices(); } catch (e) {}
+    };
+  } catch (e) {}
+  const openSpeech = function () {
+    ['pointerdown', 'touchstart', 'keydown'].forEach(function (ev) {
+      document.removeEventListener(ev, openSpeech);
+    });
+    try { window.speechSynthesis.speak(new SpeechSynthesisUtterance('')); } catch (e) {}
+  };
+  ['pointerdown', 'touchstart', 'keydown'].forEach(function (ev) {
+    document.addEventListener(ev, openSpeech);
+  });
+}
+
+/* ══════════════════════════════════════════
    ONE TILE SHAPE FOR BOTH LEVELS
    getWp1Tiles returns {display,wav}; WP2_TILES holds {d,w,t,tts}.
    Callers that only want "how is this word built and how does each part

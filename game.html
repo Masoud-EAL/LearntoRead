@@ -6722,7 +6722,7 @@ function teacherSpeak(){
   utt.rate=0.7; utt.lang='en-AU';
   if(typeof applyVoice==='function') applyVoice(utt);
   utt.onend=utt.onerror=()=>btn.classList.remove('playing');
-  window.speechSynthesis.cancel(); window.speechSynthesis.speak(utt);
+  speakUtterance(utt);
 }
 
 let currentTimerDuration=TIMER_DURATION;
@@ -11274,7 +11274,7 @@ function speakTTS(text,rate){
   // reads English with whatever the device default is, which on many phones
   // is not an English voice at all. Isolated words are where that hurts most.
   if(typeof applyVoice==='function') applyVoice(utt);
-  window.speechSynthesis.cancel(); window.speechSynthesis.speak(utt);
+  speakUtterance(utt);
 }
 
 let currentStudentQ=null;
