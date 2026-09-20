@@ -472,6 +472,37 @@ utterance comes from a touch, so the first touch anywhere opens the engine. A
 class game's first question arrives from the room rather than from the
 learner's finger, and it was being lost.
 
+### 10b. Not having the Australian voice never means having no sound
+*check: `voices`*
+
+> "If the phone has en-US or en-GB installed but not en-AU, and your code
+> passes lang = 'en-AU' without falling back to any available English voice,
+> the utterance can silently do nothing."
+
+Australian English is what this app teaches, so it is asked for first. It is
+not always there to ask for: Google and Apple ship a default voice set and
+download the rest on demand, so a learner's phone can hold American or British
+English and no Australian at all, or list an Australian voice whose data was
+never downloaded. A phone asked for a locale it does not have says nothing.
+
+The ladder walks au, gb, nz, ie, us, then any English the phone calls English,
+then a plain `en` request with no voice at all. It is walked by prefix on a
+normalised string, because Android reports `en_AU` and Chrome reports
+`en-AU-x-sfg#female_1`, and an `=== 'en-AU'` test recognised neither: a phone
+that did have the Australian voice could still be handed an American one.
+
+Two of the three holes were not in the ladder but around it. `getVoices()` is
+empty until the device loads its list, and every call site asked while it still
+was, so the first word of a session went out as a bare en-AU with no voice
+behind it: it waits for the list now, briefly. And a voice that is listed but
+hollow takes the utterance and makes no sound, no error and no start, so a
+clock is the only thing that can tell: on silence the next rung down is tried,
+and the rung that worked is remembered for the session.
+
+`speech.js` holds all of it, and `tracing.html` loads it too. That page had no
+ladder whatsoever, asking for en-AU on every utterance, and had been mute on
+such phones since it was written.
+
 ### 11. No question repeats inside a run, and a count on screen is a real count
 *check: `repeats`*
 

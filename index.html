@@ -1859,7 +1859,10 @@
 
 <footer>Created by <strong>Masoud Fakhr</strong> · <a href="about.html">About WordLink</a></footer>
 
-<!-- Word families, grapheme→recording maps and voice picking, shared with game.html -->
+<!-- The one place that speaks, and the only place that names a voice or a
+     locale. First, because phonics.js and the app below both speak through it. -->
+<script src="speech.js"></script>
+<!-- Word families and grapheme→recording maps, shared with game.html -->
 <script src="phonics.js"></script>
 <script src="spell-feedback.js"></script>
 <script>
@@ -2683,7 +2686,7 @@ function speakCurrent(wp) {
   const lbl = document.getElementById(wp + '-audioLbl');
   if (!window.speechSynthesis) { alert('Try Chrome or Edge for audio.'); return; }
   const utt = new SpeechSynthesisUtterance(word);
-  utt.rate = speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  utt.rate = speechRate; utt.pitch = 1.05;
   applyVoice(utt);
   btn.classList.add('speaking'); lbl.textContent = 'Listening…';
   utt.onend = utt.onerror = () => { btn.classList.remove('speaking'); lbl.textContent = 'Hear the word'; };
@@ -2694,7 +2697,7 @@ function speakCurrent(wp) {
 function speakRaw(text, onEnd, rate) {
   if (!window.speechSynthesis) return;
   const utt = new SpeechSynthesisUtterance(text);
-  utt.rate = rate !== undefined ? rate : speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  utt.rate = rate !== undefined ? rate : speechRate; utt.pitch = 1.05;
   applyVoice(utt);
   utt.onend = utt.onerror = () => { if (onEnd) onEnd(); };
   speakUtterance(utt);
@@ -2814,7 +2817,7 @@ function playExampleWord() {
   var lbl  = document.getElementById('examplePlayLbl');
   if (!window.speechSynthesis) return;
   var utt = new SpeechSynthesisUtterance(word);
-  utt.rate = pIsSent ? 0.85 : speechRate; utt.pitch = 1.05; utt.lang = 'en-AU';
+  utt.rate = pIsSent ? 0.85 : speechRate; utt.pitch = 1.05;
   applyVoice(utt);
   btn.classList.add('speaking');
   lbl.textContent = pIsSent ? 'Listening...' : 'Listening...';
@@ -2969,7 +2972,7 @@ function playCorrectWord() {
   var btn  = document.getElementById('correctVoiceBtn');
   if (!window.speechSynthesis) return;
   var utt = new SpeechSynthesisUtterance(word);
-  utt.rate = pIsSent ? 0.85 : speechRate; utt.pitch = 1.0; utt.lang = 'en-AU';
+  utt.rate = pIsSent ? 0.85 : speechRate; utt.pitch = 1.0;
   applyVoice(utt);
   btn.classList.add('speaking');
   utt.onend = utt.onerror = function() { btn.classList.remove('speaking'); };
@@ -3079,7 +3082,7 @@ function cvPlayQuestion(autoRecord) {
   var lbl  = document.getElementById('cvQuestionPlayLbl');
   if (!window.speechSynthesis) { if (autoRecord) cvShowRecord(true); return; }
   var utt = new SpeechSynthesisUtterance(item.q);
-  utt.rate = 0.85; utt.pitch = 1.05; utt.lang = 'en-AU';
+  utt.rate = 0.85; utt.pitch = 1.05;
   applyVoice(utt);
   btn.classList.add('speaking');
   lbl.textContent = 'Listening...';
@@ -3231,7 +3234,7 @@ function cvPlayModelAnswer() {
   var item = cvItems[cvIdx];
   if (!window.speechSynthesis) return;
   var utt = new SpeechSynthesisUtterance(getModelAnswer(item));
-  utt.rate = 0.85; utt.pitch = 1.0; utt.lang = 'en-AU';
+  utt.rate = 0.85; utt.pitch = 1.0;
   applyVoice(utt);
   speakUtterance(utt);
 }
@@ -3240,7 +3243,7 @@ function cvPlayModelAnswer2() {
   var item = cvItems[cvIdx];
   if (!item.model2 || !window.speechSynthesis) return;
   var utt = new SpeechSynthesisUtterance(item.model2);
-  utt.rate = 0.85; utt.pitch = 1.0; utt.lang = 'en-AU';
+  utt.rate = 0.85; utt.pitch = 1.0;
   applyVoice(utt);
   speakUtterance(utt);
 }
@@ -3493,7 +3496,7 @@ function testPlayCorrectWord() {
   var isSent = (testSection === 'sent0' || testSection === 'sent1');
   if (!window.speechSynthesis) return;
   var utt = new SpeechSynthesisUtterance(word);
-  utt.rate = isSent ? 0.85 : speechRate; utt.pitch = 1.0; utt.lang = 'en-AU';
+  utt.rate = isSent ? 0.85 : speechRate; utt.pitch = 1.0;
   applyVoice(utt);
   btn.classList.add('speaking');
   utt.onend = utt.onerror = function(){ btn.classList.remove('speaking'); };
@@ -3549,7 +3552,7 @@ function testPlayResult(i) {
   var isSent = (testSection === 'sent0' || testSection === 'sent1');
   if (!window.speechSynthesis) return;
   var utt = new SpeechSynthesisUtterance(word);
-  utt.rate = isSent ? 0.85 : speechRate; utt.pitch = 1.0; utt.lang = 'en-AU';
+  utt.rate = isSent ? 0.85 : speechRate; utt.pitch = 1.0;
   applyVoice(utt);
   speakUtterance(utt);
 }
@@ -4132,7 +4135,7 @@ function buildConversation() {
 function speakSentence(text, btn) {
   if (!window.speechSynthesis) return;
   var utt = new SpeechSynthesisUtterance(text);
-  utt.rate = sentenceRate; utt.pitch = 1.0; utt.lang = 'en-AU';
+  utt.rate = sentenceRate; utt.pitch = 1.0;
   applyVoice(utt);
   if (btn) {
     btn.classList.add('speaking');
@@ -4400,7 +4403,7 @@ function spellingSpeak() {
   spStopHintSound();
   var utt = new SpeechSynthesisUtterance(spAnswer());
   utt.rate = spIsSent ? sentenceRate : speechRate;
-  utt.pitch = 1.0; utt.lang = 'en-AU';
+  utt.pitch = 1.0;
   applyVoice(utt);
   var btn = document.getElementById('spellingListenBtn');
   var lbl = document.getElementById('spellingListenLbl');

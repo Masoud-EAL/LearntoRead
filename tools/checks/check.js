@@ -1051,18 +1051,21 @@ check('speech', 'a word is still heard after the app has been away', async ctx =
   // Half of this check is a sweep: cancel() and then speak() was written out
   // fourteen times over, and one copy fixed would have left thirteen live.
   const stray = [];
-  ['index.html', 'game.html'].forEach(f => {
+  ['index.html', 'game.html', 'tracing.html'].forEach(f => {
     const src = fs.readFileSync(path.join(ROOT, f), 'utf8');
     const n = (src.match(/speechSynthesis\.speak\(/g) || []).length;
     if (n) stray.push('speech: ' + f + ' speaks directly ' + n + ' time' + (n === 1 ? '' : 's') +
                       ' instead of through speakUtterance(), so it cannot wake the engine first');
+    // The locale belongs to applyVoice, which walks down to whatever English
+    // the phone has. A page naming one for itself is a page that can be mute.
+    const locale = (src.match(/\.lang\s*=\s*'en-[A-Z]{2}'/g) || []).length;
+    if (locale) stray.push('speech: ' + f + ' sets a locale on an utterance ' + locale +
+                           ' time' + (locale === 1 ? '' : 's') + ' instead of leaving it to applyVoice()');
+    if (!/src="speech\.js"/.test(src)) stray.push('speech: ' + f + ' does not load speech.js');
   });
-  // The tracing page carries its own copy because it is the one page that
-  // does not load phonics.js. It still has to wake the engine.
-  const tracing = fs.readFileSync(path.join(ROOT, 'tracing.html'), 'utf8');
-  if (!/speechSynthesis\.resume\(\)/.test(tracing)) {
-    stray.push('speech: tracing.html speaks without resuming the engine first');
-  }
+  // A page that speaks but is not precached cannot speak offline.
+  const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
+  if (!/\.\/speech\.js/.test(sw)) bad('speech: speech.js is not in the service worker CORE list');
   stray.forEach(bad);
 
   // The other half is the phone: pause the engine the way a notification
@@ -1078,11 +1081,18 @@ check('speech', 'a word is still heard after the app has been away', async ctx =
     Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: {
       get speaking() { return false; }, get pending() { return false; },
       get paused() { return paused; },
-      getVoices() { return []; },
+      // A phone with a voice, because a phone without one is the voices
+      // check's business and an empty list now means "wait for the list".
+      getVoices() { return [{ name: 'Samantha', lang: 'en-US' }]; },
       speak(u) { log.push({ text: u.text, heard: !paused }); },
       cancel() {}, pause() { paused = true; }, resume() { paused = false; },
       addEventListener() {}, removeEventListener() {}
     } });
+    // A plain utterance, so the fake voice above can be assigned to one.
+    window.SpeechSynthesisUtterance = function (t) {
+      this.text = t; this.lang = ''; this.rate = 1; this.pitch = 1; this.volume = 1; this.voice = null;
+      this.addEventListener = function () {};
+    };
   });
   await page.goto(ctx.base + '/game.html?mode=solo&game=sightwords', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => typeof ACSF_POOL !== 'undefined', null, { timeout: 15000 });
@@ -1115,6 +1125,147 @@ check('speech', 'a word is still heard after the app has been away', async ctx =
     }
   });
   say('  3 pages swept for a stray speak(), and a words round played across a background pause');
+});
+
+check('voices', 'no Australian voice never means no sound', async ctx => {
+  // "If the phone has en-US or en-GB installed but not en-AU, and the code
+  // passes lang = 'en-AU' without falling back, the utterance can silently do
+  // nothing." It could, in three places: applyVoice asked for a bare en-AU
+  // whenever the voice list had not loaded, tracing.html asked for it always,
+  // and an === 'en-AU' test did not recognise the en_AU that Android reports.
+  const page = await ctx.browser.newPage({ viewport: { width: 420, height: 860 } });
+  await page.addInitScript(() => {
+    // An engine whose voice list, and whose willingness to use a voice, the
+    // test sets: a listed voice with no data behind it is the iOS case where
+    // the Australian Siri voice was never downloaded.
+    let voices = [], hollow = [], mute = false;
+    const said = [];
+    window.__eng = {
+      said: said,
+      set(v, opts) { voices = v; hollow = (opts || {}).hollow || []; mute = !!(opts || {}).mute; },
+      arrive(v) { voices = v; try { window.speechSynthesis.dispatchEvent(new Event('voiceschanged')); } catch (e) {} }
+    };
+    const listeners = {};
+    Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: {
+      get speaking() { return false; }, get pending() { return false; }, get paused() { return false; },
+      getVoices() { return voices; },
+      speak(u) {
+        said.push({ text: u.text, voice: u.voice ? u.voice.name : null, lang: u.lang });
+        const dead = mute || (u.voice && hollow.indexOf(u.voice.name) >= 0);
+        if (mute && !u.voice) { return; }                       // nothing at all, ever
+        setTimeout(() => {
+          if (dead) u._fire('error', { error: 'synthesis-failed' });
+          else { u._fire('start', {}); u._fire('end', {}); }
+        }, 0);
+      },
+      cancel() {}, resume() {}, pause() {},
+      addEventListener(k, f) { (listeners[k] = listeners[k] || []).push(f); },
+      removeEventListener() {},
+      dispatchEvent(e) { (listeners[e.type] || []).forEach(f => f(e)); }
+    } });
+    window.SpeechSynthesisUtterance = function (t) {
+      this.text = t; this.lang = ''; this.rate = 1; this.pitch = 1; this.volume = 1; this.voice = null;
+      const ls = {};
+      this.addEventListener = (k, f) => { (ls[k] = ls[k] || []).push(f); };
+      this._fire = (k, d) => { (ls[k] || []).forEach(f => f(d || {})); };
+    };
+  });
+  await page.goto(ctx.base + '/game.html?mode=solo&game=sightwords', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => typeof speakUtterance === 'function', null, { timeout: 15000 });
+
+  const AU = { name: 'Karen', lang: 'en-AU' }, AU_ = { name: 'Karen', lang: 'en_AU' };
+  const GB = { name: 'Daniel', lang: 'en-GB' }, US = { name: 'Samantha', lang: 'en-US' };
+  const IN = { name: 'Veena', lang: 'en-IN' }, FA = { name: 'Dariush', lang: 'fa-IR' };
+
+  // Each case: the voice list the phone has, and the voice the learner should
+  // end up hearing. The last field is what used to happen instead.
+  const cases = [
+    { what: 'only American English', list: [US, FA],      want: 'en-US' },
+    { what: 'British and American',  list: [US, GB, FA],  want: 'en-GB' },
+    { what: 'Australian as en_AU',   list: [US, AU_],     want: 'en_AU' },
+    { what: 'Australian present',    list: [US, GB, AU],  want: 'en-AU' },
+    { what: 'Indian English only',   list: [IN, FA],      want: 'en-IN' },
+    { what: 'no English at all',     list: [FA],          want: 'en'    },
+    { what: 'a hollow Australian voice', list: [AU, GB, US], hollow: ['Karen'], want: 'en-GB' }
+  ];
+  for (const c of cases) {
+    const heard = await page.evaluate(async (c) => {
+      window.__eng.set(c.list, { hollow: c.hollow || [] });
+      window.__eng.said.length = 0;
+      workingVoice = null;                       // each case is a fresh device
+      const u = new SpeechSynthesisUtterance('cat');
+      applyVoice(u);
+      await new Promise(r => { u.onend = r; u.onerror = r; speakUtterance(u); setTimeout(r, 3000); });
+      const said = window.__eng.said;
+      return said.length ? said[said.length - 1].lang : null;
+    }, c);
+    if (heard !== c.want) {
+      bad('voices: with ' + c.what + ' the learner should hear ' + c.want +
+          ' but the utterance went out as ' + heard);
+    }
+  }
+
+  // The list that has not loaded yet. This is the one that reached learners:
+  // every call site asks while getVoices() is still empty.
+  const late = await page.evaluate(async () => {
+    window.__eng.set([], {});
+    window.__eng.said.length = 0;
+    workingVoice = null;
+    const u = new SpeechSynthesisUtterance('cat');
+    applyVoice(u);                                    // nothing to pick yet
+    speakUtterance(u);
+    await new Promise(r => setTimeout(r, 120));
+    const spokeEarly = window.__eng.said.slice();
+    window.__eng.arrive([{ name: 'Samantha', lang: 'en-US' }]);
+    await new Promise(r => setTimeout(r, 200));
+    return { early: spokeEarly, all: window.__eng.said.slice() };
+  });
+  if (late.early.length) {
+    bad('voices: spoke as ' + late.early[0].lang + ' before the phone had loaded its voice list');
+  }
+  if (!late.all.length || late.all[late.all.length - 1].lang !== 'en-US') {
+    bad('voices: a list that arrived late was not used; the word went out as ' +
+        (late.all.length ? late.all[late.all.length - 1].lang : 'nothing'));
+  }
+
+  // A list that never arrives must still ask for English, not for a locale
+  // this phone may not have.
+  const never = await page.evaluate(async () => {
+    window.__eng.set([], {});
+    window.__eng.said.length = 0;
+    workingVoice = null;
+    const u = new SpeechSynthesisUtterance('cat');
+    applyVoice(u);
+    await new Promise(r => { u.onend = r; u.onerror = r; speakUtterance(u); setTimeout(r, 1200); });
+    return window.__eng.said.slice();
+  });
+  if (!never.length) bad('voices: with no voice list at all, nothing was spoken');
+  else if (never[never.length - 1].lang !== 'en') {
+    bad('voices: with no voice list at all the word went out as ' +
+        never[never.length - 1].lang + ', which a phone without that locale will not say');
+  }
+
+  // And the verdict the rest of the app reads: false while anything is heard,
+  // true only when every rung has been tried and none of them made a sound.
+  const silent = await page.evaluate(async () => {
+    window.__eng.set([{ name: 'Samantha', lang: 'en-US' }], {});
+    workingVoice = null;
+    const ok = new SpeechSynthesisUtterance('cat');
+    applyVoice(ok);
+    await new Promise(r => { ok.onend = r; ok.onerror = r; speakUtterance(ok); setTimeout(r, 1500); });
+    const afterGood = speechIsSilent();
+    window.__eng.set([{ name: 'Samantha', lang: 'en-US' }], { hollow: ['Samantha'], mute: true });
+    workingVoice = null;
+    const bad2 = new SpeechSynthesisUtterance('cat');
+    applyVoice(bad2);
+    await new Promise(r => { bad2.onend = r; bad2.onerror = r; speakUtterance(bad2); setTimeout(r, 3000); });
+    return { afterGood: afterGood, afterBad: speechIsSilent() };
+  });
+  if (silent.afterGood) bad('voices: a phone that spoke was recorded as having no voice');
+  if (!silent.afterBad) bad('voices: a phone where every rung failed was not recorded as silent');
+
+  await page.close();
+  say('  ' + cases.length + ' voice sets, a list that arrives late, one that never does');
 });
 
 check('repeats', 'no bank repeats inside a run, and the launch count is a real count', async ctx => {

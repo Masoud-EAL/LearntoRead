@@ -2651,7 +2651,10 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="vendor/qrcode.min.js"></script>
 
-<!-- Word families, grapheme→recording maps and voice picking, shared with index.html -->
+<!-- The one place that speaks, and the only place that names a voice or a
+     locale. First, because phonics.js and the app below both speak through it. -->
+<script src="speech.js"></script>
+<!-- Word families and grapheme→recording maps, shared with index.html -->
 <script src="phonics.js"></script>
 <script src="spell-feedback.js"></script>
 <script>
@@ -6719,8 +6722,8 @@ function teacherSpeak(){
   if(!spokenText) return;
   btn.classList.add('playing');
   const utt=new SpeechSynthesisUtterance(spokenText);
-  utt.rate=0.7; utt.lang='en-AU';
-  if(typeof applyVoice==='function') applyVoice(utt);
+  utt.rate=0.7;
+  applyVoice(utt);
   utt.onend=utt.onerror=()=>btn.classList.remove('playing');
   speakUtterance(utt);
 }
@@ -11269,11 +11272,10 @@ function selectMc(word,btn){
 /* rate: single words are clearer slower; whole sentences don't need it. */
 function speakTTS(text,rate){
   const utt=new SpeechSynthesisUtterance(text);
-  utt.rate=rate||0.7; utt.lang='en-AU';
-  // Setting lang alone does NOT choose a voice — without this the browser
-  // reads English with whatever the device default is, which on many phones
-  // is not an English voice at all. Isolated words are where that hurts most.
-  if(typeof applyVoice==='function') applyVoice(utt);
+  utt.rate=rate||0.7;
+  // applyVoice picks the voice and the locale; see speech.js for why an
+  // isolated word is where getting that wrong hurts most.
+  applyVoice(utt);
   speakUtterance(utt);
 }
 

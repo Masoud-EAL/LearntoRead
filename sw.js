@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v43';
+const CACHE = 'learntoread-v44';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -10,6 +10,7 @@ const CORE = [
   './about.html',
   './404.html',
   './i18n.js',
+  './speech.js',
   './phonics.js',
   './spell-feedback.js',
   './manifest.json',
