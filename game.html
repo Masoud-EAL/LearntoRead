@@ -1812,7 +1812,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="wp2:gap" class="q-type-tab" onclick="selectSoloType('wp2:gap',this)">🔡 Elementary Sound Gap</button>
         <button data-type="wp2:word" class="q-type-tab" onclick="selectSoloType('wp2:word',this)">👆 Elementary Tap Word</button>
         <button data-type="wp2:build" class="q-type-tab" onclick="selectSoloType('wp2:build',this)">🧱 Elementary Build Word</button>
-        <button data-type="beginner" class="q-type-tab active" onclick="selectSoloType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
+        <button data-type="beginner" class="q-type-tab" onclick="selectSoloType('beginner',this)">📝 Beginner Listen and Fill Gaps</button>
         <button data-type="elementary" class="q-type-tab" onclick="selectSoloType('elementary',this)">📄 Elementary Listen and Fill Gaps</button>
         <button data-type="questionwords" class="q-type-tab" onclick="selectSoloType('questionwords',this)">❓ Question Words</button>
         <button data-type="numbers" class="q-type-tab" onclick="selectSoloType('numbers',this)">🔢 1–10</button>
@@ -1867,7 +1867,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
              learner what to practise next, and this one tells a teacher where
              somebody is starting from. The type carries the mode, so there is
              nothing to switch on and nothing to forget to switch on. -->
-        <button data-type="test:level" class="q-type-tab" onclick="selectSoloType(this.dataset.type,this)">📋 Level Check</button>
+        <button data-type="test:level" class="q-type-tab active" onclick="selectSoloType(this.dataset.type,this)">📋 Level Check</button>
         <button data-type="custom" class="q-type-tab" id="solo-custom-tab" onclick="showBankPicker('solo',this)">📚 Custom</button>
       </div>
       </div><!-- /.setup-main -->
@@ -5608,7 +5608,11 @@ function answerSeconds(q,base){
    learner's own setting to begin with. */
 function defaultSecsFor(type){ return isLevelCheck(type)?ACSF_SECS:TIMER_DURATION; }
 let totalPlayers=0;
-let soloMode=false,soloQuestions=[],soloQIdx=0,soloSelectedType='beginner';
+/* Solo opens on the level check. Somebody practising on their own has no
+   teacher to tell them where to start, so the game waiting for them when they
+   change nothing is the one that answers that question. Any other game is one
+   tap away. Keep this in step with the tab carrying .active in the picker. */
+let soloMode=false,soloQuestions=[],soloQIdx=0,soloSelectedType='test:level';
 let hintLevel=0;
 let mcMode=true;
 
