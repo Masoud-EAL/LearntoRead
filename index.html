@@ -1908,7 +1908,7 @@ const EMOJI = {
   'soil':'🌱','sun':'☀️','tree':'🌳','vine':'🌿',
 
   // Transport
-  'bus':'🚌','ship':'🚢','train':'🚂','truck':'🚚','van':'🚐','bike':'🚲',
+  'bus':'🚌','car':'🚗','ship':'🚢','train':'🚂','truck':'🚚','van':'🚐','bike':'🚲',
 
   // Buildings & places
   'city':'🏙️','den':'🏕️','shop':'🏪','zoo':'🦁','class':'<img src="icons/class.svg" class="custom-icon-emoji" alt="class">',
@@ -1937,7 +1937,7 @@ const EMOJI = {
   // chest, hip and back are drawn in icons/ and mapped in game.html, but were
   // never listed here, so they came up blank in Words 1 and Words 2 despite
   // the picture existing. That is what "share game.html's set" means above.
-  'chest':bodyPic('chest'),'hip':bodyPic('hip'),'back':bodyPic('back'),
+  'chest':bodyPic('chest'),'hip':bodyPic('hip'),'back':bodyPic('back'),'arm':bodyPic('arm'),
 
   // Actions
   'cry':'😢','dig':'⛏️','draw':'✏️','drop':'💧','eat':'🍽️','fly':'🪰',
@@ -1985,7 +1985,7 @@ const EMOJI = {
   'orange':'🍊','open':'📂','order':'📋',
 
   // Money / simple concepts
-  'cent':'🪙',
+  'cent':'🪙','card':'💳',
 
   /* Words swapped into the -tion/-sion/-cian/-ture and CVC groups for
      everyday frequency. Each glyph is one no other word in this map uses —
@@ -2105,7 +2105,10 @@ const letterNames = [
 // phonemeWav: the WAV file to play when the big letter is tapped.
 // For letters with two sounds, the first/main sound is used here.
 const letterSoundData = [
-  { l:'A', vowel:true,  phonemeWav:'æ as in bat.wav', sounds:[{ wav:'æ as in bat.wav', label:'Short a — as in…', examples:['ant','apple','add'] }]},
+  { l:'A', vowel:true,  phonemeWav:'æ as in bat.wav', sounds:[
+    { wav:'æ as in bat.wav',   label:'Short a — as in…', examples:['ant','apple','add'] },
+    { wav:'ɑː as in hard.wav', label:'"AR" sound — as in…', examples:['car','star','arm','card','far'], note:'A sounds like this before R, as in car.' }
+  ]},
   { l:'B', vowel:false, phonemeWav:'b.wav', sounds:[{ wav:'b.wav', label:'Sound — as in…', examples:['bat','bag','bed','bus','big'] }]},
   { l:'C', vowel:false, phonemeWav:'k.wav', sounds:[
     { wav:'k.wav',  label:'Hard sound — as in…', examples:['cat','cup','cap','cut','come'] },
