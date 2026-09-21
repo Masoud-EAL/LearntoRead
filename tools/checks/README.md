@@ -54,6 +54,7 @@ NODE_PATH=/opt/node22/lib/node_modules node tools/checks/check.js
 | `rounds` | every pool step deals the same rounds whether it is asked for one question or for twenty, so a step cannot claim a feature the round it really deals never shows | "how much is it?" every time in Read the List, and then Devices crediting "understands the purpose of some digital devices" off a question that asked what one is called |
 | `prices` | every shop round names something its price would buy, in both ranges and in paying and change rounds alike, and no price the bank can deal is left without an item that fits it | "Pay 3 dollars for shoes. Shoes should be changed with tea. Shoes being $3 doesn't make any sense" |
 | `money` | every way of writing one amount is marked as that amount, in both the level check's money rounds and the shop, the shape each round's own placeholder shows is a shape it accepts, a bare number reads as dollars, and a round that takes a typed amount cannot be left to the letters test | "I just saw one question in level check, that had a 2 dollar coin, and only accepted 2.00 as the answer, not $2 or 2" |
+| `picker` | a game chosen off the launch screen deals every round its bank has, not only the one the level check calls round 0 | "I checked Safe or Private game. It was all just type this code" |
 | `oddone` | the odd word is not in the group, the other three are, no two options share a picture, and no category joins the game without a pairing review | "I get coffee, bag, pen and bus. The answer is bus, but it could be coffee too" |
 | `signs` | every sign drawing is the form Australia uses: the prohibition band runs upper left to lower right, nothing is drawn with a font, no sign carries its own answer or any of its options in words, every drawing is used by a sign and precached for offline, and no sign's options have changed since somebody last read them against its picture | "Some of the signs in level check and the game are different from Australian signs and may be interpreted in different ways. They can be especially challenging for pre learners" |
 | `coverage` | the totals in docs/acsf-coverage.md match the rows they count, so the app's account of what it claims cannot go stale | found drifted by three after features moved between marks |
@@ -71,6 +72,12 @@ NODE_PATH=/opt/node22/lib/node_modules node tools/checks/check.js
 
 Not a check. It prints real questions from a bank as text, which is the fastest
 way to confirm or refute a report before touching anything:
+
+Each bank is printed the way the picker deals it, which is the draw a learner
+meets when they choose the game off the launch screen, and then at each round
+the level check names. `[picker]` is the first of those and it is not round 0:
+a bank that reads "no round asked for" as round 0 shows half a game there and
+a whole one below it.
 
 ```
 $ node tools/checks/check.js probe sightwords 3

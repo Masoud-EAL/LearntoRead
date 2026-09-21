@@ -3939,8 +3939,12 @@ const POSITIONS=[
    there are two words, and Safe or Private already deals a two-option round. */
 function genPositionQuestions(n,from){
   const out=[];
-  const src=from?POSITIONS:POSITIONS.filter(function(p){
-    return p.w==='up'||p.w==='down'; });
+  /* Stage A is the up and down pair and the pool names it `from` 0. Anything
+     else is the whole set, no round asked for included: `from?` read the
+     picker's undefined as Stage A, so the game promising up, down, left,
+     right, in front and behind offered two words and two options. */
+  const src=from===0?POSITIONS.filter(function(p){
+    return p.w==='up'||p.w==='down'; }):POSITIONS;
   for(let i=0;i<(n||8);i++){
     const pick=src[randInt(0,src.length-1)];
     const alts=shuffle(src.filter(function(p){ return p.w!==pick.w; })).slice(0,3)
@@ -4261,7 +4265,13 @@ const SAFE_YESNO={Yes:'<span>👍</span>', No:'<span>👎</span>'};/* `from` cho
 function genSafeQuestions(n,from){
   const out=[];
   for(let i=0;i<(n||8);i++){
-    if(from){
+    /* `from` names the round, and no round asked for is not round 0. It was
+       `if(from)`, so the picker, which passes nothing, got the code every time
+       and the game called Safe or Private never once asked what to keep
+       private. 1 is the judgement and 0 the code, because that is what the two
+       pool steps name; with neither named the game alternates, which is what
+       its own blurb promises. */
+    if(from===1||(from==null&&i%2===1)){
       /* Yes or no, with a picture on each. "Safe to share" against "Keep it
          private" asked for a judgement about risk in phrases the band does not
          have: sixteen words to hold, and the two options are the hardest English
@@ -4377,8 +4387,12 @@ const PF_COPY_NUM=PF_COPY_A.concat([
    rather than dealing the same shape over and over hoping to cover the rest. */
 function genCopyQuestions(n,from){
   const out=[];
-  const mode=Math.max(0,Math.min(2,from||0));
   for(let i=0;i<(n||8);i++){
+    /* Read per draw rather than once, because no round asked for is not round
+       0: `from||0` made the picker deal a word and never a name or a number,
+       so two of the three kinds the game names were unreachable. A step still
+       gets the one kind it names. */
+    const mode=from==null?i%3:Math.max(0,Math.min(2,from));
     if(mode===0){
       const w=COPY_WORDS[randInt(0,COPY_WORDS.length-1)];
       out.push({type:'typein', label:'COPY THE WORD', noListen:true, matchCase:true,

@@ -1352,6 +1352,78 @@ check('rounds', 'a step deals the round it names, however many you ask for', asy
   out.bad.forEach(x => bad('rounds: ' + x));
 });
 
+check('picker', 'a game chosen from the picker deals every round its bank has', async ctx => {
+  /* "I checked Safe or Private. It was all just type this code."
+
+     `rounds` asks whether a pool step deals the round it names. This is the
+     other caller: the picker, which names no round at all. `getQuestions`
+     passes `from` on as undefined for exactly that reason, and says so in its
+     comment: round 0 and "no round asked for" are not the same request. Three
+     banks had not been told: they read `from||0` or `if(from)`, so undefined
+     collapsed onto round 0 and the other half of the game was unreachable
+     outside the level check. Safe or Private dealt the code and never the
+     judgement it is named after, Copy It dealt a word and never a name or a
+     number, and Where Is It offered up and down when its own blurb promises
+     left, right, in front and behind.
+
+     So: deal each bank the way the picker deals it, deal it again at every
+     `from` the level check names for it, and compare the round kinds. A kind
+     the bank will deal when asked and never deals when not asked for is a
+     round the picker cannot reach. */
+  const FLOOR = 0.05;    // below this share it is content varying, not a round
+  const DRAWS = 6, N = 40;
+  const out = await ctx.page.evaluate(([floor, draws, n]) => {
+    soloMode = true;
+    const bad = [], seen = [];
+    /* The same idea of a round as `rounds` uses, with digits taken out so one
+       round's prices, sums and dates stay inside one key instead of becoming a
+       round apiece. */
+    const key = q => (q.type || 'mc') + ' | ' + (q.label || '') + ' | ' +
+      String(q.question || '').replace(/<[^>]*>/g, ' ').replace(/\d+/g, '#')
+        .trim().split(/\s+/).slice(0, 4).join(' ');
+    const draw = fn => {
+      const hits = {};
+      let total = 0;
+      for (let i = 0; i < draws; i++) {
+        // Fresh each time: the no-repeat memory would otherwise hide a round
+        // behind the luck of the dedupe rather than fail on it.
+        resetGenSeen();
+        let got = [];
+        try { got = fn() || []; } catch (e) { return null; }
+        got.forEach(q => { hits[key(q)] = (hits[key(q)] || 0) + 1; total++; });
+      }
+      return total ? { hits: hits, total: total } : null;
+    };
+    // Every bank the picker offers a tab for, which is where a learner meets it.
+    const tabs = [...new Set([...document.querySelectorAll('.q-type-tab[data-type]')]
+      .map(b => b.dataset.type).filter(isGenBank))];
+    tabs.forEach(function (g) {
+      const picked = draw(() => getQuestions(g, n));
+      if (!picked) return;
+      // The rounds the app itself asks this bank for, by name.
+      const froms = [...new Set(ACSF_POOL.concat(TEST_LADDERS ? Object.keys(TEST_LADDERS)
+        .reduce((a, k) => a.concat(TEST_LADDERS[k]), []) : [])
+        .filter(s => s.type === g).map(s => s.from || 0))];
+      if (!froms.length) return;
+      seen.push(g + ' (' + froms.length + ')');
+      froms.forEach(function (f) {
+        const named = draw(() => GEN_BANKS[g](n, f));
+        if (!named) return;
+        Object.keys(named.hits).forEach(function (k) {
+          if (picked.hits[k] || named.hits[k] / named.total < floor) return;
+          bad.push(g + ' at from ' + f + ' deals "' + k.split(' | ').pop() +
+                   '" as ' + Math.round(named.hits[k] / named.total * 100) +
+                   '% of its draw, and the picker never deals it at all');
+        });
+      });
+    });
+    return { bad: bad, seen: seen };
+  }, [FLOOR, DRAWS, N]);
+  say('  ' + out.seen.length + ' generated banks on the picker, each dealt ' +
+      DRAWS + ' x ' + N + ' the picker\'s way and at every round the app names');
+  out.bad.forEach(x => bad('picker: ' + x));
+});
+
 check('oddone', 'the odd one out is clearly odd', async ctx => {
   // "I get coffee, bag, pen and bus. The answer is bus because it's transport,
   // but it could be coffee too because it's food and the others are things."
@@ -2277,18 +2349,23 @@ async function probe(ctx, bank, n) {
   const out = await ctx.page.evaluate(([g, n]) => {
     soloMode = true;
     const qs = [];
-    [0, 1, 2].forEach(function (from) {
+    /* `null` first, and it is not round 0: it is what the picker passes, and it
+       is the draw a learner who chose the game off the launch screen actually
+       meets. Probing only 0, 1 and 2 is how "Safe or Private was all just type
+       this code" stayed invisible to the tool meant to reproduce it. */
+    [null, 0, 1, 2].forEach(function (from) {
       let got = [];
       try {
-        got = isGenBank(g) ? GEN_BANKS[g](n, from) : getQuestions(g, n);
+        got = isGenBank(g) ? GEN_BANKS[g](n, from == null ? undefined : from)
+                           : getQuestions(g, n);
         // Show the round as a learner meets it: a bank that can be tapped gets
         // its options when the round deals it, not when the bank builds it.
         if (mcAppliesTo(g)) attachMcChoices(got, g);
       } catch (e) {
-        qs.push({ err: 'from ' + from + ' threw ' + e.message }); return;
+        qs.push({ err: 'from ' + (from == null ? 'picker' : from) + ' threw ' + e.message }); return;
       }
       (got || []).forEach(q => qs.push({
-        from: from,
+        from: from == null ? 'picker' : from,
         label: q.label || '',
         question: String(q.question || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(),
         say: q.say || '',

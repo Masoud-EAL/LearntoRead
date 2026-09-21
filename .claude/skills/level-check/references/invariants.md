@@ -613,6 +613,52 @@ the bank:
   Number only the number, Read the Notice only the heading, and First, Second,
   Third only the half that is not the spoken one its feature names.
 
+### 12g. No round asked for is not round 0
+*check: `picker`*
+
+> "I checked Safe or Private game. It was all just type this code. This is not
+> acceptable at all."
+
+12b put `from` on the banks that were choosing their round off the draw index.
+This is the same rule read from the other caller. The level check always names a
+round; the picker never does, because a learner choosing a game off the launch
+screen is not asking for half of it. `getQuestions` passes `from` on as
+undefined for exactly that reason and says so in its own comment:
+
+> Round 0 and "no round asked for" are not the same request.
+
+The plumbing was fixed and three banks were never told. They read `from||0` or
+`if(from)`, which cannot tell undefined from 0, so every game off the picker was
+the level check's round 0 and nothing else:
+
+- **Safe or Private** dealt a four digit code to copy, over and over, and never
+  once asked what is safe to share. The game is named after the round it could
+  not reach, and its own blurb promises both: "Copy a code, and what to keep
+  private."
+- **Copy It** dealt a word and never a name or a number. Its blurb names all
+  three.
+- **Where Is It** offered up and down over two options. Its blurb reads "Up,
+  down, left, right, in front, behind", and `from` 0 there is the Stage A pair
+  because the Stage A feature names no other word. Outside the assessment there
+  is no stage to hold to.
+
+The fix is the idiom the banks that were already right use, `from===1 ||
+(from==null && i%2===1)`, or a cycle on the draw index when there are three
+kinds. A step still gets the one kind it names; with none named the game deals
+them all.
+
+Two things to hold on to. **The blurb in `GAME_INFO` is the readable statement
+of what a game deals**, so a bank whose draw is narrower than its blurb is a bug
+you can see without running anything. And **a `from` that names a difficulty
+range is not this rule**: Tap the Number, Add It Up and the rest deal their easy
+range to the picker on purpose, which is why the check keys on the round's shape
+and not on the numbers inside it. `probe` prints the picker's draw first now,
+because probing 0, 1 and 2 is how this stayed invisible to the one tool meant to
+reproduce it.
+
+Grep for `from||0`, `from?` and `if(from)` in the generators when a report says a
+game is only ever one thing.
+
 ### 12c. An option a learner cannot read is not a question about the indicator
 *check: `options`*
 
