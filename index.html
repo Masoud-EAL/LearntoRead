@@ -1338,7 +1338,9 @@
   </select>
   <select class="lang-select" id="langSelect" onchange="onLangChange()">
     <option value="">🌐 Translation: Off</option>
-    <option value="fa">🇦🇫 فارسی / Dari</option>
+    <option value="fa">🇦🇫 دری / Dari</option>
+    <option value="fa-IR">فارسی / Persian</option>
+    <option value="ps">🇦🇫 پښتو / Pashto</option>
     <option value="vi">🇻🇳 Tiếng Việt</option>
     <option value="zh">🇨🇳 中文</option>
     <option value="ur">🇵🇰 اردو</option>
@@ -2009,13 +2011,15 @@ function emo(word) {
    TRANSLATION
 ══════════════════════════════════════════ */
 let translations = null;
-const RTL_LANGS = new Set(['fa', 'ur', 'ar']);
+const RTL_LANGS = new Set(['fa', 'fa-IR', 'ps', 'ur', 'ar']);
 
 // Per-language font families (Urdu gets Nastaliq; all others use the CSS default)
 const LANG_FONT = {
   'ur': "'Noto Nastaliq Urdu','Noto Sans Arabic',sans-serif",
   'ar': "'Noto Sans Arabic',sans-serif",
   'fa': "'Noto Sans Arabic',sans-serif",
+  'fa-IR': "'Noto Sans Arabic',sans-serif",
+  'ps': "'Noto Sans Arabic',sans-serif",
   'zh': "'Noto Sans SC',sans-serif",
   'km': "'Noto Sans Khmer',sans-serif",
   'my': "'Noto Sans Myanmar',sans-serif",

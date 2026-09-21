@@ -21,13 +21,15 @@
 (function (global) {
   'use strict';
 
-  var RTL_LANGS = { fa: 1, ur: 1, ar: 1 };
+  var RTL_LANGS = { fa: 1, 'fa-IR': 1, ps: 1, ur: 1, ar: 1 };
 
   /* Urdu gets Nastaliq; the rest fall back to the CSS default. */
   var LANG_FONT = {
     ur: "'Noto Nastaliq Urdu','Noto Sans Arabic',sans-serif",
     ar: "'Noto Sans Arabic',sans-serif",
     fa: "'Noto Sans Arabic',sans-serif",
+    'fa-IR': "'Noto Sans Arabic',sans-serif",
+    ps: "'Noto Sans Arabic',sans-serif",
     zh: "'Noto Sans SC',sans-serif",
     km: "'Noto Sans Khmer',sans-serif",
     my: "'Noto Sans Myanmar',sans-serif",
@@ -39,7 +41,8 @@
   /* Language names in the language itself — a learner who can't yet
      read "Vietnamese" in English can still find "Tiếng Việt". */
   var LANG_NAMES = {
-    vi: 'Tiếng Việt', fa: 'فارسی', ar: 'العربية', zh: '中文',
+    fa: 'دری', 'fa-IR': 'فارسی', ps: 'پښتو',
+    vi: 'Tiếng Việt', ar: 'العربية', zh: '中文',
     hi: 'हिन्दी', ur: 'اردو', km: 'ខ្មែរ', my: 'မြန်မာ', th: 'ภาษาไทย'
   };
 

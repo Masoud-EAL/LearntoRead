@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v44';
+const CACHE = 'learntoread-v45';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -246,6 +246,8 @@ const OPTIONAL = [
   './audio/%CA%92%20as%20in%20pleasure.wav',
   './audio/%CE%B8%20as%20in%20thin.wav',
   './translations/fa.json',
+  './translations/fa-IR.json',
+  './translations/ps.json',
   './translations/vi.json',
   './translations/zh.json',
   './translations/ur.json',
