@@ -38,13 +38,28 @@
     vi: 'sans-serif'
   };
 
-  /* Language names in the language itself — a learner who can't yet
-     read "Vietnamese" in English can still find "Tiếng Việt". */
-  var LANG_NAMES = {
-    fa: 'دری', 'fa-IR': 'فارسی', ps: 'پښتو',
-    vi: 'Tiếng Việt', ar: 'العربية', zh: '中文',
-    hi: 'हिन्दी', ur: 'اردو', km: 'ខ្មែរ', my: 'မြန်မာ', th: 'ภาษาไทย'
+  /* Every language is named twice: in English, for the teacher pointing a
+     student at it, and in the language itself, for the learner who can't yet
+     read "Vietnamese" but knows "Tiếng Việt" on sight. Alphabetical by the
+     English name, which is the order a picker shows them in; the English
+     name comes first so that on a left-to-right page it lands on the left,
+     whichever script follows it. */
+  var LANG_EN = {
+    ar: 'Arabic', my: 'Burmese', zh: 'Chinese', fa: 'Dari', hi: 'Hindi',
+    km: 'Khmer', ps: 'Pashto', 'fa-IR': 'Persian', th: 'Thai', ur: 'Urdu',
+    vi: 'Vietnamese'
   };
+
+  var LANG_NAMES = {
+    ar: 'العربية', my: 'မြန်မာ', zh: '中文', fa: 'دری', hi: 'हिन्दी',
+    km: 'ភាសាខ្មែរ', ps: 'پښتو', 'fa-IR': 'فارسی', th: 'ภาษาไทย', ur: 'اردو',
+    vi: 'Tiếng Việt'
+  };
+
+  /* What a picker shows: "Dari / دری". */
+  function label(code) {
+    return (LANG_EN[code] || code) + ' / ' + (LANG_NAMES[code] || code);
+  }
 
   /* localStorage throws in sandboxed iframes (chat previews) and some
      private-browsing modes. Fall back to memory so the app still runs. */
@@ -137,7 +152,7 @@
     }
     Object.keys(LANG_NAMES).forEach(function (code) {
       var o = document.createElement('option');
-      o.value = code; o.textContent = LANG_NAMES[code];
+      o.value = code; o.textContent = label(code);
       sel.appendChild(o);
     });
     sel.value = current;
@@ -154,6 +169,8 @@
     applyTo: applyTo,
     populateSelect: populateSelect,
     names: LANG_NAMES,
+    english: LANG_EN,
+    label: label,
     onChange: function (fn) { if (typeof fn === 'function') listeners.push(fn); }
   };
 })(window);

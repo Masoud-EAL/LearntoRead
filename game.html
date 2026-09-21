@@ -1953,12 +1953,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       <div id="solo-lang-wrap" style="display:none;margin-top:10px;display:none;align-items:center;gap:10px;">
         <label style="font-size:.8rem;color:var(--muted);">Your language:</label>
         <select id="solo-lang-pick" class="game-input" style="width:auto;padding:6px 10px;font-size:.9rem;margin-bottom:0;" onchange="localStorage.setItem('translateLang',this.value)">
-          <option value="fa">دری</option><option value="fa-IR">فارسی</option>
-          <option value="ps">پښتو</option><option value="vi">Tiếng Việt</option>
-          <option value="ar">العربية</option><option value="zh">中文</option>
-          <option value="hi">हिन्दी</option><option value="ur">اردو</option>
-          <option value="km">ខ្មែរ</option><option value="my">မြန်မာ</option>
-          <option value="th">ภาษาไทย</option>
+          <option value="ar">Arabic / العربية</option><option value="my">Burmese / မြန်မာ</option>
+          <option value="zh">Chinese / 中文</option><option value="fa">Dari / دری</option>
+          <option value="hi">Hindi / हिन्दी</option><option value="km">Khmer / ភាសាខ្មែរ</option>
+          <option value="ps">Pashto / پښتو</option><option value="fa-IR">Persian / فارسی</option>
+          <option value="th">Thai / ภាษาไทย</option><option value="ur">Urdu / اردو</option>
+          <option value="vi">Vietnamese / Tiếng Việt</option>
         </select>
       </div>
     </div>
@@ -2245,12 +2245,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
     <div class="field-label" style="font-size:1rem;">🌐 Your language</div>
     <select class="game-input" id="s-lang-pick" style="width:auto;margin-bottom:0;"
       onchange="localStorage.setItem('translateLang',this.value)">
-      <option value="fa">دری (Dari)</option><option value="fa-IR">فارسی (Persian)</option>
-      <option value="ps">پښتو (Pashto)</option><option value="vi">Tiếng Việt (Vietnamese)</option>
-      <option value="ar">العربية (Arabic)</option><option value="zh">中文 (Chinese)</option>
-      <option value="hi">हिन्दी (Hindi)</option><option value="ur">اردو (Urdu)</option>
-      <option value="km">ខ្មែរ (Khmer)</option><option value="my">မြန်မာ (Burmese)</option>
-      <option value="th">ภาษาไทย (Thai)</option>
+      <option value="ar">Arabic / العربية</option><option value="my">Burmese / မြန်မာ</option>
+      <option value="zh">Chinese / 中文</option><option value="fa">Dari / دری</option>
+      <option value="hi">Hindi / हिन्दी</option><option value="km">Khmer / ភាសាខ្មែរ</option>
+      <option value="ps">Pashto / پښتو</option><option value="fa-IR">Persian / فارسی</option>
+      <option value="th">Thai / ภាษาไทย</option><option value="ur">Urdu / اردو</option>
+      <option value="vi">Vietnamese / Tiếng Việt</option>
     </select>
     <div style="color:var(--muted);font-size:.78rem;">You can change this until the game starts</div>
   </div>
@@ -3099,7 +3099,7 @@ const LEVEL0_SENTENCES=[
   {en:'I want to find a good job.',fa:'من می‌خواهم یک شغل خوب پیدا کنم.','fa-IR':'من می‌خواهم یک شغل خوب پیدا کنم.',ps:'زه غواړم یوه ښه دنده پیدا کړم.',vi:'Tôi muốn tìm một công việc tốt.',zh:'我想找一份好工作。',ar:'أريد إيجاد عمل جيد.',hi:'मैं एक अच्छी नौकरी ढूंढना चाहता हूँ।',ur:'میں ایک اچھی نوکری ڈھونڈنا چاہتا ہوں۔',km:'ខ្ញុំចង់រកការងារល្អ។',my:'ကျွန်ုပ် ကောင်းသောအလုပ် ရှာချင်သည်',th:'ฉันอยากหางานดีๆ'},
   {en:'I want to help my children with school.',fa:'من می‌خواهم به فرزندانم در مدرسه کمک کنم.','fa-IR':'من می‌خواهم به فرزندانم در مدرسه کمک کنم.',ps:'زه غواړم په ښوونځي کې له خپلو ماشومانو سره مرسته وکړم.',vi:'Tôi muốn giúp con tôi học bài.',zh:'我想帮孩子们学习。',ar:'أريد مساعدة أطفالي في المدرسة.',hi:'मैं अपने बच्चों की पढ़ाई में मदद करना चाहता हूँ।',ur:'میں اپنے بچوں کی پڑھائی میں مدد کرنا چاہتا ہوں۔',km:'ខ្ញុំចង់ជួយកូនៗ​ ក្នុងការរៀន។',my:'ကျွန်ုပ် ကလေးများ ကျောင်းတွင် ကူညီချင်သည်',th:'ฉันอยากช่วยลูกๆ เรื่องการเรียน'},
 ];
-const LANG_NAMES={fa:'دری','fa-IR':'فارسی',ps:'پښتو',vi:'Tiếng Việt',ar:'العربية',zh:'中文',hi:'हिन्दी',ur:'اردو',km:'ខ្មែរ',my:'မြန်မာ',th:'ภាษាไทย'};
+const LANG_NAMES={'ar':'العربية','my':'မြန်မာ','zh':'中文','fa':'دری','hi':'हिन्दी','km':'ភាសាខ្មែរ','ps':'پښتو','fa-IR':'فارسی','th':'ภាษาไทย','ur':'اردو','vi':'Tiếng Việt'};
 
 /* ── SIGNS AND NOTICES ──
    Signs are deliberately symbolic, never worded: a sign that says EXIT tests
