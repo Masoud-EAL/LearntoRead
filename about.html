@@ -108,6 +108,25 @@
   @media (max-width: 480px) {
     .cta-row a.cta { flex: 1 1 100%; justify-content: center; }
   }
+  /* Install steps. A learner who cannot read the caption still has to be
+     able to follow the picture, so each step is a phone drawing first and
+     words second, with the step number large enough to count along. */
+  .install-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 10px; }
+  @media (max-width: 620px) { .install-cols { grid-template-columns: 1fr; } }
+  .install-cols h3 { margin-top: 4px; display: flex; align-items: center; gap: 8px; }
+  .install-steps { list-style: none; margin: 0 !important; padding: 0; }
+  .install-steps li {
+    display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: center;
+    margin-bottom: 16px !important;
+  }
+  .install-steps svg { width: 96px; height: auto; display: block;
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.14)); }
+  .step-text { display: flex; gap: 10px; align-items: flex-start; font-size: 1.08rem; line-height: 1.45; }
+  .step-num {
+    flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+    font-family: 'Fredoka One', cursive; color: white; background: var(--accent1);
+  }
+  .android .step-num { background: var(--teal); }
   .note {
     font-size: 0.85rem; color: var(--mid); border-left: 3px solid var(--light);
     padding-left: 14px; margin-top: 16px;
@@ -149,7 +168,43 @@
       <a class="cta cool" href="game.html?mode=solo"><span class="cta-icon" aria-hidden="true">🎮</span>Practise with games</a>
       <a class="cta warm" href="index.html?section=speaking"><span class="cta-icon" aria-hidden="true">🗣️</span>Speaking practice</a>
       <a class="cta cool" href="game.html?mode=solo&amp;game=test:level"><span class="cta-icon" aria-hidden="true">📋</span>Check your level</a>
+      <a class="cta" href="#install"><span class="cta-icon" aria-hidden="true">📲</span>Put it on your phone</a>
     </div>
+  </div>
+
+  <div class="card plain" id="install">
+    <h2>Put WordLink on your phone</h2>
+    <p>You can keep WordLink on your phone like an app. Then you tap the
+      WordLink picture to open it. It is free. You do not need the App Store or
+      Google Play.</p>
+    <div class="install-cols">
+      <div>
+        <h3><span aria-hidden="true">🍎</span>iPhone or iPad</h3>
+        <p>Open WordLink in <strong>Safari</strong>.</p>
+        <ol class="install-steps">
+        <li><svg viewBox="0 0 120 200" aria-hidden="true"><rect x="3" y="3" width="114" height="194" rx="16" fill="#2d2a26"/><rect x="9" y="12" width="102" height="176" rx="10" fill="#fdf6ec"/><text x="60" y="50" font-family="Fredoka One,sans-serif" font-size="17" text-anchor="middle"><tspan fill="#f4845f">Word</tspan><tspan fill="#4a90d9">Link</tspan></text><rect x="24" y="66" width="72" height="18" rx="9" fill="#2baa8a" opacity=".6"/><rect x="24" y="90" width="72" height="18" rx="9" fill="#e8ddd2"/><rect x="9" y="150" width="102" height="38" fill="#f1ece4"/><rect x="18" y="126" width="84" height="18" rx="9" fill="#fff" stroke="#e8ddd2"/><text x="60" y="139" font-family="Nunito,sans-serif" font-size="9" fill="#7a6f65" text-anchor="middle">wordlink.au</text><circle cx="60" cy="168" r="14" fill="none" stroke="#f4845f" stroke-width="3"/><rect x="53" y="166" width="14" height="12" rx="2" fill="none" stroke="#2d2a26" stroke-width="2"/><path d="M60 157 v11 M56 161 L60 157 L64 161" fill="none" stroke="#2d2a26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="step-text"><span class="step-num">1</span><span>Tap <strong>Share</strong>, the square with an arrow. (If you cannot see it, tap <strong>⋯</strong> first.)</span></div></li>
+        <li><svg viewBox="0 0 120 200" aria-hidden="true"><rect x="3" y="3" width="114" height="194" rx="16" fill="#2d2a26"/><rect x="9" y="12" width="102" height="176" rx="10" fill="#fdf6ec"/><rect x="9" y="12" width="102" height="176" rx="10" fill="#d9d2c7"/><rect x="14" y="60" width="92" height="124" rx="10" fill="#fff"/><rect x="20" y="72" width="80" height="10" rx="5" fill="#e8ddd2"/><rect x="20" y="90" width="80" height="10" rx="5" fill="#e8ddd2"/><rect x="17" y="108" width="86" height="30" rx="8" fill="#fff4ee" stroke="#f4845f" stroke-width="3"/><rect x="23" y="115" width="16" height="16" rx="4" fill="none" stroke="#2d2a26" stroke-width="2"/><path d="M31 119 v8 M27 123 h8" stroke="#2d2a26" stroke-width="2"/><text x="44" y="121" font-family="Nunito,sans-serif" font-size="8" font-weight="800" fill="#2d2a26">Add to</text><text x="44" y="131" font-family="Nunito,sans-serif" font-size="8" font-weight="800" fill="#2d2a26">Home Screen</text><rect x="20" y="148" width="80" height="10" rx="5" fill="#e8ddd2"/><rect x="20" y="166" width="80" height="10" rx="5" fill="#e8ddd2"/></svg>
+          <div class="step-text"><span class="step-num">2</span><span>Tap <strong>Add to Home Screen</strong>.</span></div></li>
+        <li><svg viewBox="0 0 120 200" aria-hidden="true"><rect x="3" y="3" width="114" height="194" rx="16" fill="#2d2a26"/><rect x="9" y="12" width="102" height="176" rx="10" fill="#fdf6ec"/><rect x="14" y="22" width="92" height="46" rx="8" fill="#fff"/><rect x="72" y="28" width="30" height="16" rx="8" fill="#4a90d9" stroke="#f4845f" stroke-width="2.5"/><text x="87" y="40" font-family="Nunito,sans-serif" font-size="9" font-weight="800" fill="#fff" text-anchor="middle">Add</text><rect x="20" y="46" width="18" height="18" rx="8" fill="#fff" stroke="#e8ddd2" stroke-width="2"/><text x="29.0" y="57.88" font-family="Fredoka One,sans-serif" font-size="8" text-anchor="middle"><tspan fill="#f4845f">W</tspan><tspan fill="#4a90d9">L</tspan></text><text x="44" y="59" font-family="Nunito,sans-serif" font-size="8" font-weight="700" fill="#2d2a26">WordLink</text><path d="M60 80 v18 M53 91 L60 98 L67 91" fill="none" stroke="#7a6f65" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="40" y="110" width="40" height="40" rx="8" fill="#fff" stroke="#e8ddd2" stroke-width="2"/><text x="60.0" y="135.76" font-family="Fredoka One,sans-serif" font-size="16" text-anchor="middle"><tspan fill="#f4845f">W</tspan><tspan fill="#4a90d9">L</tspan></text><text x="60" y="166" font-family="Nunito,sans-serif" font-size="10" font-weight="800" fill="#2d2a26" text-anchor="middle">WordLink</text></svg>
+          <div class="step-text"><span class="step-num">3</span><span>Tap <strong>Add</strong>. WordLink is on your home screen.</span></div></li>
+        </ol>
+      </div>
+      <div class="android">
+        <h3><span aria-hidden="true">🤖</span>Android phone</h3>
+        <p>Open WordLink in <strong>Chrome</strong>.</p>
+        <ol class="install-steps">
+        <li><svg viewBox="0 0 120 200" aria-hidden="true"><rect x="3" y="3" width="114" height="194" rx="16" fill="#2d2a26"/><rect x="9" y="12" width="102" height="176" rx="10" fill="#fdf6ec"/><rect x="16" y="20" width="70" height="18" rx="9" fill="#fff" stroke="#e8ddd2"/><text x="51" y="33" font-family="Nunito,sans-serif" font-size="8.5" fill="#7a6f65" text-anchor="middle">wordlink.au</text><circle cx="99" cy="29" r="11" fill="none" stroke="#2baa8a" stroke-width="3"/><circle cx="99" cy="23.5" r="2" fill="#2d2a26"/><circle cx="99" cy="29" r="2" fill="#2d2a26"/><circle cx="99" cy="34.5" r="2" fill="#2d2a26"/><text x="60" y="86" font-family="Fredoka One,sans-serif" font-size="17" text-anchor="middle"><tspan fill="#f4845f">Word</tspan><tspan fill="#4a90d9">Link</tspan></text><rect x="24" y="102" width="72" height="18" rx="9" fill="#2baa8a" opacity=".6"/><rect x="24" y="126" width="72" height="18" rx="9" fill="#e8ddd2"/></svg>
+          <div class="step-text"><span class="step-num">1</span><span>Tap the menu <strong>⋮</strong> at the top.</span></div></li>
+        <li><svg viewBox="0 0 120 200" aria-hidden="true"><rect x="3" y="3" width="114" height="194" rx="16" fill="#2d2a26"/><rect x="9" y="12" width="102" height="176" rx="10" fill="#fdf6ec"/><rect x="9" y="12" width="102" height="176" rx="10" fill="#d9d2c7"/><rect x="30" y="18" width="76" height="130" rx="8" fill="#fff"/><rect x="36" y="28" width="60" height="9" rx="4.5" fill="#e8ddd2"/><rect x="36" y="46" width="60" height="9" rx="4.5" fill="#e8ddd2"/><rect x="36" y="64" width="60" height="9" rx="4.5" fill="#e8ddd2"/><rect x="33" y="80" width="70" height="28" rx="7" fill="#eafaf2" stroke="#2baa8a" stroke-width="3"/><text x="68" y="92" font-family="Nunito,sans-serif" font-size="8" font-weight="800" fill="#1c8a6e" text-anchor="middle">Add to</text><text x="68" y="102" font-family="Nunito,sans-serif" font-size="8" font-weight="800" fill="#1c8a6e" text-anchor="middle">Home screen</text><rect x="36" y="118" width="60" height="9" rx="4.5" fill="#e8ddd2"/></svg>
+          <div class="step-text"><span class="step-num">2</span><span>Tap <strong>Add to Home screen</strong> (or <strong>Install app</strong>).</span></div></li>
+        <li><svg viewBox="0 0 120 200" aria-hidden="true"><rect x="3" y="3" width="114" height="194" rx="16" fill="#2d2a26"/><rect x="9" y="12" width="102" height="176" rx="10" fill="#fdf6ec"/><rect x="14" y="22" width="92" height="46" rx="8" fill="#fff"/><rect x="20" y="30" width="18" height="18" rx="8" fill="#fff" stroke="#e8ddd2" stroke-width="2"/><text x="29.0" y="41.88" font-family="Fredoka One,sans-serif" font-size="8" text-anchor="middle"><tspan fill="#f4845f">W</tspan><tspan fill="#4a90d9">L</tspan></text><text x="44" y="43" font-family="Nunito,sans-serif" font-size="8" font-weight="700" fill="#2d2a26">WordLink</text><rect x="60" y="50" width="40" height="14" rx="7" fill="#2baa8a" stroke="#1c8a6e" stroke-width="2"/><text x="80" y="60" font-family="Nunito,sans-serif" font-size="8" font-weight="800" fill="#fff" text-anchor="middle">Install</text><path d="M60 80 v18 M53 91 L60 98 L67 91" fill="none" stroke="#7a6f65" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="40" y="110" width="40" height="40" rx="8" fill="#fff" stroke="#e8ddd2" stroke-width="2"/><text x="60.0" y="135.76" font-family="Fredoka One,sans-serif" font-size="16" text-anchor="middle"><tspan fill="#f4845f">W</tspan><tspan fill="#4a90d9">L</tspan></text><text x="60" y="166" font-family="Nunito,sans-serif" font-size="10" font-weight="800" fill="#2d2a26" text-anchor="middle">WordLink</text></svg>
+          <div class="step-text"><span class="step-num">3</span><span>Tap <strong>Install</strong> or <strong>Add</strong>. WordLink is on your home screen.</span></div></li>
+        </ol>
+      </div>
+    </div>
+    <p>Open WordLink once with internet. After that it works without internet
+      too.</p>
   </div>
 
   <div class="card">
@@ -218,6 +273,28 @@
     <p>Nothing needs installing. It runs in a browser, works on cheap phones, and
       keeps working offline once a learner has opened it, which matters when data
       is scarce.</p>
+    <p>It is worth installing it on learners' phones in the first lesson, with
+      the steps in <a href="#install">Put WordLink on your phone</a> above:
+      WordLink then opens from its own icon, full screen, like any other app,
+      and a learner who cannot yet type a web address can still find it again
+      at home. Share the address <strong>wordlink.au</strong> or the room QR
+      code from the game, and walk the class through the three steps together
+      on the projector.</p>
+    <h3>Ways to use it in a lesson</h3>
+    <ul>
+      <li><strong>Differentiate:</strong> point each learner at the section that
+        fits them: the alphabet for a true beginner, Reading words 2 or the
+        elementary sentences for a stronger reader.</li>
+      <li><strong>Stations and rotations:</strong> learners work on their phones
+        independently while you take a small group.</li>
+      <li><strong>Diagnose:</strong> the Level check, Reading words 2 and the
+        elementary sentences show quickly which sound patterns a learner has not
+        got yet.</li>
+      <li><strong>Homework and self-study:</strong> any section can be repeated
+        between classes, as often as a learner likes.</li>
+      <li><strong>Whole-class review:</strong> run the classroom game from the
+        projector at the end of a lesson on the patterns you just taught.</li>
+    </ul>
 
     <div class="cta-row">
       <a class="cta" href="game.html?mode=teacher"><span class="cta-icon" aria-hidden="true">👩‍🏫</span>Classroom game</a>
@@ -257,6 +334,7 @@
   Created by <strong>Masoud Fakhr</strong> ·
   <a href="index.html">Reading practice</a> ·
   <a href="tracing.html">Letter tracing</a> ·
+  <a href="#install">Install on your phone</a> ·
   <a href="game.html">Classroom game</a>
 </footer>
 
