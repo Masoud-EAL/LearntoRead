@@ -4338,12 +4338,23 @@ const COPY_WORDS=['bus','shop','milk','name','home','work','food','door','week',
    that a partly correct answer scores nothing towards them rather than half.
 
    The name round used to lowercase its own answer, which made the capitals
-   unmarkable even in principle. */
+   unmarkable even in principle.
+
+   The same line runs the other way. A Stage A copy feature asks for the
+   letters, so a copy with the right letters and a slip in the case or the
+   spacing has shown it, and a 2 in the fifth slot says so: that answer is
+   worth the whole observation there, not half. Half was charging Stage A for
+   a Stage B skill. "Uses extremely familiar learning strategies, such as
+   copying" is a strategy, and typing sara ahmed under Sara Ahmed is copying;
+   three copy rounds hold six of the eight observations .02 Stage A is judged
+   on, so a learner who took part in every question and slipped on two
+   capitals was reported as working towards the easiest indicator on the
+   page. */
 const PF_COPY_A=[
-  ['02','PLA','Uses extremely familiar learning strategies, such as copying',1],
-  ['02','PLA','Responds to modelling by copying action',1]];
+  ['02','PLA','Uses extremely familiar learning strategies, such as copying',1,2],
+  ['02','PLA','Responds to modelling by copying action',1,2]];
 const PF_COPY_WORD=PF_COPY_A.concat([
-  ['05','PLA','Copies letters of the alphabet and short whole words that are clearly presented',1],
+  ['05','PLA','Copies letters of the alphabet and short whole words that are clearly presented',1,2],
   /* Moved off Spell a Word, which dictates rather than copies: this round puts
      the word on the screen and takes it back typed, which is the feature.
        Not partial, and it is the one row here that is not. The flag on its
@@ -4352,13 +4363,13 @@ const PF_COPY_WORD=PF_COPY_A.concat([
      features. This one sits under Spelling, and its concern is whether the
      letters come out right, which a keyboard shows exactly. Spell a Word
      carried it unflagged for the same reason before it moved. */
-  ['06','PLA','Copies a very limited number of highly familiar words, but may have spelling inaccuracies'],
-  ['05','PLA','Copies single words left to right and top to bottom',1],
-  ['06','PLA','Copies a very limited number of extremely familiar words',1],
-  ['06','PLA','Copies text, but demonstrates lack of consistency between upper and lower case',1]]);
+  ['06','PLA','Copies a very limited number of highly familiar words, but may have spelling inaccuracies',0,2],
+  ['05','PLA','Copies single words left to right and top to bottom',1,2],
+  ['06','PLA','Copies a very limited number of extremely familiar words',1,2],
+  ['06','PLA','Copies text, but demonstrates lack of consistency between upper and lower case',1,2]]);
 const PF_COPY_NAME=PF_COPY_A.concat([
-  ['05','PLA','Copies first and last name',1],
-  ['06','PLA','Copies first and last name',1],
+  ['05','PLA','Copies first and last name',1,2],
+  ['06','PLA','Copies first and last name',1,2],
   ['05','PLB','Writes limited personal details though may need to copy or check some aspects',1],
   // The three that need it right. The fifth slot says so: a partly correct
   // copy is counted as asked and not shown, never as half shown.
@@ -9441,7 +9452,11 @@ function acsfCredit(step,tier,q,ans){
        and it is half credit towards the Stage A copying features, but it is
        no evidence at all towards these. Counted as asked and not shown rather
        than skipped, because that is the thing an assessor wants to see. */
-    const worth=c[4]?(!declined&&tier==='correct'?1:0):half;
+    /* And the other way: 2 is a Stage A copy feature, which asks for the
+       letters, so the right letters with the case or a space astray is the
+       feature shown, and worth all of it. */
+    const worth=c[4]===1?(!declined&&tier==='correct'?1:0)
+               :c[4]===2&&!declined&&tier==='partial'?1:half;
     wrote.push({ind:c[0], lvl:c[1], text:c[2], ok:worth});
     const b=TEST.ev.byInd[c[0]]||(TEST.ev.byInd[c[0]]={});
     const s=b[c[1]]||(b[c[1]]={seen:0,right:0,why:{}});
@@ -9875,7 +9890,11 @@ function acsfSignalRows(ev){
   // of the run time out sat through it rather than practised it.
   if(asked>=12&&engaged>=0.5){
     const solid=ev.finished&&engaged>=0.8;
-    const w=W(RUN,'Practises extremely simple repetitive tasks',asked,tries,'Participates in familiar learning environment interactions but may require prompting',asked,solid?asked:asked*0.6);
+    /* Participating is counted on answers given, like its Stage A neighbour
+       and like the .01 rows above. It was `solid?asked:...`, which read 47 of
+       47 for a run with three questions left blank, one line under the Stage
+       A row reading 44 of 47 off the same run. */
+    const w=W(RUN,'Practises extremely simple repetitive tasks',asked,tries,'Participates in familiar learning environment interactions but may require prompting',asked,solid?tries:tries*0.6);
     if(help) w['Uses some limited learning strategies, e.g. developing a word list with support']={n:Math.max(1,help),ok:help,partial:1,run:HELP};
     put('02','PLB',w);
   }
@@ -10092,9 +10111,29 @@ function acsfRow(ind,byInd,sig){
    a teacher reading one alongside the other is reading the same order. Takes
    the evidence rather than TEST, so a run pulled back out of storage after a
    reload builds exactly the same page. */
+/* A signal above a stage the report does not award is not printed. The run
+   gates signals on the staircase, and the staircase settles a stage on the
+   evidence it has at the time: .02 Stage A is settled by the first copy
+   round, and the two copy rounds after it still count towards Stage A. When
+   they pulled it back under the bar the report said "Working towards PLA.02"
+   and printed four Stage B lines underneath it. The panel reads the whole
+   run, so the gate it prints under has to be read off the whole run too. */
+function acsfSignalsHeld(sig,byInd){
+  Object.keys(sig).forEach(function(ind){
+    const meta=ACSF_INDICATORS[ind];
+    if(!meta) return;
+    let held=true;
+    ACSF_STEPS.forEach(function(lvl){
+      if(!held){ delete sig[ind][lvl]; return; }
+      const s=acsfEvidenceAt(ind,lvl,byInd,sig);
+      if(s&&acsfLevelState(s,meta)!=='yes') held=false;
+    });
+  });
+  return sig;
+}
 function acsfProfile(ev,isLevelCheck){
   if(!ev) return null;
-  const sig=acsfSignalRows(ev);
+  const sig=acsfSignalsHeld(acsfSignalRows(ev),ev.byInd||{});
   const rows=ACSF_ORDER.map(function(ind){ return acsfRow(ind,ev.byInd||{},sig); });
   const groups=ACSF_SKILL_ORDER.map(function(sk){
     return {skill:sk, rows:rows.filter(function(r){ return r.skill===sk; })};

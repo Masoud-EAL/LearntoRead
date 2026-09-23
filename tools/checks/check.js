@@ -1965,6 +1965,68 @@ check('spread', 'no one game fills the level check', async ctx => {
    was reported NYA and never asked Stage B. A second ask is what the whole of
    Pre Level 1 is described as needing: "may require prompting" is in the Stage
    B features themselves. */
+/* The report that earned this one: a screenshot of .02 reading "Working
+   towards PLA.02" for a learner who took part in 44 of 47 questions, with four
+   Stage B lines printed under it. Three copy rounds hold six of the eight
+   observations .02 Stage A is judged on, and a copy with the right letters and
+   a capital astray was worth half of each, so two slips on capitals were
+   enough to withhold the easiest indicator on the page. And the staircase had
+   settled Stage A on the first copy, so the report printed Stage B signals
+   under a Stage A it did not award. */
+check('copying', 'a Stage A copy is the letters, and no signal prints above a stage not awarded', async ctx => {
+  const out = await ctx.page.evaluate(() => {
+    const runWith = function (tiers, stages) {
+      soloMode = true;
+      TEST = newTestGame('solo', 'test:level');
+      TEST.plan = null;                      // every stage open, as the staircase would have it
+      [0, 1, 2].forEach(function (from) {
+        const q = genCopyQuestions(1, from)[0];
+        const tier = tiers[from];
+        // A near miss is every letter right with the first one in the wrong
+        // case and the spaces gone: Bus for bus, saraAhmed for Sara Ahmed.
+        const a0 = String(q.answer);
+        const flip = a0.charAt(0) === a0.charAt(0).toUpperCase()
+          ? a0.charAt(0).toLowerCase() : a0.charAt(0).toUpperCase();
+        const ans = tier === 'correct' ? a0
+          : tier === 'partial' ? (flip + a0.slice(1)).replace(/ /g, '') : 'zzzz';
+        acsfCredit({ type: 'copyword', from: from }, answerTier(q, ans), q, ans);
+      });
+      const ev = TEST.ev;
+      ev.asked = 47; ev.attempts = 44; ev.timeouts = 3; ev.finished = true;
+      ev.modes = { tap: 30, type: 14 };
+      ev.stages = stages || null;
+      const row = acsfProfile(ev, true).rows.find(r => r.ind === '02');
+      return {
+        level: row.level, line: row.line,
+        above: row.level ? [] : row.why.filter(w => !w.notAsked && w.lvl !== 'PLA')
+                                       .map(w => w.lvl + ' ' + w.text),
+        part: row.why.filter(w => /^Participates in familiar/.test(w.text))
+                     .map(w => ({ n: w.n, ok: w.ok }))
+      };
+    };
+    return {
+      // The word and the name each with a capital astray, and the number
+      // exactly: every letter right, every time.
+      slips: runWith(['partial', 'partial', 'correct']),
+      // One copy right and two wrong, on a staircase that settled Stage A
+      // after the first of them.
+      settled: runWith(['correct', 'wrong', 'wrong'],
+                       { at: { '02': 'PLB' }, done: { '02|PLA': 'yes' } })
+    };
+  });
+  say('  right letters, case and spacing astray: .02 reads "' + out.slips.line + '"');
+  say('  one copy of three, Stage A settled early: .02 reads "' + out.settled.line + '"');
+  if (out.slips.level !== 'PLA' && out.slips.level !== 'PLB') {
+    bad('copying: a learner whose copies had every letter right was not awarded PLA.02 ("' +
+        out.slips.line + '")');
+  }
+  out.slips.part.forEach(p => {
+    if (p.ok > 44) bad('copying: "Participates" read ' + p.ok + ' of ' + p.n + ' for a run with 44 answers');
+  });
+  if (out.settled.level) bad('copying: one copy of three was awarded ' + out.settled.level + '.02');
+  out.settled.above.forEach(x => bad('copying: printed above a stage the report did not award: ' + x));
+});
+
 check('retry', 'a wrong answer at Stage A earns one second ask, and only one', async ctx => {
   // A learner who is right about everything except the first ask of Reading
   // .03 and .04 at Stage A, and right when asked again. They must climb.

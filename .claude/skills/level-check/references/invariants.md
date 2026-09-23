@@ -985,6 +985,42 @@ Run lengths say it is working: a perfect run and a sloppy run are unchanged at
 60, because neither produces a wrong answer; a run answered wrong throughout
 goes from 17 to 34.
 
+### 12h. A Stage A copy is the letters
+*check: `copying`*
+
+> A screenshot of .02 reading "Working towards PLA.02" for a learner who took
+> part in 44 of 47 questions: "It seems to me like many learners cannot achieve
+> this very very basic learning indicator."
+
+Three faults, one row.
+
+**The near miss was charged against Stage A.** The copy rounds already drew
+the line in the right place for Stage B: "Writes full name accurately", "Leaves
+spaces between words" and "Uses upper and lower case" carry a 1 in the fifth
+slot, and a copy with the right letters is no evidence for them. But every
+Stage A copy feature was scoring that same copy at half, and Stage A asks for
+the letters. "Uses extremely familiar learning strategies, such as copying" is
+a strategy; `Bus` under `bus` is copying. A 2 in the fifth slot now marks a
+Stage A copy feature, and the right letters with the case or a space astray is
+worth the whole observation there. This mattered most on .02, where the three
+copy rounds hold six of the eight observations Stage A is judged on: two slips
+on capitals were enough to withhold it.
+
+**The report printed signals under a stage it did not award.** The staircase
+settles .02 Stage A on the first copy round, which is enough to call it, and
+the name and number copies after it still count towards Stage A. When they
+pulled it back under the bar the panel read "Working towards PLA.02" with four
+Stage B lines underneath, because `acsfSignalOpen` gates on the staircase and
+the staircase had moved on. `acsfSignalsHeld` reads the whole run at report
+time and drops a signal above any stage the report itself does not award. It
+does not touch question evidence, which rule 8 already prints as unawarded
+evidence above the climb.
+
+**"Participates" counted questions reached.** The Stage B row read
+`solid?asked:...`, so a finished run with three questions left blank read 47 of
+47, one line under the Stage A row reading 44 of 47 off the same run. It is
+counted on answers given now, as the .01 rows already were.
+
 ### 13. The odd one out is clearly odd
 *check: `oddone`*
 
