@@ -962,7 +962,6 @@ depends on. It is scoped to `q.retryOf`: the repeats the run makes on purpose
 
 What does not earn one, each for a reason already in this file:
 
-- A blank or a timeout. No answer is not a wrong answer (rule 4).
 - A partly correct answer. It is already worth half, and the `sloppy` run is
   partial nearly everywhere, so retrying partials would re-ask most of the
   typed rounds in the test.
@@ -973,6 +972,18 @@ What does not earn one, each for a reason already in this file:
   question there is whether they can go further, not whether they slipped.
 
 One per feature ever, which is what makes the run terminate.
+
+**A blank or a timeout earns one too.** It used to be on the list above, on the
+grounds that no answer is not a wrong answer. That is rule 4, and rule 4 is
+about attempts and the Learning signals: pressing Submit over an untouched
+question must not read as taking part. It says nothing about asking again. A
+learner who froze, or pressed Submit before finding the keys, is exactly who a
+prompt is for, and without one a single blank copy was enough to hold .02
+Stage A under the bar. The second ask credits nothing by itself: a second blank
+is still worth nothing and still counts as no attempt. A run left to time out
+throughout is now 34 questions, the same as a run answered wrong throughout.
+
+> "A blank should also get a second try"
 
 **The trap.** A feature is marked asked the moment it is dealt, so the stage
 reads as fully shown in the very round the learner got it wrong, and

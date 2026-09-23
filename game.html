@@ -8647,8 +8647,8 @@ function acsfNoteAsked(step,q){
    the indicator, and the learner is reported NYA and never asked Stage B. One
    mistap ended an indicator, which is not a thing any assessor would do.
 
-   So a wrong answer at Stage A earns one more go at that feature, and the
-   better of the two attempts stands. That is not generosity: the whole of Pre
+   So a wrong or missing answer at Stage A earns one more go at that feature,
+   and the better of the two attempts stands. That is not generosity: the whole of Pre
    Level 1 is described as performance with support. The Performance Variables
    Grid puts the learner "with an expert/mentor where highly structured support
    and modelling is provided", and the Stage B features themselves read "may
@@ -8660,8 +8660,6 @@ function acsfNoteAsked(step,q){
 
    What does not earn one, and why each is here rather than in a comment
    somewhere downstream:
-     - A blank or a timeout. No answer is not a wrong answer (rule 4), and
-       asking again is not going to produce one.
      - A partly correct answer. It is already worth half, and the sloppy run,
        right letters and no capitals, is partial nearly everywhere, so retrying
        partials would re-ask most of the typed rounds in the test.
@@ -8670,11 +8668,19 @@ function acsfNoteAsked(step,q){
        twice is not two observations.
      - Write Two Sentences. It is the slowest question in the test and rule 5b
        names it by name.
-   One per feature, ever, which is also what makes the run terminate. */
+   One per feature, ever, which is also what makes the run terminate.
+
+   A blank or a timeout does earn one. It used to be left out on the grounds
+   that no answer is not a wrong answer, which is true of the attempts counter
+   and the Learning signals (rule 4) and says nothing about a second ask. A
+   learner who froze, or pressed Submit before they had found the keys, is the
+   learner a prompt is for, and without one a single blank copy was enough to
+   hold .02 Stage A under the bar. Asking again credits nothing by itself: a
+   second blank is still worth nothing, and the attempts counter still counts
+   it as none. */
 function acsfNoteRetry(step,q,tier,timedOut,ans){
   if(!TEST||!TEST.plan) return;
-  if(tier!=='wrong'||timedOut) return;
-  if(!answerGiven(q,ans)) return;
+  if(tier!=='wrong'&&!timedOut&&answerGiven(q,ans)) return;
   if(isOpenQ(q)||q&&q.freeText) return;
   if(q&&q.declines&&q.declines.some(function(d){ return normalize(d)===normalize(ans); })) return;
   const plan=TEST.plan, feats=[];
@@ -9686,9 +9692,9 @@ function testRecord(tier,pts,timedOut,ans){
   // the step would have claimed with every stage still open.
   acsfNoteQuestion(step,currentStudentQ,
     {tier:open?'open':tier, ans:ans, timedOut:!!timedOut, gave:gave, feats:credited});
-  // And whether a wrong answer at Stage A has earned a second ask. Here rather
-  // than inside acsfCredit because this is where timedOut and answerGiven are
-  // already in hand, and both are part of the decision.
+  // And whether a wrong or missing answer at Stage A has earned a second ask.
+  // Here rather than inside acsfCredit because this is where timedOut and
+  // answerGiven are already in hand, and both are part of the decision.
   acsfNoteRetry(step,currentStudentQ,tier,timedOut,ans);
   // Also keep the run's answers by skill, for the report at the end. A rung is
   // a game, and every game belongs to one skill (GAME_INFO), so a ladder that

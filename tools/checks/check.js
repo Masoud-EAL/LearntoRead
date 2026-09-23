@@ -2027,11 +2027,14 @@ check('copying', 'a Stage A copy is the letters, and no signal prints above a st
   out.settled.above.forEach(x => bad('copying: printed above a stage the report did not award: ' + x));
 });
 
-check('retry', 'a wrong answer at Stage A earns one second ask, and only one', async ctx => {
+check('retry', 'a wrong or missing answer at Stage A earns one second ask, and only one', async ctx => {
   // A learner who is right about everything except the first ask of Reading
   // .03 and .04 at Stage A, and right when asked again. They must climb.
   const out = await ctx.page.evaluate(missTwice => {
-    const play = function (retryGoesRight) {
+    /* `how` is the way the first ask is missed: a wrong answer, Submit over
+       an untouched question, or the clock running out. All three earn the
+       second ask: "A blank should also get a second try". */
+    const play = function (retryGoesRight, how) {
       soloMode = true; myScore = 0;
       TEST = newTestGame('solo', 'test:level');
       const retried = [], seen = {};
@@ -2058,14 +2061,14 @@ check('retry', 'a wrong answer at Stage A earns one second ask, and only one', a
             .some(c => (c[0] === '03' || c[0] === '04') && c[1] === 'PLA');
           const miss = reading && (!again || !retryGoesRight);
           let a;
-          if (miss) a = 'zzzz';
+          if (miss) a = (how === 'blank' || how === 'timeout') ? '' : 'zzzz';
           else {
             a = q.answer;
             if (isOpenQ(q)) a = (q.choices || []).find(c => (q.declines || []).indexOf(c) < 0) || q.answer;
             if (q.freeText) a = 'My name is Ali. I am from Iraq.';
           }
           const tier = miss ? 'wrong' : answerTier(q, a);
-          testRecord(tier, tier === 'correct' ? 10 : 0, false, a);
+          testRecord(tier, tier === 'correct' ? 10 : 0, miss && how === 'timeout', a);
         });
         testEndRound();
         TEST.round++;
@@ -2108,7 +2111,8 @@ check('retry', 'a wrong answer at Stage A earns one second ask, and only one', a
     };
     let collided;
     try { collided = play(true); } finally { window.testQuestions = real; }
-    return { rescued: play(true), stuck: play(false), collided: collided };
+    return { rescued: play(true), stuck: play(false), collided: collided,
+             blank: play(true, 'blank'), timeout: play(true, 'timeout') };
   }, false);
 
   const r = out.rescued, k = out.stuck;
@@ -2142,6 +2146,19 @@ check('retry', 'a wrong answer at Stage A earns one second ask, and only one', a
       bad('retry: .' + ind + ' Stage A came back "' + (c.done[ind + '|PLA'] || 'open') +
           '" when the second ask was offered the missed question first');
     }
+  });
+  [['blank', 'left blank'], ['timeout', 'left to time out']].forEach(([key, said]) => {
+    const b = out[key];
+    say('  ' + said + ' then right:' + ' '.repeat(Math.max(1, 16 - said.length)) + b.asked +
+        ' questions, ' + b.retries + ' second asks, .03 Stage A ' + (b.done['03|PLA'] || 'open'));
+    if (!b.retries) bad('retry: a Stage A question ' + said + ' earned no second ask');
+    ['03', '04'].forEach(ind => {
+      if (b.done[ind + '|PLA'] !== 'yes') {
+        bad('retry: .' + ind + ' Stage A came back "' + (b.done[ind + '|PLA'] || 'open') +
+            '" for a learner who ' + said.replace('left', 'left it') + ' and was right when asked again');
+      }
+    });
+    b.thirds.forEach(x => bad('retry: ' + x + ' was asked a third time'));
   });
   r.thirds.forEach(x => bad('retry: ' + x + ' was asked a third time'));
   k.thirds.forEach(x => bad('retry: ' + x + ' was asked a third time'));
