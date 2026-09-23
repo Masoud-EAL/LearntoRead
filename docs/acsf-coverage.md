@@ -111,27 +111,23 @@ where the question is the gap sentence itself.
 
 Each step also deals only what the stage it serves names: whole dollars and no
 cents at Stage A, *up* and *down* and not *behind*, whole hours and not quarter
-hours, five dictated words rather than *necklace*, *humid*, *back* or
-*tie*, and question words rather than *Do you work?*
+hours, and question words rather than *Do you work?*
 
-Spell a Word dictates five words: *pen, pencil, home, name, bus*. Filtering the
-themed banks down to their shorter words was the first attempt and it still
-reached *back* and *tie*: a bank of fruit, clothing and body parts is not the
-vocabulary the framework has in mind, however hard the list is filtered. The
-twenty words Copy It shows were the second, and they hold the right register:
-its own examples are *"extremely familiar, short words ... e.g. big, fun,
-stop"*, *"stop, go, car, dog"* and *"Copies appropriate word under picture,
-e.g. pen, table"*, and the Binh scenario notes he knew *"stop, go, but not
-toilet"*. What that missed is that the two rounds are not the same task. Copy
-It leaves the word on the screen; dictation takes it away, so the same word is
-a harder question here, and the feature this round claims asks for *"a very
-limited number of extremely familiar words"*. Five is that number, and they are
-the classroom and survival words a teacher would pick.
+Spell a Word is not in the level check. It dictated a word and asked for it
+typed, and three word lists were tried: the themed banks (*necklace*, *humid*),
+the same banks filtered to short words (*back*, *tie*), and five classroom
+words (*pen, pencil, home, name, bus*). Each was reported too hard, and the
+last report named the real fault: *"I have not seen anything like it in AMES
+PTAs. It can be too hard for learners."* Hearing a word and writing it with
+nothing on the screen asks for more than the one feature it claimed, PLB .06
+*"Writes a very limited number of extremely familiar words, which may have
+spelling inaccuracies"*. That feature is now not assessed in the level check.
+PLB .06 is still reachable from its other four features, and the standalone
+Spelling game still records it.
 
-Spell a Word also lost its Stage A claim. Its wording is *"**Copies** a very
-limited number of highly familiar words"* and this round dictates: there is no
-model on the screen to copy from, and hearing a word and writing it is the
-harder task. Copy It carries it now, which is the round that does it.
+Spell a Word had already lost its Stage A claim. Its wording is *"**Copies** a
+very limited number of highly familiar words"*, and Copy It carries it, which
+is the round that does it.
 
 A feature no pool step can reach is not listed on the panel at all. "Not asked
 in this run" says another run might have asked it, and for a feature the level
@@ -310,7 +306,7 @@ cap note, not in a line that reads as a gap in the run.
 |---|---|---|---|
 | 1 | Writes full name accurately | 🆕 built | Copy It: your name |
 | 2 | Uses capital letters and full stops accurately in sentences adapted from a model | 🆕 built | Write a Sentence |
-| 3 | Writes a very limited number of extremely familiar words, which may have spelling inaccuracies | ✅ had it | All Spelling |
+| 3 | Writes a very limited number of extremely familiar words, which may have spelling inaccuracies | ✅ had it | All Spelling (standalone game only; not in the level check, where dictation is harder than the feature) |
 | 4 | Leaves spaces between words | 🆕 built | Write a Sentence (spacing); Copy It: your name |
 | 5 | Uses upper and lower case in extremely familiar words, e.g. own name | 🆕 built | Big and Small Letters; Copy It: your name |
 

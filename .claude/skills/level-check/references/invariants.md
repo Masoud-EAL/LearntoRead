@@ -885,6 +885,24 @@ what the band says, and take the register from its examples rather than from a
 proxy like length.** Length was already rejected once, in rule 12, for the
 opposite reason.
 
+Then the five words were reported too, and this time the report was about the
+task:
+
+> "What is this type this word listening and spelling used for in level check?
+> I have not seen anything like it in AMES PTAs. It can be too hard for
+> learners. Can we do without it?"
+
+Three word lists, three reports. When every list is too hard the fault is not
+in the list. Dictation with nothing on the screen asks for more than the one
+feature it claimed, and a PTA at this level does not ask for that feature
+this way. Spell a Word is out of `ACSF_POOL`, and PLB .06 is still reachable
+from its other four features. `register` fails if it comes back.
+
+**When a step keeps being reported too hard however its content is trimmed,
+ask whether the task is harder than the feature, and take the step out rather
+than trimming it again.** A feature left unclaimed costs less than a question
+that defeats the learner it is meant to place.
+
 Spell a Word lost its Stage A claim at the same time, and that is the half
 nobody reported. Its wording is "**Copies** a very limited number of highly
 familiar words, but may have spelling inaccuracies", and this round dictates:

@@ -4313,21 +4313,6 @@ function genSafeQuestions(n,from){
    about once the handwriting is set aside. */
 const COPY_WORDS=['bus','shop','milk','name','home','work','food','door','week','city',
   'bank','card','time','help','open','stop','exit','road','rent','post'];
-/* What the level check dictates, which is not what it asks a learner to copy.
-   The two rounds shared one list for a while, on the reasoning that one
-   register serves both, and the register was right. The task is not the same,
-   though: Copy It leaves the word on the screen and asks for it letter by
-   letter, while this one says it once and takes the screen away, so the same
-   word is a different question in each.
-     Five words, and the teacher's own list: "pen, pencil, home, name, bus.
-   This is enough for spelling." It is enough because of what the round claims,
-   which is one feature, PLB.06, "Writes a very limited number of extremely
-   familiar words, which may have spelling inaccuracies". A very limited number
-   is the feature's own wording, classroom and survival vocabulary is its own
-   register ("Copies appropriate word under picture, e.g. pen, table"), and a
-   near miss still counts, because "may have spelling inaccuracies" is written
-   into the feature and spellTier marks it partial. */
-const SPELL_WORDS=['pen','pencil','home','name','bus'];
 
 /* ── COPY IT ──
    from 0: single words, shown and typed.
@@ -5228,27 +5213,9 @@ function poolFor(type,from){
   if(type==='fruits') return [...questionBank.fruits];
   if(type==='body') return [...questionBank.body];
   if(type==='clothes') return [...questionBank.clothes];
-  /* Spell a Word holds every themed list, which is right for a game and wrong
-     for an assessment: the level check was dictating "humid", "necklace" and
-     "watermelon" against a feature whose own words are "a very limited number
-     of extremely familiar words".
-       The first attempt at this filtered the themed lists down to their
-     shorter words, and it still reached "back" and "tie", because a bank of
-     fruit, clothing and body parts is not the vocabulary the framework has in
-     mind however hard it is filtered. The document names its own register
-     several times over: "extremely familiar, short words ... e.g. big, fun,
-     stop", "e.g. stop, go, car, dog", "Copies appropriate word under picture,
-     e.g. pen, table", and Binh knew "stop, go, but not toilet". That is
-     survival and classroom vocabulary. COPY_WORDS was that list for both
-     rounds for a time, and the register it holds is still right; what it is
-     not is the same task. Dictation takes the word off the screen, so the
-     level check says five of them and nothing else, which is what a feature
-     reading "a very limited number of extremely familiar words" asks for.
-     The standalone game still holds every themed word: a game is for
-     practising the hard ones, an assessment is not. */
-  if(type==='spelling') return from
-    ?SPELL_WORDS.map(function(w){ return {type:'word', word:w, answer:w}; })
-    :allSpelling;
+  /* Spell a Word holds every themed list, which is right for a game. It is not
+     in the level check any more: see ACSF_POOL. */
+  if(type==='spelling') return allSpelling;
   if(type==='custom') return [...questionBank.custom];
   if(type==='unscramble') return [...questionBank.unscramble];
   if(type==='gramscramble') return [...questionBank.gramscramble];
@@ -8126,7 +8093,9 @@ const ACSF_CLAIMS={
      to copy from, and hearing a word and writing it is the harder task. It
      belongs to Copy It, which is what PF_COPY_WORD carries it as now.
      Crediting a copying feature off a dictation marked a learner down for
-     something they were never asked to do. */
+     something they were never asked to do.
+       The level check no longer deals this round (see ACSF_POOL), so this
+     claim is only ever recorded from the standalone game. */
   'spelling':{base:[
     /* Not the Level 1 row above this one either. Spelling a dictated word is
        writing a word the app chose; that feature is about a learner reaching
@@ -8338,7 +8307,7 @@ function acsfClaimsFor(step){
      missing word claims exactly the features tapping it claims — they are
      comprehension features, .03 and .08 — so the typed version asks a learner
      to spell as well and credits them for nothing extra. Writing is evidenced
-     where it is actually the task: Copy It, Spelling, Write the Number, Forms
+     where it is actually the task: Copy It, Write the Number, Forms
      and Write a Sentence. */
 const ACSF_POOL=[
   // Letters, sounds and print
@@ -8359,7 +8328,14 @@ const ACSF_POOL=[
   // Writing
   {type:'copyword',mc:false,from:0},{type:'copyword',mc:false,from:1},
   {type:'copyword',mc:false,from:2},
-  {type:'spelling',mc:false,from:1},{type:'numeralwrite',mc:false,from:0},
+  /* No Spell a Word. Hearing a word and typing it with nothing on the screen
+     is harder than the one feature it claimed, PLB.06 "Writes a very limited
+     number of extremely familiar words", and it is not how a pre-level PTA
+     asks for that feature. A teacher's report: "I have not seen anything like
+     it in AMES PTAs. It can be too hard for learners." PLB.06 is still
+     reachable without it: Copy It your name, Write a Sentence and Big and
+     Small Letters carry its other four features. */
+  {type:'numeralwrite',mc:false,from:0},
   {type:'numeralwrite',mc:false,from:1},{type:'punctuation',mc:true,from:0},
   {type:'punctuation',mc:false,from:1},{type:'modelsentence',mc:false,from:0},
   /* Grammar Unscramble is not here. Its only claim was the Level 1 "uses basic
