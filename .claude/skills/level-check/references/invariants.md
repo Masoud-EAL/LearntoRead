@@ -973,6 +973,16 @@ and Do's objects half carries it now.
 register is taken from the documents' own examples (rule 12e): the Initial
 EAL units put Stage A at single words.
 
+Then the LWA Streamlined CALD PTA kit, which carries PLA tasks, found three
+more of the same kind. Write the Number dictated "three" and "10 dollars" at
+Stage A against features that begin "Copies"; the kit asks "Copy $5". Forms
+credited "Begins to recognise some personal details" off a four-field form,
+where the kit asks the learner to point to their name on a card; the card is
+round 1 now and the form is Stage B. And Copy It shows a picture beside a word
+that has a clear one, as the kit prints "car" beside a car. `register` fails a
+typed question under a Stage A "Copies" feature with nothing on the screen to
+copy.
+
 `probe` did not pass `from` to a fixed bank, so it printed the picker's draw
 under every round for Signs, Messages and Question Words. It does now.
 

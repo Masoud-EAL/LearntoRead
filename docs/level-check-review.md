@@ -121,3 +121,24 @@ Read against the ACSF 2019 document with its Pre Level 1 Supplement, the AMES SE
 7. PLB .12 quoted in full: "...digital devices and software applications".
 
 A perfect run is now 62 questions, one that answers nothing 20, and one that answers wrong throughout 40.
+
+## 7. The LWA Streamlined CALD PTA kit: the PLA set (September 2026)
+
+This kit is the one with PLA tasks and an NYA row below them, which is the same NYA / PLA / PLB shape the level check reports. Its PLA tasks, set against the level check:
+
+| PTA PLA task | Level check | Fit |
+|---|---|---|
+| Reading 1: point to your name on your card | Forms: "Tap the name" on a model ID card | Now matched. It was a four-field form, which is Stage B work. |
+| Reading 2: find letters and numbers on the card as they are named | Letter Names, Tap the Number | Matched |
+| Reading 3: match big and small letters | Big and Small Letters | Matched |
+| Reading 4: read STOP on a stop sign | Signs, Stage A round | Close. App signs carry no words, by rule 14a. |
+| Writing 1 and 2: copy your name; copy "car" and "book" beside their pictures | Copy It, now with pictures | Matched. The name is a model, and the report says so. |
+| Writing 3: copy $5 | Write the Number: copy the number or amount shown | Now matched. It dictated. |
+| Numeracy: match $10, 50c, $1 and $2 to coins and notes | Shop under $10; Write the Number, "what is this worth" | Matched, except that the kit has 50c at PLA and the course checklist says whole dollars. The app keeps the checklist. |
+
+Two differences are left as they are, on purpose:
+
+- The kit ticks PLA .09 and .10 off one matching question. The level check asks every checklist feature at Stage A and needs three quarters of them, so it is stricter at Stage A numeracy than the kit.
+- The kit's PLA feature wording differs from the 22636VIC checklist (for example PLA .08 "Relies heavily on repetition and rephrasing for understanding"). The app quotes the course checklist only.
+
+A perfect run is now 63 questions.

@@ -128,7 +128,7 @@ the whole list and the reason for each.
 ## Run length
 
 There is no fixed length, by design. Measured over full runs: about 20
-questions for a learner who shows nothing, and about 62 for one who clears every
+questions for a learner who shows nothing, and about 63 for one who clears every
 stage. Both moved up when `.12` started asking its Stage B questions, which no
 run had ever reached. A learner who answers wrong throughout is asked about
 twice as many as one who answers nothing, because every Stage A feature they

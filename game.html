@@ -1183,6 +1183,14 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   color:#4a7c59;margin-bottom:5px;}
 .sms-body{font-weight:600;}
 .q-emoji-big .sms-card{font-size:.82rem;max-width:280px;}
+/* A model identity card for Forms at Stage A: a plain card with the lines a
+   real one carries, and no brand on it. */
+.id-card{max-width:320px;margin:0 auto;text-align:left;background:#e4eef6;color:#14222e;
+  border-radius:12px;padding:10px 14px 12px;box-shadow:0 3px 12px rgba(0,0,0,.28);
+  font-family:'Nunito',sans-serif;font-weight:800;font-size:clamp(.9rem,2.3vh,1.05rem);
+  letter-spacing:.5px;line-height:1.5;}
+.id-card .id-head{font-size:.72rem;color:#3d6488;letter-spacing:1px;margin-bottom:4px;}
+.q-emoji-big .id-card{font-size:.84rem;max-width:280px;}
 
 /* ── Clock ── */
 .clock-section{display:none;flex-direction:column;align-items:center;gap:clamp(3px,calc(var(--vh,1vh)*1.2),10px);width:100%;}
@@ -1457,6 +1465,9 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   color:var(--teal);background:rgba(15,155,142,.10);border:1.5px dashed rgba(15,155,142,.5);
   border-radius:12px;padding:6px 18px;letter-spacing:1px;}
 .copy-model.sm{font-size:1.25rem;letter-spacing:0;}
+/* The picture beside a word to copy, as the PTA prints it: "car" beside a car. */
+.copy-pic{display:inline-block;font-size:2.4rem;line-height:1;vertical-align:middle;margin-right:10px;}
+.copy-pic img{width:1.2em;height:1.2em;vertical-align:middle;}
 /* "Example", over the two sentences in Write Two Sentences. The Copy It rounds
    show a word to be reproduced exactly and are not labelled: there the model is
    the answer. Here it is somebody else's answer, shown so the learner can see
@@ -3496,7 +3507,9 @@ function genNumberTapQuestions(n,hi){
    Digits, not words. Spelling "twenty-five" is a writing skill and is already
    covered by the number-word banks; writing "25" is the numeracy one, and
    until now nothing in this app asked for it. */
-function genNumeralWriteQuestions(n,hi){
+/* `copy` says whether a round shows its model: true for the Stage A step,
+   false for Stage B, and null for the game off the picker, which deals both. */
+function genNumeralWriteQuestions(n,hi,copy){
   hi=hi||10;
   const out=[];
   for(let i=0;i<(n||8);i++){
@@ -3505,11 +3518,26 @@ function genNumeralWriteQuestions(n,hi){
        coins and notes up to $10 whole dollar monetary amounts up to $10"), and a
        run dealt one question, so it only ever wrote the number. */
     const mode=randInt(0,2);
+    /* Stage A copies and Stage B writes, because that is what each stage's
+       features say. The Stage A rows are "Copies numbers of one or two
+       digits" and "Copies: numbers from 0 to 10 as number symbols ... whole
+       dollar monetary amounts up to $10", and the PTA asks for them as "Copy
+       $5" with the model on the page. This round dictated them, with nothing
+       on the screen to copy, which is Spell a Word's fault over again (rule
+       12e). Stage B is "Writes: numbers from 0 to 100", and dictation is
+       writing. */
+    const copyThis=hi<=10&&(copy==null?Math.random()<0.5:copy);
     if(mode===0){
       const v=randInt(0,hi);
-      out.push({type:'typein', label:'WRITE THE NUMBER', say:numWord(v),
-        question:'🔊 Write this number', placeholder:'e.g. '+(hi>10?'25':'5'),
-        answer:String(v)});
+      if(copyThis){
+        out.push({type:'typein', label:'COPY THE NUMBER', say:'Copy this number.',
+          icon:'<span style="'+NUM_BIG+'">'+v+'</span>',
+          question:'🔊 Copy this number', placeholder:'1 or 2 numbers', answer:String(v)});
+      } else {
+        out.push({type:'typein', label:'WRITE THE NUMBER', say:numWord(v),
+          question:'🔊 Write this number', placeholder:'e.g. '+(hi>10?'25':'5'),
+          answer:String(v)});
+      }
     } else if(mode===1){
       /* Whole dollars only at the lower range. The Stage A features this round
          is evidence for say "whole dollar coins and notes up to $10" and
@@ -3529,6 +3557,12 @@ function genNumeralWriteQuestions(n,hi){
       // 50 cents" was dictated against "whole dollar monetary amounts up to
       // $10". Cents belong to the Stage B feature, which names $25.20.
       const cents=randInt(1,hi)*100+(hi>10&&Math.random()<0.5?50:0);
+      if(copyThis){
+        out.push({type:'typein', label:'COPY THE AMOUNT', money:true, say:'Copy this amount.',
+          icon:'<span style="'+NUM_BIG+'">$'+(cents/100)+'</span>',
+          question:'🔊 Copy this amount', placeholder:'e.g. $5', answer:moneyAnswer(cents)});
+        continue;
+      }
       out.push({type:'typein', label:'WRITE THE AMOUNT', money:true, say:moneySpoken(cents),
         question:'🔊 Write this amount of money',
         placeholder:hi>10?'e.g. 25.50':'e.g. 5.00',
@@ -4323,7 +4357,12 @@ function genSafeQuestions(n,from){
    mind and put it down in the right order, which is what the feature is
    about once the handwriting is set aside. */
 const COPY_WORDS=['bus','shop','milk','name','home','work','food','door','week','city',
+  'book','pen','bag','phone','key','bed',
   'bank','card','time','help','open','stop','exit','road','rent','post'];
+/* The Copy It words drawn beside a picture: only the ones whose picture is the
+   thing itself (rule 14). A lunchbox is not "food" and a briefcase is not
+   "work", and a picture that is nearly right is worse than none. */
+const COPY_PICS=['bus','shop','door','book','pen','bag','phone','key','bed','stop'];
 
 /* ── COPY IT ──
    from 0: single words, shown and typed.
@@ -4391,9 +4430,13 @@ function genCopyQuestions(n,from){
     const mode=from==null?i%3:Math.max(0,Math.min(2,from));
     if(mode===0){
       const w=COPY_WORDS[randInt(0,COPY_WORDS.length-1)];
+      /* The picture beside the word where the word has one, as the PTA prints
+         "car" beside a car. It does not help with the copying, which is the
+         letters; it tells the learner what they are writing. */
+      const pic=COPY_PICS.indexOf(w)>=0?emo(w):'';
       out.push({type:'typein', label:'COPY THE WORD', noListen:true, matchCase:true,
         acsf:PF_COPY_WORD,
-        icon:'<span class="copy-model">'+w+'</span>',
+        icon:(pic?'<span class="copy-pic">'+pic+'</span>':'')+'<span class="copy-model">'+w+'</span>',
         question:'Type this word', placeholder:w.length+' letters', answer:w});
     } else if(mode===1){
       const c=FORM_CARDS[randInt(0,FORM_CARDS.length-1)];
@@ -4914,16 +4957,48 @@ const FORM_CARDS=[
              {label:'Date of birth',value:'3 July 1985'},
              {label:'Address',value:'8 Park Rd Springvale'} ] },
 ];
-function genFormQuestions(n){
+/* ── THE NAME ON A CARD ──
+   Stage A of .03 is "Begins to recognise some personal details", and the PTA
+   asks it as "point to your name on your card". The form above asks more than
+   that: four chips and four written labels, which is reading a form, closer to
+   the Stage B feature "Locates personally relevant words in an extremely
+   familiar text". So Stage A gets the card. The app cannot know the learner's
+   own name, so the card is a model, as the PTA's is, and the ask is the name
+   or the number on it. The options are the card's own lines and are not
+   spoken: finding the name among them is the reading. */
+const ID_CARDS=[
+  {name:'ALI HASSAN',   num:'2345 67891 1', valid:'VALID TO 08/2029'},
+  {name:'MAI NGUYEN',   num:'5102 33476 2', valid:'VALID TO 03/2028'},
+  {name:'FATIMA AHMADI',num:'4816 20935 1', valid:'VALID TO 11/2030'},
+  {name:'CHEN WEI',     num:'3927 54108 3', valid:'VALID TO 06/2029'},
+];
+function genIdCardQuestion(){
+  const c=ID_CARDS[randInt(0,ID_CARDS.length-1)];
+  const icon='<div class="id-card"><div class="id-head">ID CARD</div>'
+    +'<div>'+c.num+'</div><div>'+c.name+'</div><div>'+c.valid+'</div></div>';
+  const askNum=Math.random()<0.3;
+  const ask=askNum?'Tap the card number.':'Tap the name.';
+  return {type:'mc', textOnly:true, icon:icon, say:ask, question:'🔊 '+ask.replace(/\.$/,''),
+    answer:(askNum?c.num:c.name).toLowerCase(), choices:shuffle([c.name,c.num,c.valid,'ID CARD'])};
+}
+/* `from` names the round: 1 the card, 0 and 2 the form, and nothing at all
+   alternates, for the game off the picker. */
+function genFormQuestions(n,from){
   const pool=shuffle([...FORM_CARDS]);
-  return pool.slice(0,n||pool.length).map(card=>({
-    type:'form',
-    fields:card.fields.map(f=>f.label),
-    chips:shuffle(card.fields.map(f=>f.value)),
-    answer:card.fields.map(f=>f.value).join(' | ').toLowerCase(),
-    // The type label already says what to do, so the prompt says who for.
-    question:'Fill in the form for '+card.who
-  }));
+  const out=[];
+  for(let i=0;i<(n||pool.length);i++){
+    if(from===1||(from==null&&i%2===1)){ out.push(genIdCardQuestion()); continue; }
+    const card=pool[i%pool.length];
+    out.push({
+      type:'form',
+      fields:card.fields.map(f=>f.label),
+      chips:shuffle(card.fields.map(f=>f.value)),
+      answer:card.fields.map(f=>f.value).join(' | ').toLowerCase(),
+      // The type label already says what to do, so the prompt says who for.
+      question:'Fill in the form for '+card.who
+    });
+  }
+  return out;
 }
 
 /* ── PRE-LITERACY PICTURE GAMES ──
@@ -5376,9 +5451,9 @@ const GEN_BANKS={
   shop:         function(n,f){ return genShopQuestions(n,f); },
   // The same game under $10, for the Stage A half of .09 and .10.
   shopsmall:    function(n,f){ return genShopQuestions(n,f,true); },
-  forms:        function(n){ return genFormQuestions(n); },
+  forms:        function(n,f){ return genFormQuestions(n,f); },
   numbertap:    function(n,f){ return genNumberTapQuestions(n,f?100:10); },
-  numeralwrite: function(n,f){ return genNumeralWriteQuestions(n,f?100:10); },
+  numeralwrite: function(n,f){ return genNumeralWriteQuestions(n,f?100:10,f==null?null:!f); },
   addup:        function(n,f){ return genAddQuestions(n,f?100:10,false); },
   addmoney:     function(n,f){ return genAddQuestions(n,f?100:10,true); },
   ordering:     function(n,f){ return genOrderQuestions(n,f); },
@@ -7776,7 +7851,7 @@ const TEST_LADDERS={
     {type:'sms',          mc:true,  label:'Read the message, tap the answer'},
     {type:'beginner',     mc:true,  label:'Read the sentence, tap the missing word'},
     {type:'gramscramble', mc:true,  label:'Tap the sentence in the right order'},
-    {type:'forms',        mc:false, label:'Put each answer in the right box'},
+    {type:'forms',        mc:false, from:0, label:'Put each answer in the right box'},
     {type:'gramscramble', mc:false, label:'Put the words in the right order'},
     {type:'beginner',     mc:false, label:'Write the missing word'},
     {type:'elementary',   mc:false, label:'Longer sentences — write the missing word'},
@@ -7794,7 +7869,7 @@ const TEST_LADDERS={
     {type:'numbers1120', mc:false, label:'Write the number 11–20'},
     {type:'months',      mc:false, label:'Write the month'},
     {type:'wp2:gap',     mc:true,  label:'Longer words — tap the missing sound'},
-    {type:'forms',       mc:false, label:'Put each answer in the right box'},
+    {type:'forms',       mc:false, from:0, label:'Put each answer in the right box'},
     {type:'beginner',    mc:false, label:'Write the missing word'},
     {type:'wp2:build',   mc:false, label:'Build a longer word'},
     {type:'numbers2199', mc:false, label:'Write the number 21–99'},
@@ -7843,7 +7918,7 @@ const TEST_LADDERS={
     {type:'safeinfo',    mc:false, from:0, label:'Copy the code'},
     {type:'sms',         mc:true,  label:'Read the message, tap the answer'},
     {type:'safeinfo',    mc:true,  from:1, label:'Safe to share, or private'},
-    {type:'forms',       mc:false, label:'Put each answer in the right box'},
+    {type:'forms',       mc:false, from:0, label:'Put each answer in the right box'},
   ],
   everyday:[
     {type:'signs',       mc:true,  label:'Read the sign'},
@@ -7853,7 +7928,7 @@ const TEST_LADDERS={
     {type:'shop',        mc:false, from:1, label:'Pay the right amount'},
     {type:'clock',       mc:false, from:4, label:'Read and set the clock — quarter past and to'},
     {type:'gramscramble',mc:true,  label:'Tap the sentence in the right order'},
-    {type:'forms',       mc:false, label:'Put each answer in the right box'},
+    {type:'forms',       mc:false, from:0, label:'Put each answer in the right box'},
     {type:'unscramble',  mc:true,  label:'Listen, tap the sentence in order'},
     {type:'translate',   mc:true,  label:'Tap the English sentence'},
     {type:'shop',        mc:false, from:2, label:'Count your change'},
@@ -7878,7 +7953,7 @@ const TEST_LADDERS={
     {type:'questionwords',mc:true, label:'Tap the question word'},
     {type:'wp1:build',   mc:false, label:'Build a short word'},
     {type:'shop',        mc:false, from:2, label:'Count your change'},
-    {type:'forms',       mc:false, label:'Put each answer in the right box'},
+    {type:'forms',       mc:false, from:0, label:'Put each answer in the right box'},
     {type:'wp2:gap',     mc:true,  label:'Longer words — tap the missing sound'},
     {type:'spelling',    mc:false, label:'Spell words from every topic'},
     {type:'elementary',  mc:false, label:'Longer sentences — write the missing word'},
@@ -8077,10 +8152,13 @@ const ACSF_CLAIMS={
      SIGNS_PLA). Round 0 is the game as it always was and keeps every claim. */
   'signs':{base:[],
     byFrom:{0:PF_SIGNS_A.concat(PF_SIGNS_B), 1:PF_SIGNS_A, 2:PF_SIGNS_B}},
-  'forms':{base:[
-    ['03','PLA','Begins to recognise some personal details'],
-    ['04','PLB','Locates personally relevant words in an extremely familiar text'],
-  ]},
+  /* Split by round, like Signs: the card is Stage A, the form Stage B, and
+     round 0 is the form as the ladders deal it, keeping both claims. */
+  'forms':{base:[],
+    byFrom:{0:[['03','PLA','Begins to recognise some personal details'],
+               ['04','PLB','Locates personally relevant words in an extremely familiar text']],
+            1:[['03','PLA','Begins to recognise some personal details']],
+            2:[['04','PLB','Locates personally relevant words in an extremely familiar text']]}},
   'sms':{base:[
     ['03','PLB','Understands short and extremely simple text with explicit purpose and extremely familiar vocab'],
     ['03','L1','Understands a limited range of short, highly explicit and culturally accessible texts, some of which may be ICT based, e.g. SMS texts',1],
@@ -8440,7 +8518,7 @@ const ACSF_POOL=[
      structures and limited verb tenses", which came out when Level 1 Writing
      did, and a step that claims nothing can never serve a stage. It is still a
      game; it is just not evidence of anything the profile reports. */
-  {type:'unscramble',mc:false},{type:'forms',mc:false},
+  {type:'unscramble',mc:false},{type:'forms',mc:true,from:1},{type:'forms',mc:false,from:2},
   // Numeracy
   {type:'numbertap',mc:true},{type:'numbertap',mc:true,from:1},
   {type:'shopsmall',mc:false,from:1},{type:'shop',mc:false,from:1},

@@ -29,9 +29,9 @@ legible script are also not claimed, because that is `tracing.html` and paper.
 
 | Status | Features |
 |---|---|
-| ✅ had it | 30 |
+| ✅ had it | 29 |
 | 📊 from the run | 17 |
-| 🔧 extended | 8 |
+| 🔧 extended | 9 |
 | 🆕 built | 63 |
 | ❌ not assessed | 14 |
 | **Total** | **132** |
@@ -65,7 +65,7 @@ prints *on the second ask* beside the feature, which is what the Stage B
 wording *"may require prompting"* describes. Stage A only, one per feature.
 
 The run therefore has no fixed length. Measured over full runs: **20
-questions** for a learner who shows nothing, **62** for one who clears every
+questions** for a learner who shows nothing, **63** for one who clears every
 stage, and **40** for one who answers wrong throughout, where every Stage A
 feature comes back once. `node tools/checks/check.js run` prints them.
 
@@ -155,6 +155,19 @@ asking more than that at Stage A and are now split by stage:
   is worked out from *"Please arrive 10 minutes early"* rather than found in
   it. The Stage B features are about locating.
 
+Three more came from the LWA Streamlined CALD PTA kit, which has PLA tasks
+of its own:
+
+- **Write the Number** copies at Stage A. It dictated *"three"* and *"10
+  dollars"* against features that begin *"Copies"*; the kit asks *"Copy $5"*
+  with the $5 on the page. Stage B still dictates, because its feature is
+  *"Writes numbers from 0 to 100"*.
+- **Forms** asks Stage A *"Tap the name"* on a model ID card, which is the
+  kit's *"point to your name on your card"*. Dragging four details into a
+  labelled form is reading a form, and stays at Stage B.
+- **Copy It** shows a picture beside a word that has a clear one, as the kit
+  prints *car* beside a car.
+
 Picture and Word is new: a picture and four words, the first sample activity
 in the ACSF Pre Level 1 Supplement and the one Stage A reading feature the
 level check had no round for.
@@ -224,7 +237,7 @@ level check had no round for.
 |---|---|---|---|
 | 1 | Begins to recognise typed print and clear, handwritten letters of the alphabet | 🔧 extended | Letter Names + handwritten letter forms |
 | 2 | Begins to recognise common signs, supported by visuals, e.g. stop, go | ✅ had it | Signs (Stage A round: the other signs are the wrong options) |
-| 3 | Begins to recognise some personal details | ✅ had it | Forms |
+| 3 | Begins to recognise some personal details | 🔧 extended | Forms: tap the name on an ID card (the form itself is Stage B) |
 
 ### `PLB1.03` — Identifies personally relevant information and ideas from texts on highly familiar topics, Pre Level 1 Stage B
 
@@ -284,7 +297,7 @@ level check had no round for.
 |---|---|---|---|
 | 1 | Copies letters of the alphabet and short whole words that are clearly presented | 🆕 built | Copy It |
 | 2 | Copies first and last name | 🆕 built | Copy It: your name |
-| 3 | Copies numbers of one or two digits | 🆕 built | Write the Number |
+| 3 | Copies numbers of one or two digits | 🆕 built | Write the Number: copy the number shown; Copy It: a number |
 | 4 | Copies single words left to right and top to bottom | 🆕 built | Copy It |
 | 5 | Checks copied letters and single words with structured support from expert/mentor | ✅ had it | spelling feedback shows what to fix |
 
@@ -430,9 +443,9 @@ level check had no round for.
 
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
-| 1 | Copies: numbers from 0 to 10 as number symbols value of Australian whole dollar coins and notes up to $10 whole dollar monetary amounts up to $10 | 🆕 built | Write the Number |
+| 1 | Copies: numbers from 0 to 10 as number symbols value of Australian whole dollar coins and notes up to $10 whole dollar monetary amounts up to $10 | 🆕 built | Write the Number: copy the number or amount shown ("Copy $5") |
 | 2 | Uses personally relevant informal language and gestures to convey very simple numeracy-based information, e.g.: today, tomorrow, yesterday pointing and saying up and down one, two, three five dollars | 🆕 built | Where Is It / First, Second, Third |
-| 3 | Uses personally relevant and informal symbolism including numbers up to 10, e.g.: 5 $ | 🆕 built | Write the Number |
+| 3 | Uses personally relevant and informal symbolism including numbers up to 10, e.g.: 5 $ | 🆕 built | Write the Number: copy $5 |
 
 ### `PLB1.11` — Communicating and representing mathematics, Pre Level 1 Stage B
 

@@ -1857,6 +1857,29 @@ check('register', 'the level check stays at the register it is for', async ctx =
          beside "No smoking") are the Stage B feature, linking phrases,
          pictures and signs. */
       const signA = claims.some(c => c[1] === 'PLA' && /recognise common signs/i.test(c[2]));
+      /* A Stage A feature that says "Copies" is shown by copying: the model is
+         on the screen. Write the Number dictated "three" and "10 dollars" at
+         Stage A against "Copies numbers of one or two digits" and "Copies:
+         ... whole dollar monetary amounts up to $10", and the PTA asks the
+         same thing as "Copy $5" with the $5 on the page. A picture carries the
+         model too: a note drawn with 5 on it is copied from. */
+      const copies = claims.some(c => c[1] === 'PLA' && /^Copies/.test(c[2]));
+      if (copies) {
+        let cq = [];
+        try { cq = testQuestions(st, 30); } catch (e) { cq = []; }
+        cq.forEach(function (q) {
+          if (q.choices && q.choices.length) return;
+          const ic = String(q.icon || '');
+          const text = ic.replace(/<[^>]*>/g, ' ').trim();
+          const shown = /<img|<svg/i.test(ic) ||
+            (text && (q.money ? (moneyCents(text) || {}).cents === (moneyCents(String(q.answer)) || {}).cents
+                              : normalize(text).indexOf(normalize(String(q.answer))) >= 0));
+          if (!shown) {
+            over.push(acsfStepKey(st) + ' claims a Stage A "Copies" feature and puts nothing ' +
+                      'on the screen to copy: "' + String(q.question || '').slice(0, 30) + '"');
+          }
+        });
+      }
       if (!single && !signA) return;
       let qs = [];
       try { qs = testQuestions(st, 30); if (st.mc) attachMcChoices(qs, st.type); }
