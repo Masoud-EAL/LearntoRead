@@ -3119,6 +3119,17 @@ const SIGNS=[
   {icon:'no-food',    answer:'No food or drink',alts:['Restaurant','Free lunch','Wash your hands']},
   {icon:'bus-stop',   answer:'Bus stop',        alts:['Car park','No buses','Taxi rank']},
 ];
+/* The signs a Stage A round asks, and asks differently. The feature is "Begins
+   to recognise common signs, supported by visuals, e.g. stop, go": one sign,
+   one plain meaning. The options above are written to be close ("No cooking",
+   "No matches" beside "No smoking"), so telling them apart is careful reading
+   of a phrase, which is the Stage B feature "Links extremely familiar phrases,
+   pictures and signs". At Stage A the wrong options are the other signs in
+   this list, each a different thing, so the round asks whether the learner
+   knows the sign and not whether they can split two near phrases.
+   None of these can be read as another: a wheelchair is also on the accessible
+   toilet, and wet floor is also a danger, so those two pairs stay out. */
+const SIGNS_PLA=['toilets','bus-stop','first-aid','exit','no-smoking','no-parking'];
 
 /* ── TEXT MESSAGES AND APPOINTMENT REMINDERS ──
    One short message, then a question about it. The message renders as a phone
@@ -3138,7 +3149,7 @@ const SMS_ITEMS=[
          {q:'Who sent the message?',answer:'Mum',            alts:['Your teacher','The doctor','The school']} ] },
   { from:'Dental Clinic', body:'Reminder: your appointment is tomorrow at 11:15am. Please arrive 10 minutes early.',
     qs:[ {q:'What time is the appointment?',answer:'11:15am',      alts:['11:50am','10:15am','1:15pm']},
-         {q:'When should you arrive?',      answer:'10 minutes early',alts:['10 minutes late','1 hour early','At 11:15am']} ] },
+         {q:'When should you arrive?',      answer:'10 minutes early',alts:['10 minutes late','1 hour early','At 11:15am'], infer:true} ] },
   { from:'Your teacher', body:'There is no class on Friday. The centre is closed. See you on Monday.',
     qs:[ {q:'Which day has no class?', answer:'Friday', alts:['Monday','Sunday','Tuesday']},
          {q:'When is the next class?', answer:'Monday', alts:['Friday','Saturday','Tomorrow']} ] },
@@ -4493,6 +4504,32 @@ function genSightWordQuestions(n){
   return out;
 }
 
+/* ── PICTURE AND WORD ──
+   ".04 Recognises a small bank of extremely familiar words supported by
+   pictures", the Stage A reading feature the level check had no round for.
+   Matching a picture to its word is the first sample activity in the ACSF Pre
+   Level 1 Supplement, and the task an assessor gives first. The clothes, fruit
+   and body games claim it too, but they dictate a word to spell, and their
+   lists run to "beanie" and "necklace".
+   The picture is the question and the words are the options, so the options
+   carry no pictures and are not spoken: hearing them would turn reading the
+   word into hearing it, and a picture on each would hand the answer over.
+   Every word here is one an adult meets every day and every picture is one
+   thing only. */
+const PIC_WORDS=['bus','train','apple','banana','egg','fish','rice','phone','door',
+  'book','pen','bag','bed','key','chair','shoes','clock','soap'];
+function genPicWordQuestions(n){
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    const w=PIC_WORDS[randInt(0,PIC_WORDS.length-1)];
+    const alts=shuffle(PIC_WORDS.filter(function(x){ return x!==w; })).slice(0,3);
+    out.push({type:'mc', textOnly:true, icon:emo(w), say:'Tap the word for this picture.',
+      question:'🔊 Tap the word for this picture',
+      answer:w, choices:shuffle([w].concat(alts))});
+  }
+  return out;
+}
+
 /* ── CAPITAL LETTERS AND FULL STOPS ──
    ".04 Recognises some basic punctuation and understands its use in
    meaning-making, e.g. a full stop", ".06 Uses capital letters and full
@@ -4615,33 +4652,59 @@ function genNoticeQuestions(n){
    Every round here is heard first. The text is on the screen too, because a
    learner who cannot yet hear it should still be able to work at it, but the
    audio is the task. */
+/* Two halves, and `from` names which, because they answer different features
+   at different stages.
+
+     from 0: greetings and courtesy, answered in a word or two. This is where
+       Stage A sits: "Understands basic one word greetings", "Understands
+       extremely familiar social exchanges using single words", and the Initial
+       EAL unit behind them is "Responds to one word greetings and leave
+       taking". The replies were sentences ("I am forty years old.", "Yes, of
+       course.") heard among three other sentences, which is Stage B listening
+       credited as Stage A.
+     from 1: the short personal questions, "Your name?", "Where are you from?",
+       answered in a word. That is "Understands extremely short and highly
+       explicit questions" and "requests for basic information", and "requests
+       for limited personal information" at Stage B. The Speaking bank carries
+       those features and is not in the level check, so no run asked them,
+       although the PTA opens on exactly this exchange.
+
+   Not "Good morning." answered by "Good morning.". A reply that is the greeting
+   handed straight back is answered by matching two identical lines, which is
+   rule 9's second form: the option gives itself away, and a learner who
+   understands none of it scores. The `options` check refuses a reply the
+   prompt already says. */
 const GREETINGS=[
-  /* Not "Good morning." answered by "Good morning.". A reply that is the
-     greeting handed straight back is answered by matching two identical lines,
-     which is rule 9's second form: the option gives itself away, and a learner
-     who understands none of it scores. It is also the one item a chip on the
-     options could not be given, because hearing them would hand it over twice.
-     The exchange is worth keeping, so it is asked the way it happens. */
-  {say:'You arrive at class in the morning.', a:'Good morning.', alts:['Good night.','Thank you.','Goodbye.']},
-  {say:'How are you?',        a:'I am fine, thank you.', alts:['My name is Ali.','It is Monday.','Good night.']},
-  {say:'Thank you.',          a:"You're welcome.", alts:['Good morning.','See you tomorrow.','How are you?']},
-  {say:'I am going home now.', a:'Goodbye.', alts:['Good morning.','Thank you.','Please.']},
-  {say:'What is your name?',  a:'My name is Ali.', alts:['I am fine.','It is nine o’clock.','Yes, please.']},
-  {say:'Where are you from?', a:'I am from Vietnam.', alts:['I am fine, thank you.','My name is Sara.','On Monday.']},
-  {say:'Please sit down.',    a:'Yes, thank you.', alts:['Good morning.','My name is Omar.','It is Tuesday.']},
-  {say:'Excuse me. Can you help me?', a:'Yes, of course.', alts:['Good night.','It is $5.','I am from Iraq.']},
-  {say:'How old are you?',    a:'I am forty years old.', alts:['I am from Syria.','It is Friday.','Thank you.']},
-  {say:'See you next week.',  a:'Goodbye.',        alts:['Good morning.','Please.','Yes, of course.']},
+  {say:'Hello.',               a:'Hi.',            alts:['Goodbye.','Sorry.','Thank you.']},
+  {say:'Good morning.',        a:'Hello.',         alts:['Good night.','Sorry.','Please.']},
+  {say:'How are you?',         a:'Fine, thanks.',  alts:['Goodbye.','Sorry.','Please.']},
+  {say:'Thank you.',           a:"You're welcome.",alts:['Hello.','Goodbye.','Sorry.']},
+  {say:'Sorry!',               a:"That's OK.",     alts:['Hello.','Good night.','Please.']},
+  {say:'Please sit down.',     a:'Thank you.',     alts:['Goodbye.','Hello.','Sorry.']},
+  {say:'I am going home now.', a:'Goodbye.',       alts:['Good morning.','Thank you.','Please.']},
+  {say:'See you next week.',   a:'Bye.',           alts:['Good morning.','Please.','Sorry.']},
+];
+const GREETING_QUESTIONS=[
+  {say:'What is your name?',     a:'Ali.',       alts:['Vietnam.','Forty.','Monday.']},
+  {say:'Where are you from?',    a:'Vietnam.',   alts:['Sara.','Forty.','Friday.']},
+  {say:'How old are you?',       a:'Forty.',     alts:['Syria.','Omar.','Tuesday.']},
+  {say:'Where do you live?',     a:'Springvale.',alts:['Sara.','Thirty.','Sunday.']},
+  {say:'Do you have children?',  a:'Yes, two.',  alts:['Vietnam.','Omar.','Friday.']},
+  {say:'What is your phone number?',a:'0412 345 678',alts:['Omar.','Iraq.','Monday.']},
 ];
 /* ── GREETINGS AND COURTESY ──
    ".08 Understands basic one word greetings", "Understands extremely
    familiar courtesy phrases and basic greetings, e.g. hello, good morning,
    goodbye, thank you, please", and "Understands extremely short and highly
-   explicit questions". */
-function genGreetingQuestions(n){
-  const out=[], pool=shuffle(GREETINGS.slice());
+   explicit questions". With no `from`, as a game off the picker, the two
+   halves alternate. */
+function genGreetingQuestions(n,from){
+  const both=from==null;
+  const half=[shuffle(GREETINGS.slice()),shuffle(GREETING_QUESTIONS.slice())];
+  const out=[];
   for(let i=0;i<(n||8);i++){
-    const g=pool[i%pool.length];
+    const h=both?i%2:(from===1?1:0), pool=half[h];
+    const g=pool[(both?Math.floor(i/2):i)%pool.length];
     /* A chip on each option, because hearing the four replies is exactly the
        help a Stage A learner needs and none of them is the greeting handed
        back. See the note on the bank above, and the `options` check, which is
@@ -5109,7 +5172,7 @@ function genOddOneOut(count){
   return out;
 }
 
-let questionBank={'wp1:gap':[],'wp1:word':[],'wp1:build':[],'wp2:gap':[],'wp2:word':[],'wp2:build':[],beginner:[],elementary:[],questionwords:[],numbers:[],numbers1120:[],numbers2199:[],days:[],months:[],weather:[],fruits:[],body:[],clothes:[],custom:[],unscramble:[],gramscramble:[],speaking:[],translate:[],letter:[],oddone:[],signs:[],sms:[],clock:[],shop:[],forms:[]};
+let questionBank={'wp1:gap':[],'wp1:word':[],'wp1:build':[],'wp2:gap':[],'wp2:word':[],'wp2:build':[],beginner:[],elementary:[],questionwords:[],numbers:[],numbers1120:[],numbers2199:[],days:[],months:[],weather:[],fruits:[],body:[],clothes:[],custom:[],unscramble:[],gramscramble:[],speaking:[],translate:[],letter:[],oddone:[],signs:[],signsPLA:[],sms:[],clock:[],shop:[],forms:[]};
 let customBanks={};        // { bankId: { name, questions:[] } }
 let activeBankId=null;     // bank open in editor
 let selectedBankId=null;   // bank loaded for the game
@@ -5170,6 +5233,14 @@ function buildBank(){
     answer:s.answer.toLowerCase(),
     choices:shuffle([s.answer,...s.alts])
   }));
+  const plaSigns=SIGNS.filter(s=>SIGNS_PLA.indexOf(s.icon)>=0);
+  questionBank.signsPLA=plaSigns.map(s=>({
+    type:'mc', noListen:true,
+    icon:'<img src="icons/sign-'+s.icon+'.svg" class="sign-pic" alt="">',
+    question:'What does this sign mean?',
+    answer:s.answer.toLowerCase(),
+    choices:shuffle([s.answer].concat(shuffle(plaSigns.filter(x=>x!==s)).slice(0,3).map(x=>x.answer)))
+  }));
   questionBank.clock=genClockQuestions();
   questionBank.shop=genShopQuestions();
   questionBank.forms=genFormQuestions();
@@ -5179,7 +5250,7 @@ function buildBank(){
       +'<div class="sms-body">'+m.body+'</div></div>';
     m.qs.forEach(item=>{
       questionBank.sms.push({
-        type:'mc', noListen:true, icon:bubble, question:item.q,
+        type:'mc', noListen:true, icon:bubble, question:item.q, infer:!!item.infer,
         answer:item.answer.toLowerCase(),
         choices:shuffle([item.answer,...item.alts])
       });
@@ -5223,8 +5294,16 @@ function poolFor(type,from){
   if(type==='translate') return [...questionBank.translate];
   if(type==='letter') return [...questionBank.letter];
   if(type==='oddone') return [...questionBank.oddone];
-  if(type==='signs') return [...questionBank.signs];
-  if(type==='sms') return [...questionBank.sms];
+  /* The level check names the stage: 1 deals the Stage A signs with other
+     signs for wrong options, 2 the phrase options every sign has. With no
+     `from`, as a game, it is the phrase options, as it always was. */
+  if(type==='signs') return from===1?[...questionBank.signsPLA]:[...questionBank.signs];
+  /* The level check leaves out a question that has to be worked out rather
+     than found. "Please arrive 10 minutes early" answering "When should you
+     arrive?" is a reading of the message, not a word located in it, and the
+     Stage B features are about locating: "Locates an extremely familiar piece
+     of information in a short simple text". */
+  if(type==='sms') return questionBank.sms.filter(function(q){ return from?!q.infer:true; });
   if(type==='clock') return [...questionBank.clock];
   if(type==='shop') return [...questionBank.shop];
   if(type==='forms') return [...questionBank.forms];
@@ -5317,10 +5396,11 @@ const GEN_BANKS={
   casematch:    function(n,f){ return genCaseQuestions(n,f); },
   direction:    function(n){ return genDirectionQuestions(n); },
   sightwords:   function(n){ return genSightWordQuestions(n); },
+  picword:      function(n){ return genPicWordQuestions(n); },
   punctuation:  function(n,f){ return genPunctuationQuestions(n,f); },
   modelsentence:function(n,f){ return genSentenceQuestions(n,f); },
   notice:       function(n){ return genNoticeQuestions(n); },
-  greetings:    function(n){ return genGreetingQuestions(n); },
+  greetings:    function(n,f){ return genGreetingQuestions(n,f); },
   instructions: function(n,f){ return genInstructionQuestions(n,f); },
   mylearning:   function(n,from){ return genMyLearningQuestions(n,from); },
 };
@@ -7553,7 +7633,7 @@ const BANK_SECTIONS=[
   {id:'vocab',      label:'📚 Vocabulary',       banks:['days','months','weather','fruits','body','clothes','spelling','oddone','translate']},
   {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','unscramble','speaking','clock','digitaltime','ordinals','position','greetings','instructions']},
   {id:'speaking',   label:'🗣️ Speaking',         banks:['speaking','questionwords','unscramble','greetings']},
-  {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary','tableread','direction','sightwords','notice']},
+  {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary','tableread','direction','sightwords','picword','notice']},
   {id:'writing',    label:'✍️ Writing',          banks:['wp1:gap','wp1:build','wp2:gap','wp2:build','days','months','weather','fruits','body','clothes','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary','numeralwrite','copyword','punctuation','modelsentence']},
   {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble']},
   {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target','numbertap','numeralwrite','addup','addmoney','ordering','placevalue','tableread','digitaltime','calendar','ordinals','position']},
@@ -7943,6 +8023,14 @@ const ACSF_ORDER=['01','02','03','04','05','06','07','08','09','10','11','12','1
    Not claimed at all, and deliberately: anything about handwriting or legible
    script (that is tracing.html, and paper), and the whole of .07, which is
    speaking. */
+const PF_SIGNS_A=[
+  ['03','PLA','Begins to recognise common signs, supported by visuals, e.g. stop, go'],
+  /* First Sounds carried this one and has been removed. A sign is a symbol
+     standing for words, which is exactly what the feature describes. */
+  ['04','PLA','Begins to make a connection between extremely simple text, pictures and symbols']];
+const PF_SIGNS_B=[
+  ['04','PLB','Links extremely familiar phrases, pictures and signs'],
+  ['04','L1','Recognises common signs and symbols',1]];
 const ACSF_CLAIMS={
   /* Kept on `byFrom` rather than moved to `base` now that one ask is left. A
      draw with no `from` cycles all four asks, and three of them say nothing
@@ -7977,19 +8065,18 @@ const ACSF_CLAIMS={
   'unscramble':{base:[
     ['08','PLB','Understands extremely familiar social exchanges that include phrases and occasional, extremely simple sentences'],
   ]},
+  /* No .08 row. "Understands a very limited bank of extremely familiar
+     words" is about words, and a letter name is not one. Listen and Do's
+     objects half carries it: "Tap the book" is a familiar word heard and
+     understood. */
   'letter':{base:[
     ['03','PLA','Begins to recognise typed print and clear, handwritten letters of the alphabet'],
     ['04','PLA','Links spoken and written forms of the names and sounds of letters'],
-    ['08','PLA','Understands a very limited bank of extremely familiar words'],
   ]},
-  'signs':{base:[
-    ['03','PLA','Begins to recognise common signs, supported by visuals, e.g. stop, go'],
-    /* First Sounds carried this one and has been removed. A sign is a symbol
-       standing for words, which is exactly what the feature describes. */
-    ['04','PLA','Begins to make a connection between extremely simple text, pictures and symbols'],
-    ['04','PLB','Links extremely familiar phrases, pictures and signs'],
-    ['04','L1','Recognises common signs and symbols',1],
-  ]},
+  /* Split by stage, because the two rounds are pitched differently (see
+     SIGNS_PLA). Round 0 is the game as it always was and keeps every claim. */
+  'signs':{base:[],
+    byFrom:{0:PF_SIGNS_A.concat(PF_SIGNS_B), 1:PF_SIGNS_A, 2:PF_SIGNS_B}},
   'forms':{base:[
     ['03','PLA','Begins to recognise some personal details'],
     ['04','PLB','Locates personally relevant words in an extremely familiar text'],
@@ -8031,6 +8118,9 @@ const ACSF_CLAIMS={
     byFrom:{0:[['04','PLA','Recognises different forms of the same letters, e.g. upper and lower case']],
             1:[['06','PLA','Copies text, but demonstrates lack of consistency between upper and lower case'],
                ['06','PLB','Uses upper and lower case in extremely familiar words, e.g. own name']]}},
+  'picword':{base:[
+    ['04','PLA','Recognises a small bank of extremely familiar words supported by pictures'],
+  ]},
   'clothes':{base:[
     ['04','PLA','Recognises a small bank of extremely familiar words supported by pictures'],
   ]},
@@ -8109,11 +8199,17 @@ const ACSF_CLAIMS={
        answer, and the learner produces neither. Dropped rather than kept with
        a partial marker on it. */
   ]},
-  'greetings':{base:[
-    ['08','PLA','Understands extremely familiar social exchanges using single words'],
-    ['08','PLA','Understands basic one word greetings'],
-    ['08','PLB','Understands extremely familiar courtesy phrases and basic greetings, e.g. hello, good morning, goodbye, thank you, please'],
-  ]},
+  /* Split by half, the way the bank is: the greeting half answers the single
+     word and courtesy features, the question half the ones about short
+     questions and requests for personal information. A draw with no `from`
+     reads as the greeting half here, the same as every other split bank. */
+  'greetings':{base:[],
+    byFrom:{0:[['08','PLA','Understands extremely familiar social exchanges using single words'],
+               ['08','PLA','Understands basic one word greetings'],
+               ['08','PLB','Understands extremely familiar courtesy phrases and basic greetings, e.g. hello, good morning, goodbye, thank you, please']],
+            1:[['08','PLA','Understands extremely short and highly explicit questions'],
+               ['08','PLA','Understands some extremely familiar requests for basic information'],
+               ['08','PLB','Understands requests for limited personal information']]}},
   'speaking':{base:[
     ['08','PLA','Understands extremely short and highly explicit questions'],
     ['08','PLA','Understands some extremely familiar requests for basic information'],
@@ -8128,7 +8224,8 @@ const ACSF_CLAIMS={
     ['08','PLA','Understands some short extremely familiar instructions supported with a prompt'],
     ['08','PLB','Understands extremely familiar and explicit instructions supported with gestures'],
   ],
-    byFrom:{1:[['13','PLA','Follows a single step oral or pictorial instruction to activate or deactivate tool']]}},
+    byFrom:{0:[['08','PLA','Understands a very limited bank of extremely familiar words']],
+            1:[['13','PLA','Follows a single step oral or pictorial instruction to activate or deactivate tool']]}},
   'numbertap':{base:[
     ['09','PLA','Shows some recognition of whole numbers up to 10 (including 0)'],
     ['09','PLB','Whole numbers up to 100 (including 0)'],
@@ -8200,7 +8297,7 @@ const ACSF_CLAIMS={
      puts the feature in front of the learner and marks it, it is credited. */
   'devices':{base:[
     ['12','PLA','Begins to recognise there are different digital devices commonly used to connect with others'],
-    ['12','PLB','Begins to understand the purpose of some commonly used digital devices and software'],
+    ['12','PLB','Begins to understand the purpose of some commonly used digital devices and software applications'],
     ['13','PLA','Begins to recognise extremely familiar digital devices'],
     ['13','PLB','Begins to understand the purpose of some extremely familiar digital devices and software'],
   ]},
@@ -8315,7 +8412,8 @@ const ACSF_POOL=[
   {type:'wp1:gap',mc:true},{type:'wp1:word',mc:true},{type:'wp1:build',mc:false},
   {type:'sightwords',mc:true},{type:'direction',mc:true},
   // Reading
-  {type:'signs',mc:true},{type:'oddone',mc:true},{type:'sms',mc:true},
+  {type:'signs',mc:true,from:1},{type:'signs',mc:true,from:2},{type:'picword',mc:true},
+  {type:'oddone',mc:true},{type:'sms',mc:true,from:1},
   {type:'notice',mc:true},{type:'questionwords',mc:true,from:1},{type:'beginner',mc:true},
   /* Not the elementary sentence bank. "The cook ___ a good look at the food on
      the stove", "The nation ___ a new station for the next generation" — those
@@ -8358,10 +8456,10 @@ const ACSF_POOL=[
   {type:'devices',mc:true},{type:'devices',mc:true,from:1},{type:'digisymbols',mc:true},
   {type:'prompts',mc:true,from:0},{type:'prompts',mc:true,from:1},
   {type:'safeinfo',mc:false,from:0},{type:'safeinfo',mc:false,from:1},
-  {type:'instructions',mc:true,from:1},
+  {type:'instructions',mc:true,from:0},{type:'instructions',mc:true,from:1},
   // Learning
   {type:'mylearning',mc:true,from:0},
-  {type:'greetings',mc:true},
+  {type:'greetings',mc:true,from:0},{type:'greetings',mc:true,from:1},
 ];
 
 /* The stages a level check walks, in order, and the one an indicator starts
@@ -8887,6 +8985,7 @@ const GAME_INFO={
      to carry one skill label for both, and the run report would have told a
      learner who missed the reading half to practise their numbers. */
   direction:   {skill:'reading', name:'Which Comes First', blurb:'Which word is first and which is last.'},
+  picword:     {skill:'reading', name:'Picture and Word', blurb:'Look at the picture and tap its word.'},
   sightwords:  {skill:'reading', name:'Sight Words', blurb:'The words you see everywhere.'},
   punctuation: {skill:'writing', name:'Capitals and Full Stops', blurb:'Start big, end with a full stop.'},
   modelsentence:{skill:'writing',name:'Write a Sentence', blurb:'Write a sentence about you.'},
@@ -10174,15 +10273,22 @@ function acsfNum(n){ return n===Math.floor(n)?String(n):n.toFixed(1); }
    counted in questions; a feature read off how the learner went through the
    run is counted over the whole run; and a feature no question in this run
    went near says that instead of a number. */
+/* What a teacher should know about how the app shows a feature, where that
+   differs from how an assessor would ask for it. The feature is still
+   credited: the note says what the evidence was, and the teacher decides. */
+const ACSF_FEATURE_NOTES={
+  'Writes full name accurately':'shown by copying a model name; a PTA asks for the learner\'s own name with no model, so confirm on paper'
+};
 function acsfWhyCount(w){
   if(w.notAsked) return 'not asked in this run';
+  const note=ACSF_FEATURE_NOTES[w.text];
   /* A feature the learner missed and was asked again says so. Pre Level 1 is
      described throughout as performance with support, and the Stage B features
      themselves read "may require prompting", so a teacher reading "on the
      second ask" is reading the thing the framework asks them to notice, not a
      demerit. Saying nothing would print a plain pass over two attempts. */
   return acsfNum(w.ok)+' of '+w.n+(typeof w.run==='string'?' '+w.run:'')
-    +(w.prompted?', on the second ask':'');
+    +(w.prompted?', on the second ask':'')+(note?'; '+note:'');
 }
 
 /* ══════════════ LEVEL CHECK — THE PANEL ══════════════

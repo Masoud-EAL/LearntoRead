@@ -935,6 +935,47 @@ the row above made solid, `reachable` passes either way, so this one is a
 latent fault put right rather than a failure repaired: the next claim map
 change could have landed on it.
 
+### 12h. A Stage A round is asked at Stage A, even when its bank serves both stages
+*check: `register`*
+
+Found in a review of the level check against the SEE Streamlined PTA Kit and
+the 22636VIC Initial EAL mapping, not in a report from a phone. Three banks
+were credited at Stage A for work pitched at Stage B, and three Stage A
+features were never asked at all:
+
+- **Greetings** credited "Understands basic one word greetings" off *How old
+  are you?* answered by *I am forty years old.* among three other sentences.
+  The Initial EAL unit behind the feature is "Responds to one word greetings
+  and leave taking". The bank is now two halves: a greeting answered in a word
+  or two, and a short personal question answered in a word.
+- **Signs** credited "Begins to recognise common signs, supported by visuals,
+  e.g. stop, go" off options written to be close (*No cooking*, *No matches*
+  beside *No smoking*). Splitting close phrases is the Stage B feature, "Links
+  extremely familiar phrases, pictures and signs". Stage A now offers other
+  signs as the wrong options (`SIGNS_PLA`).
+- **Messages** at Stage B dealt *When should you arrive?* off *Please arrive
+  10 minutes early*, which is worked out, not located. It carries `infer` and
+  the level check's draw leaves it out.
+- **Unreached:** "Recognises a small bank of extremely familiar words supported
+  by pictures" (the first sample activity in the ACSF Pre Level 1 Supplement,
+  now Picture and Word), and "Understands extremely short and highly explicit
+  questions", "requests for basic information" and "requests for limited
+  personal information" (the PTA's opening exchange, now Greetings round 1).
+  They lived on banks outside the pool, and a feature no step can reach is
+  hidden from the panel, so nothing said it was missing.
+
+And a rule 5 case found alongside: Letter Names claimed "Understands a very
+limited bank of extremely familiar **words**". A letter is not a word. Listen
+and Do's objects half carries it now.
+
+**A bank that serves both stages deals each stage its own draw, split by
+`from`, and the Stage A draw is pitched at the Stage A wording.** The
+register is taken from the documents' own examples (rule 12e): the Initial
+EAL units put Stage A at single words.
+
+`probe` did not pass `from` to a fixed bank, so it printed the picker's draw
+under every round for Signs, Messages and Question Words. It does now.
+
 ### 12d. A wrong answer at Stage A earns one second ask
 *check: `retry`, and the run lengths under `run` and `spread`*
 

@@ -29,10 +29,10 @@ legible script are also not claimed, because that is `tracing.html` and paper.
 
 | Status | Features |
 |---|---|
-| ✅ had it | 31 |
+| ✅ had it | 30 |
 | 📊 from the run | 17 |
 | 🔧 extended | 8 |
-| 🆕 built | 62 |
+| 🆕 built | 63 |
 | ❌ not assessed | 14 |
 | **Total** | **132** |
 
@@ -64,9 +64,9 @@ answer revises the first rather than being counted beside it, and the panel
 prints *on the second ask* beside the feature, which is what the Stage B
 wording *"may require prompting"* describes. Stage A only, one per feature.
 
-The run therefore has no fixed length. Measured over full runs: **17
-questions** for a learner who shows nothing, **58** for one who clears every
-stage, and **34** for one who answers wrong throughout, where every Stage A
+The run therefore has no fixed length. Measured over full runs: **20
+questions** for a learner who shows nothing, **62** for one who clears every
+stage, and **40** for one who answers wrong throughout, where every Stage A
 feature comes back once. `node tools/checks/check.js run` prints them.
 
 Two kinds of question are deliberately outside the pool:
@@ -135,6 +135,30 @@ check can never reach that would be untrue — the app's own limits belong in th
 cap note, not in a line that reads as a gap in the run.
 
 
+## Stage A is asked at the Stage A register
+
+The Initial EAL units behind Stage A are pitched at single words: *"Responds
+to one word greetings and leave taking"*, *"Responds to extremely familiar
+questions using single words"*, signs *"e.g. stop, go"*. Three rounds were
+asking more than that at Stage A and are now split by stage:
+
+- **Greetings.** Stage A hears a greeting and taps a reply of a word or two
+  (*Hello* → *Hi*, *Thank you* → *You're welcome*). The short personal
+  questions (*What is your name?* → *Ali*) are their own round, and they
+  carry the three features about questions and requests for personal
+  information that no run used to reach.
+- **Signs.** Stage A offers the other signs as the wrong options, so the round
+  asks whether the learner knows the sign. The close phrase options (*No
+  smoking* beside *No cooking*) are Stage B's, where the feature is linking
+  phrases, pictures and signs.
+- **Messages.** The level check leaves out *"When should you arrive?"*, which
+  is worked out from *"Please arrive 10 minutes early"* rather than found in
+  it. The Stage B features are about locating.
+
+Picture and Word is new: a picture and four words, the first sample activity
+in the ACSF Pre Level 1 Supplement and the one Stage A reading feature the
+level check had no round for.
+
 ## Learning
 
 
@@ -199,7 +223,7 @@ cap note, not in a line that reads as a gap in the run.
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
 | 1 | Begins to recognise typed print and clear, handwritten letters of the alphabet | 🔧 extended | Letter Names + handwritten letter forms |
-| 2 | Begins to recognise common signs, supported by visuals, e.g. stop, go | ✅ had it | Signs |
+| 2 | Begins to recognise common signs, supported by visuals, e.g. stop, go | ✅ had it | Signs (Stage A round: the other signs are the wrong options) |
 | 3 | Begins to recognise some personal details | ✅ had it | Forms |
 
 ### `PLB1.03` — Identifies personally relevant information and ideas from texts on highly familiar topics, Pre Level 1 Stage B
@@ -226,14 +250,14 @@ cap note, not in a line that reads as a gap in the run.
 | 2 | Begins to make a connection between extremely simple text, pictures and symbols | ✅ had it | Signs, Odd One Out |
 | 3 | Links spoken and written forms of the names and sounds of letters | ✅ had it | Letter Names |
 | 4 | Recognises different forms of the same letters, e.g. upper and lower case | 🆕 built | Big and Small Letters |
-| 5 | Recognises a small bank of extremely familiar words supported by pictures | ✅ had it | Clothes / Fruit / Body |
+| 5 | Recognises a small bank of extremely familiar words supported by pictures | 🆕 built | Picture and Word (a bank, not on the games list: Test Yourself, the level check and All Reading); Clothes / Fruit / Body as games |
 
 ### `PLB1.04` — Uses a limited range of strategies to locate specific information and construct meaning, Pre Level 1 Stage B
 
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
 | 1 | Locates an extremely familiar piece of information in a short simple text | ✅ had it | Messages |
-| 2 | Links extremely familiar phrases, pictures and signs | ✅ had it | Signs |
+| 2 | Links extremely familiar phrases, pictures and signs | ✅ had it | Signs (Stage B round: close phrase options) |
 | 3 | Recognises spoken word and written word for extremely familiar words | ✅ had it | Tap the Word |
 | 4 | Locates personally relevant words in an extremely familiar text | ✅ had it | Forms |
 | 5 | Recognises frequently used question words, e.g. who, what | ✅ had it | Question Words |
@@ -304,7 +328,7 @@ cap note, not in a line that reads as a gap in the run.
 
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
-| 1 | Writes full name accurately | 🆕 built | Copy It: your name |
+| 1 | Writes full name accurately | 🆕 built | Copy It: your name (the panel notes it was copied from a model, which a PTA does not give) |
 | 2 | Uses capital letters and full stops accurately in sentences adapted from a model | 🆕 built | Write a Sentence |
 | 3 | Writes a very limited number of extremely familiar words, which may have spelling inaccuracies | ✅ had it | All Spelling (standalone game only; not in the level check, where dictation is harder than the feature) |
 | 4 | Leaves spaces between words | 🆕 built | Write a Sentence (spacing); Copy It: your name |
@@ -328,20 +352,20 @@ cap note, not in a line that reads as a gap in the run.
 
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
-| 1 | Understands extremely familiar social exchanges using single words | 🆕 built | Listen and Do: greetings |
-| 2 | Understands basic one word greetings | 🆕 built | Listen and Do: greetings |
-| 3 | Understands extremely short and highly explicit questions | ✅ had it | Speaking |
+| 1 | Understands extremely familiar social exchanges using single words | 🆕 built | Greetings: one or two word replies |
+| 2 | Understands basic one word greetings | 🆕 built | Greetings: one or two word replies |
+| 3 | Understands extremely short and highly explicit questions | ✅ had it | Greetings: short personal questions; Speaking |
 | 4 | Understands some short extremely familiar instructions supported with a prompt | 🆕 built | Listen and Do: instructions |
-| 5 | Understands a very limited bank of extremely familiar words | ✅ had it | Letter Names, Numbers, Clothes |
-| 6 | Understands some extremely familiar requests for basic information | ✅ had it | Speaking |
+| 5 | Understands a very limited bank of extremely familiar words | ✅ had it | Listen and Do: objects ("Tap the book") |
+| 6 | Understands some extremely familiar requests for basic information | ✅ had it | Greetings: short personal questions; Speaking |
 
 ### `PLB1.08` — Listens for basic information in short, simple oral texts, Pre Level 1 Stage B
 
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
 | 1 | Understands extremely familiar social exchanges that include phrases and occasional, extremely simple sentences | ✅ had it | Beginner sentences |
-| 2 | Understands requests for limited personal information | ✅ had it | Speaking |
-| 3 | Understands extremely familiar courtesy phrases and basic greetings, e.g. hello, good morning, goodbye, thank you, please | 🆕 built | Listen and Do: courtesy phrases |
+| 2 | Understands requests for limited personal information | ✅ had it | Greetings: short personal questions; Speaking |
+| 3 | Understands extremely familiar courtesy phrases and basic greetings, e.g. hello, good morning, goodbye, thank you, please | 🆕 built | Greetings: one or two word replies |
 | 4 | Understands extremely familiar and explicit instructions supported with gestures | 🆕 built | Listen and Do: instructions |
 
 ### `1.08` — Listens for basic information in short, simple oral texts, Level 1
@@ -435,7 +459,7 @@ cap note, not in a line that reads as a gap in the run.
 
 | # | Key performance feature (verbatim) | Status | Game |
 |---|---|---|---|
-| 1 | Begins to understand the purpose of some commonly used digital devices and software | 🆕 built | Using a Device: which one do you use to ... |
+| 1 | Begins to understand the purpose of some commonly used digital devices and software applications | 🆕 built | Using a Device: which one do you use to ... |
 | 2 | Begins to use an extremely limited number of digital devices and software applications | 📊 from the run | works the app on a phone or tablet |
 | 3 | Begins to understand there are risks associated with providing information | 🆕 built | Using a Device: can you share this? |
 

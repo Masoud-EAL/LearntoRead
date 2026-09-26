@@ -1843,6 +1843,36 @@ check('register', 'the level check stays at the register it is for', async ctx =
           }
         });
       }
+      /* A Stage A listening feature that names single words is answered in a
+         word or two. Greetings credited "Understands basic one word greetings"
+         off "How old are you?" answered by "I am forty years old." among three
+         other sentences, and the Initial EAL unit behind that feature is
+         "Responds to one word greetings and leave taking". */
+      const claims = acsfClaimsFor(st);
+      const single = claims.some(c => c[0] === '08' && c[1] === 'PLA' &&
+                                      /single words|one word/i.test(c[2]));
+      /* And the Stage A sign feature, "Begins to recognise common signs,
+         supported by visuals, e.g. stop, go", is asked with other signs as the
+         wrong options. The close phrases every sign carries ("No cooking"
+         beside "No smoking") are the Stage B feature, linking phrases,
+         pictures and signs. */
+      const signA = claims.some(c => c[1] === 'PLA' && /recognise common signs/i.test(c[2]));
+      if (!single && !signA) return;
+      let qs = [];
+      try { qs = testQuestions(st, 30); if (st.mc) attachMcChoices(qs, st.type); }
+      catch (e) { return; }
+      const signNames = SIGNS.map(x => normalize(x.answer));
+      qs.forEach(function (q) {
+        (q.choices || []).forEach(function (w) {
+          const words = String(w).replace(/[.,!?]/g, ' ').trim().split(/\s+/);
+          if (single && words.length > 2) {
+            over.push(acsfStepKey(st) + ' answers a single word feature with "' + w + '"');
+          }
+          if (signA && signNames.indexOf(normalize(w)) < 0) {
+            over.push(acsfStepKey(st) + ' offers "' + w + '" at Stage A, which is not a sign');
+          }
+        });
+      });
     });
     [...new Set(over)].forEach(x => bad.push(x));
     return { bad: bad, pool: ACSF_POOL.length };
@@ -1931,8 +1961,12 @@ check('spread', 'no one game fills the level check', async ctx => {
      so it cannot see its own overlap. If this fails after a deliberate change
      to the pool, read the new number, satisfy yourself the extra questions are
      each showing something, and move it. If it fails after a change to the
-     picker, it is probably padding. */
-  const BUDGET = 60;
+     picker, it is probably padding.
+       Moved from 60 to 64 when the level check began asking four features no
+     run had reached (picture and word at Stage A .04, and the three about short
+     personal questions at .08), and moved a fifth, a familiar word heard, off
+     Letter Names and onto Listen and Do. A perfect run went to 62. */
+  const BUDGET = 64;
   for (const how of ['right', 'sloppy']) {
     const out = await play(ctx.page, how, function (ev, prof, seen, perStep) {
       const labels = {};
@@ -2345,8 +2379,11 @@ async function probe(ctx, bank, n) {
     [null, 0, 1, 2].forEach(function (from) {
       let got = [];
       try {
+        /* A fixed bank takes `from` too: Signs, Messages and Question Words
+           deal a different draw to a level-check step than to the picker, and
+           a probe that dropped it printed the picker's draw under every round. */
         got = isGenBank(g) ? GEN_BANKS[g](n, from == null ? undefined : from)
-                           : getQuestions(g, n);
+                           : getQuestions(g, n, from == null ? undefined : from);
         // Show the round as a learner meets it: a bank that can be tapped gets
         // its options when the round deals it, not when the bank builds it.
         if (mcAppliesTo(g)) attachMcChoices(got, g);

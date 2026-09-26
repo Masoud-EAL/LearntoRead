@@ -92,3 +92,32 @@ How well the Level Check in `game.html` can be used to assess Pre Level 1A (PL1A
 5. **Should:** two attempts per PL1A feature and feature-level judging (3.3).
 6. **Should:** print the 2017 indicator titles and the PL1A / PL1B / NYA labels; mark .12 and .13 as non-ACSF (4.1).
 7. **Could:** claim the keypad features the document already provides (4.4); show .01/.02 as observations only (4.2).
+
+## 6. Second review: the SEE Streamlined PTA Kit and the 22636VIC mapping (September 2026)
+
+Read against the ACSF 2019 document with its Pre Level 1 Supplement, the AMES SEE Streamlined PTA Kit Assessor Guide (v1.3), and the 22636VIC and 22637VIC mapping documents. Most of sections 3 to 5 above has been done since the first review.
+
+### Verdict
+
+- **Usable as a screening and placement aid that a teacher confirms, not as a stand-alone PTA outcome.** The structure matches the PTA: each indicator climbs until the learner reaches their limit, no level is awarded without the one below it, and the profile can be spiky. What it cannot replace is the assessor's interview and observation, which is how the PTA judges PLB Learning and Oral Communication.
+- **Level 1 is always partial**, so the useful output is NYA, PLA or PLB per indicator, which is the range this audience needs.
+- **NYA is right for the Initial EAL course.** The SEE PTA treats PLA as the default outcome and does not test it, but the Initial EAL units assess PLA as a stage of its own, and the app follows that checklist.
+
+### Difficulty against the PTA samples
+
+- **Numeracy PLB matches** the PTA "Office Furniture Sale" task: a time on the hour, a price, notes in order, two prices added.
+- **Writing PLB matches**: Write Two Sentences is PTA PLB question 3 almost word for word, and Copy It is question 1. Question 2, the learner's own name with no model, is the gap: "Writes full name accurately" is still credited from a copied name, and the panel now says so beside the feature.
+- **Reading PLB was a little above** the PTA "Class" task. The one Messages question that had to be worked out rather than found is out of the level check's draw.
+- **Stage A had two rounds pitched too high**, Greetings and Signs, and three of its most typical features were never asked. Both are fixed; see rule 12h in the level check skill and "Stage A is asked at the Stage A register" in `acsf-coverage.md`.
+
+### What changed
+
+1. Picture and Word: a picture and four words, for PLA .04 "Recognises a small bank of extremely familiar words supported by pictures".
+2. Greetings split in two: greetings answered in a word or two (PLA single word features, PLB courtesy), and short personal questions answered in a word (PLA questions and requests, PLB requests for limited personal information).
+3. Letter Names no longer claims .08 "extremely familiar words"; Listen and Do's objects half does.
+4. The note on "Writes full name accurately" in the panel and the copied report.
+5. Signs split by stage: other signs as wrong options at Stage A, the close phrase options at Stage B.
+6. Messages: the inference question is left out of the level check.
+7. PLB .12 quoted in full: "...digital devices and software applications".
+
+A perfect run is now 62 questions, one that answers nothing 20, and one that answers wrong throughout 40.
