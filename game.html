@@ -1865,6 +1865,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="copyword" class="q-type-tab" onclick="selectSoloType('copyword',this)">📝 Copy It</button>
         <button data-type="casematch" class="q-type-tab" onclick="selectSoloType('casematch',this)">🔠 Big and Small Letters</button>
         <button data-type="sightwords" class="q-type-tab" onclick="selectSoloType('sightwords',this)">👁️ Sight Words</button>
+        <button data-type="picword" class="q-type-tab" onclick="selectSoloType('picword',this)">🖼️ Picture and Word</button>
         <button data-type="punctuation" class="q-type-tab" onclick="selectSoloType('punctuation',this)">❕ Capitals and Full Stops</button>
         <button data-type="modelsentence" class="q-type-tab" onclick="selectSoloType('modelsentence',this)">✏️ Write a Sentence</button>
         <button data-type="notice" class="q-type-tab" onclick="selectSoloType('notice',this)">📢 Read the Notice</button>
@@ -2067,6 +2068,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
             <button data-type="copyword" class="q-type-tab" onclick="selectQType('copyword',this)">📝 Copy It</button>
             <button data-type="casematch" class="q-type-tab" onclick="selectQType('casematch',this)">🔠 Big and Small Letters</button>
             <button data-type="sightwords" class="q-type-tab" onclick="selectQType('sightwords',this)">👁️ Sight Words</button>
+            <button data-type="picword" class="q-type-tab" onclick="selectQType('picword',this)">🖼️ Picture and Word</button>
             <button data-type="punctuation" class="q-type-tab" onclick="selectQType('punctuation',this)">❕ Capitals and Full Stops</button>
             <button data-type="modelsentence" class="q-type-tab" onclick="selectQType('modelsentence',this)">✏️ Write a Sentence</button>
             <button data-type="notice" class="q-type-tab" onclick="selectQType('notice',this)">📢 Read the Notice</button>
@@ -7699,22 +7701,29 @@ function initSolo(){
   updateSoloCountDisplay();
 }
 /* ══════════════ SECTIONS ══════════════
-   A bank can sit in several sections — "Beginner" is listening, reading,
-   writing and everyday life all at once — so this is a filter, not a
-   re-grouping: each pill still appears exactly once in the list. */
+   A bank can sit in several sections ("Beginner" is listening, reading and
+   writing all at once), so this is a filter, not a re-grouping: each pill
+   still appears exactly once in the list.
+
+   A section holds the games that practise that skill, not every game that
+   touches it. Everyday life is the tasks a learner meets outside class: a
+   sign, a notice, a message, a form, a greeting, the time, a date, money and
+   the phone. The general sentence games live under Listening, Reading and
+   Grammar. Vocabulary is learning words: the topic word banks, and the
+   question words, sight words, pictures and devices a learner names. */
 const BANK_SECTIONS=[
   {id:'*',          label:'✨ All games',        banks:null},
-  {id:'letters',    label:'🔤 Letters & Sounds', banks:[...PHONICS_TYPES,'letter','elementary','casematch']},
-  {id:'vocab',      label:'📚 Vocabulary',       banks:['days','months','weather','fruits','body','clothes','spelling','oddone','translate']},
-  {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','unscramble','speaking','clock','digitaltime','ordinals','position','greetings','instructions']},
+  {id:'letters',    label:'🔤 Letters & Sounds', banks:[...PHONICS_TYPES,'letter','casematch']},
+  {id:'vocab',      label:'📚 Vocabulary',       banks:['days','months','weather','fruits','body','clothes','questionwords','sightwords','picword','devices','spelling','oddone','translate']},
+  {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','unscramble','speaking','digitaltime','ordinals','position','greetings','instructions']},
   {id:'speaking',   label:'🗣️ Speaking',         banks:['speaking','questionwords','unscramble','greetings']},
-  {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary','tableread','direction','sightwords','picword','notice']},
-  {id:'writing',    label:'✍️ Writing',          banks:['wp1:gap','wp1:build','wp2:gap','wp2:build','days','months','weather','fruits','body','clothes','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary','numeralwrite','copyword','punctuation','modelsentence']},
-  {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble']},
+  {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary','tableread','direction','sightwords','picword','notice','prompts']},
+  {id:'writing',    label:'✍️ Writing',          banks:['wp1:gap','wp1:build','wp2:gap','wp2:build','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary','numeralwrite','copyword','punctuation','modelsentence']},
+  {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble','punctuation']},
   {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target','numbertap','numeralwrite','addup','addmoney','ordering','placevalue','tableread','digitaltime','calendar','ordinals','position']},
   {id:'translation',label:'🌐 Translation',      banks:['translate']},
   {id:'digital',    label:'💻 Using a device',   banks:['devices','digisymbols','prompts','safeinfo','sms','forms','instructions']},
-  {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','sms','clock','shop','forms','beginner','unscramble','gramscramble','speaking','translate','digitaltime','calendar']},
+  {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','notice','sms','forms','greetings','instructions','speaking','clock','digitaltime','calendar','shop','addmoney','tableread','prompts','safeinfo','translate']},
 ];
 /* Every bank a learner can be dealt from "All games", read off the sections
    above so a game added to a section joins the top All with it.
@@ -7747,7 +7756,7 @@ const SECTION_DEFAULTS={
   grammar:      {type:'gramscramble', mc:false},
   numeracy:     {type:'clock',        mc:true},
   translation:  {type:'translate',    mc:true},
-  everyday:     {type:'beginner',     mc:true},
+  everyday:     {type:'signs',        mc:true},
   digital:      {type:'devices',      mc:true},
 };
 
@@ -7796,37 +7805,48 @@ const TEST_ROUNDS=10, TEST_PER_ROUND=3;
 const TEST_LADDERS={
   letters:[
     {type:'letter',      mc:true,  label:'Hear a letter, tap it'},
+    {type:'casematch',   mc:true,  from:0, label:'Match big and small letters'},
     {type:'wp1:word',    mc:true,  label:'Hear the sounds, tap the word'},
     {type:'wp1:gap',     mc:true,  label:'Tap the missing sound'},
     {type:'wp1:build',   mc:false, label:'Build a short word'},
+    {type:'casematch',   mc:false, from:1, label:'Write a name with a big letter'},
     {type:'wp2:word',    mc:true,  label:'Longer words — tap the word'},
     {type:'wp2:gap',     mc:true,  label:'Longer words — tap the missing sound'},
     {type:'wp2:build',   mc:false, label:'Build a longer word'},
-    {type:'elementary',  mc:true,  label:'Listen, tap the missing word'},
-    {type:'elementary',  mc:false, label:'Listen, write the missing word'},
   ],
   vocab:[
-    {type:'oddone',   mc:true,  label:'Find the one that is different'},
-    {type:'fruits',   mc:true,  label:'Tap the fruit'},
-    {type:'body',     mc:true,  label:'Tap the part of the body'},
-    {type:'clothes',  mc:true,  label:'Tap the clothing word'},
-    {type:'days',     mc:true,  label:'Tap the day'},
-    {type:'months',   mc:true,  label:'Tap the month'},
-    {type:'weather',  mc:true,  label:'Tap the weather word'},
-    {type:'days',     mc:false, label:'Write the day'},
-    {type:'clothes',  mc:false, label:'Write the clothing word'},
-    {type:'weather',  mc:false, label:'Write the weather word'},
-    {type:'months',   mc:false, label:'Write the month'},
-    {type:'spelling', mc:false, label:'Spell words from every topic'},
-    {type:'translate',mc:false, label:'Read it in your language, write it in English'},
+    {type:'picword',      mc:true,  label:'Tap the word for the picture'},
+    {type:'oddone',       mc:true,  label:'Find the one that is different'},
+    {type:'fruits',       mc:true,  label:'Tap the fruit'},
+    {type:'body',         mc:true,  label:'Tap the part of the body'},
+    {type:'devices',      mc:true,  from:0, label:'Name the device'},
+    {type:'clothes',      mc:true,  label:'Tap the clothing word'},
+    {type:'days',         mc:true,  label:'Tap the day'},
+    {type:'sightwords',   mc:true,  label:'Hear a common word, tap it'},
+    {type:'months',       mc:true,  label:'Tap the month'},
+    {type:'weather',      mc:true,  label:'Tap the weather word'},
+    {type:'questionwords',mc:true,  label:'Tap the question word'},
+    {type:'days',         mc:false, label:'Write the day'},
+    {type:'clothes',      mc:false, label:'Write the clothing word'},
+    {type:'weather',      mc:false, label:'Write the weather word'},
+    {type:'questionwords',mc:false, label:'Write the question word'},
+    {type:'months',       mc:false, label:'Write the month'},
+    {type:'spelling',     mc:false, label:'Spell words from every topic'},
+    {type:'translate',    mc:false, label:'Read it in your language, write it in English'},
   ],
+  /* Clock left Listening: it is read off a clock face and nothing is heard.
+     Digital Time is the heard time, so it holds the rung instead. */
   listening:[
     {type:'letter',      mc:true,  label:'Hear a letter, tap it'},
+    {type:'greetings',   mc:true,  from:0, label:'Hear a greeting, tap the answer'},
+    {type:'position',    mc:true,  from:0, label:'Up or down'},
     {type:'wp1:word',    mc:true,  label:'Hear the sounds, tap the word'},
+    {type:'ordinals',    mc:true,  from:0, label:'First, second or third'},
     {type:'wp1:gap',     mc:true,  label:'Tap the missing sound'},
+    {type:'instructions',mc:true,  from:0, label:'Listen, then tap what it says'},
     {type:'beginner',    mc:true,  label:'Listen, tap the missing word'},
     {type:'wp1:build',   mc:false, label:'Build a short word'},
-    {type:'clock',       mc:false, from:0, label:"Read and set the clock — o'clock"},
+    {type:'digitaltime', mc:true,  from:1, label:'Hear a time, tap it'},
     {type:'wp2:word',    mc:true,  label:'Longer words — tap the word'},
     {type:'wp2:gap',     mc:true,  label:'Longer words — tap the missing sound'},
     {type:'unscramble',  mc:true,  label:'Listen, tap the sentence in order'},
@@ -7837,7 +7857,9 @@ const TEST_LADDERS={
     {type:'speaking',    mc:false, label:'Listen, build your answer'},
   ],
   speaking:[
+    {type:'greetings',    mc:true,  from:0, label:'Hear a greeting, tap the answer'},
     {type:'questionwords',mc:true,  label:'Tap the question word'},
+    {type:'greetings',    mc:true,  from:1, label:'Hear a question, tap the answer'},
     {type:'speaking',     mc:true,  label:'Listen, tap the answer'},
     {type:'unscramble',   mc:true,  label:'Listen, tap the sentence in order'},
     {type:'questionwords',mc:false, label:'Write the question word'},
@@ -7845,58 +7867,80 @@ const TEST_LADDERS={
     {type:'speaking',     mc:false, label:'Listen, build your answer'},
   ],
   reading:[
+    {type:'picword',      mc:true,  label:'Tap the word for the picture'},
     {type:'signs',        mc:true,  label:'Read the sign'},
+    {type:'sightwords',   mc:true,  label:'Hear a common word, tap it'},
+    {type:'direction',    mc:true,  label:'Which word is first, which is last'},
     {type:'oddone',       mc:true,  label:'Find the one that is different'},
     {type:'questionwords',mc:true,  label:'Tap the question word'},
+    {type:'notice',       mc:true,  label:'Read the notice'},
+    {type:'tableread',    mc:true,  from:0, label:'Find a price in a list'},
     {type:'sms',          mc:true,  label:'Read the message, tap the answer'},
+    {type:'prompts',      mc:true,  label:'A message on the screen: what to do'},
     {type:'beginner',     mc:true,  label:'Read the sentence, tap the missing word'},
     {type:'gramscramble', mc:true,  label:'Tap the sentence in the right order'},
+    {type:'tableread',    mc:true,  from:2, label:'Compare two prices'},
     {type:'forms',        mc:false, from:0, label:'Put each answer in the right box'},
     {type:'gramscramble', mc:false, label:'Put the words in the right order'},
     {type:'beginner',     mc:false, label:'Write the missing word'},
     {type:'elementary',   mc:false, label:'Longer sentences — write the missing word'},
   ],
+  /* Writing is the writing itself: copying, numbers, a form, a sentence.
+     The topic word banks are Vocabulary's, and All Spelling still brings them
+     all here in one game. */
   writing:[
+    {type:'copyword',    mc:false, from:0, label:'Copy a word'},
     {type:'wp1:gap',     mc:true,  label:'Tap the missing sound'},
+    {type:'copyword',    mc:false, from:1, label:'Copy a name'},
+    {type:'numeralwrite',mc:false, from:0, label:'Copy the number'},
     {type:'numbers',     mc:true,  label:'Tap the number word'},
-    {type:'fruits',      mc:false, label:'Write the fruit'},
-    {type:'body',        mc:false, label:'Write the part of the body'},
     {type:'wp1:build',   mc:false, label:'Build a short word'},
-    {type:'days',        mc:false, label:'Write the day'},
-    {type:'clothes',     mc:false, label:'Write the clothing word'},
     {type:'numbers',     mc:false, label:'Write the number 1–10'},
-    {type:'weather',     mc:false, label:'Write the weather word'},
+    {type:'punctuation', mc:true,  from:0, label:'Tap the sentence written correctly'},
     {type:'numbers1120', mc:false, label:'Write the number 11–20'},
-    {type:'months',      mc:false, label:'Write the month'},
-    {type:'wp2:gap',     mc:true,  label:'Longer words — tap the missing sound'},
     {type:'forms',       mc:false, from:0, label:'Put each answer in the right box'},
+    {type:'wp2:gap',     mc:true,  label:'Longer words — tap the missing sound'},
+    {type:'numeralwrite',mc:false, from:1, label:'Write the number in figures'},
+    {type:'punctuation', mc:false, from:1, label:'Write it with a capital and a full stop'},
     {type:'beginner',    mc:false, label:'Write the missing word'},
     {type:'wp2:build',   mc:false, label:'Build a longer word'},
     {type:'numbers2199', mc:false, label:'Write the number 21–99'},
     {type:'spelling',    mc:false, label:'Spell words from every topic'},
+    {type:'modelsentence',mc:false,from:0, label:'Write a sentence about you'},
     {type:'elementary',  mc:false, label:'Longer sentences — write the missing word'},
   ],
   grammar:[
     {type:'questionwords',mc:true,  label:'Tap the question word'},
+    {type:'punctuation',  mc:true,  from:0, label:'Tap the sentence written correctly'},
     {type:'gramscramble', mc:true,  label:'Tap the sentence in the right order'},
     {type:'unscramble',   mc:true,  label:'Listen, tap the sentence in order'},
     {type:'questionwords',mc:false, label:'Write the question word'},
+    {type:'punctuation',  mc:false, from:1, label:'Write it with a capital and a full stop'},
     {type:'gramscramble', mc:false, label:'Put the words in the right order'},
     {type:'unscramble',   mc:false, label:'Listen, put the words in order'},
   ],
+  /* Every numeracy bank is a rung, so the test can hand any of them back as
+     the game to practise. Dice is the one left out (see above). */
   numeracy:[
+    {type:'numbertap',   mc:true,  from:0, label:'Hear a number, tap it'},
     {type:'numbers',     mc:true,  label:'Tap the number word'},
-    {type:'numbers1120', mc:true,  label:'Tap the number 11–20'},
+    {type:'position',    mc:true,  from:0, label:'Up or down'},
+    {type:'ordinals',    mc:true,  from:0, label:'First, second or third'},
     {type:'clock',       mc:false, from:0, label:"Read and set the clock — o'clock"},
-    {type:'numbers',     mc:false, label:'Write the number 1–10'},
+    {type:'addup',       mc:false, from:0, label:'Add two small numbers'},
+    {type:'ordering',    mc:false, from:0, label:'Put small numbers in order'},
+    {type:'numbers1120', mc:true,  label:'Tap the number 11–20'},
+    {type:'placevalue',  mc:true,  label:'How many tens and how many ones'},
+    {type:'tableread',   mc:true,  from:0, label:'Find a price in a list'},
     {type:'numbers2199', mc:true,  label:'Tap the number 21–99'},
-    {type:'clock',       mc:false, from:2, label:'Read and set the clock — half past'},
-    {type:'numbers1120', mc:false, label:'Write the number 11–20'},
+    {type:'digitaltime', mc:true,  from:1, label:'Hear a time, tap it'},
+    {type:'calendar',    mc:true,  label:'Find a day and a date on a calendar'},
     {type:'shop',        mc:false, from:1, label:'Pay the right amount'},
+    {type:'addmoney',    mc:false, from:0, label:'Add two amounts of money'},
+    {type:'numeralwrite',mc:false, from:1, label:'Write the number in figures'},
     {type:'clock',       mc:false, from:4, label:'Read and set the clock — quarter past and to'},
-    {type:'numbers2199', mc:false, label:'Write the number 21–99'},
+    {type:'addup',       mc:false, from:1, label:'Add two bigger numbers'},
     {type:'shop',        mc:false, from:2, label:'Count your change'},
-    {type:'clock',       mc:false, from:6, label:'Read and set the clock — every five minutes'},
   ],
   /* One game in the skill, so the ladder is honestly two rungs: reading the
      English and choosing it, then reading it and writing it. */
@@ -7920,21 +7964,28 @@ const TEST_LADDERS={
     {type:'safeinfo',    mc:true,  from:1, label:'Safe to share, or private'},
     {type:'forms',       mc:false, from:0, label:'Put each answer in the right box'},
   ],
+  /* The tasks a learner meets outside class, easiest first: read a sign,
+     answer a greeting, then time, dates, money and the phone, up to a form
+     and a sentence in English. */
   everyday:[
     {type:'signs',       mc:true,  label:'Read the sign'},
+    {type:'greetings',   mc:true,  from:0, label:'Hear a greeting, tap the answer'},
+    {type:'notice',      mc:true,  label:'Read the notice'},
     {type:'sms',         mc:true,  label:'Read the message, tap the answer'},
     {type:'clock',       mc:false, from:0, label:"Read and set the clock — o'clock"},
-    {type:'beginner',    mc:true,  label:'Listen, tap the missing word'},
+    {type:'instructions',mc:true,  from:0, label:'Listen, then tap what it says'},
+    {type:'digitaltime', mc:true,  from:1, label:'Hear a time, tap it'},
+    {type:'calendar',    mc:true,  label:'Find a day and a date on a calendar'},
     {type:'shop',        mc:false, from:1, label:'Pay the right amount'},
-    {type:'clock',       mc:false, from:4, label:'Read and set the clock — quarter past and to'},
-    {type:'gramscramble',mc:true,  label:'Tap the sentence in the right order'},
+    {type:'tableread',   mc:true,  from:0, label:'Find a price in a list'},
+    {type:'prompts',     mc:true,  label:'A message on the screen: what to do'},
+    {type:'addmoney',    mc:false, from:0, label:'Add two amounts of money'},
+    {type:'safeinfo',    mc:true,  from:1, label:'Safe to share, or private'},
     {type:'forms',       mc:false, from:0, label:'Put each answer in the right box'},
-    {type:'unscramble',  mc:true,  label:'Listen, tap the sentence in order'},
-    {type:'translate',   mc:true,  label:'Tap the English sentence'},
+    {type:'clock',       mc:false, from:4, label:'Read and set the clock — quarter past and to'},
     {type:'shop',        mc:false, from:2, label:'Count your change'},
-    {type:'beginner',    mc:false, label:'Write the missing word'},
-    {type:'gramscramble',mc:false, label:'Put the words in the right order'},
     {type:'speaking',    mc:false, label:'Listen, build your answer'},
+    {type:'translate',   mc:true,  label:'Tap the English sentence'},
     {type:'translate',   mc:false, label:'Read it in your language, write it in English'},
   ],
   /* The whole-app placement test: one sweep across every skill rather than
