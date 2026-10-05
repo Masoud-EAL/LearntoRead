@@ -623,6 +623,24 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 .ans-bar .correct{color:var(--green);font-weight:800;}
 .ans-bar .wrong{color:var(--accent);}
 .ans-bar .pending{color:var(--muted);font-style:italic;}
+/* Teacher game: the answers card fills the rest of the screen and the
+   "answered" names sit in two columns, in type a class can read from the
+   back of the room. */
+.ans-card{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;padding:18px 20px;}
+#ans-bars{flex:1;min-height:0;max-height:none;}
+#ans-bars .ans-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px;}
+#ans-bars .ans-bar{padding:7px 16px;}
+#ans-bars .ans-bar .aname{font-size:1.2rem;}
+#ans-bars .ans-bar .atext{font-size:1.05rem;flex:0 0 auto;}
+#ans-bars .rgroup-label{font-size:.95rem;}
+#ans-bars .rname-chip{font-size:1.15rem;padding:8px 18px;}
+@media(max-width:560px){#ans-bars .ans-grid{grid-template-columns:1fr;}}
+/* On a laptop or projector the screen is exactly one viewport tall, so the
+   card stretches to the buttons and only scrolls if the class is very large. */
+@media(min-width:700px) and (min-height:560px){
+  #screen-teacher-game{height:var(--app-h,100dvh);overflow:hidden;}
+  #screen-teacher-game .tgame-body{min-height:0;}
+}
 .tgame-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
 
 /* LEADERBOARD */
@@ -2152,7 +2170,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       </div>
     </div>
   </div>
-  <div style="padding:0 20px;flex:1;display:flex;flex-direction:column;gap:10px;">
+  <div class="tgame-body" style="padding:0 20px;flex:1;display:flex;flex-direction:column;gap:10px;">
     <div class="q-display">
       <div class="q-badge" id="q-badge">WORD</div>
       <div class="q-emoji-big" id="q-emoji"></div>
@@ -2161,9 +2179,11 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
       <button class="hear-btn" id="hear-btn" onclick="teacherSpeak()">🔊 Play again</button>
     </div>
     <div class="t-options" id="teacher-options" style="display:none;"></div>
-    <div class="card" style="flex:1;overflow:hidden;">
-      <p style="font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--muted);margin-bottom:10px;">📝 Student answers</p>
-      <div class="ans-bars scrollable" id="ans-bars" style="max-height:220px;"></div>
+    <!-- The answers card takes all the space left under the question, so a
+         projector shows the whole class at once instead of a scrolled strip. -->
+    <div class="card ans-card">
+      <p style="font-family:'Fredoka One',cursive;font-size:1.15rem;color:var(--muted);margin-bottom:10px;">📝 Student answers</p>
+      <div class="ans-bars scrollable" id="ans-bars"></div>
     </div>
   </div>
   <div class="tgame-actions" style="padding:10px 20px 18px;">
@@ -6930,12 +6950,15 @@ function listenForAnswers(){
     const bars=document.getElementById('ans-bars');
     if(!revealed){
       bars.innerHTML='';
+      const grid=document.createElement('div');
+      grid.className='ans-grid';
       Object.entries(answers).forEach(([pid,ans])=>{
         const bar=document.createElement('div');
         bar.className='ans-bar';
         bar.innerHTML='<span class="aname">'+ans.name+'</span><span class="atext pending">✏️ answered</span>';
-        bars.appendChild(bar);
+        grid.appendChild(bar);
       });
+      bars.appendChild(grid);
     } else {
       renderRevealResults(answers,q);
     }
