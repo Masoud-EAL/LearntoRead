@@ -1293,7 +1293,36 @@ check('repeats', 'no bank repeats inside a run, and the launch count is a real c
     if (claimed && Number(claimed) > r.distinct) {
       bad('repeats: ' + r.g + ' promises "' + r.line + '" but only ' + r.distinct + ' exist');
     }
+    // And the other way: Forms said "4 available, 10 will be used" over a game
+    // that dealt ten different questions, because only round 0 was counted.
+    const dealt = r.got10 - r.dup10;
+    if (claimed && Number(claimed) < dealt) {
+      bad('repeats: ' + r.g + ' says "' + r.line + '" but one game deals ' + dealt +
+          ' different questions');
+    }
   });
+
+  /* "In one game the same person's ID card came up twice in a row." Forms
+     walked its people with the round number, so a game alternating form and
+     card only reached half of them, and the rounds left over were cards picked
+     at random. A ten question game has room for every person once each way. */
+  const forms = await ctx.page.evaluate(() => {
+    const who = q => q.type === 'form'
+      ? 'form ' + q.question.replace('Fill in the form for ', '')
+      : 'card ' + ((q.icon.match(/<div>([A-Z ]+)<\/div>/) || [])[1]);
+    const out = { running: [], twice: [] };
+    for (let k = 0; k < 200; k++) {
+      resetGenSeen();
+      const w = getQuestions('forms', 10).map(who);
+      for (let i = 1; i < w.length; i++) {
+        if (w[i] === w[i - 1] && out.running.length < 3) out.running.push(w.join(', '));
+      }
+      if (new Set(w).size < w.length && out.twice.length < 3) out.twice.push(w.join(', '));
+    }
+    return out;
+  });
+  forms.running.forEach(g => bad('repeats: forms dealt the same person twice running: ' + g));
+  forms.twice.forEach(g => bad('repeats: forms dealt one person\'s form or card twice in ten: ' + g));
 });
 
 check('rounds', 'a step deals the round it names, however many you ask for', async ctx => {

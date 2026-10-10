@@ -3461,7 +3461,10 @@ function genShopQuestions(n,from,small){
              +'</span><span class="price-tag">'+money(price)+'</span>'
              +'<span class="paid-with">you paid <img src="icons/money-'+n.file
              +'.svg" alt="'+money(n.cents)+'"></span></div>',
-        question:'You pay '+money(n.cents)+' for '+item.name+'. Tap your change.'});
+        // The price and the note are two sentences: "You pay $50.00 for books"
+        // under a $20.00 tag read as the books costing $50. The item is named
+        // under its picture, so "it" is enough, and the line fits a small phone.
+        question:'It costs '+money(price)+'. You give '+money(n.cents)+'. Tap your change.'});
     }
   }
   return out;
@@ -4978,6 +4981,13 @@ const FORM_CARDS=[
     fields:[ {label:'First name',value:'Chen'}, {label:'Family name',value:'Wei'},
              {label:'Date of birth',value:'3 July 1985'},
              {label:'Address',value:'8 Park Rd Springvale'} ] },
+  { who:'Joseph Deng',
+    fields:[ {label:'First name',value:'Joseph'}, {label:'Family name',value:'Deng'},
+             {label:'Address',value:'15 Lonsdale St Dandenong'},
+             {label:'Postcode',value:'3175'} ] },
+  { who:'Samira Haddad',
+    fields:[ {label:'First name',value:'Samira'}, {label:'Family name',value:'Haddad'},
+             {label:'Country of birth',value:'Syria'}, {label:'Date of birth',value:'21 May 1993'} ] },
 ];
 /* ── THE NAME ON A CARD ──
    Stage A of .03 is "Begins to recognise some personal details", and the PTA
@@ -4993,24 +5003,52 @@ const ID_CARDS=[
   {name:'MAI NGUYEN',   num:'5102 33476 2', valid:'VALID TO 03/2028'},
   {name:'FATIMA AHMADI',num:'4816 20935 1', valid:'VALID TO 11/2030'},
   {name:'CHEN WEI',     num:'3927 54108 3', valid:'VALID TO 06/2029'},
+  {name:'JOSEPH DENG',  num:'6031 85247 4', valid:'VALID TO 09/2028'},
+  {name:'SAMIRA HADDAD',num:'7259 41806 2', valid:'VALID TO 01/2031'},
 ];
-function genIdCardQuestion(){
-  const c=ID_CARDS[randInt(0,ID_CARDS.length-1)];
+/* The order the cards come round in. Picked at random each time, a game dealt
+   the same person's card twice running, once for the name and once for the
+   number. So every card comes once before any comes again, the second time
+   round asks it the other way, and the turn of a round never puts the last
+   card first. */
+function idCardOrder(){
+  const one=shuffle([...ID_CARDS]), two=shuffle([...ID_CARDS]);
+  if(two[0]===one[one.length-1]) two.push(two.shift());
+  const num=one.map(()=>Math.random()<0.3);
+  return one.map((c,i)=>({card:c,askNum:num[i]}))
+    .concat(two.map(c=>({card:c,askNum:!num[one.indexOf(c)]})));
+}
+function genIdCardQuestion(pick){
+  const c=pick.card, askNum=pick.askNum;
   const icon='<div class="id-card"><div class="id-head">ID CARD</div>'
     +'<div>'+c.num+'</div><div>'+c.name+'</div><div>'+c.valid+'</div></div>';
-  const askNum=Math.random()<0.3;
   const ask=askNum?'Tap the card number.':'Tap the name.';
   return {type:'mc', textOnly:true, icon:icon, say:ask, question:'🔊 '+ask.replace(/\.$/,''),
     answer:(askNum?c.num:c.name).toLowerCase(), choices:shuffle([c.name,c.num,c.valid,'ID CARD'])};
 }
 /* `from` names the round: 1 the card, 0 and 2 the form, and nothing at all
-   alternates, for the game off the picker. */
+   alternates, for the game off the picker.
+
+   Forms and cards each keep their own place in their own list. Walking the
+   forms with the round number put only the even ones in a game that
+   alternates, so half the people never had a form, and the rounds left over
+   were all cards. */
 function genFormQuestions(n,from){
   const pool=shuffle([...FORM_CARDS]);
   const out=[];
+  let forms=0, cards=[], lastCard=null;
   for(let i=0;i<(n||pool.length);i++){
-    if(from===1||(from==null&&i%2===1)){ out.push(genIdCardQuestion()); continue; }
-    const card=pool[i%pool.length];
+    if(from===1||(from==null&&i%2===1)){
+      if(!cards.length){
+        cards=idCardOrder();
+        if(cards[0].card===lastCard) cards.splice(0,2,cards[1],cards[0]);
+      }
+      const pick=cards.shift();
+      lastCard=pick.card;
+      out.push(genIdCardQuestion(pick));
+      continue;
+    }
+    const card=pool[forms++%pool.length];
     out.push({
       type:'form',
       fields:card.fields.map(f=>f.label),
@@ -5561,12 +5599,12 @@ const GEN_SIZES={};
 function genDistinctCount(type){
   if(GEN_SIZES[type]!=null) return GEN_SIZES[type];
   const seen=new Set();
-  /* At from 0, because that is the only difficulty the launch screen ever
-     deals: the harder halves of a bank belong to the level check, which
-     prints no count. Counting those too is how Which Device came to say
-     twenty when a game of it can only show ten. */
+  /* With no round named, because that is what the launch screen deals: a
+     game off the picker plays every round its bank has. Counting round 0
+     alone is how Forms said "4 available, 10 will be used" over a game that
+     deals ten different questions. */
   for(let t=0;t<4&&seen.size<GEN_MADE_FRESH;t++)
-    GEN_BANKS[type](60,0).forEach(function(q){ seen.add(qKey(q)); });
+    GEN_BANKS[type](60).forEach(function(q){ seen.add(qKey(q)); });
   return (GEN_SIZES[type]=seen.size);
 }
 
