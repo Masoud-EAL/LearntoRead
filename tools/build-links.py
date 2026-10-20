@@ -123,6 +123,11 @@ PAGE = """<!DOCTYPE html>
      the app's own single title and description, which is exactly the problem
      they exist to solve. -->
 <link rel="canonical" href="{site}/{slug}">
+<!-- Kept out of search on purpose: a page that redirects the moment it loads
+     is what Bing's guidelines call a sneaky redirect, and fifty of them
+     dragged down how often Bing would crawl the real pages. Share previews
+     read the og: tags below and ignore this. -->
+<meta name="robots" content="noindex, follow">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="WordLink">
@@ -199,10 +204,10 @@ def main():
         desc = blurb + TAIL
         written.append(write(slug, 'game.html?mode=solo&game=' + game, title, desc, blurb, DARK))
 
-    # Keep the sitemap and the service worker in step with the pages that
-    # actually exist, so a new slug is never half-added.
-    slugs = [s for s, *_ in SECTIONS] + [s for s, *_ in GAMES]
-    update_sitemap(slugs)
+    # Keep the service worker in step with the pages that actually exist, so a
+    # new slug is never half-added. They stay out of the sitemap: they are
+    # noindex redirects, and listing them told Bing to crawl fifty pages it
+    # would never index.
     update_sw(written)
     print('wrote %d pages' % len(written))
 
@@ -230,26 +235,6 @@ def update_sw(files):
         js = js.replace('const OPTIONAL = [\n', 'const OPTIONAL = [\n' + block, 1)
     with open(path, 'w', encoding='utf-8') as f:
         f.write(js)
-
-
-def update_sitemap(slugs):
-    path = os.path.join(ROOT, 'sitemap.xml')
-    with open(path, encoding='utf-8') as f:
-        xml = f.read()
-    entries = ''.join(
-        '  <url>\n'
-        '    <loc>%s/%s</loc>\n'
-        '    <changefreq>monthly</changefreq>\n'
-        '    <priority>0.7</priority>\n'
-        '  </url>\n' % (SITE, s) for s in slugs)
-    block = '  <!-- %s -->\n%s  <!-- /short links -->\n' % (MARKER, entries)
-    if '<!-- ' + MARKER + ' -->' in xml:
-        xml = re.sub(r'  <!-- %s -->\n.*?  <!-- /short links -->\n' % re.escape(MARKER),
-                     block, xml, flags=re.S)
-    else:
-        xml = xml.replace('</urlset>', block + '</urlset>')
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write(xml)
 
 
 if __name__ == '__main__':
