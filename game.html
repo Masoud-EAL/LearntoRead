@@ -531,21 +531,16 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
      Given a height it grows into, it stops at the 800px it was rendered at. */
   #screen-teacher-lobby #qr-wrap > img,
   #screen-teacher-lobby #qr-wrap > canvas{width:auto;height:auto;max-width:100%;max-height:100%;}
-  /* The roster takes only what its names need, so everything it does not use
-     goes to the code. Its ceiling is whole rows, not a round number: a class
-     of thirty scrolls, and a scroller cut mid-row shows half a name — 45px
-     chips on a 53px pitch, so two rows are 98px and three are 151px. */
-  .lobby-grid > .lobby-col:first-child > .card{flex:0 0 auto;display:flex;flex-direction:column;
-    padding:16px 20px;}
-  #screen-teacher-lobby .player-chips{flex:0 0 auto;max-height:98px;align-content:flex-start;}
-  #screen-teacher-lobby .player-chip{font-size:1.15rem;padding:9px 18px;}
-  #screen-teacher-lobby .players-hd{font-size:1.2rem;}
-}
-
-/* A screen tall enough to spare the row shows three at once — the difference
-   between a glance telling you the class is here and one that needs a scroll. */
-@media (min-width:900px) and (min-height:960px){
-  #screen-teacher-lobby .player-chips{max-height:151px;}
+  /* The roster takes what its names need and the code takes the rest, down
+     to the code's floor above; past that the roster scrolls. An empty room
+     leaves the code the whole column, and a full one shows the whole class
+     instead of the two rows a fixed cap allowed. The card keeps the heading
+     and one row of names whatever the screen. */
+  .lobby-grid > .lobby-col:first-child > .card{flex:0 1 auto;display:flex;flex-direction:column;
+    min-height:118px;padding:14px 18px;}
+  #screen-teacher-lobby .player-chips{flex:0 1 auto;min-height:0;max-height:none;align-content:flex-start;gap:6px 8px;}
+  #screen-teacher-lobby .player-chip{font-size:1.4rem;padding:3px 15px;}
+  #screen-teacher-lobby .players-hd{font-size:1.4rem;margin-bottom:8px;}
 }
 
 /* ── A short window: everything else stands down for the code ──
@@ -576,12 +571,11 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
   #screen-teacher-lobby .rc-code{font-size:clamp(2.2rem,2.6vw,3rem);letter-spacing:6px;line-height:1.1;}
   #screen-teacher-lobby .rc-url{margin-top:4px;}
   #screen-teacher-lobby #qr-wrap{padding:8px;margin-top:8px;}
-  /* One row of names. A class that has arrived is read off the count beside
-     the heading; the names are how the teacher spots who has not. */
-  .lobby-grid > .lobby-col:first-child > .card{flex:0 1 auto;padding:11px 16px;}
-  #screen-teacher-lobby .players-hd{font-size:1.05rem;margin-bottom:7px;}
-  #screen-teacher-lobby .player-chips{max-height:45px;min-height:36px;}
-  #screen-teacher-lobby .player-chip{font-size:1.05rem;padding:7px 15px;}
+  /* The roster still gets whatever the code's floor leaves, just with a
+     little less padding around it. */
+  .lobby-grid > .lobby-col:first-child > .card{padding:11px 16px;}
+  #screen-teacher-lobby .players-hd{font-size:1.25rem;margin-bottom:7px;}
+  #screen-teacher-lobby .player-chip{font-size:1.3rem;padding:2px 14px;}
 }
 
 /* ── Wide screens: the skills stand beside the games, as they do in practice ──
@@ -640,6 +634,43 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 @media(min-width:700px) and (min-height:560px){
   #screen-teacher-game{height:var(--app-h,100dvh);overflow:hidden;}
   #screen-teacher-game .tgame-body{min-height:0;}
+}
+/* On a laptop or projector everything on this screen is read from the back
+   of the room, not from the teacher's chair, so the type steps up across the
+   board: the progress line, the question and its hint, the options, the
+   answer names and the buttons under them. */
+@media(min-width:900px){
+  #screen-teacher-game .game-prog{font-size:1.45rem;}
+  #screen-teacher-game .q-display{padding:20px 24px;}
+  #screen-teacher-game .q-badge{font-size:.95rem;padding:4px 16px;}
+  #screen-teacher-game .q-text{font-size:clamp(2rem,3.2vw,3.2rem);}
+  #screen-teacher-game .q-hint{font-size:1.45rem;}
+  #screen-teacher-game .hear-btn{font-size:1.2rem;}
+  #screen-teacher-game .t-opt{min-height:64px;}
+  #screen-teacher-game .t-opt .t-opt-label{font-size:1.6rem;}
+  #screen-teacher-game .t-opt.t-opt-sentence{font-size:1.4rem;}
+  #screen-teacher-game .ans-card > p{font-size:1.45rem!important;}
+  #ans-bars .ans-bar .aname{font-size:1.5rem;}
+  #ans-bars .ans-bar .atext{font-size:1.3rem;}
+  #ans-bars .rgroup-label{font-size:1.2rem;}
+  #ans-bars .rname-chip{font-size:1.5rem;padding:8px 20px;}
+  #screen-teacher-game .tgame-actions .btn{font-size:1.35rem;padding:15px 32px;}
+  /* A word with no picture leaves an empty picture row above it; here that
+     row is better spent on the answers below. */
+  #screen-teacher-game .q-emoji-big:empty{display:none;}
+}
+/* A short laptop window keeps most of the step but gives back enough height
+   that the answers card still shows a row of names. */
+@media(min-width:900px) and (max-height:760px){
+  #screen-teacher-game .q-display{padding:12px 20px;}
+  #screen-teacher-game .q-badge{margin-bottom:6px;}
+  #screen-teacher-game .q-text{font-size:clamp(1.8rem,2.6vw,2.4rem);margin-bottom:4px;}
+  #screen-teacher-game .q-hint{font-size:1.25rem;}
+  #screen-teacher-game .t-opt{min-height:50px;padding:6px 10px;}
+  #screen-teacher-game .t-opt .t-opt-label{font-size:1.35rem;}
+  #screen-teacher-game .t-opt.t-opt-sentence{font-size:1.2rem;}
+  #screen-teacher-game .tgame-actions{padding:8px 20px 12px!important;}
+  #screen-teacher-game .tgame-actions .btn{font-size:1.2rem;padding:11px 28px;}
 }
 .tgame-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
 
