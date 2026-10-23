@@ -1498,6 +1498,10 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .ord-fig{opacity:.45;filter:grayscale(1);}
 .ord-fig.ord-hit{opacity:1;filter:none;transform:scale(1.25);}
 .ord-arrow{color:var(--muted);font-size:1.1rem;}
+.ord-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;max-width:320px;margin:0 auto;}
+.ord-cell{font-family:'Fredoka One',cursive;font-size:.95rem;padding:4px 0;border-radius:6px;
+  color:var(--muted);background:rgba(255,255,255,.06);text-align:center;}
+.ord-cell.ord-hit{color:#fff;background:var(--accent);transform:scale(1.15);}
 /* A key as it looks on a screen, a dialog box as it appears over one, and a
    code big enough to copy digit by digit without losing your place. */
 .digi-key{display:inline-flex;align-items:center;justify-content:center;width:74px;height:74px;
@@ -1906,11 +1910,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="digitaltime" class="q-type-tab" onclick="selectSoloType('digitaltime',this)">🕐 Digital Time</button>
         <button data-type="calendar" class="q-type-tab" onclick="selectSoloType('calendar',this)">📆 Find the Date</button>
         <button data-type="ordinals" class="q-type-tab" onclick="selectSoloType('ordinals',this)">🥇 First, Second, Third</button>
+        <button data-type="ordinals30" class="q-type-tab" onclick="selectSoloType('ordinals30',this)">🏅 Ordinal Numbers</button>
         <button data-type="position" class="q-type-tab" onclick="selectSoloType('position',this)">🧭 Where Is It</button>
         <button data-type="devices" class="q-type-tab" onclick="selectSoloType('devices',this)">💻 Devices</button>
         <button data-type="digisymbols" class="q-type-tab" onclick="selectSoloType('digisymbols',this)">🔣 Screen Symbols</button>
         <button data-type="prompts" class="q-type-tab" onclick="selectSoloType('prompts',this)">⚠️ What Should You Do?</button>
-        <button data-type="safeinfo" class="q-type-tab" onclick="selectSoloType('safeinfo',this)">🔒 Safe or Private</button>
+        <button data-type="safeinfo" class="q-type-tab" onclick="selectSoloType('safeinfo',this)">🔒 Security</button>
         <button data-type="copyword" class="q-type-tab" onclick="selectSoloType('copyword',this)">📝 Copy It</button>
         <button data-type="casematch" class="q-type-tab" onclick="selectSoloType('casematch',this)">🔠 Big and Small Letters</button>
         <button data-type="sightwords" class="q-type-tab" onclick="selectSoloType('sightwords',this)">👁️ Sight Words</button>
@@ -2109,11 +2114,12 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
             <button data-type="digitaltime" class="q-type-tab" onclick="selectQType('digitaltime',this)">🕐 Digital Time</button>
             <button data-type="calendar" class="q-type-tab" onclick="selectQType('calendar',this)">📆 Find the Date</button>
             <button data-type="ordinals" class="q-type-tab" onclick="selectQType('ordinals',this)">🥇 First, Second, Third</button>
+            <button data-type="ordinals30" class="q-type-tab" onclick="selectQType('ordinals30',this)">🏅 Ordinal Numbers</button>
             <button data-type="position" class="q-type-tab" onclick="selectQType('position',this)">🧭 Where Is It</button>
             <button data-type="devices" class="q-type-tab" onclick="selectQType('devices',this)">💻 Devices</button>
             <button data-type="digisymbols" class="q-type-tab" onclick="selectQType('digisymbols',this)">🔣 Screen Symbols</button>
             <button data-type="prompts" class="q-type-tab" onclick="selectQType('prompts',this)">⚠️ What Should You Do?</button>
-            <button data-type="safeinfo" class="q-type-tab" onclick="selectQType('safeinfo',this)">🔒 Safe or Private</button>
+            <button data-type="safeinfo" class="q-type-tab" onclick="selectQType('safeinfo',this)">🔒 Security</button>
             <button data-type="copyword" class="q-type-tab" onclick="selectQType('copyword',this)">📝 Copy It</button>
             <button data-type="casematch" class="q-type-tab" onclick="selectQType('casematch',this)">🔠 Big and Small Letters</button>
             <button data-type="sightwords" class="q-type-tab" onclick="selectQType('sightwords',this)">👁️ Sight Words</button>
@@ -2247,7 +2253,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
     <div class="lb-list scrollable" id="lb-list"></div>
     <div id="lb-controls-final" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:4px;">
       <button class="btn btn-teal" id="play-again-btn" onclick="playAgain()">🔄 Play Again</button>
-      <button class="btn btn-ghost" id="home-btn" onclick="goHome()">🏠 Home</button>
+      <button class="btn btn-ghost" id="home-btn" onclick="leaveFinalBoard()">🏠 Home</button>
     </div>
     <div id="lb-controls-mid" style="display:none;flex-direction:column;align-items:center;gap:10px;margin-top:4px;">
       <!-- Wrapped as one row so the student's standings can hide the teacher's
@@ -3962,47 +3968,95 @@ function genCalendarQuestions(n){
 /* ── FIRST, SECOND, THIRD ──
    "Recognise oral ordinal numbers from 1st to 3rd" (.09), and the ordinals
    named in the .11 list of things a learner uses informal language for. */
-const ORDINALS=['first','second','third','fourth','fifth'];
-const ORD_SHORT=['1st','2nd','3rd','4th','5th'];
+const ORDINALS=['first','second','third','fourth','fifth','sixth','seventh','eighth',
+  'ninth','tenth','eleventh','twelfth','thirteenth','fourteenth','fifteenth','sixteenth',
+  'seventeenth','eighteenth','nineteenth','twentieth','twenty-first','twenty-second',
+  'twenty-third','twenty-fourth','twenty-fifth','twenty-sixth','twenty-seventh',
+  'twenty-eighth','twenty-ninth','thirtieth'];
+// 1st, 2nd, 3rd, 4th ... 11th, 12th, 13th ... 21st, 22nd, 23rd ... 30th.
+function ordShort(n){
+  const t=n%100, u=n%10;
+  return n+((t>10&&t<14)?'th':u===1?'st':u===2?'nd':u===3?'rd':'th');
+}
 const ORD_FACES=['🧍','🧍‍♀️','🧍‍♂️','🧑','👩'];
-/* Two directions, alternating, and neither of them says its own answer.
-   The old round spoke "which one is second?" over a row of figures with the
-   second one marked and offered the ordinal words as the choices, so the
-   answer was audible and the picture was decoration.
-     even rounds — the row is marked, the prompt asks which one it is, and the
-       learner counts along the row to name the position.
-     odd rounds — there is no row at all, the ordinal is spoken, and the learner
-       taps its written short form. A row of identical unmarked figures only
-       invites a learner to pick one of them, and the choices are the task
-       here. This is the half that carries the quoted feature,
-       "recognise oral ordinal numbers from 1st to 3rd": the word is heard, and
-       1st/2nd/3rd is a different written form from first/second/third, so
-       matching them is the skill rather than an echo. */
+/* Three kinds, drawn, and none of them says its own answer.
+     heard, short form: "Tap second." and the options are 1st, 2nd, 3rd. It
+       used to say "Tap the second one." over those options, and "the second
+       one" is a position, not the name of a written form: the words said
+       one thing and the buttons another.
+     heard, position: "Tap the second one." and the options are 1, 2, 3 in
+       that order, so the second one really is the second button. This is
+       the round where "the ... one" means what it says.
+     marked: the row is marked, the prompt asks which one it is, and the
+       learner counts along the row to name the position. A row of identical
+       unmarked figures only invites a learner to pick one of them, so the
+       two heard kinds show no row.
+   The two heard kinds carry the quoted feature, "recognise oral ordinal
+   numbers from 1st to 3rd": the word is heard and matched to a different
+   written form, so matching them is the skill rather than an echo. */
 function genOrdinalQuestions(n,from){
-  const out=[], top=(from?5:3);
-  for(let i=0;i<(n||8);i++){
-    const pos=randInt(0,top-1);
-    /* Drawn, not indexed. The feature is "Recognise **oral** ordinal numbers from
-       1st to 3rd", and the half that says "Tap the first one" out loud is the one
-       that shows it; at one question a draw, `i` was always 0 and that half was
-       never dealt. */
-    const hear=Math.random()<0.5;
+  return genOrdinalRounds(n,from?5:3);
+}
+/* Ordinal Numbers: the same three kinds, first to thirtieth, because a date
+   is said "the twenty-first" and that is where an adult hears them. Not in
+   the level check: the band names 1st to 3rd and nothing past it. */
+function genOrdinal30Questions(n){
+  return genOrdinalRounds(n,30);
+}
+/* The wrong options a learner would actually confuse with n: the ones either
+   side, the same last digit (21st, 31st), and thirteenth against thirtieth,
+   which sound alike. Topped up at random when that is not three. */
+function ordinalAlts(pos,top,count){
+  if(top<=4) return shuffle(Array.from({length:top},function(_,i){ return i+1; })
+    .filter(function(x){ return x!==pos; })).slice(0,count);
+  const near=[pos-1,pos+1,pos-10,pos+10,pos%10||10,pos===13?30:pos===30?13:0];
+  const ok=function(x,list){ return x>=1&&x<=top&&x!==pos&&list.indexOf(x)<0; };
+  const out=[];
+  shuffle(near).forEach(function(x){ if(out.length<count&&ok(x,out)) out.push(x); });
+  while(out.length<count){ const x=randInt(1,top); if(ok(x,out)) out.push(x); }
+  return out;
+}
+/* Past five, a row of people is too long to count on a phone, so the marked
+   round shows the numbers 1 to 30 in rows of ten, the way the tens line up
+   on a calendar, and asks for the word. */
+function ordinalPicture(pos,top){
+  if(top<=5){
     const row=ORD_FACES.slice(0,top).map(function(f,ix){
-      return '<span class="ord-fig'+(ix===pos?' ord-hit':'')+'">'+f+'</span>';
+      return '<span class="ord-fig'+(ix===pos-1?' ord-hit':'')+'">'+f+'</span>';
     }).join('<span class="ord-arrow">›</span>');
-    const icon='<div class="ord-row">'+row+'</div>';
-    if(hear){
-      const correct=ORD_SHORT[pos];
-      const alts=shuffle(ORD_SHORT.slice(0,top).filter(function(o){ return o!==correct; })).slice(0,3);
-      out.push({type:'mc', say:'Tap the '+ORDINALS[pos]+' one.',
+    return '<div class="ord-row">'+row+'</div>';
+  }
+  let cells='';
+  for(let k=1;k<=top;k++) cells+='<span class="ord-cell'+(k===pos?' ord-hit':'')+'">'+k+'</span>';
+  return '<div class="ord-grid">'+cells+'</div>';
+}
+function genOrdinalRounds(n,top){
+  const out=[];
+  for(let i=0;i<(n||8);i++){
+    const pos=randInt(1,top);
+    /* Drawn, not indexed. The feature is "Recognise **oral** ordinal numbers
+       from 1st to 3rd", and the level check deals one question per draw, so
+       on `i` it would only ever have seen the first kind. */
+    const kind=randInt(0,2);
+    const word=ORDINALS[pos-1];
+    const alts=ordinalAlts(pos,top,Math.min(3,top-1));
+    if(kind===0){
+      const correct=ordShort(pos);
+      out.push({type:'mc', textOnly:true, say:'Tap '+word+'.',
         question:'🔊 Which one did you hear?',
-        answer:correct, choices:shuffle([correct].concat(alts))});
+        answer:correct, choices:shuffle([correct].concat(alts.map(ordShort)))});
+    } else if(kind===1){
+      /* In counting order, not shuffled: the buttons are the row. In a short
+         row they are the whole row, so "the third one" is the third button. */
+      const nums=(top<=5?Array.from({length:top},function(_,k){ return k+1; })
+        :[pos].concat(alts)).sort(function(a,b){ return a-b; });
+      out.push({type:'mc', textOnly:true, say:'Tap the '+word+' one.',
+        question:'🔊 Tap the one you hear.',
+        answer:String(pos), choices:nums.map(String)});
     } else {
-      const correct=ORDINALS[pos];
-      const alts=shuffle(ORDINALS.slice(0,top).filter(function(o){ return o!==correct; })).slice(0,3);
-      out.push({type:'mc', say:'Which one is marked?', icon:icon, hearOpts:true,
+      out.push({type:'mc', say:'Which one is marked?', icon:ordinalPicture(pos,top), hearOpts:true,
         question:'🔊 Which one is marked?',
-        answer:correct, choices:shuffle([correct].concat(alts))});
+        answer:word, choices:shuffle([word].concat(alts.map(function(x){ return ORDINALS[x-1]; })))});
     }
   }
   return out;
@@ -4084,7 +4138,9 @@ const DEVICES=[
      small screen it and the phone above are the same picture, and the round
      came down to a coin toss between two right-looking answers. */
   {n:'screen',  e:'🖥️'},
-  {n:'printer', e:'🖨️', use:'to put it on paper'},
+  /* "To print on paper", not "to put it on paper": "put it" named nothing,
+     and the question read as writing on paper with a pen. */
+  {n:'printer', e:'🖨️', use:'to print on paper'},
   {n:'camera',  e:'📷', use:'to take a photo', alsoDoes:['phone','laptop']},
   {n:'keyboard',e:'⌨️', use:'to type', alsoDoes:['phone','laptop']},
   {n:'mouse',   art:mouseArt, use:'to point and click'},
@@ -4093,7 +4149,7 @@ const DEVICES=[
   {n:'charger', art:chargerArt, use:'to give it power'},
   /* No `use`: "to get on the internet" is the phone's and the laptop's answer as
      much as the wifi bars', and Screen Symbols already asks this glyph by name. */
-  {n:'wifi',    e:'📶'},
+  {n:'wifi',    e:'🛜'},
 ];
 const DEVICE_USES=DEVICES.filter(function(d){ return !!d.use; });
 function deviceByName(n){
@@ -4228,7 +4284,7 @@ const DIGI_SYMBOLS=[
      is the word most learners already have for it. Both are printed so the
      one they know is never the wrong answer. */
   {s:'▶️', n:'Play'},     {s:'⏸️', n:'Stop (pause)'}, {s:'🔊', n:'Sound on'},
-  {s:'🔇', n:'Sound off'},{s:'📶', n:'Internet'},  {s:'🔋', n:'Battery'},
+  {s:'🔇', n:'Sound off'},{s:'🛜', n:'Internet'},  {s:'🔋', n:'Battery'},
   {s:'⚙️', n:'Settings'}, {s:'🗑️', n:'Delete'},    {s:'💾', n:'Save'},
   {s:'📷', n:'Camera'},   {s:'✉️', n:'Message'},   {s:'☰',  n:'Menu'},
 ];
@@ -4275,7 +4331,10 @@ const PF_CARE  =['13','PLB','Demonstrates an extremely limited capacity to maint
    "Changes not kept", "Photos are ready" and "Card not accepted" had no wrong
    answer to give: installing an update now is as reasonable as later, and the
    round only marked "Later" right because the other three options were absurd.
-   What is left is what a phone says to an adult in an ordinary week. */
+   What is left is what a phone says to an adult in an ordinary week.
+     "Unknown number" came out for the same reason: it marked "Do not answer"
+   right, and an adult in Australia answers unknown numbers every week, because
+   that is how the doctor, the school and Centrelink call. */
 const PROMPTS=[
   {t:'Battery low',        b:'10% left',                 a:'Charge it',    alts:['Delete it','Print it','Call someone']},
   {t:'No internet',        b:'You are not connected',    a:'Turn on wifi', alts:['Charge it','Take a photo','Save the file']},
@@ -4286,7 +4345,6 @@ const PROMPTS=[
   {t:'New message',        b:'Someone has written to you', a:'Read it',    alts:['Charge it','Print it','Turn on wifi']},
   {t:'Someone is calling', b:'Do you want to talk?',     a:'Answer it',    alts:['Delete it','Print it','Save the file']},
   {t:'Phone locked',       b:'You cannot use it now',    a:'Type your PIN',alts:['Charge it','Print it','Call someone']},
-  {t:'Unknown number',     b:'You do not know who this is', a:'Do not answer', alts:['Tell them your PIN','Send them money','Give them your card']},
   {t:'Alarm',              b:'It is time to get up',     a:'Turn it off',  alts:['Take a photo','Print it','Call someone']},
 ];/* Both halves in one shuffle, so a game is a mix rather than a run of notices
    followed by a run of problems. Shuffled and sliced, the way a fixed bank is
@@ -4616,7 +4674,7 @@ function genSightWordQuestions(n){
    Every word here is one an adult meets every day and every picture is one
    thing only. */
 const PIC_WORDS=['bus','train','apple','banana','egg','fish','rice','phone','door',
-  'book','pen','bag','bed','key','chair','shoes','clock','soap'];
+  'book','pen','bag','bed','key','chair','shoe','clock','soap'];
 function genPicWordQuestions(n){
   const out=[];
   for(let i=0;i<(n||8);i++){
@@ -4853,7 +4911,7 @@ const INSTRUCTION_TOOLS=[
    strip to nothing and mark every option correct. */
 const INSTRUCTION_ART={book:'📖',pen:'✏️',bag:'🎒',chair:'🪑',door:'🚪',window:'🪟',cup:'☕',
   phone:'📱',laptop:'💻',camera:'📷',headphones:'🎧',keyboard:'⌨️',printer:'🖨️',
-  'sound on':'🔊','sound off':'🔇',internet:'📶',battery:'🔋',bin:'🗑️',
+  'sound on':'🔊','sound off':'🔇',internet:'🛜',battery:'🔋',bin:'🗑️',
   save:'💾',home:'🏠',play:'▶️',search:'🔍',message:'✉️',settings:'⚙️'};
 /* The charger is the drawing, here as well as in Devices. The emoji is a
    two-pin wall plug, which is the thing an appliance has and not the thing
@@ -5553,6 +5611,7 @@ const GEN_BANKS={
   digitaltime:  function(n,f){ return genDigitalTimeQuestions(n,f); },
   calendar:     function(n){ return genCalendarQuestions(n); },
   ordinals:     function(n,f){ return genOrdinalQuestions(n,f); },
+  ordinals30:   function(n){ return genOrdinal30Questions(n); },
   position:     function(n,f){ return genPositionQuestions(n,f); },
   devices:      function(n,f){ return genDeviceQuestions(n,f); },
   digisymbols:  function(n){ return genSymbolQuestions(n); },
@@ -5857,7 +5916,7 @@ const EMOJI={
   /* Clothes and accessories. Australian English: jumper, not sweater;
      thongs are the footwear. */
   'shirt':'<img src="icons/clothes-shirt.svg" class="custom-icon-emoji" alt="shirt">','jeans':'👖','shorts':'🩳','singlet':'🎽',
-  'socks':'🧦','shoes':'👞','boots':'🥾','sandals':'👡',
+  'socks':'🧦','shoes':'👞','shoe':'👞','boots':'🥾','sandals':'👡',
   'thongs':'🩴','scarf':'🧣','gloves':'🧤','glasses':'👓',
   'sunglasses':'🕶️','backpack':'🎒','umbrella':'☂️','ring':'💍',
   'jumper':'<img src="icons/clothes-jumper.svg" class="custom-icon-emoji" alt="jumper">',
@@ -7204,6 +7263,17 @@ function setLeaderboardControls(which){
     const el=document.getElementById(map[k]);
     if(el) el.style.display=(k===which)?'flex':'none';
   });
+  document.getElementById('home-btn').textContent=soloMode?'← Choose another game':'🏠 Home';
+}
+/* The way off a finished board. After practice it is the skill and game
+   picker, the same place the test card's "Choose another game" goes: a
+   learner who has just finished one game is choosing the next, and the
+   front page made them pick Practice and a skill all over again. A class
+   game still goes home. */
+function leaveFinalBoard(){
+  if(!soloMode){ goHome(); return; }
+  quitSoloGame();
+  playLobbyMusic();
 }
 /* Shows one of the leaderboard screen's three stages: the student's wait, the
    student's own placing, or the board itself. */
@@ -7807,12 +7877,12 @@ const BANK_SECTIONS=[
   {id:'*',          label:'✨ All games',        banks:null},
   {id:'letters',    label:'🔤 Letters & Sounds', banks:[...PHONICS_TYPES,'letter','casematch']},
   {id:'vocab',      label:'📚 Vocabulary',       banks:['days','months','weather','fruits','body','clothes','questionwords','sightwords','picword','devices','spelling','oddone','translate']},
-  {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','unscramble','speaking','digitaltime','ordinals','position','greetings','instructions']},
+  {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','unscramble','speaking','digitaltime','ordinals','ordinals30','position','greetings','instructions']},
   {id:'speaking',   label:'🗣️ Speaking',         banks:['speaking','questionwords','unscramble','greetings']},
   {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary','tableread','direction','sightwords','picword','notice','prompts']},
   {id:'writing',    label:'✍️ Writing',          banks:['wp1:gap','wp1:build','wp2:gap','wp2:build','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary','numeralwrite','copyword','punctuation','modelsentence']},
   {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble','punctuation']},
-  {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target','numbertap','numeralwrite','addup','addmoney','ordering','placevalue','tableread','digitaltime','calendar','ordinals','position']},
+  {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target','numbertap','numeralwrite','addup','addmoney','ordering','placevalue','tableread','digitaltime','calendar','ordinals','ordinals30','position']},
   {id:'translation',label:'🌐 Translation',      banks:['translate']},
   {id:'digital',    label:'💻 Using a device',   banks:['devices','digisymbols','prompts','safeinfo','sms','forms','instructions']},
   {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','notice','sms','forms','greetings','instructions','speaking','clock','digitaltime','calendar','shop','addmoney','tableread','prompts','safeinfo','translate']},
@@ -9181,13 +9251,14 @@ const GAME_INFO={
   digitaltime: {skill:'numeracy', name:'Digital Time', blurb:'Hear a time and read it in numbers.'},
   calendar:    {skill:'numeracy', name:'Find the Date', blurb:'Find a day and a date on a calendar.'},
   ordinals:    {skill:'numeracy', name:'First, Second, Third', blurb:'Which one is first, second or third.'},
+  ordinals30:  {skill:'numeracy', name:'Ordinal Numbers', blurb:'First to thirtieth.'},
   position:    {skill:'numeracy', name:'Where Is It', blurb:'Up, down, left, right, in front, behind.'},
   /* The digital indicators had no game at all until now: the profile was
      reading them off how the learner happened to work the app. */
   devices:     {skill:'digital', name:'Devices', blurb:'Name a device and say what it is for.'},
   digisymbols: {skill:'digital', name:'Screen Symbols', blurb:'What the buttons on a screen do.'},
   prompts:     {skill:'digital', name:'What Should You Do?', blurb:'A message, or a problem with the phone.'},
-  safeinfo:    {skill:'digital', name:'Safe or Private', blurb:'Copy a code, and what to keep private.'},
+  safeinfo:    {skill:'digital', name:'Security', blurb:'Copy a code, and what to keep private.'},
   /* The writing half of the checklist is mostly the word "copies", and none
      of it was on screen: tracing.html is a different app and outside the test. */
   copyword:    {skill:'writing', name:'Copy It', blurb:'Copy a word, a name or a number.'},
@@ -9470,7 +9541,7 @@ const GAME_SLUG={
   modelsentence:'write-a-sentence',greetings:'greetings',instructions:'do-what-it-says',
   numbertap:'tap-the-number',numeralwrite:'write-the-number',addup:'add-it-up',
   addmoney:'add-the-money',ordering:'put-in-order',placevalue:'tens-and-ones',
-  tableread:'read-the-list',calendar:'find-the-date',ordinals:'first-second-third',
+  tableread:'read-the-list',calendar:'find-the-date',ordinals:'first-second-third',ordinals30:'ordinal-numbers',
   position:'where-is-it',digitaltime:'digital-time',devices:'devices',digisymbols:'screen-symbols',
   prompts:'what-should-you-do',safeinfo:'safe-or-private',
 };
