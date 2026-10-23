@@ -1,0 +1,1603 @@
+{
+ "_comment": "The words on each game's start page (wordlink.au/<slug>). tools/build-links.py reads this and writes the pages. name is the H1 and the game's name; seo is the <title>; meta is the search snippet; sub is the one line a learner reads; about, how, cls and good are the part below Play, written for teachers and tutors. Keep every page's text its own: search engines ignore a paragraph repeated across pages.",
+ "games": [
+  {
+   "slug": "letter-names",
+   "game": "letter",
+   "emoji": "🔤",
+   "skill": "letters",
+   "level": "Beginner",
+   "name": "Letter Names",
+   "seo": "Letter Names Game: Hear an English Letter and Tap It | Free Alphabet Practice for Adults",
+   "meta": "Free alphabet game for adult English learners. Hear a letter name, tap the right letter. Printed and handwritten letters. No sign-up.",
+   "sub": "Hear a letter name and choose the letter.",
+   "about": "An alphabet listening game for adults learning English letters for the first time. The learner hears a letter name, like \"G\" or \"J\", and taps it from four letters. Some rounds show the letters handwritten instead of printed, so learners recognise both. Letters that sound alike, like B, D, P, E, G and V, come up often.",
+   "how": [
+    "Listen to the letter.",
+    "Look at the four letters.",
+    "Tap the one you heard."
+   ],
+   "cls": "Open the Teacher Game, choose Letter Names, and students join on their phones with the room code or QR code. The projector says the letter and everyone answers at once.",
+   "good": [
+    "alphabet game for adults",
+    "letter names ESL",
+    "recognise handwritten letters",
+    "letters that sound the same",
+    "spelling your name in English"
+   ]
+  },
+  {
+   "slug": "big-and-small-letters",
+   "game": "casematch",
+   "emoji": "🔠",
+   "skill": "letters",
+   "level": "Beginner",
+   "name": "Big and Small Letters",
+   "seo": "Big and Small Letters: Match Capital and Lowercase Letters | Free Game for Adult Learners",
+   "meta": "Match uppercase and lowercase letters, then write names with a capital letter. Free English literacy game for adults.",
+   "sub": "Match big and small letters.",
+   "about": "A matching game for uppercase and lowercase letters. The learner sees a capital letter and finds its small letter, or the other way round. Other rounds show a name in small letters, like \"fatima\", and ask the learner to write it with a capital at the start.",
+   "how": [
+    "Look at the letter.",
+    "Tap its big or small partner.",
+    "In writing rounds, type the name with a capital letter."
+   ],
+   "cls": "Choose Big and Small Letters in the Teacher Game. Students tap on their phones while the letter shows on the projector.",
+   "good": [
+    "uppercase lowercase matching game",
+    "capital letters for names",
+    "adult literacy letter recognition",
+    "b d p q confusion"
+   ]
+  },
+  {
+   "slug": "beginner-sound-gap",
+   "game": "wp1:gap",
+   "emoji": "🔡",
+   "skill": "letters",
+   "level": "Beginner",
+   "name": "Beginner Sound Gap",
+   "seo": "Beginner Sound Gap: CVC Word Families Phonics Game | Free Phonics for Adult Beginners",
+   "meta": "Phonics game with CVC word families like -at, -an, -ig and -ot. Hear the word, tap the missing first sound. Free for adult learners.",
+   "sub": "Hear the missing sound and tap it.",
+   "about": "A first phonics game built on short CVC word families: -an, -at, -ap, -et, -en, -ig, -in, -ip, -op, -ot, -ug and -un. The learner hears a word like \"cat\", sees \"_at\" and taps the missing first sound. Every round stays in one rhyming family, so one sound decides the answer.",
+   "how": [
+    "Listen to the word.",
+    "Look at the word with a gap.",
+    "Tap the missing sound."
+   ],
+   "cls": "Choose Beginner Sound Gap in the Teacher Game. The projector shows the word family and students tap the sound on their phones.",
+   "good": [
+    "CVC words game",
+    "word families phonics",
+    "initial sounds activity",
+    "phonics for adults",
+    "short vowel words"
+   ]
+  },
+  {
+   "slug": "beginner-tap-word",
+   "game": "wp1:word",
+   "emoji": "👆",
+   "skill": "letters",
+   "level": "Beginner",
+   "name": "Beginner Tap Word",
+   "seo": "Beginner Tap Word: Read CVC Rhyming Words | Free Decoding Game for Adult Learners",
+   "meta": "Hear a short word and tap it from rhyming words like cat, bat, hat. A free decoding game for adults learning to read English.",
+   "sub": "Hear a word and tap it.",
+   "about": "A decoding game with short rhyming words. The learner hears \"pen\" and chooses from pen, hen, ten and men. The words differ by one sound, so the learner has to read the first letter, not guess. It uses the same word families as Beginner Sound Gap.",
+   "how": [
+    "Listen to the word.",
+    "Read the rhyming words.",
+    "Tap the one you heard."
+   ],
+   "cls": "Choose Beginner Tap Word in the Teacher Game. The word is spoken from the projector and students tap it on their phones.",
+   "good": [
+    "decoding CVC words",
+    "rhyming words game",
+    "beginner reading for adults",
+    "sound it out practice"
+   ]
+  },
+  {
+   "slug": "beginner-build-word",
+   "game": "wp1:build",
+   "emoji": "🧱",
+   "skill": "letters",
+   "level": "Beginner",
+   "name": "Beginner Build Word",
+   "seo": "Beginner Build Word: Build CVC Words From Sounds | Free Blending Game for Adults",
+   "meta": "Put the sounds in order to build short words like man, pig and sun. Free phonics blending and segmenting game for adult learners.",
+   "sub": "Build the word from its sounds.",
+   "about": "A blending and segmenting game. The learner hears a short word and puts its sound tiles in order, like m, a, n for \"man\". Each tile plays its sound, recorded by a real voice. It is the step from hearing sounds to spelling words.",
+   "how": [
+    "Listen to the word.",
+    "Tap or drag the sound tiles into order.",
+    "Check your word."
+   ],
+   "cls": "Choose Beginner Build Word in the Teacher Game. Students build the word on their phones and the answers show on the projector.",
+   "good": [
+    "blending and segmenting game",
+    "phoneme tiles",
+    "build CVC words",
+    "phonics for adult ESL"
+   ]
+  },
+  {
+   "slug": "elementary-sound-gap",
+   "game": "wp2:gap",
+   "emoji": "🔡",
+   "skill": "letters",
+   "level": "Elementary",
+   "name": "Elementary Sound Gap",
+   "seo": "Elementary Sound Gap: Digraphs and Vowel Teams Phonics Game | sh, ch, th, ee, ai, oa",
+   "meta": "Phonics game for digraphs and vowel teams: sh, ch, th, wh, ph, ee, ea, ai, ay, oa, oo, ou. Hear the word, tap the missing sound.",
+   "sub": "Hear the missing sound in a longer word.",
+   "about": "The next step in phonics, built on two-letter sounds: consonant digraphs (sh, ch, th, wh, ph) and vowel teams (ee, ea, ai, ay, oa, oe, ie, ue, oo, ou and more). The learner hears a word like \"rain\" and taps the missing sound. The words are from everyday life: ship, chips, phone, train, boat.",
+   "how": [
+    "Listen to the word.",
+    "Find the gap.",
+    "Tap the missing sound."
+   ],
+   "cls": "Choose Elementary Sound Gap in the Teacher Game. It is a good way to revise one sound pattern with the whole class.",
+   "good": [
+    "digraphs game",
+    "vowel teams phonics",
+    "sh ch th activity",
+    "long vowel sounds ee ai oa",
+    "phonics for adults"
+   ]
+  },
+  {
+   "slug": "elementary-tap-word",
+   "game": "wp2:word",
+   "emoji": "👆",
+   "skill": "letters",
+   "level": "Elementary",
+   "name": "Elementary Tap Word",
+   "seo": "Elementary Tap Word: Read Words With Digraphs and Vowel Teams | Free Game for Adults",
+   "meta": "Hear a word and tap it from words with the same sound pattern, like boat, coat, road. Free English decoding game for adults.",
+   "sub": "Hear a longer word and tap it.",
+   "about": "A decoding game for words with digraphs and vowel teams. The four choices share a sound pattern, like moon, food, soon and pool, so the learner has to read the whole word.",
+   "how": [
+    "Listen to the word.",
+    "Read the four words.",
+    "Tap the one you heard."
+   ],
+   "cls": "Choose Elementary Tap Word in the Teacher Game and students answer on their phones.",
+   "good": [
+    "decoding words with digraphs",
+    "vowel team words",
+    "reading practice for adult ESL"
+   ]
+  },
+  {
+   "slug": "elementary-build-word",
+   "game": "wp2:build",
+   "emoji": "🧱",
+   "skill": "letters",
+   "level": "Elementary",
+   "name": "Elementary Build Word",
+   "seo": "Elementary Build Word: Build Words From Sound Tiles (Graphemes) | Free Phonics for Adults",
+   "meta": "Build words like ship, train and moon from grapheme tiles, where two letters can make one sound. Free phonics game for adults.",
+   "sub": "Build a longer word from its sounds.",
+   "about": "The learner builds words from sound tiles, not single letters: \"ship\" is sh, i, p and \"train\" is t, r, ai, n. It teaches that two letters can make one sound, which is the key to spelling longer English words.",
+   "how": [
+    "Listen to the word.",
+    "Put the sound tiles in order.",
+    "Check your word."
+   ],
+   "cls": "Choose Elementary Build Word in the Teacher Game. The projector shows everyone's answers, so mistakes are easy to talk about.",
+   "good": [
+    "grapheme tiles game",
+    "segmenting words with digraphs",
+    "spelling with sounds",
+    "phonics for adult learners"
+   ]
+  },
+  {
+   "slug": "sight-words",
+   "game": "sightwords",
+   "emoji": "👁️",
+   "skill": "reading",
+   "level": "Beginner",
+   "name": "Sight Words",
+   "seo": "Sight Words Game: Hear and Tap Common English Words | Free High-Frequency Words for Adults",
+   "meta": "Hear a common word like the, was, have or would, and tap it. A free sight words and high-frequency words game for adults.",
+   "sub": "The words you see everywhere.",
+   "about": "A game for high-frequency sight words like the, and, you, was, have, come, would and little. Many of them cannot be sounded out, so learners need to know them by sight. The learner hears the word and taps it from four written words.",
+   "how": [
+    "Listen to the word.",
+    "Read the four words.",
+    "Tap the one you heard."
+   ],
+   "cls": "Choose Sight Words in the Teacher Game for a quick warm-up.",
+   "good": [
+    "sight words game for adults",
+    "high-frequency words",
+    "tricky words",
+    "Dolch words practice"
+   ]
+  },
+  {
+   "slug": "picture-and-word",
+   "game": "picword",
+   "emoji": "🖼️",
+   "skill": "reading",
+   "level": "Beginner",
+   "name": "Picture and Word",
+   "seo": "Picture and Word: Match a Picture to Its English Word | Free Reading Game for Adults",
+   "meta": "Look at a picture and tap its word. A free vocabulary and early reading game for adult English learners. No typing.",
+   "sub": "Look at the picture and tap its word.",
+   "about": "An early reading game where a picture carries the meaning. The learner sees a picture, like a bus or an apple, and taps its word from four written words. There is no typing, and the instruction is spoken.",
+   "how": [
+    "Look at the picture.",
+    "Read the four words.",
+    "Tap the word for the picture."
+   ],
+   "cls": "Choose Picture and Word in the Teacher Game. The picture shows on the projector and students tap the word on their phones.",
+   "good": [
+    "picture word matching",
+    "early reading for adults",
+    "ESL vocabulary with pictures"
+   ]
+  },
+  {
+   "slug": "read-the-notice",
+   "game": "notice",
+   "emoji": "📢",
+   "skill": "reading",
+   "level": "Elementary",
+   "name": "Read the Notice",
+   "seo": "Read the Notice: Find the Date, Time and Price on a Notice | Free Reading Practice for Adults",
+   "meta": "Read short notices like a class time, a shop closure or a bus timetable. Find what, when and how much. Free survival English reading.",
+   "sub": "Find what a notice tells you.",
+   "about": "A reading game with short everyday notices: an English class, a shop closed sign, a bus timetable, a doctor's appointment and a for sale sign. The learner answers one question: what is it about, when is it, or how much is it. It practises scanning for the key information.",
+   "how": [
+    "Read the notice.",
+    "Read the question.",
+    "Tap the answer."
+   ],
+   "cls": "Choose Read the Notice in the Teacher Game, then ask the class where they see notices like these.",
+   "good": [
+    "reading notices ESL",
+    "scanning for information",
+    "survival English reading",
+    "functional literacy activity"
+   ]
+  },
+  {
+   "slug": "copy-it",
+   "game": "copyword",
+   "emoji": "📝",
+   "skill": "writing",
+   "level": "Beginner",
+   "name": "Copy It",
+   "seo": "Copy It: Copy Words, Names and Numbers | Free Writing and Typing Practice for Adults",
+   "meta": "Copy a word, a full name or a number exactly, with capitals in the right place. Free copying practice for adult literacy learners.",
+   "sub": "Copy a word, a name or a number.",
+   "about": "Copying practice for learners starting to write. Rounds take turns between a word (some with a picture), a full name like \"Mai Nguyen\" and a number. Capital letters must match, so learners practise writing names the way forms expect them.",
+   "how": [
+    "Look at the word, name or number.",
+    "Type it the same way.",
+    "Check it."
+   ],
+   "cls": "Choose Copy It in the Teacher Game. It works well before a paper form activity.",
+   "good": [
+    "copying words activity",
+    "writing your name practice",
+    "adult literacy writing",
+    "typing practice for ESL"
+   ]
+  },
+  {
+   "slug": "capitals-and-full-stops",
+   "game": "punctuation",
+   "emoji": "❕",
+   "skill": "writing",
+   "level": "Beginner",
+   "name": "Capitals and Full Stops",
+   "seo": "Capitals and Full Stops: Punctuation Game for Adult English Learners | Free",
+   "meta": "Choose the correctly written sentence, or add the capital letter and full stop. Free punctuation practice for adults.",
+   "sub": "Start big, end with a full stop.",
+   "about": "A punctuation game for the first two rules: a sentence starts with a capital letter and ends with a full stop. Some rounds ask which of four sentences is written correctly. Others give a sentence in small letters to write again properly. The sentences are about everyday life, like \"I live in Springvale.\"",
+   "how": [
+    "Read the sentence.",
+    "Find what is missing.",
+    "Tap the right one, or write it correctly."
+   ],
+   "cls": "Choose Capitals and Full Stops in the Teacher Game and go through the wrong answers together.",
+   "good": [
+    "capital letters and full stops activity",
+    "punctuation for beginners",
+    "sentence writing ESL"
+   ]
+  },
+  {
+   "slug": "write-a-sentence",
+   "game": "modelsentence",
+   "emoji": "✏️",
+   "skill": "writing",
+   "level": "Elementary",
+   "name": "Write a Sentence",
+   "seo": "Write a Sentence About Yourself: Model Sentences for Adult English Learners | Free",
+   "meta": "Follow a model like \"My name is David. I am from Vietnam.\" and write two sentences about yourself. Free writing practice for adults.",
+   "sub": "Write a sentence about you.",
+   "about": "Guided writing from a model. The learner sees two model sentences, like \"My name is David. I am from Vietnam.\", and writes two sentences about themselves the same way. Topics are name and country, where you live, family, class day, language and work. Capitals and full stops count.",
+   "how": [
+    "Read the model sentences.",
+    "Change them to be about you.",
+    "Write your two sentences."
+   ],
+   "cls": "Choose Write a Sentence in the Teacher Game. Students' sentences show on the projector, which is a good start for speaking.",
+   "good": [
+    "write about yourself ESL",
+    "sentence frames",
+    "personal information writing",
+    "guided writing for adults"
+   ]
+  },
+  {
+   "slug": "spelling",
+   "game": "spelling",
+   "emoji": "🗂️",
+   "skill": "writing",
+   "level": "Elementary",
+   "name": "All Spelling",
+   "seo": "All Spelling: Hear and Spell English Words From Every Topic | Free Spelling Game for Adults",
+   "meta": "Mixed spelling game: numbers, days, months, weather, fruit, body and clothes words. Type it or choose it. Free for adult English learners.",
+   "sub": "Spell words from every topic.",
+   "about": "A mixed spelling review across the vocabulary topics: number words, days, months, weather, fruit, parts of the body and clothes. The learner hears a word and types it. Multiple choice is there for an easier round.",
+   "how": [
+    "Listen to the word.",
+    "Type it.",
+    "Check your spelling."
+   ],
+   "cls": "Choose All Spelling in the Teacher Game for an end-of-week spelling quiz.",
+   "good": [
+    "spelling test game for adults",
+    "ESL spelling practice",
+    "listen and spell",
+    "vocabulary revision"
+   ]
+  },
+  {
+   "slug": "days",
+   "game": "days",
+   "emoji": "📅",
+   "skill": "vocab",
+   "level": "Beginner",
+   "name": "Days of the Week",
+   "seo": "Days of the Week Game: Hear and Spell Monday to Sunday | Free English for Adults",
+   "meta": "Hear a day of the week and spell it, with a capital letter. Free English vocabulary and spelling game for adult learners.",
+   "sub": "Hear a day of the week and write it.",
+   "about": "A listening and spelling game for the seven days, Monday to Sunday. Days start with a capital letter and the game marks that, so learners learn to write them properly. Multiple choice is there for learners who cannot type yet.",
+   "how": [
+    "Listen to the day.",
+    "Type it with a capital letter.",
+    "Check it."
+   ],
+   "cls": "Choose Days of the Week in the Teacher Game, then ask \"What day is today?\"",
+   "good": [
+    "days of the week game",
+    "spelling days ESL",
+    "Wednesday spelling",
+    "adult beginner vocabulary"
+   ]
+  },
+  {
+   "slug": "months",
+   "game": "months",
+   "emoji": "🗓️",
+   "skill": "vocab",
+   "level": "Beginner",
+   "name": "Months",
+   "seo": "Months of the Year Game: Hear and Spell January to December | Free English for Adults",
+   "meta": "Hear a month and spell it, with a capital letter. Free months of the year spelling game for adult English learners.",
+   "sub": "Hear a month and write it.",
+   "about": "A listening and spelling game for the twelve months. Learners hear the month and type it with its capital letter. February, August and September are the usual hard ones.",
+   "how": [
+    "Listen to the month.",
+    "Type it with a capital letter.",
+    "Check it."
+   ],
+   "cls": "Choose Months in the Teacher Game, then follow up with Find the Date.",
+   "good": [
+    "months of the year game",
+    "spelling months ESL",
+    "birthday month vocabulary"
+   ]
+  },
+  {
+   "slug": "weather",
+   "game": "weather",
+   "emoji": "🌦️",
+   "skill": "vocab",
+   "level": "Beginner",
+   "name": "Weather",
+   "seo": "Weather Words Game: Sunny, Rainy, Windy, Humid | Free English Vocabulary for Adults",
+   "meta": "Hear and spell weather words: sunny, cloudy, rainy, windy, stormy, foggy, hot, cold, warm, humid. Free ESL game for adults.",
+   "sub": "Hear a weather word and write it.",
+   "about": "Vocabulary and spelling for the weather: sunny, cloudy, rainy, windy, snowy, stormy, foggy, hot, cold, warm, cool and humid. These are the words for small talk and for reading a weather forecast. In multiple choice the learner taps the matching picture.",
+   "how": [
+    "Listen to the word.",
+    "Type it, or tap the picture.",
+    "Check it."
+   ],
+   "cls": "Choose Weather in the Teacher Game, then ask \"What is the weather like today?\"",
+   "good": [
+    "weather vocabulary ESL",
+    "weather words game",
+    "small talk English",
+    "weather adjectives"
+   ]
+  },
+  {
+   "slug": "fruits",
+   "game": "fruits",
+   "emoji": "🍎",
+   "skill": "vocab",
+   "level": "Beginner",
+   "name": "Fruits",
+   "seo": "Fruit Names Game: Hear and Spell Fruits in English | Free Vocabulary for Adult Learners",
+   "meta": "Apple, banana, mango, watermelon and more. Hear a fruit name and spell it, or tap its picture. Free English game for adults.",
+   "sub": "Hear the fruit and write its name.",
+   "about": "Fruit vocabulary for shopping: apple, banana, orange, grape, mango, peach, plum, pear, lemon, cherry, strawberry, watermelon, pineapple, coconut and kiwi. The learner hears the word and spells it, or in multiple choice taps the matching picture.",
+   "how": [
+    "Listen to the fruit name.",
+    "Type it, or tap the picture.",
+    "Check it."
+   ],
+   "cls": "Choose Fruits in the Teacher Game, and follow up with Shop or Read the List.",
+   "good": [
+    "fruit vocabulary ESL",
+    "food words for shopping",
+    "spelling fruit names",
+    "picture vocabulary for adults"
+   ]
+  },
+  {
+   "slug": "body",
+   "game": "body",
+   "emoji": "👤",
+   "skill": "vocab",
+   "level": "Beginner",
+   "name": "Parts of the Body",
+   "seo": "Parts of the Body Game: Head, Knee, Wrist, Stomach | Free English for the Doctor",
+   "meta": "Hear and spell 24 parts of the body, from head to toe. Free English vocabulary for adults, useful at the doctor or chemist.",
+   "sub": "Hear a part of the body and write it.",
+   "about": "Body vocabulary with clear drawings: head, eye, ear, nose, mouth, tooth, tongue, neck, shoulder, arm, elbow, wrist, hand, finger, thumb, chest, stomach, back, hip, leg, knee, ankle, foot and toe. These are the words for telling a doctor where it hurts.",
+   "how": [
+    "Listen to the word.",
+    "Type it, or tap the picture.",
+    "Check it."
+   ],
+   "cls": "Choose Parts of the Body in the Teacher Game, then practise \"My ... hurts.\"",
+   "good": [
+    "body parts vocabulary ESL",
+    "health English",
+    "at the doctor English",
+    "parts of the body for adults"
+   ]
+  },
+  {
+   "slug": "clothes",
+   "game": "clothes",
+   "emoji": "👕",
+   "skill": "vocab",
+   "level": "Beginner",
+   "name": "Clothes",
+   "seo": "Clothes Vocabulary Game: Jumper, Thongs, Beanie, Hoodie | Free Australian English for Adults",
+   "meta": "Hear and spell 34 clothing words, including Australian ones like jumper, thongs and singlet. Free ESL vocabulary for adults.",
+   "sub": "Hear the clothing word and write it.",
+   "about": "Clothes and accessories with drawings, including Australian English words: shirt, jumper, jacket, coat, pants, jeans, shorts, singlet, hoodie, socks, shoes, boots, sandals, thongs, hat, cap, beanie, helmet, scarf, gloves, belt, glasses, watch, wallet, backpack, umbrella and more.",
+   "how": [
+    "Listen to the word.",
+    "Type it, or tap the picture.",
+    "Check it."
+   ],
+   "cls": "Choose Clothes in the Teacher Game, then pair it with Weather: \"It is cold. Wear a jumper.\"",
+   "good": [
+    "clothes vocabulary ESL",
+    "Australian English words",
+    "shopping for clothes English"
+   ]
+  },
+  {
+   "slug": "odd-one-out",
+   "game": "oddone",
+   "emoji": "🧩",
+   "skill": "vocab",
+   "level": "Beginner",
+   "name": "Odd One Out",
+   "seo": "Odd One Out Picture Game: Find the One That Does Not Belong | Free English for Adults",
+   "meta": "Four pictures, three belong together. Animals, fruit, transport, clothes, food, weather, colours and more. Free ESL game for adults.",
+   "sub": "Find the word that does not belong.",
+   "about": "A picture game for grouping words by meaning. The learner sees four pictures, three from one group (animals, fruit, transport, clothes, body, food, weather, colours, numbers or actions), and taps the one that is different. It builds vocabulary in categories.",
+   "how": [
+    "Look at the four pictures.",
+    "Find the one that is different.",
+    "Tap it."
+   ],
+   "cls": "Choose Odd One Out in the Teacher Game, then ask students to say why.",
+   "good": [
+    "odd one out game",
+    "word categories ESL",
+    "vocabulary groups",
+    "thinking game for adult learners"
+   ]
+  },
+  {
+   "slug": "beginner-listening",
+   "game": "beginner",
+   "emoji": "📝",
+   "skill": "listening",
+   "level": "Beginner",
+   "name": "Beginner Listen and Fill Gaps",
+   "seo": "Beginner Listening Game: Hear a Sentence and Fill the Gap | Free English for Adults",
+   "meta": "Hear simple sentences about you, like \"I live in Springvale.\", and write the missing word. Free listening practice for adults.",
+   "sub": "Listen to a sentence and fill the gaps.",
+   "about": "A listening gap-fill with short personal sentences, like \"My ___ is David.\", \"I am ___ Vietnam.\" and \"I go to English ___ three days a week.\" The learner hears the whole sentence and types the missing word, or taps it in multiple choice. The audio can be played again.",
+   "how": [
+    "Listen to the sentence.",
+    "Find the gap.",
+    "Type or tap the missing word."
+   ],
+   "cls": "Choose Beginner Listen and Fill Gaps in the Teacher Game. The projector reads the sentence aloud to the whole room.",
+   "good": [
+    "listening gap fill",
+    "cloze listening activity",
+    "personal information sentences",
+    "beginner listening ESL"
+   ]
+  },
+  {
+   "slug": "elementary-listening",
+   "game": "elementary",
+   "emoji": "📄",
+   "skill": "listening",
+   "level": "Elementary",
+   "name": "Elementary Listen and Fill Gaps",
+   "seo": "Elementary Listening Game: Fill the Gap in Longer Sentences | Free English for Adults",
+   "meta": "Hear longer everyday sentences and write the missing word. Free listening and gap-fill practice for adult English learners.",
+   "sub": "Listen to a longer sentence and fill the gaps.",
+   "about": "A listening gap-fill with longer sentences, like \"She ___ at the fish shop on the main street.\" The sentences use the Elementary sound patterns (sh, ee, oo, ai), so listening and phonics go together. The learner types the missing word, or taps it in multiple choice.",
+   "how": [
+    "Listen to the sentence.",
+    "Find the gap.",
+    "Type or tap the missing word."
+   ],
+   "cls": "Choose Elementary Listen and Fill Gaps in the Teacher Game.",
+   "good": [
+    "listening cloze for adults",
+    "decodable sentences",
+    "elementary listening ESL"
+   ]
+  },
+  {
+   "slug": "unscramble",
+   "game": "unscramble",
+   "emoji": "🎧",
+   "skill": "listening",
+   "level": "Elementary",
+   "name": "Listen and Unscramble",
+   "seo": "Listen and Unscramble: Hear a Sentence, Put the Words in Order | Free Game for Adults",
+   "meta": "Hear a sentence, then drag the word tiles into order. Sentences about name, family, home and daily routine. Free ESL game.",
+   "sub": "Listen, then put the words in order.",
+   "about": "A listening and word order game. The learner hears a sentence, like \"I have one son and one daughter.\", then puts the mixed-up word tiles in order. The sentences cover personal information, family, home, daily routine and the weekend. In multiple choice the learner taps the sentence in the right order.",
+   "how": [
+    "Listen to the sentence.",
+    "Tap or drag the words into order.",
+    "Check your sentence."
+   ],
+   "cls": "Choose Listen and Unscramble in the Teacher Game.",
+   "good": [
+    "sentence scramble with audio",
+    "word order game",
+    "listening and sentence building",
+    "daily routine sentences"
+   ]
+  },
+  {
+   "slug": "greetings",
+   "game": "greetings",
+   "emoji": "👋",
+   "skill": "listening",
+   "level": "Beginner",
+   "name": "Greetings",
+   "seo": "Greetings Game: Hello, How Are You, Thank You | Free English Listening for Adult Beginners",
+   "meta": "Hear a greeting or a question like \"Where are you from?\" and tap the right reply. Free everyday English for adults.",
+   "sub": "Hear a greeting and answer it.",
+   "about": "Everyday exchanges for the first weeks of English. The learner hears a greeting or courtesy phrase, like \"How are you?\", \"Thank you.\" or \"See you next week.\", and taps the right reply. Other rounds ask short personal questions: \"What is your name?\", \"Where are you from?\", \"How old are you?\"",
+   "how": [
+    "Listen to what the person says.",
+    "Read the four replies.",
+    "Tap the right one."
+   ],
+   "cls": "Choose Greetings in the Teacher Game, then have students say the replies to each other.",
+   "good": [
+    "greetings ESL game",
+    "social English for beginners",
+    "how are you replies",
+    "personal questions English"
+   ]
+  },
+  {
+   "slug": "do-what-it-says",
+   "game": "instructions",
+   "emoji": "🖐️",
+   "skill": "listening",
+   "level": "Beginner",
+   "name": "Do What It Says",
+   "seo": "Do What It Says: Follow Simple Spoken Instructions | Free English Listening for Adults",
+   "meta": "Hear \"Tap the book\", \"Open the door\" or \"Turn the sound off\" and tap the right picture. Free listening game for adults.",
+   "sub": "Listen, then tap what it says.",
+   "about": "A game for following short spoken instructions. Classroom rounds use everyday things: \"Tap the book.\", \"Open the door.\", \"Tap the cup.\" Device rounds use phone instructions: \"Turn the sound off.\", \"Charge the battery.\", \"Take a photo.\" Every answer has a picture.",
+   "how": [
+    "Listen to the instruction.",
+    "Look at the pictures.",
+    "Tap what it says."
+   ],
+   "cls": "Choose Do What It Says in the Teacher Game, then do the same instructions for real in the room.",
+   "good": [
+    "following instructions ESL",
+    "classroom instructions game",
+    "TPR activity",
+    "listening for adult beginners"
+   ]
+  },
+  {
+   "slug": "speaking-game",
+   "game": "speaking",
+   "emoji": "🗣️",
+   "skill": "speaking",
+   "level": "Beginner",
+   "name": "Speaking Game",
+   "seo": "Speaking Practice Game: Answer Everyday Questions in English | Free for Adult Learners",
+   "meta": "Hear a question like \"What did you do on Saturday?\" and build the answer from word tiles. Free English speaking preparation for adults.",
+   "sub": "Hear the question and build your answer.",
+   "about": "Practice for common conversation questions. The learner hears a question, like \"Where do you live?\", \"What is your favourite food?\", \"Can you drive?\" or \"How was your weekend?\", and builds a full answer from word tiles, like \"On Saturday, I stayed at home.\" The answer is read aloud afterwards so the learner can say it too. In multiple choice the learner taps the right answer instead. To record their own voice, learners can use Speaking Practice on the home page.",
+   "how": [
+    "Listen to the question.",
+    "Put the word tiles in order to make the answer.",
+    "Hear the answer and say it."
+   ],
+   "cls": "Choose Speaking Game in the Teacher Game, then ask each student the same question aloud.",
+   "good": [
+    "speaking practice for adults",
+    "common questions and answers ESL",
+    "conversation questions",
+    "personal information speaking"
+   ]
+  },
+  {
+   "slug": "question-words",
+   "game": "questionwords",
+   "emoji": "❓",
+   "skill": "grammar",
+   "level": "Elementary",
+   "name": "Question Words",
+   "seo": "Question Words Game: What, Where, How, Who | Free English Grammar for Adults",
+   "meta": "Choose the right question word for everyday questions like \"___ old are you?\" and \"___ do you live?\". Free ESL grammar game.",
+   "sub": "Choose the right question word.",
+   "about": "A reading game for question words. The learner sees an everyday question with its first word missing, like \"___ is your name?\" or \"___ do you spell your name?\", and taps or writes the right question word. These are the questions asked at enrolment, at the doctor and at work.",
+   "how": [
+    "Read the question.",
+    "Find the missing word.",
+    "Tap or type it."
+   ],
+   "cls": "Choose Question Words in the Teacher Game, then have pairs ask each other the questions.",
+   "good": [
+    "wh questions game",
+    "question words ESL",
+    "asking personal questions",
+    "grammar for adult beginners"
+   ]
+  },
+  {
+   "slug": "word-order",
+   "game": "gramscramble",
+   "emoji": "🔀",
+   "skill": "grammar",
+   "level": "Elementary",
+   "name": "Grammar Unscramble",
+   "seo": "Grammar Unscramble: Put English Words in the Right Order | Free Sentence Game for Adults",
+   "meta": "Drag the word tiles into a correct sentence, like \"I live in a three-bedroom house.\" Free English word order practice for adults.",
+   "sub": "Put the words in the right order.",
+   "about": "A word order game with no audio. The learner sees the words of a sentence mixed up and puts them in order. The sentences are about personal information, family, home and daily routine, so they are useful for speaking and writing about yourself.",
+   "how": [
+    "Read the mixed-up words.",
+    "Tap or drag them into order.",
+    "Check your sentence."
+   ],
+   "cls": "Choose Grammar Unscramble in the Teacher Game.",
+   "good": [
+    "sentence scramble game",
+    "English word order",
+    "jumbled sentences ESL",
+    "sentence building for adults"
+   ]
+  },
+  {
+   "slug": "translate",
+   "game": "translate",
+   "emoji": "🌐",
+   "skill": "translation",
+   "level": "Elementary",
+   "name": "Translate",
+   "seo": "Translate to English: Arabic, Dari, Persian, Pashto, Vietnamese, Chinese and More | Free",
+   "meta": "Read a sentence in your language and write it in English. Arabic, Burmese, Chinese, Dari, Hindi, Khmer, Pashto, Persian, Thai, Urdu, Vietnamese.",
+   "sub": "Read it in your language, write it in English.",
+   "about": "A translation game for learners who can read their first language. The learner reads a sentence in Arabic, Burmese, Chinese, Dari, Hindi, Khmer, Pashto, Persian, Thai, Urdu or Vietnamese and writes it in English. In multiple choice they choose the right English sentence. The sentences are about name, family, home, daily routine and the weekend.",
+   "how": [
+    "Choose your language.",
+    "Read the sentence.",
+    "Write it in English, or tap it."
+   ],
+   "cls": "Choose Translate in the Teacher Game. Each student picks their own language on their phone.",
+   "good": [
+    "English for Arabic speakers",
+    "English for Dari speakers",
+    "Vietnamese to English practice",
+    "bilingual ESL activity"
+   ]
+  },
+  {
+   "slug": "numbers-1-10",
+   "game": "numbers",
+   "emoji": "🔢",
+   "skill": "numeracy",
+   "level": "Beginner",
+   "name": "Numbers 1 to 10",
+   "seo": "Number Words 1 to 10: Hear and Spell One to Ten | Free English Numbers for Adults",
+   "meta": "Hear a number and spell its word: one, two, three... ten. Type it or choose it. Free English number words game for adults.",
+   "sub": "Hear a number from 1 to 10 and spell it.",
+   "about": "A spelling game for the number words one to ten. The learner hears the number and types the word, like \"seven\" or \"eight\". Multiple choice is there for learners who cannot type yet.",
+   "how": [
+    "Listen to the number.",
+    "Type the number word.",
+    "Check it."
+   ],
+   "cls": "Choose Numbers 1 to 10 in the Teacher Game.",
+   "good": [
+    "number words 1 to 10",
+    "spelling numbers in English",
+    "numbers for adult beginners"
+   ]
+  },
+  {
+   "slug": "numbers-11-20",
+   "game": "numbers1120",
+   "emoji": "🔢",
+   "skill": "numeracy",
+   "level": "Beginner",
+   "name": "Numbers 11 to 20",
+   "seo": "Number Words 11 to 20: Thirteen or Thirty? | Free English Numbers Game for Adults",
+   "meta": "Hear and spell eleven to twenty, the hardest English numbers to hear and spell. Free number words game for adult learners.",
+   "sub": "Hear a number from 11 to 20 and spell it.",
+   "about": "A spelling game for eleven to twenty. The teen numbers are hard to hear and hard to spell: twelve, fifteen, eighteen. The learner hears the number and types the word.",
+   "how": [
+    "Listen to the number.",
+    "Type the number word.",
+    "Check it."
+   ],
+   "cls": "Choose Numbers 11 to 20 in the Teacher Game, and point out the stress in thirTEEN and THIRty.",
+   "good": [
+    "teen numbers game",
+    "spelling eleven twelve",
+    "number words 11 to 20"
+   ]
+  },
+  {
+   "slug": "numbers-21-99",
+   "game": "numbers2199",
+   "emoji": "🔢",
+   "skill": "numeracy",
+   "level": "Elementary",
+   "name": "Numbers 21 to 99",
+   "seo": "Number Words 21 to 99: Hear and Spell Twenty-One to Ninety-Nine | Free for Adults",
+   "meta": "Hear a number and spell it with its hyphen, like forty-two. Free English number words game for adult learners.",
+   "sub": "Hear a number from 21 to 99 and spell it.",
+   "about": "A spelling game for two-digit number words, like twenty-one, forty-two and ninety-nine. Learners practise the tens words and the hyphen, which they need for forms and for writing amounts in words.",
+   "how": [
+    "Listen to the number.",
+    "Type the number word.",
+    "Check it."
+   ],
+   "cls": "Choose Numbers 21 to 99 in the Teacher Game.",
+   "good": [
+    "number words to 100",
+    "spelling forty",
+    "writing numbers in words"
+   ]
+  },
+  {
+   "slug": "tap-the-number",
+   "game": "numbertap",
+   "emoji": "🔢",
+   "skill": "numeracy",
+   "level": "Beginner",
+   "name": "Tap the Number",
+   "seo": "Tap the Number: Hear a Number and Find It | Free Number Recognition Game for Adults",
+   "meta": "Hear a number and tap it from four. The choices are close, like 13 and 31. Free number recognition game for adult learners.",
+   "sub": "Hear a number and tap it.",
+   "about": "A number recognition game with no typing. The learner hears a number and taps it from four numbers. The wrong choices are close (one more, one less, ten more, or the digits swapped), so the learner has to listen carefully.",
+   "how": [
+    "Listen to the number.",
+    "Look at the four numbers.",
+    "Tap the one you heard."
+   ],
+   "cls": "Choose Tap the Number in the Teacher Game as a quick warm-up.",
+   "good": [
+    "number recognition game",
+    "listening to numbers",
+    "numeracy for adult ESL"
+   ]
+  },
+  {
+   "slug": "write-the-number",
+   "game": "numeralwrite",
+   "emoji": "✍️",
+   "skill": "numeracy",
+   "level": "Beginner",
+   "name": "Write the Number",
+   "seo": "Write the Number: Write Numbers and Australian Money in Figures | Free for Adults",
+   "meta": "Hear a number or price and write it in figures, or write what an Australian coin or note is worth. Free numeracy for adults.",
+   "sub": "Write numbers and money in figures.",
+   "about": "Writing numbers and money in figures. Rounds mix four kinds: write a number you hear, copy a number, write what an Australian coin or note is worth (from 5c to $50), and write an amount of money you hear, like $4.50.",
+   "how": [
+    "Listen, or look at the coin or note.",
+    "Type the number or amount.",
+    "Check it."
+   ],
+   "cls": "Choose Write the Number in the Teacher Game.",
+   "good": [
+    "writing numbers in figures",
+    "Australian coins and notes",
+    "money numeracy for ESL"
+   ]
+  },
+  {
+   "slug": "add-it-up",
+   "game": "addup",
+   "emoji": "➕",
+   "skill": "numeracy",
+   "level": "Beginner",
+   "name": "Add It Up",
+   "seo": "Add It Up: Simple Addition in English | Free Numeracy Game for Adult Learners",
+   "meta": "Hear and read a simple sum like 4 + 3, then type the answer. Free numeracy and maths English for adults.",
+   "sub": "Add two numbers together.",
+   "about": "Simple addition, asked in English. The sum is spoken (\"What is four plus three?\") and shown on screen. The maths is easy on purpose: the aim is understanding numbers and \"plus\" in English.",
+   "how": [
+    "Listen to the sum.",
+    "Add the numbers.",
+    "Type the answer."
+   ],
+   "cls": "Choose Add It Up in the Teacher Game.",
+   "good": [
+    "addition game for adults",
+    "maths English",
+    "numeracy for ESL"
+   ]
+  },
+  {
+   "slug": "add-the-money",
+   "game": "addmoney",
+   "emoji": "💵",
+   "skill": "numeracy",
+   "level": "Elementary",
+   "name": "Add the Money",
+   "seo": "Add the Money: Add Two Amounts in Dollars | Free Money Maths for Adult English Learners",
+   "meta": "Hear \"What is five dollars plus three dollars?\" and type the total. Free money and numeracy game for adults.",
+   "sub": "Add two amounts of money.",
+   "about": "Adding two amounts of money in whole dollars. The question is spoken and shown, like \"$5 + $3 = ?\". It practises the word \"dollars\" and working out a total when shopping.",
+   "how": [
+    "Listen to the two amounts.",
+    "Add them.",
+    "Type the total."
+   ],
+   "cls": "Choose Add the Money in the Teacher Game, then follow with Shop.",
+   "good": [
+    "money maths game",
+    "adding dollars",
+    "money for adult ESL"
+   ]
+  },
+  {
+   "slug": "put-in-order",
+   "game": "ordering",
+   "emoji": "↕️",
+   "skill": "numeracy",
+   "level": "Beginner",
+   "name": "Put In Order",
+   "seo": "Put In Order: Order Numbers, Australian Money, Days and Months | Free Game for Adults",
+   "meta": "Drag numbers, coins and notes, days or months into order. Free ordering and sequencing game for adult English learners.",
+   "sub": "Put numbers, money, days and months in order.",
+   "about": "An ordering game with four kinds of rounds: numbers from smallest to biggest, Australian coins and notes from smallest to biggest, three days of the week in order, and three months in order.",
+   "how": [
+    "Look at the tiles.",
+    "Tap or drag them into order.",
+    "Check it."
+   ],
+   "cls": "Choose Put In Order in the Teacher Game.",
+   "good": [
+    "ordering numbers game",
+    "sequencing days and months",
+    "ordering money"
+   ]
+  },
+  {
+   "slug": "tens-and-ones",
+   "game": "placevalue",
+   "emoji": "🔟",
+   "skill": "numeracy",
+   "level": "Elementary",
+   "name": "Tens and Ones",
+   "seo": "Tens and Ones: Place Value Game for Adult Learners | Free Numeracy in English",
+   "meta": "How many tens in 47? How many ones? Free place value game for adult numeracy and English learners.",
+   "sub": "How many tens and how many ones.",
+   "about": "A place value game for the numbers 11 to 99. The learner sees a number and answers \"How many tens?\" or \"How many ones?\". The question is spoken as well as shown.",
+   "how": [
+    "Look at the number.",
+    "Listen to the question.",
+    "Tap the answer."
+   ],
+   "cls": "Choose Tens and Ones in the Teacher Game.",
+   "good": [
+    "place value game",
+    "tens and ones activity",
+    "adult numeracy"
+   ]
+  },
+  {
+   "slug": "read-the-list",
+   "game": "tableread",
+   "emoji": "📊",
+   "skill": "numeracy",
+   "level": "Elementary",
+   "name": "Read the List",
+   "seo": "Read the List: Find Prices on a Price List | Free Shopping English for Adults",
+   "meta": "Read a short price list, find how much something costs, and spot the cheaper item. Free reading and numeracy for adults.",
+   "sub": "Find a price in a list.",
+   "about": "A price list reading game, like a menu or a shop board. Rounds ask \"How much is the bread?\", \"Which one is cheaper?\" or \"Which one is more expensive?\". The items are everyday groceries at believable prices.",
+   "how": [
+    "Read the price list.",
+    "Read the question.",
+    "Tap the answer."
+   ],
+   "cls": "Choose Read the List in the Teacher Game.",
+   "good": [
+    "reading a price list",
+    "menu reading ESL",
+    "cheaper and more expensive",
+    "shopping English"
+   ]
+  },
+  {
+   "slug": "find-the-date",
+   "game": "calendar",
+   "emoji": "📆",
+   "skill": "numeracy",
+   "level": "Elementary",
+   "name": "Find the Date",
+   "seo": "Find the Date: Read a Calendar in English | Free Calendar Game for Adult Learners",
+   "meta": "Read a month calendar: what day is May 14? Which month is this? Free calendar reading practice for adults.",
+   "sub": "Find a day and a date on a calendar.",
+   "about": "Calendar reading with a real month grid. The learner answers \"What day is May 14?\" by finding the date and reading its column, or answers \"Which month is this?\". It is practice for appointments, rent and school dates.",
+   "how": [
+    "Look at the calendar.",
+    "Listen to the question.",
+    "Tap the answer."
+   ],
+   "cls": "Choose Find the Date in the Teacher Game. The calendar shows big on the projector.",
+   "good": [
+    "reading a calendar ESL",
+    "dates in English",
+    "calendar activity for adults"
+   ]
+  },
+  {
+   "slug": "first-second-third",
+   "game": "ordinals",
+   "emoji": "🥇",
+   "skill": "numeracy",
+   "level": "Beginner",
+   "name": "First, Second, Third",
+   "seo": "First, Second, Third: Ordinal Numbers Game | Free English for Adult Learners",
+   "meta": "Hear \"Tap the second one\" or say which one is marked. Free ordinal numbers game for adult English learners.",
+   "sub": "Which one is first, second or third.",
+   "about": "Ordinal numbers with a row of people. The learner hears \"Tap the first one.\" and chooses, or sees one person marked and answers 1st, 2nd or 3rd. These are the words for queues, floors and dates.",
+   "how": [
+    "Look at the row.",
+    "Listen to the question.",
+    "Tap the answer."
+   ],
+   "cls": "Choose First, Second, Third in the Teacher Game, then line up the class for real.",
+   "good": [
+    "ordinal numbers game",
+    "first second third ESL",
+    "ordinals for adults"
+   ]
+  },
+  {
+   "slug": "where-is-it",
+   "game": "position",
+   "emoji": "🧭",
+   "skill": "numeracy",
+   "level": "Beginner",
+   "name": "Where Is It",
+   "seo": "Where Is It: Up, Down, Left, Right, In Front, Behind | Free English Game for Adults",
+   "meta": "Position words game: which way does the arrow point? Where is the box? Free prepositions of place for adult learners.",
+   "sub": "Up, down, left, right, in front, behind.",
+   "about": "Direction and position words. The learner sees an arrow and answers which way it points (up, down, left or right), or sees a person and a box and answers whether the box is in front or behind.",
+   "how": [
+    "Look at the picture.",
+    "Listen to the question.",
+    "Tap the word."
+   ],
+   "cls": "Choose Where Is It in the Teacher Game.",
+   "good": [
+    "left and right game",
+    "prepositions of place",
+    "directions ESL"
+   ]
+  },
+  {
+   "slug": "clock",
+   "game": "clock",
+   "emoji": "⏰",
+   "skill": "numeracy",
+   "level": "Elementary",
+   "name": "Clock",
+   "seo": "Interactive Clock Game: Move the Hour and Minute Hands | Free Telling Time for Adults",
+   "meta": "Drag the clock hands to set the time, and read analogue clocks. O'clock, half past, quarter past, quarter to, 5 minutes. Free.",
+   "sub": "Read the clock and set the time.",
+   "about": "An interactive analogue clock with hour and minute hands you can drag. Rounds take turns: read the clock and choose the time, then set the clock to a time, like \"Set the clock to 3:15, quarter past three\". It moves from o'clock to half past, then quarter past and quarter to, then 5-minute steps. The wrong choices are the real mistakes, like reading the hands the wrong way round.",
+   "how": [
+    "Read the clock and tap the time.",
+    "Drag the hour and minute hands to the time shown.",
+    "Check it."
+   ],
+   "cls": "Choose Clock in the Teacher Game. The clock shows big on the projector and every student sets the hands on their own phone.",
+   "good": [
+    "interactive clock with movable hands",
+    "telling the time game",
+    "analogue clock practice",
+    "quarter past and quarter to",
+    "teaching clocks to adults"
+   ]
+  },
+  {
+   "slug": "digital-time",
+   "game": "digitaltime",
+   "emoji": "🕐",
+   "skill": "numeracy",
+   "level": "Beginner",
+   "name": "Digital Time",
+   "seo": "Digital Time: Hear a Time and Read It in Numbers | Free Telling Time for Adults",
+   "meta": "Hear \"nine thirty\" and tap 9:30, or type it. Whole hours, quarter hours, AM and PM. Free digital time game for adults.",
+   "sub": "Hear a time and read it in numbers.",
+   "about": "Digital time, as on phones, tickets and appointment cards. The learner hears a time and taps the matching digital time, or types it in numbers. It includes whole hours, quarter hours and AM and PM.",
+   "how": [
+    "Listen to the time.",
+    "Tap the matching time, or type it.",
+    "Check it."
+   ],
+   "cls": "Choose Digital Time in the Teacher Game.",
+   "good": [
+    "digital time game",
+    "AM and PM ESL",
+    "telling the time in numbers"
+   ]
+  },
+  {
+   "slug": "shop",
+   "game": "shop",
+   "emoji": "🛒",
+   "skill": "numeracy",
+   "level": "Elementary",
+   "name": "Shop",
+   "seo": "Shop: Pay With Australian Coins and Notes, Work Out Change | Free Money Game for Adults",
+   "meta": "Tap real Australian coins and notes to pay a price, then work out the change. Free money game for adult English learners.",
+   "sub": "Count the coins and pay the right amount.",
+   "about": "A money game with pictures of real Australian coins and notes, from 5c to $50. The learner pays the right amount for an everyday item at a believable price. Other rounds ask for the change: \"It costs $7.00. You give $10.00. Tap your change.\"",
+   "how": [
+    "Read the price.",
+    "Tap coins and notes to pay.",
+    "Check your total."
+   ],
+   "cls": "Choose Shop in the Teacher Game. Every student pays on their phone and the projector shows who got it right.",
+   "good": [
+    "Australian money game",
+    "coins and notes activity",
+    "giving change",
+    "money for newly arrived migrants"
+   ]
+  },
+  {
+   "slug": "dice",
+   "game": "target",
+   "emoji": "🎲",
+   "skill": "numeracy",
+   "level": "Beginner",
+   "name": "Dice",
+   "seo": "Dice Game: Roll, Add and Get Closest to the Target | Free Number Game for Adults",
+   "meta": "Roll two dice, add to your score, and stop before you go over the target. Free maths and English game, great for a whole class.",
+   "sub": "Roll two dice and get closest to the target.",
+   "about": "A dice game for adding and deciding. The learner rolls two dice, adds them to their score and types the new score, then chooses to roll again or stop. Going over the target means you are out. You choose the target number, and whether a wrong sum ends your game or gives one more try.",
+   "how": [
+    "Roll the dice and type your new score.",
+    "Roll again, or stop.",
+    "Get closest to the target without going over."
+   ],
+   "cls": "Choose Dice in the Teacher Game. The whole class races to the target on the projector and the closest score wins.",
+   "good": [
+    "dice game maths",
+    "adding game for adults",
+    "whole class number game"
+   ]
+  },
+  {
+   "slug": "signs",
+   "game": "signs",
+   "emoji": "🚪",
+   "skill": "everyday",
+   "level": "Beginner",
+   "name": "Signs",
+   "seo": "Signs Game: No Smoking, Wet Floor, Exit, First Aid | Free Safety Signs for English Learners",
+   "meta": "What does this sign mean? Common safety and public signs in Australia: exit, toilets, wet floor, no entry. Free for adults.",
+   "sub": "Read the signs you see around you.",
+   "about": "Common public and safety signs shown as pictures, without words: no smoking, no parking, do not enter, wet floor, danger, first aid, exit, toilets, wheelchair access, no food or drink, and bus stop. The learner taps what the sign means.",
+   "how": [
+    "Look at the sign.",
+    "Read the four meanings.",
+    "Tap the right one."
+   ],
+   "cls": "Choose Signs in the Teacher Game, then walk around the building and find the same signs.",
+   "good": [
+    "safety signs ESL",
+    "signs in Australia",
+    "workplace safety signs",
+    "survival English"
+   ]
+  },
+  {
+   "slug": "messages",
+   "game": "sms",
+   "emoji": "📱",
+   "skill": "everyday",
+   "level": "Elementary",
+   "name": "Messages",
+   "seo": "Reading Text Messages: Appointment Reminders and SMS | Free English Reading for Adults",
+   "meta": "Read a text message from a doctor, a dentist, a class or family, and answer a question about it. Free reading practice for adults.",
+   "sub": "Read a short message and answer it.",
+   "about": "Reading real-life text messages: a medical appointment reminder (\"Reply YES to confirm\"), a dental reminder, a class start time, or a message from family asking you to buy milk and bread. The learner answers what day, what time, who, or what to bring.",
+   "how": [
+    "Read the message.",
+    "Read the question.",
+    "Tap the answer."
+   ],
+   "cls": "Choose Messages in the Teacher Game, then ask what the learner should do next.",
+   "good": [
+    "reading text messages ESL",
+    "appointment reminder SMS",
+    "functional reading for adults"
+   ]
+  },
+  {
+   "slug": "forms",
+   "game": "forms",
+   "emoji": "📋",
+   "skill": "everyday",
+   "level": "Elementary",
+   "name": "Forms",
+   "seo": "Filling In Forms: First Name, Family Name, Date of Birth, Postcode | Free Practice for Adults",
+   "meta": "Put each detail in the right box on a form, and read an ID card. Free form-filling practice for adult English learners.",
+   "sub": "Fill in a form with your details.",
+   "about": "Form-filling practice. The learner gets a person's details and puts each one in the right box: first name, family name, date of birth, phone, address, postcode and country of birth. Other rounds show an ID card and ask for the name or the card number.",
+   "how": [
+    "Read the form.",
+    "Read the details.",
+    "Put each one in its box."
+   ],
+   "cls": "Choose Forms in the Teacher Game, then follow up with a real paper enrolment form.",
+   "good": [
+    "filling in forms ESL",
+    "personal details form",
+    "first name and family name",
+    "form-filling for adults"
+   ]
+  },
+  {
+   "slug": "devices",
+   "game": "devices",
+   "emoji": "💻",
+   "skill": "digital",
+   "level": "Beginner",
+   "name": "Devices",
+   "seo": "Devices Game: Phone, Laptop, Printer, Charger | Free Digital Skills English for Adults",
+   "meta": "Name a device, or choose which one you use to call, print, type or take a photo. Free digital literacy for adults.",
+   "sub": "Name a device and say what it is for.",
+   "about": "Digital literacy vocabulary: phone, laptop, screen, printer, camera, keyboard, mouse, headphones, charger and wifi. Rounds ask \"What is this called?\" or \"Which one do you use to put it on paper?\".",
+   "how": [
+    "Listen to the question.",
+    "Look at the pictures.",
+    "Tap the answer."
+   ],
+   "cls": "Choose Devices in the Teacher Game.",
+   "good": [
+    "digital literacy for adults",
+    "technology vocabulary ESL",
+    "computer words"
+   ]
+  },
+  {
+   "slug": "screen-symbols",
+   "game": "digisymbols",
+   "emoji": "🔣",
+   "skill": "digital",
+   "level": "Beginner",
+   "name": "Screen Symbols",
+   "seo": "Screen Symbols: What Phone and Computer Icons Mean | Free Digital Literacy for Adults",
+   "meta": "Search, home, back, play, pause, sound off, wifi, battery, settings, delete, save, menu. Learn what screen icons mean. Free.",
+   "sub": "What the buttons on a screen do.",
+   "about": "The icons on phones, computers and kiosks: search, home, go back, play, pause, sound on, sound off, internet, battery, settings, delete, save, camera, message and menu. The learner sees the icon and taps its name.",
+   "how": [
+    "Look at the symbol.",
+    "Listen to the question.",
+    "Tap its name."
+   ],
+   "cls": "Choose Screen Symbols in the Teacher Game, then find the same icons on students' own phones.",
+   "good": [
+    "computer icons ESL",
+    "phone symbols",
+    "digital literacy for seniors and migrants"
+   ]
+  },
+  {
+   "slug": "what-should-you-do",
+   "game": "prompts",
+   "emoji": "⚠️",
+   "skill": "digital",
+   "level": "Elementary",
+   "name": "What Should You Do?",
+   "seo": "What Should You Do? Phone Messages, Battery Low, Scam Calls | Free Digital Skills for Adults",
+   "meta": "Battery low, no internet, wrong password, unknown number. Read the phone message and choose what to do. Free.",
+   "sub": "A message, or a problem with the phone.",
+   "about": "Common phone messages and what to do about them: battery low, no internet, storage full, wrong password, missed call, phone locked, an alarm, and a call from an unknown number. Other rounds ask what to check or tap when the phone will not turn on or nothing will load.",
+   "how": [
+    "Read the phone message.",
+    "Listen to the question.",
+    "Tap what you should do."
+   ],
+   "cls": "Choose What Should You Do? in the Teacher Game, and talk through the unknown number round as scam awareness.",
+   "good": [
+    "phone skills for adults",
+    "digital literacy scenarios",
+    "scam awareness ESL"
+   ]
+  },
+  {
+   "slug": "safe-or-private",
+   "game": "safeinfo",
+   "emoji": "🔒",
+   "skill": "digital",
+   "level": "Elementary",
+   "name": "Safe or Private",
+   "seo": "Safe or Private: What Not to Share Online | Free Scam Awareness and Digital Safety for Adults",
+   "meta": "Can you share your PIN? Your first name? Learn what to keep private, and copy a verification code. Free.",
+   "sub": "Copy a code, and what to keep private.",
+   "about": "Online safety with yes or no answers. The learner decides whether something is safe to share, like a first name, a class day or a favourite colour, or must stay private, like a bank PIN, a password, a card number or a photo of a passport. Other rounds practise copying a 4-digit code, like a verification code sent by SMS.",
+   "how": [
+    "Listen to what it is.",
+    "Decide if you can share it.",
+    "Tap yes or no, or type the code."
+   ],
+   "cls": "Choose Safe or Private in the Teacher Game, then talk about scams before setting up banking or myGov apps.",
+   "good": [
+    "online safety for adults",
+    "scam awareness ESL",
+    "keep your PIN private",
+    "verification code practice"
+   ]
+  },
+  {
+   "slug": "all-games",
+   "game": "all",
+   "emoji": "✨",
+   "skill": null,
+   "level": "Beginner and Elementary",
+   "name": "All Games",
+   "seo": "All English Games Mixed: Letters, Words, Numbers, Time, Money | Free Practice for Adults",
+   "meta": "A mix of every WordLink game in one round. Free English practice for adult learners. No sign-up.",
+   "sub": "A mix of every game.",
+   "about": "One round drawn from every game: letters and sounds, reading, writing, vocabulary, listening, speaking, grammar, numbers, time, money, everyday English and digital skills.",
+   "how": [
+    "Choose how many questions.",
+    "Play.",
+    "See your score."
+   ],
+   "cls": "Choose All Games in the Teacher Game for a mixed review quiz.",
+   "good": [
+    "ESL review game",
+    "mixed English quiz for adults"
+   ]
+  },
+  {
+   "slug": "test-yourself",
+   "game": "test:*",
+   "emoji": "🎯",
+   "skill": null,
+   "level": "Beginner and Elementary",
+   "name": "Test Yourself",
+   "seo": "Test Yourself: Free Adaptive English Test for Adult Learners | WordLink",
+   "meta": "10 rounds of 3 questions from every game. It gets harder or easier as you go, and shows what to practise next.",
+   "sub": "10 rounds of 3 questions, drawn from every game. It gets harder or easier as you go.",
+   "about": "An adaptive self-check. The questions get harder after right answers and easier after wrong ones. At the end the learner sees their strong skills and which games to practise next.",
+   "how": [
+    "Answer each round.",
+    "The test changes to match you.",
+    "See your results."
+   ],
+   "cls": "Test Yourself is played on each student's own phone, and the results tell the teacher who needs what. For a whole-class check, run the Level Check from the Teacher Game.",
+   "good": [
+    "free English level test for adults",
+    "adaptive English quiz"
+   ]
+  },
+  {
+   "slug": "test-letters",
+   "game": "test:letters",
+   "emoji": "🎯",
+   "skill": "letters",
+   "level": "Beginner and Elementary",
+   "name": "Test Yourself: Letters and Sounds",
+   "seo": "Letters and Sounds Test: Free Adaptive Phonics Check for Adult Learners | WordLink",
+   "meta": "10 rounds of 3 questions from every letters and sounds game: letter names, big and small letters, word families and digraphs.",
+   "sub": "10 rounds of 3 questions, drawn from every letters and sounds game. It gets harder or easier as you go.",
+   "about": "An adaptive check of letters and phonics. It draws on Letter Names, Big and Small Letters and all six Sound Gap, Tap Word and Build Word games, from CVC word families up to digraphs and vowel teams.",
+   "how": [
+    "Answer each round.",
+    "The test changes to match you.",
+    "See your results."
+   ],
+   "cls": "Students take it on their own phones. The results show which phonics games each one should practise next.",
+   "good": [
+    "phonics test for adults",
+    "alphabet check ESL",
+    "adaptive phonics quiz"
+   ]
+  },
+  {
+   "slug": "test-vocabulary",
+   "game": "test:vocab",
+   "emoji": "🎯",
+   "skill": "vocab",
+   "level": "Beginner and Elementary",
+   "name": "Test Yourself: Vocabulary",
+   "seo": "English Vocabulary Test: Free Adaptive Word Check for Adult Learners | WordLink",
+   "meta": "10 rounds of 3 questions from every vocabulary game: days, months, weather, fruit, body, clothes, devices and more.",
+   "sub": "10 rounds of 3 questions, drawn from every vocabulary game. It gets harder or easier as you go.",
+   "about": "An adaptive vocabulary check. It draws on Days of the Week, Months, Weather, Fruits, Parts of the Body, Clothes, Question Words, Sight Words, Picture and Word, Devices, All Spelling, Odd One Out and Translate.",
+   "how": [
+    "Answer each round.",
+    "The test changes to match you.",
+    "See your results."
+   ],
+   "cls": "Students take it on their own phones. It shows which topics each one already knows.",
+   "good": [
+    "vocabulary test for adults",
+    "ESL word quiz",
+    "everyday English vocabulary check"
+   ]
+  },
+  {
+   "slug": "test-listening",
+   "game": "test:listening",
+   "emoji": "🎯",
+   "skill": "listening",
+   "level": "Beginner and Elementary",
+   "name": "Test Yourself: Listening",
+   "seo": "English Listening Test: Free Adaptive Listening Check for Adult Learners | WordLink",
+   "meta": "10 rounds of 3 questions from every listening game: greetings, instructions, gap-fill sentences and more.",
+   "sub": "10 rounds of 3 questions, drawn from every listening game. It gets harder or easier as you go.",
+   "about": "An adaptive listening check: how well the learner understands spoken letters, words, sentences, times, greetings and instructions. It draws on the listening gap-fill games, Listen and Unscramble, the Speaking Game, Greetings, Do What It Says, Letter Names, the phonics games, Digital Time, First, Second, Third and Where Is It.",
+   "how": [
+    "Answer each round.",
+    "The test changes to match you.",
+    "See your results."
+   ],
+   "cls": "Students take it on their own phones, with headphones in a busy room.",
+   "good": [
+    "listening test for adults",
+    "ESL listening quiz",
+    "adaptive listening check"
+   ]
+  },
+  {
+   "slug": "test-speaking",
+   "game": "test:speaking",
+   "emoji": "🎯",
+   "skill": "speaking",
+   "level": "Beginner and Elementary",
+   "name": "Test Yourself: Speaking",
+   "seo": "English Speaking Preparation Test: Free Adaptive Check for Adult Learners | WordLink",
+   "meta": "10 rounds of 3 questions from the speaking games: everyday questions, question words, greetings and word order.",
+   "sub": "10 rounds of 3 questions, drawn from every speaking game. It gets harder or easier as you go.",
+   "about": "An adaptive check of the language learners need to speak: answering everyday questions, choosing question words, replying to greetings and putting a sentence in order. It draws on the Speaking Game, Question Words, Listen and Unscramble and Greetings.",
+   "how": [
+    "Answer each round.",
+    "The test changes to match you.",
+    "See your results."
+   ],
+   "cls": "Students take it on their own phones, then follow up with real speaking in pairs.",
+   "good": [
+    "speaking test preparation ESL",
+    "conversation questions quiz",
+    "adult English speaking check"
+   ]
+  },
+  {
+   "slug": "test-reading",
+   "game": "test:reading",
+   "emoji": "🎯",
+   "skill": "reading",
+   "level": "Beginner and Elementary",
+   "name": "Test Yourself: Reading",
+   "seo": "English Reading Test: Free Adaptive Reading Check for Adult Learners | WordLink",
+   "meta": "10 rounds of 3 questions from every reading game: signs, messages, notices, forms, price lists and sight words.",
+   "sub": "10 rounds of 3 questions, drawn from every reading game. It gets harder or easier as you go.",
+   "about": "An adaptive reading check, from sight words and picture words up to everyday texts: signs, text messages, notices, forms and price lists.",
+   "how": [
+    "Answer each round.",
+    "The test changes to match you.",
+    "See your results."
+   ],
+   "cls": "Students take it on their own phones. It shows which kinds of everyday text each one can already read.",
+   "good": [
+    "reading test for adults",
+    "functional reading check ESL",
+    "adaptive reading quiz"
+   ]
+  },
+  {
+   "slug": "test-writing",
+   "game": "test:writing",
+   "emoji": "🎯",
+   "skill": "writing",
+   "level": "Beginner and Elementary",
+   "name": "Test Yourself: Writing",
+   "seo": "English Writing Test: Free Adaptive Writing Check for Adult Learners | WordLink",
+   "meta": "10 rounds of 3 questions from every writing game: copying, capitals and full stops, spelling and model sentences.",
+   "sub": "10 rounds of 3 questions, drawn from every writing game. It gets harder or easier as you go.",
+   "about": "An adaptive writing check: copying words and names, capital letters and full stops, spelling words and number words, filling in forms, and writing sentences from a model.",
+   "how": [
+    "Answer each round.",
+    "The test changes to match you.",
+    "See your results."
+   ],
+   "cls": "Students take it on their own phones. It shows where each one is, from copying up to writing their own sentences.",
+   "good": [
+    "writing test for adults",
+    "ESL writing check",
+    "adaptive spelling and writing quiz"
+   ]
+  },
+  {
+   "slug": "test-grammar",
+   "game": "test:grammar",
+   "emoji": "🎯",
+   "skill": "grammar",
+   "level": "Beginner and Elementary",
+   "name": "Test Yourself: Grammar",
+   "seo": "English Grammar Test: Free Adaptive Grammar Check for Adult Learners | WordLink",
+   "meta": "10 rounds of 3 questions from every grammar game: question words, word order and punctuation.",
+   "sub": "10 rounds of 3 questions, drawn from every grammar game. It gets harder or easier as you go.",
+   "about": "An adaptive grammar check: question words, word order in sentences, and capitals and full stops. It draws on Question Words, Grammar Unscramble, Listen and Unscramble and Capitals and Full Stops.",
+   "how": [
+    "Answer each round.",
+    "The test changes to match you.",
+    "See your results."
+   ],
+   "cls": "Students take it on their own phones.",
+   "good": [
+    "grammar test for adults",
+    "ESL grammar quiz",
+    "word order check"
+   ]
+  },
+  {
+   "slug": "test-numeracy",
+   "game": "test:numeracy",
+   "emoji": "🎯",
+   "skill": "numeracy",
+   "level": "Beginner and Elementary",
+   "name": "Test Yourself: Numbers",
+   "seo": "Numeracy Test: Free Adaptive Numbers, Time and Money Check for Adult Learners | WordLink",
+   "meta": "10 rounds of 3 questions from every numbers game: numbers, time, money, calendars and price lists.",
+   "sub": "10 rounds of 3 questions, drawn from every numbers game. It gets harder or easier as you go.",
+   "about": "An adaptive numeracy check in English. It draws on Tap the Number, Write the Number, Add It Up, Add the Money, Put In Order, Tens and Ones, Read the List, Clock, Digital Time, Find the Date, Shop and more.",
+   "how": [
+    "Answer each round.",
+    "The test changes to match you.",
+    "See your results."
+   ],
+   "cls": "Students take it on their own phones. It shows which number, time and money skills each one has.",
+   "good": [
+    "numeracy test for adults",
+    "time and money quiz ESL",
+    "adaptive maths English check"
+   ]
+  },
+  {
+   "slug": "test-translation",
+   "game": "test:translation",
+   "emoji": "🎯",
+   "skill": "translation",
+   "level": "Beginner and Elementary",
+   "name": "Test Yourself: Translation",
+   "seo": "Translation Test: From Your Language to English | Free Adaptive Check for Adult Learners",
+   "meta": "10 rounds of 3 questions: read a sentence in your language and write it in English. 11 languages.",
+   "sub": "10 rounds of 3 questions, drawn from the translation game. It gets harder or easier as you go.",
+   "about": "An adaptive translation check in Arabic, Burmese, Chinese, Dari, Hindi, Khmer, Pashto, Persian, Thai, Urdu or Vietnamese. The learner reads a sentence in their language and writes or chooses the English.",
+   "how": [
+    "Choose your language.",
+    "Answer each round.",
+    "See your results."
+   ],
+   "cls": "Students take it on their own phones, each in their own language.",
+   "good": [
+    "translation test ESL",
+    "first language to English check",
+    "bilingual English quiz"
+   ]
+  },
+  {
+   "slug": "test-everyday",
+   "game": "test:everyday",
+   "emoji": "🎯",
+   "skill": "everyday",
+   "level": "Beginner and Elementary",
+   "name": "Test Yourself: Everyday English",
+   "seo": "Everyday English Test: Signs, Messages, Forms, Time and Money | Free Adaptive Check for Adults",
+   "meta": "10 rounds of 3 questions from the everyday English games: signs, messages, forms, time, money, phones and more.",
+   "sub": "10 rounds of 3 questions, drawn from every everyday English game. It gets harder or easier as you go.",
+   "about": "An adaptive check of survival English: safety and public signs, notices, text messages, forms, greetings and instructions, time, calendars, money and price lists, phone messages and staying safe online.",
+   "how": [
+    "Answer each round.",
+    "The test changes to match you.",
+    "See your results."
+   ],
+   "cls": "Students take it on their own phones.",
+   "good": [
+    "survival English test",
+    "everyday English quiz for adults",
+    "functional English check"
+   ]
+  },
+  {
+   "slug": "level-check",
+   "game": "test:level",
+   "emoji": "📋",
+   "skill": null,
+   "level": "For your teacher",
+   "name": "Level Check",
+   "seo": "Level Check: Free ACSF Pre Level English Placement Check for Adult Learners | WordLink",
+   "meta": "12 rounds across every skill, ending with an indicative ACSF level and a strengths report a teacher can start from. Free.",
+   "sub": "12 rounds of 3 questions, spread across every skill. It ends with an indicative ACSF level a teacher can start from.",
+   "about": "A placement check for teachers and tutors of adult pre-level learners. It covers every skill: letters and sounds, reading, writing, listening, numbers, everyday English and digital skills. Each skill moves up a stage only where the learner has shown the one below. It ends with an indicative ACSF level (Pre Level 1 Stage A, Stage B, or Level 1) and a report of strengths and gaps to confirm in an interview.",
+   "how": [
+    "Your teacher gives you the link.",
+    "Answer each round as well as you can.",
+    "Show your teacher the results."
+   ],
+   "cls": "Run it for the whole class from the Teacher Game. Every student's report comes back to the teacher's screen.",
+   "good": [
+    "ACSF pre-level assessment",
+    "English placement test for adults",
+    "ESL level test",
+    "assessing new literacy learners"
+   ]
+  }
+ ]
+}

@@ -9127,7 +9127,7 @@ const SKILL_ACCENT={
   _:          {label:'Practice',         c:'var(--muted)',  glow:'rgba(255,255,255,.10)'},
 };
 const GAME_INFO={
-  'wp1:gap':   {skill:'letters',   blurb:'Hear the missing sound and write it.'},
+  'wp1:gap':   {skill:'letters',   blurb:'Hear the missing sound and tap it.'},
   'wp1:word':  {skill:'letters',   blurb:'Hear a word and tap it.'},
   'wp1:build': {skill:'letters',   blurb:'Build the word from its sounds.'},
   'wp2:gap':   {skill:'letters',   blurb:'Hear the missing sound in a longer word.'},
@@ -9138,9 +9138,9 @@ const GAME_INFO={
   questionwords:{skill:'grammar',  blurb:'Choose the right question word.'},
   /* In the picker "🔢 1–10" sits under a Numbers heading; on a card of its own
      it has to say what it is. */
-  numbers:     {skill:'numeracy',  name:'Numbers 1–10', blurb:'Hear a number from 1 to 10 and write it.'},
-  numbers1120: {skill:'numeracy',  blurb:'Hear a number from 11 to 20 and write it.'},
-  numbers2199: {skill:'numeracy',  blurb:'Hear a number from 21 to 99 and write it.'},
+  numbers:     {skill:'numeracy',  name:'Numbers 1–10', blurb:'Hear a number from 1 to 10 and spell it.'},
+  numbers1120: {skill:'numeracy',  blurb:'Hear a number from 11 to 20 and spell it.'},
+  numbers2199: {skill:'numeracy',  blurb:'Hear a number from 21 to 99 and spell it.'},
   days:        {skill:'vocab',     blurb:'Hear a day of the week and write it.'},
   months:      {skill:'vocab',     blurb:'Hear a month and write it.'},
   weather:     {skill:'vocab',     blurb:'Hear a weather word and write it.'},
@@ -9150,13 +9150,13 @@ const GAME_INFO={
   spelling:    {skill:'writing',   blurb:'Spell words from every topic.'},
   unscramble:  {skill:'listening', blurb:'Listen, then put the words in order.'},
   gramscramble:{skill:'grammar',   blurb:'Put the words in the right order.'},
-  speaking:    {skill:'speaking',  blurb:'Say the answer out loud.'},
+  speaking:    {skill:'speaking',  blurb:'Hear the question and build your answer.'},
   translate:   {skill:'translation',blurb:'Read it in your language, write it in English.'},
   letter:      {skill:'letters',   blurb:'Hear a letter name and choose the letter.'},
   oddone:      {skill:'vocab',     blurb:'Find the word that does not belong.'},
   signs:       {skill:'everyday',  blurb:'Read the signs you see around you.'},
   sms:         {skill:'everyday',  blurb:'Read a short message and answer it.'},
-  clock:       {skill:'numeracy',  blurb:'Read the time and write it.'},
+  clock:       {skill:'numeracy',  blurb:'Read the clock and set the time.'},
   shop:        {skill:'numeracy',  blurb:'Count the coins and pay the right amount.'},
   /* The same game under $10. It is not on the picker — Shop covers that — but
      it is a step in two level check bands, and testRecord reads the skill from
@@ -9347,10 +9347,36 @@ function openSoloLaunch(type){
   showScreen('screen-solo-launch');
   return true;
 }
+/* Play was pressed on the game's own page (wordlink.au/clock), so the first
+   question comes next, not this app's copy of the same start card.
+     Except where the browser will not play sound yet. That tap was on the page
+   before, and most browsers carry it over to this one, but some (Safari on an
+   iPhone) want a tap on this page before any speech or sound will play, and a
+   listening game that starts silent is broken. So when the audio cannot start,
+   the start screen opened just before this stays up, and its Play is that tap:
+   the same number of taps as before the start pages existed. */
+function playFromStartPage(){
+  let ctx=null;
+  try{ ctx=getCtx(); }catch(e){}
+  const go=()=>startSoloGame();
+  if((navigator.userActivation&&navigator.userActivation.hasBeenActive)||(ctx&&ctx.state==='running')){ go(); return; }
+  if(!ctx) return;
+  // resume() settles at once when it is allowed and never when it is not.
+  Promise.race([ctx.resume().then(()=>ctx.state==='running'),
+                new Promise(r=>setTimeout(()=>r(false),250))])
+    .then(ok=>{ if(ok&&document.getElementById('screen-solo-launch').classList.contains('active')) go(); })
+    .catch(()=>{});
+}
 /* Start Practice on the picker: it opens the chosen game's start page rather
    than the first question, so the learner sees what they picked, sets how it
    runs, and can copy its link. */
 function goSoloStart(){
+  /* A game with a page of its own opens that page: it is the same start card,
+     and one card in one place means a learner who came in through the app and
+     one who was sent the link see the same thing and tap the same number of
+     times. The few without a page (Custom, a section's own mix) start here. */
+  const slug=GAME_SLUG[soloSelectedType];
+  if(slug&&soloTabFor(soloSelectedType)){ location.href=new URL(slug,APP_BASE).href; return; }
   if(!openSoloLaunch(soloSelectedType)) showToast('Choose a game first');
   window.scrollTo(0,0);
 }
@@ -9394,12 +9420,17 @@ const APP_BASE=(function(){ try{ return new URL('.',location.href).href; }catch(
    game.html resolves to one page with one title and one preview: pasted into
    Teams, every game looked identical. Each short address is a page of its own
    with the game's name and its own one-line description.
-   A link that changes the question count, the length or the answer mode has
-   more to say than a name can, so that keeps the /solo?game=… form. */
+   A link that changes the question count, the length or the answer mode
+   carries them after the short address (wordlink.au/clock?q=20): the start
+   page reads them back into its own boxes. A game with no page of its own
+   keeps the /solo?game=… form. */
 function soloShareUrl(type){
   if(UNSHAREABLE_GAMES.indexOf(type)>=0) return new URL('solo',APP_BASE);
-  const q=queryOf(type), slug=GAME_SLUG[type];
-  return (slug&&q==='game='+type) ? new URL(slug,APP_BASE) : new URL('solo?'+q,APP_BASE);
+  const slug=GAME_SLUG[type];
+  if(!slug) return new URL('solo?'+queryOf(type),APP_BASE);
+  const p=soloLinkParams(type); p.delete('game');
+  const rest=p.toString();
+  return new URL(slug+(rest?'?'+rest:''),APP_BASE);
 }
 function syncSoloUrl(type){
   try{
@@ -9414,9 +9445,10 @@ function clearSoloUrl(){
   try{ history.replaceState(null,'',new URL('game.html',APP_BASE).pathname); }catch(e){}
 }
 /* Each game's short address — wordlink.au/clock rather than
-   wordlink.au/solo?game=clock. Each slug is a small page of its own that
-   forwards here; the pages and this list both come from tools/build-links.py,
-   so keep them in step there. */
+   wordlink.au/solo?game=clock. Each slug is the game's own start page, built
+   by tools/build-links.py from tools/game-pages.json: the same card as the
+   start screen here, plus the about text a search engine can read. Its Play
+   comes back here with play=1. Keep this list and that file in step. */
 const GAME_SLUG={
   'wp1:gap':'beginner-sound-gap','wp1:word':'beginner-tap-word','wp1:build':'beginner-build-word',
   'wp2:gap':'elementary-sound-gap','wp2:word':'elementary-tap-word','wp2:build':'elementary-build-word',
@@ -9431,6 +9463,14 @@ const GAME_SLUG={
   'test:listening':'test-listening','test:speaking':'test-speaking','test:reading':'test-reading',
   'test:writing':'test-writing','test:grammar':'test-grammar','test:numeracy':'test-numeracy',
   'test:translation':'test-translation','test:everyday':'test-everyday',
+  casematch:'big-and-small-letters',sightwords:'sight-words',picword:'picture-and-word',
+  notice:'read-the-notice',copyword:'copy-it',punctuation:'capitals-and-full-stops',
+  modelsentence:'write-a-sentence',greetings:'greetings',instructions:'do-what-it-says',
+  numbertap:'tap-the-number',numeralwrite:'write-the-number',addup:'add-it-up',
+  addmoney:'add-the-money',ordering:'put-in-order',placevalue:'tens-and-ones',
+  tableread:'read-the-list',calendar:'find-the-date',ordinals:'first-second-third',
+  position:'where-is-it',digitaltime:'digital-time',devices:'devices',digisymbols:'screen-symbols',
+  prompts:'what-should-you-do',safeinfo:'safe-or-private',
 };
 function copySoloLink(){
   /* The address bar is already the shareable link; copying is copying it. */
@@ -12922,8 +12962,14 @@ window.addEventListener('load',()=>{
       if(t>=10&&t<=120&&!isLevelCheck(game)) document.getElementById('solo-t-limit').value=t;
       const mc=params.get('mc');
       setMcMode(mc===null?defaultMcFor(game):mc==='1');
+      // The start page's language box, for Translate.
+      const lang=params.get('lang');
+      if(lang&&document.querySelector('#solo-lang-pick option[value="'+lang+'"]'))
+        localStorage.setItem('translateLang',lang);
 
       openSoloLaunch(game);
+      // Play on a game's own start page: the learner has already pressed it.
+      if(params.get('play')==='1'&&!isSpecialGame(game)) playFromStartPage();
     }
   }
   else{showScreen('screen-home');playLobbyMusic();}
