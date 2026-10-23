@@ -176,6 +176,10 @@ PAGE = """<!DOCTYPE html>
 {ld}
 </script>
 
+<!-- The same visit counter as game.html. Play runs the game inside this page,
+     so game.html is not loaded as a page of its own and would not count it. -->
+<script data-goatcounter="https://masoud-eal.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 <link href="fonts/fonts.css" rel="stylesheet">
 <link href="game-page.css" rel="stylesheet">
 <meta name="theme-color" content="#0d0d1a">

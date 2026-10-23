@@ -9355,10 +9355,13 @@ function openSoloLaunch(type){
    listening game that starts silent is broken. So when the audio cannot start,
    the start screen opened just before this stays up, and its Play is that tap:
    the same number of taps as before the start pages existed. */
-function playFromStartPage(){
+function playFromStartPage(tapped){
   let ctx=null;
   try{ ctx=getCtx(); }catch(e){}
   const go=()=>startSoloGame();
+  // Called from inside the tap itself, on the page that was tapped: nothing
+  // to wait for, and waiting would spend the tap.
+  if(tapped){ go(); return; }
   if((navigator.userActivation&&navigator.userActivation.hasBeenActive)||(ctx&&ctx.state==='running')){ go(); return; }
   if(!ctx) return;
   // resume() settles at once when it is allowed and never when it is not.
@@ -12913,9 +12916,14 @@ function sortPlayersForBoard(players){
 }
 
 /* INIT */
-window.addEventListener('load',()=>{
+/* Start the app from an address: a room code, a teacher, a solo game or the
+   home screen. A game's own start page (wordlink.au/clock) loads this file into
+   itself and calls this when its Play is pressed, with the settings as params
+   and `tapped` set; see game-page.js. That is the only way the first question
+   can speak on Safari, which will not play sound on a page until that page
+   itself has been tapped: a tap on one page does not carry to the next. */
+function bootApp(params,opts){
   buildBank(); renderSectionChips(); renderTargetChips();
-  const params=new URLSearchParams(window.location.search);
   const urlCode=params.get('join');
   const mode=params.get('mode');
   if(urlCode){
@@ -12969,10 +12977,14 @@ window.addEventListener('load',()=>{
 
       openSoloLaunch(game);
       // Play on a game's own start page: the learner has already pressed it.
-      if(params.get('play')==='1'&&!isSpecialGame(game)) playFromStartPage();
+      if(params.get('play')==='1'&&!isSpecialGame(game)) playFromStartPage(!!(opts&&opts.tapped));
     }
   }
   else{showScreen('screen-home');playLobbyMusic();}
+}
+window.addEventListener('load',()=>{
+  // On a start page the app waits for Play; see bootApp.
+  if(!window.WORDLINK_EMBEDDED) bootApp(new URLSearchParams(window.location.search));
 });
 </script>
 <script>
