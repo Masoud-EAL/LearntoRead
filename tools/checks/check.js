@@ -2487,6 +2487,23 @@ check('gamepages', 'every game has a start page that offers what the game does a
   await page.goBack();
   await page.waitForSelector('#gp-form', { timeout: 10000 })
     .catch(() => bad('gamepages: Back from the game did not return to the start card'));
+  // Start Practice on the picker opens the start screen in the app itself. It
+  // used to load the game's own page, which on Safari sometimes took a second
+  // tap and looked like a reload.
+  await page.goto(ctx.base + '/game.html?mode=solo', { waitUntil: 'load' });
+  await page.waitForFunction(() => !!document.querySelector('#screen-solo-setup.active'), null, { timeout: 15000 });
+  const pick = await page.evaluate(() => {
+    window.__samePage = true;
+    document.querySelector('#screen-solo-setup .q-type-tab[data-type="sightwords"]').click();
+    document.querySelector('#screen-solo-setup .solo-start-bar button').click();
+    return { same: window.__samePage === true,
+             screen: (document.querySelector('.screen.active') || {}).id, game: soloSelectedType };
+  });
+  await page.waitForTimeout(500);
+  const still = await page.evaluate(() => window.__samePage === true);
+  if (!pick.same || !still) bad('gamepages: Start Practice on the picker left the page');
+  if (pick.screen !== 'screen-solo-launch' || pick.game !== 'sightwords')
+    bad('gamepages: Start Practice on the picker did not open Sight Words\' start screen (' + pick.screen + ')');
   await page.goto(ctx.base + '/dice', { waitUntil: 'domcontentloaded' });
   await page.click('.launch-begin');
   await page.waitForFunction(() => !!document.querySelector('#screen-solo-launch.active'), null, { timeout: 15000 })
