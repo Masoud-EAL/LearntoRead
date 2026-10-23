@@ -4131,6 +4131,25 @@ function genPositionQuestions(n,from){
    with no `use` is never the answer to a purpose question, only a distractor,
    because its job overlaps too many others to have one right answer: a laptop is
    for work and for watching and for typing, and so is a screen. */
+/* The wifi symbol, where the phone has it. 🛜 is new (2022), and a phone
+   older than that draws an empty box, which is a question with no picture.
+   So it is drawn once off screen first: a colour emoji comes out in colour,
+   and the box or blank an older phone draws does not. Those phones get the
+   signal bars, the nearest older picture of it. */
+const WIFI=(function(){
+  try{
+    const c=document.createElement('canvas'); c.width=c.height=32;
+    const x=c.getContext('2d',{willReadFrequently:true});
+    x.font='28px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+    x.textBaseline='top';
+    x.fillText('🛜',0,0);
+    const d=x.getImageData(0,0,32,32).data;
+    for(let i=0;i<d.length;i+=4){
+      if(d[i+3]>100&&Math.max(d[i],d[i+1],d[i+2])-Math.min(d[i],d[i+1],d[i+2])>60) return '🛜';
+    }
+  }catch(e){}
+  return '📶';
+})();
 const DEVICES=[
   {n:'phone',   e:'📱', use:'to call someone', alsoDoes:['laptop']},
   {n:'laptop',  e:'💻'},
@@ -4149,7 +4168,7 @@ const DEVICES=[
   {n:'charger', art:chargerArt, use:'to give it power'},
   /* No `use`: "to get on the internet" is the phone's and the laptop's answer as
      much as the wifi bars', and Screen Symbols already asks this glyph by name. */
-  {n:'wifi',    e:'🛜'},
+  {n:'wifi',    e:WIFI},
 ];
 const DEVICE_USES=DEVICES.filter(function(d){ return !!d.use; });
 function deviceByName(n){
@@ -4284,7 +4303,7 @@ const DIGI_SYMBOLS=[
      is the word most learners already have for it. Both are printed so the
      one they know is never the wrong answer. */
   {s:'▶️', n:'Play'},     {s:'⏸️', n:'Stop (pause)'}, {s:'🔊', n:'Sound on'},
-  {s:'🔇', n:'Sound off'},{s:'🛜', n:'Internet'},  {s:'🔋', n:'Battery'},
+  {s:'🔇', n:'Sound off'},{s:WIFI, n:'Internet'},  {s:'🔋', n:'Battery'},
   {s:'⚙️', n:'Settings'}, {s:'🗑️', n:'Delete'},    {s:'💾', n:'Save'},
   {s:'📷', n:'Camera'},   {s:'✉️', n:'Message'},   {s:'☰',  n:'Menu'},
 ];
@@ -4911,7 +4930,7 @@ const INSTRUCTION_TOOLS=[
    strip to nothing and mark every option correct. */
 const INSTRUCTION_ART={book:'📖',pen:'✏️',bag:'🎒',chair:'🪑',door:'🚪',window:'🪟',cup:'☕',
   phone:'📱',laptop:'💻',camera:'📷',headphones:'🎧',keyboard:'⌨️',printer:'🖨️',
-  'sound on':'🔊','sound off':'🔇',internet:'🛜',battery:'🔋',bin:'🗑️',
+  'sound on':'🔊','sound off':'🔇',internet:WIFI,battery:'🔋',bin:'🗑️',
   save:'💾',home:'🏠',play:'▶️',search:'🔍',message:'✉️',settings:'⚙️'};
 /* The charger is the drawing, here as well as in Devices. The emoji is a
    two-pin wall plug, which is the thing an appliance has and not the thing
