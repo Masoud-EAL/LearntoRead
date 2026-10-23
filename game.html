@@ -9374,12 +9374,11 @@ function playFromStartPage(tapped){
    than the first question, so the learner sees what they picked, sets how it
    runs, and can copy its link. */
 function goSoloStart(){
-  /* A game with a page of its own opens that page: it is the same start card,
-     and one card in one place means a learner who came in through the app and
-     one who was sent the link see the same thing and tap the same number of
-     times. The few without a page (Custom, a section's own mix) start here. */
-  const slug=GAME_SLUG[soloSelectedType];
-  if(slug&&soloTabFor(soloSelectedType)){ location.href=new URL(slug,APP_BASE).href; return; }
+  /* Here, in this page, not by going to the game's own page (wordlink.au/clock).
+     Going there loaded a new page, which on Safari sometimes took two taps and
+     looked like a reload, and a new page also needs a tap of its own before it
+     may play sound. The learner has already tapped this page, so the start
+     screen here can start the game with sound straight away. */
   if(!openSoloLaunch(soloSelectedType)) showToast('Choose a game first');
   window.scrollTo(0,0);
 }
