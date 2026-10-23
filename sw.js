@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v46';
+const CACHE = 'learntoread-v47';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -100,6 +100,8 @@ const OPTIONAL = [
   './numbers-21-99',
   './odd-one-out.html',
   './odd-one-out',
+  './ordinal-numbers.html',
+  './ordinal-numbers',
   './picture-and-word.html',
   './picture-and-word',
   './put-in-order.html',

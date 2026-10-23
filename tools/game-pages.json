@@ -1004,9 +1004,9 @@
    "level": "Beginner",
    "name": "First, Second, Third",
    "seo": "First, Second, Third: Ordinal Numbers Game | Free English for Adult Learners",
-   "meta": "Hear \"Tap the second one\" or say which one is marked. Free ordinal numbers game for adult English learners.",
+   "meta": "Hear \"Tap second\" or \"Tap the second one\", or say which one is marked. Free ordinal numbers game for adult English learners.",
    "sub": "Which one is first, second or third.",
-   "about": "Ordinal numbers with a row of people. The learner hears \"Tap the first one.\" and chooses, or sees one person marked and answers 1st, 2nd or 3rd. These are the words for queues, floors and dates.",
+   "about": "Ordinal numbers with a row of people. The learner hears \"Tap second.\" and chooses 2nd, hears \"Tap the second one.\" and taps the second of 1, 2 and 3, or sees one person marked and names the position. These are the words for queues, floors and dates.",
    "how": [
     "Look at the row.",
     "Listen to the question.",
@@ -1017,6 +1017,29 @@
     "ordinal numbers game",
     "first second third ESL",
     "ordinals for adults"
+   ]
+  },
+  {
+   "slug": "ordinal-numbers",
+   "game": "ordinals30",
+   "emoji": "🏅",
+   "skill": "numeracy",
+   "level": "Beginner",
+   "name": "Ordinal Numbers",
+   "seo": "Ordinal Numbers 1st to 30th: Listening Game | Free English for Adult Learners",
+   "meta": "Hear \"Tap twenty-first\" and choose 21st, or find the marked number and name it. Free game for ordinal numbers first to thirtieth.",
+   "sub": "First to thirtieth.",
+   "about": "Ordinal numbers from first to thirtieth, the way dates are said. The learner hears \"Tap twelfth.\" and chooses 12th, hears \"Tap the twelfth one.\" and taps 12 from numbers in counting order, or sees one number marked on a grid of 1 to 30 and chooses its word. The wrong options are the ones people mix up: thirteenth and thirtieth, twelfth and twentieth.",
+   "how": [
+    "Listen to the number.",
+    "Look at the options.",
+    "Tap the answer."
+   ],
+   "cls": "Choose Ordinal Numbers in the Teacher Game, then say the dates of this month's classes aloud.",
+   "good": [
+    "ordinal numbers 1 to 30",
+    "dates in English ESL",
+    "thirteenth or thirtieth"
    ]
   },
   {
@@ -1283,8 +1306,8 @@
    "emoji": "🔒",
    "skill": "digital",
    "level": "Elementary",
-   "name": "Safe or Private",
-   "seo": "Safe or Private: What Not to Share Online | Free Scam Awareness and Digital Safety for Adults",
+   "name": "Security",
+   "seo": "Security: What Not to Share Online | Free Scam Awareness and Digital Safety for Adults",
    "meta": "Can you share your PIN? Your first name? Learn what to keep private, and copy a verification code. Free.",
    "sub": "Copy a code, and what to keep private.",
    "about": "Online safety with yes or no answers. The learner decides whether something is safe to share, like a first name, a class day or a favourite colour, or must stay private, like a bank PIN, a password, a card number or a photo of a passport. Other rounds practise copying a 4-digit code, like a verification code sent by SMS.",
@@ -1293,7 +1316,7 @@
     "Decide if you can share it.",
     "Tap yes or no, or type the code."
    ],
-   "cls": "Choose Safe or Private in the Teacher Game, then talk about scams before setting up banking or myGov apps.",
+   "cls": "Choose Security in the Teacher Game, then talk about scams before setting up banking or myGov apps.",
    "good": [
     "online safety for adults",
     "scam awareness ESL",

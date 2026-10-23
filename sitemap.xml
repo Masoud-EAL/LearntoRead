@@ -241,6 +241,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://wordlink.au/ordinal-numbers</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://wordlink.au/where-is-it</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
