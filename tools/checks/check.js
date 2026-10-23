@@ -65,7 +65,9 @@ const TYPES = {
 function serve() {
   const server = http.createServer((req, res) => {
     const rel = decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '') || 'index.html';
-    const file = path.resolve(ROOT, rel);
+    let file = path.resolve(ROOT, rel);
+    // Pages serves clock.html at /clock, and the app links to the short form.
+    if (!fs.existsSync(file) && fs.existsSync(file + '.html')) file += '.html';
     if (!file.startsWith(ROOT) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
       res.writeHead(404); res.end('not found'); return;
     }
@@ -2408,6 +2410,75 @@ check('links', 'the generated short pages are in step with build-links.py', asyn
   } else {
     say('  ' + targets.length + ' pages match what build-links.py produces');
   }
+});
+
+check('gamepages', 'every game has a start page that offers what the game does and Play reaches its first question', async ctx => {
+  // Every game on the picker has a page, and each page's settings are the
+  // ones game.html gives that game: the seconds it starts from, whether it
+  // takes the Multiple Choice switch and which way the switch starts. The
+  // pages are generated from Python and the defaults live in JS, so this is
+  // where the two meet.
+  const games = await ctx.page.evaluate(() =>
+    [...document.querySelectorAll('#screen-solo-setup .q-type-tab[data-type]')]
+      .map(b => b.dataset.type).filter(t => UNSHAREABLE_GAMES.indexOf(t) < 0)
+      .map(t => ({ t, slug: GAME_SLUG[t] || null, mc: mcAppliesTo(t), mcOn: defaultMcFor(t),
+                   secs: defaultSecsFor(t), test: isTestType(t), level: isLevelCheck(t),
+                   special: isSpecialGame(t) })));
+  let pages = 0;
+  for (const g of games) {
+    if (!g.slug) { bad('gamepages: ' + g.t + ' is on the picker and has no slug in GAME_SLUG'); continue; }
+    const file = path.join(ROOT, g.slug + '.html');
+    if (!fs.existsSync(file)) { bad('gamepages: ' + g.slug + '.html is missing'); continue; }
+    const html = fs.readFileSync(file, 'utf8');
+    pages++;
+    const want = (cond, what) => { if (!cond) bad('gamepages: ' + g.slug + ' ' + what); };
+    want(html.includes('name="game" value="' + g.t + '"'), 'does not start ' + g.t);
+    want(!/name="robots"[^>]*noindex/.test(html), 'is kept out of search');
+    want(/<h1[^>]*>[^<]+<\/h1>/.test(html), 'has no h1');
+    want(html.includes('game.html?mode=teacher'), 'does not link the Teacher Game');
+    want(!/[–—]/.test(html), 'carries an en or em dash');
+    want(html.includes('name="play" value="1"') === !g.special, g.special
+      ? 'starts the game, but its settings are only on the app\'s start screen'
+      : 'does not go straight to the first question');
+    const mc = html.match(/id="gp-mc-val" value="(\d)" data-default="(\d)"/);
+    want(!!mc === (g.mc && !g.special), g.mc ? 'has no Multiple Choice switch' : 'offers a Multiple Choice switch that changes nothing');
+    if (mc) want(mc[2] === (g.mcOn ? '1' : '0'), 'starts the switch ' + (mc[2] === '1' ? 'on' : 'off') + ', the game starts it ' + (g.mcOn ? 'on' : 'off'));
+    const secs = html.match(/id="gp-t"[^>]*value="(\d+)"/);
+    want(!!secs === !(g.level || g.special), secs ? 'offers seconds the game ignores' : 'has no seconds box');
+    if (secs) want(+secs[1] === g.secs, 'starts at ' + secs[1] + ' seconds, the game at ' + g.secs);
+    want(/id="gp-q"/.test(html) === !(g.test || g.special), g.test ? 'offers a question count a test ignores' : 'has no question count');
+  }
+  say('  ' + pages + ' start pages match their games');
+
+  // Play, through the real UI: a count and a switch set on the page arrive in
+  // the game, and the learner lands on question 1 rather than on a second
+  // start screen. Then the dice page, which hands over to the app's own one.
+  const page = await ctx.browser.newPage({ viewport: { width: 390, height: 844 } });
+  const errs = [];
+  page.on('pageerror', e => errs.push(e.message));
+  await page.goto(ctx.base + '/fruits', { waitUntil: 'domcontentloaded' });
+  const wide = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
+  if (wide) bad('gamepages: /fruits scrolls sideways at phone width');
+  await page.fill('#gp-q', '7');
+  await page.click('#gp-mc');
+  await page.click('.launch-begin');
+  await page.waitForURL(/game\.html|\/fruits/, { timeout: 10000 });
+  await page.waitForFunction(() => typeof soloQuestions !== 'undefined'
+    && (document.querySelector('#screen-solo-launch.active') || (soloQuestions && soloQuestions.length)), null, { timeout: 15000 });
+  const r = await page.evaluate(() => ({ n: soloQuestions.length, mc: mcMode,
+    launch: !!document.querySelector('#screen-solo-launch.active'), url: location.pathname + location.search }));
+  if (r.launch) bad('gamepages: Play on /fruits stopped on the app\'s start screen although audio could start');
+  else {
+    if (r.n !== 7) bad('gamepages: Play on /fruits asked for 7 questions and dealt ' + r.n);
+    if (r.mc !== false) bad('gamepages: Multiple Choice was switched off on /fruits and came on in the game');
+  }
+  say('  /fruits: 7 questions, typing  ->  ' + (r.launch ? 'start screen' : r.n + ' dealt, ' + (r.mc ? 'multiple choice' : 'typing')) + '  at ' + r.url);
+  await page.goto(ctx.base + '/dice', { waitUntil: 'domcontentloaded' });
+  await page.click('.launch-begin');
+  await page.waitForFunction(() => !!document.querySelector('#screen-solo-launch.active'), null, { timeout: 15000 })
+    .catch(() => bad('gamepages: Open on /dice did not reach the dice settings'));
+  errs.forEach(e => bad('gamepages: ' + e));
+  await page.close();
 });
 
 /* ------------------------------------------------------------------- probe */

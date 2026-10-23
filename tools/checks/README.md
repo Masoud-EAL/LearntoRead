@@ -67,6 +67,7 @@ NODE_PATH=/opt/node22/lib/node_modules node tools/checks/check.js
 | `variants` | all twelve ordinary Test Yourself ladders still finish with full rounds | regression guard for the path that is not the level check |
 | `classroom` | a level check a teacher starts in a class room is the one a learner sits alone: every phone deals it, on the same clock, the same questions, the same length, ending at a card that still reaches the report, while the teacher's screens name it and promise it no rounds | "I have only worked on the solo mode recently, so I want to make sure the teacher mode is also working": a teacher could pick Level Check in the lobby and press Start, and every phone in the room stayed on the waiting screen |
 | `links` | re-running `build-links.py` changes nothing, then puts the tree back | the generated stubs, sitemap and sw.js are checked in and drift silently |
+| `gamepages` | every game on the picker has a start page (wordlink.au/clock) that can be indexed, links the Teacher Game, offers exactly the settings the game uses with the game's own defaults, and Play on it reaches question 1 with those settings; the dice page hands over to the app's own start screen | the start pages were redirect stubs a search engine could not see, so every game looked like one page |
 
 ## probe
 
