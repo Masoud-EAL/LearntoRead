@@ -7,7 +7,7 @@ How well the Level Check in `game.html` can be used to assess Pre Level 1A (PL1A
 - **Usable as an indicative screen, not as an assessment.** The run produces an honest, hedged per-indicator profile (NYA / PL1A / PL1B) that mirrors the way the ACSF reports a learner (one stage per indicator, as in the Binh and Sharlene profiles). A teacher can start an assessor analysis sheet from it. The panel already says this.
 - **The design is sound: the content has drift.** The per-indicator staircase, the "asked and not shown" versus "never asked" distinction, the refusal to award a stage skipped below, and the exclusion of speaking (.07) and handwriting are all correct against the framework. The problems are in individual items and claims, listed in sections 3 and 4.
 - **Two structural issues limit validity for PL1A specifically:** nearly every non-reading item is answered by reading written options, and every item is timed. Both push down learners at the very band the check exists to find.
-- **Reference mismatch.** The app quotes the SEE reporting checklist's *key* features, not the 2017 document. The 2017 document has more features per stage (PL1A .04 lists twelve; the app can reach six) and different indicator titles. This is acceptable if the panel says it is a sample, but the titles should match the document (section 4.1).
+- **Reference mismatch.** The app quotes the course reporting checklist's *key* features, not the 2017 document. The 2017 document has more features per stage (PL1A .04 lists twelve; the app can reach six) and different indicator titles. This is acceptable if the panel says it is a sample, but the titles should match the document (section 4.1).
 
 ## 2. What the check gets right
 
@@ -93,21 +93,21 @@ How well the Level Check in `game.html` can be used to assess Pre Level 1A (PL1A
 6. **Should:** print the 2017 indicator titles and the PL1A / PL1B / NYA labels; mark .12 and .13 as non-ACSF (4.1).
 7. **Could:** claim the keypad features the document already provides (4.4); show .01/.02 as observations only (4.2).
 
-## 6. Second review: the SEE Streamlined PTA Kit and the 22636VIC mapping (September 2026)
+## 6. Second review: a PTA kit and the course mapping (September 2026)
 
-Read against the ACSF 2019 document with its Pre Level 1 Supplement, the AMES SEE Streamlined PTA Kit Assessor Guide (v1.3), and the 22636VIC and 22637VIC mapping documents. Most of sections 3 to 5 above has been done since the first review.
+Read against the ACSF 2019 document with its Pre Level 1 Supplement, a PTA kit assessor guide, and the course mapping documents (kept offline). Most of sections 3 to 5 above has been done since the first review.
 
 ### Verdict
 
 - **Usable as a screening and placement aid that a teacher confirms, not as a stand-alone PTA outcome.** The structure matches the PTA: each indicator climbs until the learner reaches their limit, no level is awarded without the one below it, and the profile can be spiky. What it cannot replace is the assessor's interview and observation, which is how the PTA judges PLB Learning and Oral Communication.
 - **Level 1 is always partial**, so the useful output is NYA, PLA or PLB per indicator, which is the range this audience needs.
-- **NYA is right for the Initial EAL course.** The SEE PTA treats PLA as the default outcome and does not test it, but the Initial EAL units assess PLA as a stage of its own, and the app follows that checklist.
+- **NYA is right for the Initial EAL course.** The PTA treats PLA as the default outcome and does not test it, but the Initial EAL units assess PLA as a stage of its own, and the app follows that checklist.
 
 ### Difficulty against the PTA samples
 
-- **Numeracy PLB matches** the PTA "Office Furniture Sale" task: a time on the hour, a price, notes in order, two prices added.
+- **Numeracy PLB matches** the PTA numeracy sample task: a time on the hour, a price, notes in order, two prices added.
 - **Writing PLB matches**: Write Two Sentences is PTA PLB question 3 almost word for word, and Copy It is question 1. Question 2, the learner's own name with no model, is the gap: "Writes full name accurately" is still credited from a copied name, and the panel now says so beside the feature.
-- **Reading PLB was a little above** the PTA "Class" task. The one Messages question that had to be worked out rather than found is out of the level check's draw.
+- **Reading PLB was a little above** the PTA reading sample task. The one Messages question that had to be worked out rather than found is out of the level check's draw.
 - **Stage A had two rounds pitched too high**, Greetings and Signs, and three of its most typical features were never asked. Both are fixed; see rule 12h in the level check skill and "Stage A is asked at the Stage A register" in `acsf-coverage.md`.
 
 ### What changed
@@ -122,7 +122,7 @@ Read against the ACSF 2019 document with its Pre Level 1 Supplement, the AMES SE
 
 A perfect run is now 62 questions, one that answers nothing 20, and one that answers wrong throughout 40.
 
-## 7. The LWA Streamlined CALD PTA kit: the PLA set (September 2026)
+## 7. A second PTA kit: the PLA set (September 2026)
 
 This kit is the one with PLA tasks and an NYA row below them, which is the same NYA / PLA / PLB shape the level check reports. Its PLA tasks, set against the level check:
 
@@ -139,6 +139,6 @@ This kit is the one with PLA tasks and an NYA row below them, which is the same 
 Two differences are left as they are, on purpose:
 
 - The kit ticks PLA .09 and .10 off one matching question. The level check asks every checklist feature at Stage A and needs three quarters of them, so it is stricter at Stage A numeracy than the kit.
-- The kit's PLA feature wording differs from the 22636VIC checklist (for example PLA .08 "Relies heavily on repetition and rephrasing for understanding"). The app quotes the course checklist only.
+- The kit's PLA feature wording differs from the course checklist (for example PLA .08 "Relies heavily on repetition and rephrasing for understanding"). The app quotes the course checklist only.
 
 A perfect run is now 63 questions.

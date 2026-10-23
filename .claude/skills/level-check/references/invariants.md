@@ -889,7 +889,7 @@ Then the five words were reported too, and this time the report was about the
 task:
 
 > "What is this type this word listening and spelling used for in level check?
-> I have not seen anything like it in AMES PTAs. It can be too hard for
+> I have not seen anything like it in PTAs. It can be too hard for
 > learners. Can we do without it?"
 
 Three word lists, three reports. When every list is too hard the fault is not
@@ -938,8 +938,8 @@ change could have landed on it.
 ### 12h. A Stage A round is asked at Stage A, even when its bank serves both stages
 *check: `register`*
 
-Found in a review of the level check against the SEE Streamlined PTA Kit and
-the 22636VIC Initial EAL mapping, not in a report from a phone. Three banks
+Found in a review of the level check against a PTA kit and
+the course mapping, not in a report from a phone. Three banks
 were credited at Stage A for work pitched at Stage B, and three Stage A
 features were never asked at all:
 
@@ -973,7 +973,7 @@ and Do's objects half carries it now.
 register is taken from the documents' own examples (rule 12e): the Initial
 EAL units put Stage A at single words.
 
-Then the LWA Streamlined CALD PTA kit, which carries PLA tasks, found three
+Then a second PTA kit, which carries PLA tasks, found three
 more of the same kind. Write the Number dictated "three" and "10 dollars" at
 Stage A against features that begin "Copies"; the kit asks "Copy $5". Forms
 credited "Begins to recognise some personal details" off a four-field form,

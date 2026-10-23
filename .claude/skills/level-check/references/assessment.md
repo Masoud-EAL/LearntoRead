@@ -6,14 +6,11 @@ subtly, confidently wrong.
 
 ## The sources
 
-Every performance feature the app quotes comes verbatim from the AMES/SEE
-Reporting Checklist in two Victorian course mapping documents:
+Every performance feature the app quotes comes verbatim from the course
+reporting checklist (the source documents are kept offline).
 
-- `22636VIC Course in Initial EAL Mapping` (08/09/2025)
-- `22637VIC Course in EAL Mapping` (08/09/2025, updated April 2026)
-
-These give the reduced list of **key** performance features, the ones the SEE
-Program treats as demonstrable and assessable, which is exactly the set a game
+It gives the reduced list of **key** performance features, the ones the
+checklist treats as demonstrable and assessable, which is exactly the set a game
 can be built against. All 132 are in `docs/acsf-coverage.md` with the game that
 shows each one.
 
@@ -24,8 +21,8 @@ claim, it puts words in the framework's mouth on a page a teacher may act on.
 ## PLA and PLB are not official ACSF
 
 This matters and is easy to miss. The national framework has **one undivided
-Pre Level 1 band**. The split into Stage A and Stage B comes from the AMES/SEE
-Reporting Checklist, which is what Victorian providers report against. The app
+Pre Level 1 band**. The split into Stage A and Stage B comes from the course
+reporting checklist, which is what providers report against. The app
 follows the checklist because that is what its teachers use.
 
 Say "Pre Level 1 Stage A" in anything a teacher reads. Do not describe PLA or
