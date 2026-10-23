@@ -2459,20 +2459,34 @@ check('gamepages', 'every game has a start page that offers what the game does a
   await page.goto(ctx.base + '/fruits', { waitUntil: 'domcontentloaded' });
   const wide = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
   if (wide) bad('gamepages: /fruits scrolls sideways at phone width');
+  // The app comes into the page in the background; Play then runs it here.
+  // Safari plays no sound on a page that has not itself been tapped, so the
+  // first question has to be up before the tap's click handler returns, on
+  // this same page: "Play twice, the first time looks like a reload".
+  await page.waitForFunction(() => typeof bootApp === 'function', null, { timeout: 15000 })
+    .catch(() => bad('gamepages: the app never loaded into /fruits'));
   await page.fill('#gp-q', '7');
   await page.click('#gp-mc');
-  await page.click('.launch-begin');
-  await page.waitForURL(/game\.html|\/fruits/, { timeout: 10000 });
-  await page.waitForFunction(() => typeof soloQuestions !== 'undefined'
-    && (document.querySelector('#screen-solo-launch.active') || (soloQuestions && soloQuestions.length)), null, { timeout: 15000 });
-  const r = await page.evaluate(() => ({ n: soloQuestions.length, mc: mcMode,
-    launch: !!document.querySelector('#screen-solo-launch.active'), url: location.pathname + location.search }));
-  if (r.launch) bad('gamepages: Play on /fruits stopped on the app\'s start screen although audio could start');
-  else {
-    if (r.n !== 7) bad('gamepages: Play on /fruits asked for 7 questions and dealt ' + r.n);
-    if (r.mc !== false) bad('gamepages: Multiple Choice was switched off on /fruits and came on in the game');
-  }
-  say('  /fruits: 7 questions, typing  ->  ' + (r.launch ? 'start screen' : r.n + ' dealt, ' + (r.mc ? 'multiple choice' : 'typing')) + '  at ' + r.url);
+  const r = await page.evaluate(() => {
+    window.__samePage = true;
+    document.querySelector('.launch-begin').click();
+    const active = document.querySelector('.screen.active');
+    return { screen: active && active.id, n: (soloQuestions || []).length, mc: mcMode,
+             same: window.__samePage === true, url: location.pathname + location.search,
+             wide: document.documentElement.scrollWidth > innerWidth };
+  });
+  if (!r.same) bad('gamepages: Play on /fruits left the page');
+  if (r.screen === 'screen-solo-launch') bad('gamepages: Play on /fruits stopped on a second start screen');
+  else if (!/question|student/i.test(r.screen || '')) bad('gamepages: Play on /fruits did not reach a question (' + r.screen + ')');
+  if (r.n !== 7) bad('gamepages: Play on /fruits asked for 7 questions and dealt ' + r.n);
+  if (r.mc !== false) bad('gamepages: Multiple Choice was switched off on /fruits and came on in the game');
+  if (r.wide) bad('gamepages: the game in /fruits scrolls sideways at phone width');
+  say('  /fruits: 7 questions, typing  ->  ' + r.n + ' dealt, ' + (r.mc ? 'multiple choice' : 'typing')
+      + ', on ' + r.screen + ' inside the tap, at ' + r.url);
+  // Back from the game returns to the start card.
+  await page.goBack();
+  await page.waitForSelector('#gp-form', { timeout: 10000 })
+    .catch(() => bad('gamepages: Back from the game did not return to the start card'));
   await page.goto(ctx.base + '/dice', { waitUntil: 'domcontentloaded' });
   await page.click('.launch-begin');
   await page.waitForFunction(() => !!document.querySelector('#screen-solo-launch.active'), null, { timeout: 15000 })
