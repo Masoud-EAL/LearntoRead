@@ -227,7 +227,7 @@ PAGE = """<!DOCTYPE html>
     <ul class="gp-tags">
 {good}
     </ul>
-    <h2>More games like this</h2>
+    <h2>{more_title}</h2>
     <ul class="gp-more">
 {more}
     </ul>
@@ -304,7 +304,10 @@ def related(g, games):
     if len(pool) < 4:
         pool += [x for x in games if x is not g and x not in pool and not is_test(x)]
     i = games.index(g)
-    pool.sort(key=lambda x: (games.index(x) - i) % len(games))
+    # Same skill first: when a skill has fewer than four games, the top-up
+    # must not push its own games off the list, or a skill's first game ends
+    # up linked from nowhere.
+    pool.sort(key=lambda x: (x['skill'] != g['skill'], (games.index(x) - i) % len(games)))
     return pool[:4]
 
 
@@ -362,8 +365,13 @@ def page(g, games):
         cls=esc(g['cls']).replace('Teacher Game', '<a href="%s">Teacher Game</a>' % TEACHER, 1),
         teacher=TEACHER,
         good='\n'.join('      <li>%s</li>' % esc(s) for s in g['good']),
+        more_title='Every game in the mix' if game == 'all' else 'More games like this',
+        # The mixed round lists every game, so one page links to all of them
+        # and a search engine can reach each one from the site, not only the
+        # sitemap.
         more='\n'.join('      <li><a href="%s"><span aria-hidden="true">%s</span> %s</a></li>'
-                       % (x['slug'], x['emoji'], esc(x['name'])) for x in related(g, games)),
+                       % (x['slug'], x['emoji'], esc(x['name']))
+                       for x in ([x for x in games if x is not g] if game == 'all' else related(g, games))),
     )
 
 
