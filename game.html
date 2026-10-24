@@ -922,6 +922,11 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 .result-word{font-family:'Fredoka One',cursive;font-size:1.9rem;line-height:1.3;}
 .correct-answer{color:var(--green);}
 .wrong-answer{color:var(--accent);text-decoration:line-through;margin-right:8px;}
+/* A gap round's word, whole, with the sound that was missing in green. Large,
+   because reading it is the point of the screen. */
+.result-gap-word{font-size:3.4rem;line-height:1.15;letter-spacing:1px;}
+.result-gap-miss{font-size:1.3rem;margin-top:4px;}
+.result-gap-miss .wrong-answer{margin-right:0;}
 .result-points{font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--gold);}
 /* THE TWO ALIGNED ROWS — see spell-feedback.js.
    The answer on top, what the learner wrote underneath, one column per part
@@ -986,6 +991,7 @@ button.sf-want:hover{transform:translateY(-2px);}
   #screen-student-result{gap:10px;}
   .result-icon{font-size:clamp(2.6rem,calc(var(--vh,1vh)*9),5rem);}
   .result-word{font-size:clamp(1.3rem,calc(var(--vh,1vh)*3.6),1.9rem);}
+  .result-gap-word{font-size:clamp(2.4rem,calc(var(--vh,1vh)*7.5),3.4rem);}
   .result-points{font-size:clamp(1.1rem,calc(var(--vh,1vh)*2.6),1.4rem);}
   .waiting-blob{width:82px;height:82px;font-size:2.2rem;}
 }
@@ -5307,7 +5313,7 @@ function phonicsQ(level,fam,word,rung,fams){
     const c=phonicsContrast(fam,word,fams);
     if(!c) return null;   // no three honest rivals
     return Object.assign(base,{
-      type:'phgap', answer:c.answer,
+      type:'phgap', answer:c.answer, gapAt:c.at,
       choices:shuffle([c.answer,...c.rivals]),
       icon:'<div class="ph-word">'+word.slice(0,c.at)
         +'<span class="ph-gap">?</span>'+word.slice(c.at+c.len)+'</div>'
@@ -9641,6 +9647,25 @@ function startSoloGame(){
   setSoloExit(true);
   showStudentQuestion(soloQuestions[0],serverNow());
 }
+/* The answer line on the result screen, for everything but translation and
+   spelling, which draw their own. One function for the solo and the class
+   screen, so the two cannot show a round differently.
+     A gap round's answer is one sound, and "ai" on its own teaches nothing:
+   the learner has just seen "t?l" and needs to see "tail" whole. So the word
+   is the answer here, large, with the sound that was missing in green, and a
+   wrong tap is shown crossed out underneath rather than in front of it. */
+function resultAnswerHtml(q,sub,correct,tier){
+  if(q&&q.type==='phgap'&&q.word){
+    const w=q.word, len=(correct||'').length;
+    let at=q.gapAt!=null?q.gapAt:w.indexOf(correct);
+    if(at<0||w.slice(at,at+len)!==correct) at=w.indexOf(correct);
+    const word=at<0?w:w.slice(0,at)+'<span class="correct-answer">'+correct+'</span>'+w.slice(at+len);
+    return '<div class="result-gap-word">'+word+(tier==='correct'?' ✅':'')+'</div>'
+      +(tier==='correct'?'':'<div class="result-gap-miss"><span class="wrong-answer">'+(sub||'(blank)')+'</span></div>');
+  }
+  return tier==='correct'?'<span class="correct-answer">'+correct+'</span> ✅'
+    :'<span class="wrong-answer">'+(sub||'(blank)')+'</span> → <span class="correct-answer">'+correct+'</span>';
+}
 function showSoloResult(submittedAns,correctAns,timeLeft,timedOut){
   clearInterval(studentTimerInt); stopMusic();
   let pts,tier;
@@ -9663,10 +9688,7 @@ function showSoloResult(submittedAns,correctAns,timeLeft,timedOut){
   } else if(isSpellingQ(currentStudentQ)){
     renderSpellResult(document.getElementById('result-word'),submittedAns,correctAns,tier);
   } else {
-    document.getElementById('result-word').innerHTML=tier==='correct'?'<span class="correct-answer">'+correctAns+'</span> ✅':'<span class="wrong-answer">'+(submittedAns||'(blank)')+'</span> → <span class="correct-answer">'+correctAns+'</span>';
-    // The answer to a gap round is one sound; show the word it completes.
-    if(currentStudentQ&&currentStudentQ.type==='phgap')
-      document.getElementById('result-word').innerHTML+='<div style="font-size:.9rem;color:var(--muted);margin-top:6px;">'+currentStudentQ.word+'</div>';
+    document.getElementById('result-word').innerHTML=resultAnswerHtml(currentStudentQ,submittedAns,correctAns,tier);
   }
   document.getElementById('result-sound-btn').style.display=isSpellingQ(currentStudentQ)?'':'none';
   document.getElementById('result-points').textContent=tier==='correct'?'+'+pts+' points 🎯':tier==='partial'?'+'+pts+' points 🌟 (partly correct)':'No points this round';
@@ -12060,7 +12082,7 @@ function showStudentResult(correctAnswer){
     } else if(isSpellingQ(currentStudentQ)){
       renderSpellResult(document.getElementById('result-word'),myAnswer,correctAnswer,tier);
     } else {
-      document.getElementById('result-word').innerHTML=tier==='correct'?'<span class="correct-answer">'+correctAnswer+'</span> ✅':'<span class="wrong-answer">'+(myAnswer||'(blank)')+'</span> → <span class="correct-answer">'+correctAnswer+'</span>';
+      document.getElementById('result-word').innerHTML=resultAnswerHtml(currentStudentQ,myAnswer,correctAnswer,tier);
     }
     document.getElementById('result-sound-btn').style.display=isSpellingQ(currentStudentQ)?'':'none';
     document.getElementById('result-points').textContent=tier==='correct'?'+'+pts+' points 🎯':tier==='partial'?'+'+pts+' points 🌟 (partly correct)':'No points this round';
