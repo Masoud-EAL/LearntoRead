@@ -386,6 +386,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://wordlink.au/trace-numbers</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://wordlink.au/sound-words</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

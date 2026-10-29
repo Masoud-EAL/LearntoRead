@@ -267,7 +267,7 @@ GUIDE = """<!DOCTYPE html>
 <meta property="og:title" content="{name}">
 <meta property="og:description" content="{meta}">
 <meta property="og:image" content="{image}">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="{card}">
 <script type="application/ld+json">
 {ld}
 </script>
@@ -301,7 +301,7 @@ GUIDE = """<!DOCTYPE html>
     <p class="gp-kicker">For teachers and tutors</p>
     <h2>About {name}</h2>
     <p>{about}</p>
-    <h2>How to use it</h2>
+{shot}    <h2>How to use it</h2>
     <ol class="gp-steps">
 {how}
     </ol>
@@ -474,7 +474,7 @@ def page(g, games):
     )
 
 
-def guide_ld(g, url):
+def guide_ld(g, url, image):
     data = {
         '@context': 'https://schema.org',
         '@type': 'LearningResource',
@@ -482,7 +482,7 @@ def guide_ld(g, url):
         'headline': g['seo'],
         'description': g['meta'],
         'url': url,
-        'image': SITE + '/icon-512.png',
+        'image': image,
         'inLanguage': 'en-AU',
         'isAccessibleForFree': True,
         'offers': {'@type': 'Offer', 'price': '0', 'priceCurrency': 'AUD'},
@@ -500,10 +500,18 @@ def guide_ld(g, url):
 
 
 def guide_page(g):
-    url = '%s/%s' % (SITE, g['slug'])
+    slug = g['slug']
+    url = '%s/%s' % (SITE, slug)
+    # The picture is of the screen Play opens, taken by tools/build-shots.js.
+    has_shot = os.path.exists(os.path.join(ROOT, 'shots', slug + '.jpg'))
+    image = '%s/shots/%s.jpg' % (SITE, slug) if has_shot else SITE + '/icon-512.png'
+    shot = ('    <figure class="gp-shot"><img src="shots/%s.jpg" width="1200" height="630" loading="lazy"\n'
+            '      alt="%s"></figure>\n' % (slug, esc('The %s screen' % g['name']))
+            if has_shot else '')
     return GUIDE.format(
         marker=MARKER, seo=esc(g['seo']), meta=esc(g['meta']), url=url, name=esc(g['name']),
-        image=SITE + '/icon-512.png', ld=guide_ld(g, url),
+        image=image, card='summary_large_image' if has_shot else 'summary', shot=shot,
+        ld=guide_ld(g, url, image),
         label=esc(g['label']), level=esc(g['level']), emoji=g['emoji'], sub=esc(g['sub']),
         dest=g['dest'].replace('&', '&amp;'), play=esc(g['play']),
         about=esc(g['about']),
