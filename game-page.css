@@ -51,6 +51,8 @@ button,a,input,select{touch-action:manipulation;font:inherit;}
   background:linear-gradient(135deg,var(--accent),var(--gold),var(--purple));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .launch-sub{color:var(--muted);font-size:1.05rem;line-height:1.45;text-align:center;max-width:34ch;}
+.launch-free{font-family:'Fredoka One',cursive;font-size:1.05rem;letter-spacing:.5px;color:var(--gold);
+  text-align:center;}
 .gp-say{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:var(--text);
   border-radius:50%;width:44px;height:44px;margin-left:6px;vertical-align:middle;cursor:pointer;
   font-size:1.1rem;}
