@@ -1,12 +1,9 @@
 # ACSF coverage: key performance features and the games that show them
 
-Every key ACSF performance feature (PF) below is quoted verbatim from the AMES/SEE
-Reporting Checklist in the two Victorian course mapping documents:
+Every key ACSF performance feature (PF) below is quoted verbatim from the course
+reporting checklist (the source documents are kept offline).
 
-- `22636VIC Course in Initial EAL Mapping` (08/09/2025)
-- `22637VIC Course in EAL Mapping` (08/09/2025, updated by AMES April 2026)
-
-These give the reduced list of **key** PFs, the ones the SEE Program treats as
+It gives the reduced list of **key** PFs, the ones the checklist treats as
 demonstrable and assessable, which is exactly the set a game can be built against.
 Nothing in the PF column is paraphrased or inferred: it is the source text, and it
 is the same text the teacher panel prints as its evidence for each row.
@@ -117,7 +114,7 @@ Spell a Word is not in the level check. It dictated a word and asked for it
 typed, and three word lists were tried: the themed banks (*necklace*, *humid*),
 the same banks filtered to short words (*back*, *tie*), and five classroom
 words (*pen, pencil, home, name, bus*). Each was reported too hard, and the
-last report named the real fault: *"I have not seen anything like it in AMES
+last report named the real fault: *"I have not seen anything like it in
 PTAs. It can be too hard for learners."* Hearing a word and writing it with
 nothing on the screen asks for more than the one feature it claimed, PLB .06
 *"Writes a very limited number of extremely familiar words, which may have
@@ -155,7 +152,7 @@ asking more than that at Stage A and are now split by stage:
   is worked out from *"Please arrive 10 minutes early"* rather than found in
   it. The Stage B features are about locating.
 
-Three more came from the LWA Streamlined CALD PTA kit, which has PLA tasks
+Three more came from a pre-training assessment kit, which has PLA tasks
 of its own:
 
 - **Write the Number** copies at Stage A. It dictated *"three"* and *"10
