@@ -28,10 +28,26 @@
     "free tracing, no sign up"
    ],
    "more": [
-    {"href": "tracing-words", "emoji": "📖", "label": "Tracing Words"},
-    {"href": "trace-your-name", "emoji": "🙋", "label": "Trace Your Name"},
-    {"href": "letter-names", "emoji": "🔤", "label": "Letter Names"},
-    {"href": "big-and-small-letters", "emoji": "🔠", "label": "Big and Small Letters"}
+    {
+     "href": "tracing-words",
+     "emoji": "📖",
+     "label": "Tracing Words"
+    },
+    {
+     "href": "trace-your-name",
+     "emoji": "🙋",
+     "label": "Trace Your Name"
+    },
+    {
+     "href": "letter-names",
+     "emoji": "🔤",
+     "label": "Letter Names"
+    },
+    {
+     "href": "trace-numbers",
+     "emoji": "🔢",
+     "label": "Trace the Numbers"
+    }
    ]
   },
   {
@@ -61,10 +77,26 @@
     "handwriting practice, free"
    ],
    "more": [
-    {"href": "trace-letters", "emoji": "✍️", "label": "Trace the Letters"},
-    {"href": "trace-your-name", "emoji": "🙋", "label": "Trace Your Name"},
-    {"href": "copy-it", "emoji": "📝", "label": "Copy It"},
-    {"href": "sound-words", "emoji": "🔊", "label": "Sound Words"}
+    {
+     "href": "trace-letters",
+     "emoji": "✍️",
+     "label": "Trace the Letters"
+    },
+    {
+     "href": "trace-your-name",
+     "emoji": "🙋",
+     "label": "Trace Your Name"
+    },
+    {
+     "href": "copy-it",
+     "emoji": "📝",
+     "label": "Copy It"
+    },
+    {
+     "href": "sound-words",
+     "emoji": "🔊",
+     "label": "Sound Words"
+    }
    ]
   },
   {
@@ -94,10 +126,75 @@
     "first English writing for adults"
    ],
    "more": [
-    {"href": "trace-letters", "emoji": "✍️", "label": "Trace the Letters"},
-    {"href": "tracing-words", "emoji": "📖", "label": "Tracing Words"},
-    {"href": "forms", "emoji": "📋", "label": "Forms"},
-    {"href": "capitals-and-full-stops", "emoji": "🔡", "label": "Capitals and Full Stops"}
+    {
+     "href": "trace-letters",
+     "emoji": "✍️",
+     "label": "Trace the Letters"
+    },
+    {
+     "href": "trace-numbers",
+     "emoji": "🔢",
+     "label": "Trace the Numbers"
+    },
+    {
+     "href": "forms",
+     "emoji": "📋",
+     "label": "Forms"
+    },
+    {
+     "href": "capitals-and-full-stops",
+     "emoji": "❕",
+     "label": "Capitals and Full Stops"
+    }
+   ]
+  },
+  {
+   "slug": "trace-numbers",
+   "emoji": "🔢",
+   "label": "Writing",
+   "level": "Beginner",
+   "dest": "tracing.html?mode=digits",
+   "play": "▶ Start Tracing Numbers",
+   "name": "Trace the Numbers with Your Finger",
+   "seo": "Trace Numbers 0 to 9 with Your Finger | Free, No Sign Up",
+   "meta": "Free number tracing for adults. Learn to write the numbers 0 to 9: watch each number, then trace it with your finger. No sign up, any phone.",
+   "sub": "Watch the number. Then trace it with your finger.",
+   "about": "Number tracing for adults who are learning to write numbers in the English way. Many learners already count and use money but write numbers in another script, or have never held a pen. The learner hears the number name, such as \"seven\", watches the number being written, then traces it with a finger from the start dot. All ten numbers from 0 to 9 are included, so the learner can write a phone number, a date or an amount on a form.",
+   "how": [
+    "Open the page and choose a number.",
+    "Listen to its name and watch how it is written.",
+    "Put your finger on the start dot and trace it.",
+    "Write the number on paper."
+   ],
+   "cls": "Use it before writing phone numbers, dates of birth and prices. Ask students to trace each number, then write their own phone number on paper. The Write the Number and Tap the Number games give more practice with the same numbers.",
+   "good": [
+    "trace numbers with your finger",
+    "number tracing for adults",
+    "learn to write numbers 0 to 9",
+    "write a phone number in English",
+    "free numeracy, no sign up"
+   ],
+   "more": [
+    {
+     "href": "trace-letters",
+     "emoji": "✍️",
+     "label": "Trace the Letters"
+    },
+    {
+     "href": "write-the-number",
+     "emoji": "✍️",
+     "label": "Write the Number"
+    },
+    {
+     "href": "numbers-1-10",
+     "emoji": "🔢",
+     "label": "Numbers 1 to 10"
+    },
+    {
+     "href": "tap-the-number",
+     "emoji": "🔢",
+     "label": "Tap the Number"
+    }
    ]
   },
   {
@@ -127,10 +224,26 @@
     "free phonics, no sign up"
    ],
    "more": [
-    {"href": "index.html?section=sounds", "emoji": "🔤", "label": "Letter Sounds"},
-    {"href": "index.html?section=wp2", "emoji": "📘", "label": "Words 2: Longer Words"},
-    {"href": "beginner-sound-gap", "emoji": "🔊", "label": "Beginner Sound Gap"},
-    {"href": "beginner-build-word", "emoji": "🧱", "label": "Beginner Build Word"}
+    {
+     "href": "index.html?section=sounds",
+     "emoji": "🔤",
+     "label": "Letter Sounds"
+    },
+    {
+     "href": "index.html?section=wp2",
+     "emoji": "📘",
+     "label": "Words 2: Longer Words"
+    },
+    {
+     "href": "beginner-sound-gap",
+     "emoji": "🔡",
+     "label": "Beginner Sound Gap"
+    },
+    {
+     "href": "beginner-build-word",
+     "emoji": "🧱",
+     "label": "Beginner Build Word"
+    }
    ]
   },
   {
@@ -160,14 +273,46 @@
     "no sign up reading games"
    ],
    "more": [
-    {"href": "sight-words", "emoji": "👀", "label": "Sight Words"},
-    {"href": "picture-and-word", "emoji": "🖼️", "label": "Picture and Word"},
-    {"href": "read-the-notice", "emoji": "📌", "label": "Read the Notice"},
-    {"href": "signs", "emoji": "🚸", "label": "Signs"},
-    {"href": "messages", "emoji": "💬", "label": "Messages"},
-    {"href": "test-reading", "emoji": "✅", "label": "Test Yourself: Reading"},
-    {"href": "sound-words", "emoji": "🔊", "label": "Sound Words"},
-    {"href": "all-games", "emoji": "🎲", "label": "All Games"}
+    {
+     "href": "sight-words",
+     "emoji": "👁️",
+     "label": "Sight Words"
+    },
+    {
+     "href": "picture-and-word",
+     "emoji": "🖼️",
+     "label": "Picture and Word"
+    },
+    {
+     "href": "read-the-notice",
+     "emoji": "📢",
+     "label": "Read the Notice"
+    },
+    {
+     "href": "signs",
+     "emoji": "🚪",
+     "label": "Signs"
+    },
+    {
+     "href": "messages",
+     "emoji": "📱",
+     "label": "Messages"
+    },
+    {
+     "href": "test-reading",
+     "emoji": "🎯",
+     "label": "Test Yourself: Reading"
+    },
+    {
+     "href": "sound-words",
+     "emoji": "🔊",
+     "label": "Sound Words"
+    },
+    {
+     "href": "all-games",
+     "emoji": "✨",
+     "label": "All Games"
+    }
    ]
   }
  ]

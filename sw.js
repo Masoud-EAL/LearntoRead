@@ -164,6 +164,8 @@ const OPTIONAL = [
   './test-yourself',
   './trace-letters.html',
   './trace-letters',
+  './trace-numbers.html',
+  './trace-numbers',
   './trace-your-name.html',
   './trace-your-name',
   './tracing-words.html',
