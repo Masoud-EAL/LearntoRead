@@ -1,0 +1,174 @@
+{
+ "_comment": "Explanation pages for the parts of WordLink that are not games: finger tracing, sound words, the reading games. tools/build-links.py reads this and writes wordlink.au/<slug>. name is the H1; seo is the <title>; meta is the search snippet; sub is the one line a learner reads; dest is where Play goes; about, how, cls and good sit below Play; more is a list of {href, emoji, label}. Keep every page's text its own, and write no en or em dashes.",
+ "guides": [
+  {
+   "slug": "trace-letters",
+   "emoji": "✍️",
+   "label": "Writing",
+   "level": "Beginner",
+   "dest": "tracing.html?mode=letters",
+   "play": "▶ Start Tracing",
+   "name": "Trace the Letters with Your Finger",
+   "seo": "Trace the Letters with Your Finger | Free, No Sign Up | WordLink",
+   "meta": "Free letter tracing for adults. Trace the letters with your finger on your phone or tablet. Watch each letter, then trace it. No sign up.",
+   "sub": "Watch the letter. Then trace it with your finger.",
+   "about": "A letter tracing activity for adults who are learning to write English letters for the first time. The learner watches a letter being written, stroke by stroke, then traces it with a finger on the screen. The app shows where to start and which way to go, so the letter is formed the right way from the first try. Capital and small letters are both included, and there is no account to make and nothing to buy.",
+   "how": [
+    "Open the page and choose a letter.",
+    "Watch how the letter is written.",
+    "Put your finger on the start dot and trace the letter.",
+    "Try again until it feels easy."
+   ],
+   "cls": "Hand out phones or tablets and open this page. Each student works at their own speed. The tutor can walk around and check that every student starts the strokes in the right place. For a whole class activity, use the Teacher Game.",
+   "good": [
+    "trace the letters with your finger",
+    "letter tracing for adults",
+    "learn to write English letters",
+    "handwriting practice on a phone",
+    "free tracing, no sign up"
+   ],
+   "more": [
+    {"href": "tracing-words", "emoji": "📖", "label": "Tracing Words"},
+    {"href": "trace-your-name", "emoji": "🙋", "label": "Trace Your Name"},
+    {"href": "letter-names", "emoji": "🔤", "label": "Letter Names"},
+    {"href": "big-and-small-letters", "emoji": "🔠", "label": "Big and Small Letters"}
+   ]
+  },
+  {
+   "slug": "tracing-words",
+   "emoji": "📖",
+   "label": "Writing",
+   "level": "Beginner",
+   "dest": "tracing.html?mode=words",
+   "play": "▶ Start Tracing Words",
+   "name": "Tracing Words",
+   "seo": "Tracing Words: Trace Each Letter of a Word | Free, No Sign Up",
+   "meta": "Free word tracing for adults learning English. Trace short words like cat, sun and bus one letter at a time with your finger. No sign up.",
+   "sub": "Trace a word, one letter at a time.",
+   "about": "Word tracing for adults who can already trace single letters. The learner sees a short picture word, such as cat, dog, sun, bus, cup, pen, bed, hat, egg or box, and traces its letters from left to right with a finger. Every word has three letters or fewer, so a first word can be finished in one short session. Seeing the picture next to the word links the letters to a meaning.",
+   "how": [
+    "Look at the picture and the word.",
+    "Trace the first letter.",
+    "Trace the next letters, left to right.",
+    "Read the whole word when you finish."
+   ],
+   "cls": "Use this after the letter tracing page. Ask students to say each word aloud as they trace it, then write it on paper without the screen. The words are short and common, so they also work as a first set of words to read.",
+   "good": [
+    "tracing words",
+    "trace the letters of a word",
+    "first words to write in English",
+    "picture words for adult beginners",
+    "handwriting practice, free"
+   ],
+   "more": [
+    {"href": "trace-letters", "emoji": "✍️", "label": "Trace the Letters"},
+    {"href": "trace-your-name", "emoji": "🙋", "label": "Trace Your Name"},
+    {"href": "copy-it", "emoji": "📝", "label": "Copy It"},
+    {"href": "sound-words", "emoji": "🔊", "label": "Sound Words"}
+   ]
+  },
+  {
+   "slug": "trace-your-name",
+   "emoji": "🙋",
+   "label": "Writing",
+   "level": "Beginner",
+   "dest": "tracing.html?mode=name",
+   "play": "▶ Trace My Name",
+   "name": "Trace Your Name in English",
+   "seo": "Trace Your Name in English | Free Writing Practice, No Sign Up",
+   "meta": "Type your name and trace it with your finger, letter by letter. Free English writing practice for adults. No sign up, works on any phone.",
+   "sub": "Type your name. Then trace each letter.",
+   "about": "For many adult learners, writing their own name in English letters is the first goal. The learner types their name, and the app breaks it into letters to trace one after another. The name is remembered on that device, so it is ready next time. Names with a capital first letter, such as Ali or Fatima, are drawn correctly.",
+   "how": [
+    "Type your name in the box.",
+    "Trace the first letter.",
+    "Trace each next letter in turn.",
+    "Write your name on paper."
+   ],
+   "cls": "Useful at enrolment, for signing forms, and for the first lesson. Ask each student to trace their own name, then a classmate's name. It is a good way to start talking about capital letters.",
+   "good": [
+    "write your name in English",
+    "learn to sign your name",
+    "trace your name with your finger",
+    "capital letters in names",
+    "first English writing for adults"
+   ],
+   "more": [
+    {"href": "trace-letters", "emoji": "✍️", "label": "Trace the Letters"},
+    {"href": "tracing-words", "emoji": "📖", "label": "Tracing Words"},
+    {"href": "forms", "emoji": "📋", "label": "Forms"},
+    {"href": "capitals-and-full-stops", "emoji": "🔡", "label": "Capitals and Full Stops"}
+   ]
+  },
+  {
+   "slug": "sound-words",
+   "emoji": "🔊",
+   "label": "Letters and Sounds",
+   "level": "Beginner",
+   "dest": "index.html?section=wp1",
+   "play": "▶ Start Reading",
+   "name": "Sound Words",
+   "seo": "EAL Sound Words: Read Words Letter by Letter | Free, No Sign Up",
+   "meta": "Free EAL sound words for adult beginners. Hear each letter sound, then sound out short words one pattern at a time. No sign up, any phone.",
+   "sub": "Hear the sounds. Read the word.",
+   "about": "Sound words are short English words that can be read by saying each letter sound in turn, like cat, pen and sit. WordLink teaches them in steps. First the learner hears the sound each letter makes. Then they read short words, one letter pattern at a time, and tap any word to hear it read aloud. Longer words and harder patterns follow once the first set feels easy. It is made for adult EAL learners who are new to reading in any language.",
+   "how": [
+    "Start with Letter Sounds and hear each sound.",
+    "Open Words 1 and tap a word to hear it.",
+    "Say the sounds, then the whole word.",
+    "Move on to Words 2 for longer words."
+   ],
+   "cls": "Use it as the phonics part of a pre-literacy lesson. Project one word list, say the sounds together, then let students practise alone on their phones. The Sound Gap, Tap Word and Build Word games give extra practice with the same words.",
+   "good": [
+    "EAL sound words",
+    "phonics for adult beginners",
+    "sound out words in English",
+    "pre-literacy ESL resource",
+    "free phonics, no sign up"
+   ],
+   "more": [
+    {"href": "index.html?section=sounds", "emoji": "🔤", "label": "Letter Sounds"},
+    {"href": "index.html?section=wp2", "emoji": "📘", "label": "Words 2: Longer Words"},
+    {"href": "beginner-sound-gap", "emoji": "🔊", "label": "Beginner Sound Gap"},
+    {"href": "beginner-build-word", "emoji": "🧱", "label": "Beginner Build Word"}
+   ]
+  },
+  {
+   "slug": "reading-games",
+   "emoji": "📚",
+   "label": "Reading",
+   "level": "Beginner and Elementary",
+   "dest": "game.html?mode=solo",
+   "play": "▶ Choose a Game",
+   "name": "Reading Games for Adults",
+   "seo": "Reading Games for Adults Learning English | Free, No Sign Up",
+   "meta": "Free reading games for adult English learners. Sight words, picture words, signs and notices. Play on any phone, no sign up, no account.",
+   "sub": "Free reading games. Choose one and play.",
+   "about": "A set of free reading games for adults who are learning to read English. They start with letters and sounds, then move to sight words, picture words and the signs, notices, messages and forms that adults meet every day. The tone is respectful and the screens are simple, with audio support, so learners with little reading can use them on their own. Everything opens straight away in the browser. There is no sign up, no account and no advertising.",
+   "how": [
+    "Press the button and choose a reading game.",
+    "Listen to the question, or read it.",
+    "Tap the answer.",
+    "Play again, or pick the next game."
+   ],
+   "cls": "Open the Teacher Game and choose a reading game. Students join on their phones with the room code or QR code, and the projector shows the question to the whole class. Test Yourself: Reading gives a quick check of where each student is.",
+   "good": [
+    "reading games for adults",
+    "free reading practice for adult ESL",
+    "sight words for adults",
+    "read signs and notices in English",
+    "no sign up reading games"
+   ],
+   "more": [
+    {"href": "sight-words", "emoji": "👀", "label": "Sight Words"},
+    {"href": "picture-and-word", "emoji": "🖼️", "label": "Picture and Word"},
+    {"href": "read-the-notice", "emoji": "📌", "label": "Read the Notice"},
+    {"href": "signs", "emoji": "🚸", "label": "Signs"},
+    {"href": "messages", "emoji": "💬", "label": "Messages"},
+    {"href": "test-reading", "emoji": "✅", "label": "Test Yourself: Reading"},
+    {"href": "sound-words", "emoji": "🔊", "label": "Sound Words"},
+    {"href": "all-games", "emoji": "🎲", "label": "All Games"}
+   ]
+  }
+ ]
+}

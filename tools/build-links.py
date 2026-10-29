@@ -14,8 +14,13 @@ real file. There are two kinds:
   game. Play goes straight into the first question, so a shared link costs the
   learner no more taps than the start screen inside the app did.
 
-The words for every game page live in tools/game-pages.json. Edit that (or
-SECTIONS below), then re-run:
+Guides (trace-letters, sound-words, reading-games...) are the same kind of
+  real, indexed page for the parts of the app that are not games. The learner
+  sees the name, one line, "Free. No sign up." and one Play button; the text
+  below is for the people searching.
+
+The words for every game page live in tools/game-pages.json, and for every
+guide in tools/guide-pages.json. Edit those (or SECTIONS below), then re-run:
 
     python3 tools/build-links.py
 
@@ -244,6 +249,83 @@ PAGE = """<!DOCTYPE html>
 </html>
 """
 
+GUIDE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- {marker} from tools/guide-pages.json. Do not edit by hand. -->
+<title>{seo}</title>
+<meta name="description" content="{meta}">
+<link rel="canonical" href="{url}">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="WordLink">
+<meta property="og:locale" content="en_AU">
+<meta property="og:url" content="{url}">
+<meta property="og:title" content="{name}">
+<meta property="og:description" content="{meta}">
+<meta property="og:image" content="{image}">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{ld}
+</script>
+
+<script data-goatcounter="https://masoud-eal.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+<link href="fonts/fonts.css" rel="stylesheet">
+<link href="game-page.css" rel="stylesheet">
+<meta name="theme-color" content="#0d0d1a">
+<link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+</head>
+<body style="--lx:var(--teal);--lx-glow:rgba(15,155,142,.30);">
+<header class="gp-bar"><a href="./">WordLink <span>🎮</span> Practice</a></header>
+<main>
+  <section class="gp-launch">
+    <p class="launch-skill">{label} · {level}</p>
+    <div class="launch-medallion" aria-hidden="true">{emoji}</div>
+    <h1 class="home-title">{name}</h1>
+    <p class="launch-sub">{sub}</p>
+    <p class="launch-free">Free. No sign up. Start now.</p>
+    <div class="solo-start-bar">
+      <a class="btn btn-gold btn-lg launch-begin" href="{dest}">{play}</a>
+    </div>
+  </section>
+
+  <article class="gp-about">
+    <p class="gp-kicker">For teachers and tutors</p>
+    <h2>About {name}</h2>
+    <p>{about}</p>
+    <h2>How to use it</h2>
+    <ol class="gp-steps">
+{how}
+    </ol>
+    <h2>Use it in a class</h2>
+    <p>{cls}</p>
+    <p><a class="btn btn-teal btn-sm" href="{teacher}">👩‍🏫 Open the Teacher Game</a></p>
+    <h2>Good for</h2>
+    <ul class="gp-tags">
+{good}
+    </ul>
+    <h2>More to try</h2>
+    <ul class="gp-more">
+{more}
+    </ul>
+  </article>
+</main>
+<footer class="gp-foot">
+  <p>WordLink: free English practice for adults learning to read and write English for the first time.
+    Free, with no sign-up and no account. Works on any phone.</p>
+  <p><a href="about.html">About WordLink</a> · <a href="reading-games">Reading games</a> ·
+    <a href="all-games">All games</a> · <a href="{teacher}">Teacher Game</a> · <a href="./">Home</a></p>
+</footer>
+</body>
+</html>
+"""
+
 
 def esc(s):
     return html.escape(s, quote=True)
@@ -375,6 +457,53 @@ def page(g, games):
     )
 
 
+def guide_ld(g, url):
+    data = {
+        '@context': 'https://schema.org',
+        '@type': 'LearningResource',
+        'name': g['name'],
+        'headline': g['seo'],
+        'description': g['meta'],
+        'url': url,
+        'image': SITE + '/icon-512.png',
+        'inLanguage': 'en-AU',
+        'isAccessibleForFree': True,
+        'offers': {'@type': 'Offer', 'price': '0', 'priceCurrency': 'AUD'},
+        'learningResourceType': 'Interactive resource',
+        'interactivityType': 'active',
+        'educationalLevel': g['level'],
+        'teaches': g['label'],
+        'keywords': ', '.join(g['good']),
+        'audience': {'@type': 'EducationalAudience',
+                     'educationalRole': 'student',
+                     'audienceType': 'Adults learning to read and write English'},
+        'publisher': {'@type': 'Organization', 'name': 'WordLink', 'url': SITE + '/'},
+    }
+    return json.dumps(data, ensure_ascii=False, indent=1).replace('</', '<\\/')
+
+
+def guide_page(g):
+    url = '%s/%s' % (SITE, g['slug'])
+    return GUIDE.format(
+        marker=MARKER, seo=esc(g['seo']), meta=esc(g['meta']), url=url, name=esc(g['name']),
+        image=SITE + '/icon-512.png', ld=guide_ld(g, url),
+        label=esc(g['label']), level=esc(g['level']), emoji=g['emoji'], sub=esc(g['sub']),
+        dest=g['dest'].replace('&', '&amp;'), play=esc(g['play']),
+        about=esc(g['about']),
+        how='\n'.join('      <li>%s</li>' % esc(x) for x in g['how']),
+        cls=esc(g['cls']).replace('Teacher Game', '<a href="%s">Teacher Game</a>' % TEACHER, 1),
+        teacher=TEACHER,
+        good='\n'.join('      <li>%s</li>' % esc(x) for x in g['good']),
+        more='\n'.join('      <li><a href="%s"><span aria-hidden="true">%s</span> %s</a></li>'
+                       % (x['href'], x['emoji'], esc(x['label'])) for x in g['more']),
+    )
+
+
+def load_guides():
+    with open(os.path.join(ROOT, 'tools', 'guide-pages.json'), encoding='utf-8') as f:
+        return json.load(f)['guides']
+
+
 def load_games():
     with open(os.path.join(ROOT, 'tools', 'game-pages.json'), encoding='utf-8') as f:
         return json.load(f)['games']
@@ -388,7 +517,8 @@ def write_file(name, text):
 
 def main():
     games = load_games()
-    dashes = [g['slug'] for g in games if re.search('[–—]', json.dumps(g, ensure_ascii=False))]
+    guides = load_guides()
+    dashes = [g['slug'] for g in games + guides if re.search('[–—]', json.dumps(g, ensure_ascii=False))]
     if dashes:
         raise SystemExit('en or em dash in: ' + ', '.join(dashes))
     written = []
@@ -396,8 +526,19 @@ def main():
         written.append(write_file(slug + '.html', stub(slug, dest, title, desc)))
     for g in games:
         written.append(write_file(g['slug'] + '.html', page(g, games)))
+    known = {g['slug'] for g in games + guides}
+    for g in guides:
+        for x in g['more']:
+            target = x['href'].split('?')[0]
+            if '.' in target:
+                ok = os.path.exists(os.path.join(ROOT, target))
+            else:
+                ok = target in known
+            if not ok:
+                raise SystemExit('%s links to %s, which is not a page' % (g['slug'], x['href']))
+        written.append(write_file(g['slug'] + '.html', guide_page(g)))
     update_sw(written)
-    update_sitemap([g['slug'] for g in games])
+    update_sitemap([g['slug'] for g in games + guides])
     print('wrote %d pages' % len(written))
 
 
