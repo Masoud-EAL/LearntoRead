@@ -242,6 +242,7 @@ PAGE = """<!DOCTYPE html>
   <p>WordLink: free English games for adults learning to read and write English for the first time.
     Free, with no sign-up. Works on any phone.</p>
   <p><a href="about.html">About WordLink</a> · <a href="solo">All solo games</a> ·
+    <a href="reading-games">Reading games</a> · <a href="trace-letters">Letter tracing</a> ·
     <a href="{teacher}">Teacher Game</a> · <a href="./">Home</a></p>
 </footer>
 <script src="game-page.js" defer></script>
@@ -288,7 +289,8 @@ GUIDE = """<!DOCTYPE html>
     <p class="launch-skill">{label} · {level}</p>
     <div class="launch-medallion" aria-hidden="true">{emoji}</div>
     <h1 class="home-title">{name}</h1>
-    <p class="launch-sub">{sub}</p>
+    <p class="launch-sub">{sub}
+      <button type="button" class="gp-say" data-say="{sub}" aria-label="Hear it">🔊</button></p>
     <p class="launch-free">Free. No sign up. Start now.</p>
     <div class="solo-start-bar">
       <a class="btn btn-gold btn-lg launch-begin" href="{dest}">{play}</a>
@@ -322,6 +324,21 @@ GUIDE = """<!DOCTYPE html>
   <p><a href="about.html">About WordLink</a> · <a href="reading-games">Reading games</a> ·
     <a href="all-games">All games</a> · <a href="{teacher}">Teacher Game</a> · <a href="./">Home</a></p>
 </footer>
+<script>
+// Read the learner's line aloud, as on the game pages (game-page.js).
+(function(){{
+  var say=document.querySelector('.gp-say');
+  if(!('speechSynthesis' in window)){{ say.hidden=true; return; }}
+  say.addEventListener('click',function(){{
+    try{{
+      speechSynthesis.cancel();
+      var u=new SpeechSynthesisUtterance(say.dataset.say);
+      u.lang='en-AU'; u.rate=.9;
+      speechSynthesis.speak(u);
+    }}catch(e){{}}
+  }});
+}})();
+</script>
 </body>
 </html>
 """
