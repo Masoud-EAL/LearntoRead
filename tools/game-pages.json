@@ -1123,6 +1123,16 @@
     "number words 1 to 10",
     "spelling numbers in English",
     "numbers for adult beginners"
+   ],
+   "inside": [
+    "The number words one to ten.",
+    "The learner hears a number and types its word. Multiple choice is on at the start, for learners who cannot type yet.",
+    "A Hint button sounds the word out, then shows it one part at a time."
+   ],
+   "tips": [
+    "Two, four and eight have letters that are hard to hear, like the w in two and the gh in eight. Point these out before a spelling game.",
+    "Write the digit beside the word on the board: 8, eight. Many learners know the digit long before the word.",
+    "Next, play [Numbers 11 to 20](numbers-11-20)."
    ]
   },
   {
@@ -1147,6 +1157,15 @@
     "teen numbers game",
     "spelling eleven twelve",
     "number words 11 to 20"
+   ],
+   "inside": [
+    "The number words eleven to twenty.",
+    "The learner hears a number and types its word. Multiple choice is on at the start."
+   ],
+   "tips": [
+    "Say thirteen and thirty side by side, and stress the end: thirTEEN, THIRty. Learners mix these up when listening to prices and times.",
+    "Eleven and twelve do not follow the teen pattern. Teach them on their own first.",
+    "Next, play [Numbers 21 to 99](numbers-21-99)."
    ]
   },
   {
@@ -1157,10 +1176,10 @@
    "level": "Elementary",
    "name": "Numbers 21 to 99",
    "seo": "Number Words 21 to 99: Hear and Spell Twenty-One to Ninety-Nine | Free for Adults",
-   "meta": "Hear a number and spell it with its hyphen, like forty-two. Free English number words game for adult learners.",
+   "meta": "Hear a number and spell it, like forty-two or ninety-nine. Free English number words game for adult learners.",
    "sub": "Hear a number from 21 to 99 and spell it.",
-   "blurb": "Hear a number like forty-two and spell it, hyphen included. Needed for writing amounts in words.",
-   "about": "A spelling game for two-digit number words, like twenty-one, forty-two and ninety-nine. Learners practise the tens words and the hyphen, which they need for forms and for writing amounts in words.",
+   "blurb": "Hear a number like forty-two and spell it. Needed for writing amounts in words.",
+   "about": "A spelling game for two-digit number words, like twenty-one, forty-two and ninety-nine. Learners practise the tens words they need for forms and for writing amounts in words. The hyphen is shown as the standard form, and a space is accepted too.",
    "how": [
     "Listen to the number.",
     "Type the number word.",
@@ -1171,6 +1190,16 @@
     "number words to 100",
     "spelling forty",
     "writing numbers in words"
+   ],
+   "inside": [
+    "The number words from twenty-one to ninety-nine.",
+    "The learner hears a number and types its word. The hyphen is the standard way to write it, but twenty one with a space is also accepted.",
+    "Multiple choice is on at the start."
+   ],
+   "tips": [
+    "Teach the tens words first: twenty, thirty, forty, fifty. Forty has no u, which surprises many learners.",
+    "Then show that the rest is a tens word and a ones word joined: forty and two make forty-two.",
+    "For writing numbers in figures instead of words, play [Write the Number](write-the-number)."
    ]
   },
   {
@@ -1181,10 +1210,10 @@
    "level": "Beginner",
    "name": "Tap the Number",
    "seo": "Tap the Number: Hear a Number and Find It | Free Number Recognition Game for Adults",
-   "meta": "Hear a number and tap it from four. The choices are close, like 13 and 31. Free number recognition game for adult learners.",
+   "meta": "Hear a number from 0 to 10 and tap it from four. Free number recognition game for adult learners, with no typing.",
    "sub": "Hear a number and tap it.",
-   "blurb": "Hear a number and tap it from four close choices: one more, one less, ten more or the digits swapped. Careful listening, no typing.",
-   "about": "A number recognition game with no typing. The learner hears a number and taps it from four numbers. The wrong choices are close (one more, one less, ten more, or the digits swapped), so the learner has to listen carefully.",
+   "blurb": "Hear a number from 0 to 10 and tap it from four. The wrong choices are close, so it trains careful listening with no typing.",
+   "about": "A number recognition game with no typing. The learner hears a number from 0 to 10 and taps it from four numbers. The wrong choices include the numbers on either side, so the learner has to listen carefully.",
    "how": [
     "Listen to the number.",
     "Look at the four numbers.",
@@ -1195,6 +1224,16 @@
     "number recognition game",
     "listening to numbers",
     "numeracy for adult ESL"
+   ],
+   "inside": [
+    "Numbers from 0 to 10, including zero.",
+    "The learner hears a number and taps it from four. The wrong choices include the numbers either side, like 6 and 8 for 7.",
+    "There is no typing, so learners who cannot type yet can play."
+   ],
+   "tips": [
+    "Zero is often skipped in class, but it is in every phone number. Practise saying zero and oh.",
+    "Say a number and ask learners to hold up that many fingers, then find it in the game.",
+    "Next, play [Write the Number](write-the-number), where learners write the digits themselves."
    ]
   },
   {
@@ -1207,8 +1246,8 @@
    "seo": "Write the Number: Write Numbers and Australian Money in Figures | Free for Adults",
    "meta": "Hear a number or price and write it in figures, or write what an Australian coin or note is worth. Free numeracy for adults.",
    "sub": "Write numbers and money in figures.",
-   "blurb": "Write numbers and money in figures: a number you hear or see, the value of an Australian coin or note, or an amount like $4.50.",
-   "about": "Writing numbers and money in figures. Rounds mix four kinds: write a number you hear, copy a number, write what an Australian coin or note is worth (from 5c to $50), and write an amount of money you hear, like $4.50.",
+   "blurb": "Write numbers and money in figures: a number from 0 to 10, the value of a $1, $2, $5 or $10, or an amount like $7.",
+   "about": "Writing numbers and money in figures. Rounds mix three kinds: write a number from 0 to 10 that you hear or see, write what an Australian coin or note is worth ($1, $2, $5 or $10), and write a whole dollar amount up to $10, like $7.",
    "how": [
     "Listen, or look at the coin or note.",
     "Type the number or amount.",
@@ -1219,6 +1258,17 @@
     "writing numbers in figures",
     "Australian coins and notes",
     "money numeracy for ESL"
+   ],
+   "inside": [
+    "Three kinds of round, mixed: a number, a coin or note, and an amount of money.",
+    "Numbers from 0 to 10, either heard or shown to copy.",
+    "Coins and notes: a picture of a $1, $2, $5 or $10, and the learner writes what it is worth.",
+    "Money amounts in whole dollars up to $10, like $7, either heard or shown to copy."
+   ],
+   "tips": [
+    "Bring real coins and notes to class and ask learners to write what each one is worth.",
+    "Show that $5 and $5.00 are the same amount. The game accepts both.",
+    "For bigger amounts and cents, play [Shop](shop) and [Read the List](read-the-list)."
    ]
   },
   {
@@ -1243,6 +1293,15 @@
     "addition game for adults",
     "maths English",
     "numeracy for ESL"
+   ],
+   "inside": [
+    "Two numbers that add up to 10 or less, like 4 + 3.",
+    "The sum is spoken, What is four plus three?, and shown on the screen. The learner types the answer."
+   ],
+   "tips": [
+    "The maths is easy on purpose. The point is the English: plus, equals, and the number words.",
+    "Teach the other ways to say it too: four and three, four add three.",
+    "Next, play [Add the Money](add-the-money) for the same sums with dollars."
    ]
   },
   {
@@ -1267,6 +1326,15 @@
     "money maths game",
     "adding dollars",
     "money for adult ESL"
+   ],
+   "inside": [
+    "Two whole dollar amounts that add up to $10 or less, like $5 + $3.",
+    "The question is spoken, What is five dollars plus three dollars?, and shown on the screen. The learner types the total."
+   ],
+   "tips": [
+    "Use a shopping list on the board: milk $3, bread $4. How much altogether?",
+    "Teach how much altogether and total, the words used at the checkout.",
+    "Next, play [Shop](shop) to pay with coins and notes."
    ]
   },
   {
@@ -1291,6 +1359,17 @@
     "ordering numbers game",
     "sequencing days and months",
     "ordering money"
+   ],
+   "inside": [
+    "Four kinds of round, mixed: numbers, money, days and months.",
+    "Numbers: three numbers between 1 and 100, from smallest to biggest.",
+    "Money: three Australian coins or notes, from 5c to $50, from smallest to biggest.",
+    "Days and months: three in a row, like Tuesday, Wednesday, Thursday, to put in order."
+   ],
+   "tips": [
+    "Coins can be tricky: the $2 coin is smaller than the $1 coin, and the 50c coin is the biggest. Put real coins in order on the table.",
+    "Ask learners to say the order aloud as they tap: smallest, then bigger, then biggest.",
+    "For more on days and months, play [Days of the Week](days) and [Months](months)."
    ]
   },
   {
@@ -1315,6 +1394,16 @@
     "place value game",
     "tens and ones activity",
     "adult numeracy"
+   ],
+   "inside": [
+    "Numbers from 11 to 99.",
+    "Each round asks How many tens in 47? or How many ones in 47?, spoken and shown.",
+    "The wrong choices include the other digit of the same number, so the learner has to know which place is which."
+   ],
+   "tips": [
+    "Use bundles of ten, like pop sticks or $10 notes and $1 coins, so learners can see the tens and ones.",
+    "Link it to money: 47 dollars is four $10 notes and seven $1 coins.",
+    "Practise saying the numbers with [Numbers 21 to 99](numbers-21-99)."
    ]
   },
   {
@@ -1340,6 +1429,17 @@
     "menu reading ESL",
     "cheaper and more expensive",
     "shopping English"
+   ],
+   "inside": [
+    "A short price list of groceries like bread, milk, eggs, apples, cheese, rice, tea, coffee, bananas and soap.",
+    "Two kinds of round, taking turns: find a price in a list of four, and compare two prices.",
+    "Prices are whole dollars up to $10.",
+    "The questions are How much is the bread?, Which one is cheaper? and Which one is more expensive?"
+   ],
+   "tips": [
+    "Bring in a real price list, like a café menu or a supermarket catalogue, and ask the same questions.",
+    "Cheaper and more expensive are the words to teach first. Most and least can come later.",
+    "For paying the price, play [Shop](shop)."
    ]
   },
   {
@@ -1364,6 +1464,16 @@
     "reading a calendar ESL",
     "dates in English",
     "calendar activity for adults"
+   ],
+   "inside": [
+    "A real month calendar, with the days of the week across the top. Any of the twelve months can come up.",
+    "Two kinds of question: What day is May 14?, and Which month is this?",
+    "The four choices can be heard as well as read."
+   ],
+   "tips": [
+    "Use the class calendar or a learner's appointment card and ask the same question about real dates.",
+    "Show how to read down a column to find the day, and across the top to find its name.",
+    "For saying dates aloud, play [Ordinal Numbers](ordinal-numbers)."
    ]
   },
   {
@@ -1388,6 +1498,15 @@
     "ordinal numbers game",
     "first second third ESL",
     "ordinals for adults"
+   ],
+   "inside": [
+    "The ordinal words first, second and third.",
+    "Three kinds of round: hear Tap second and choose 2nd, hear Tap the second one and tap it in a row, or see one person marked in a row and choose the word."
+   ],
+   "tips": [
+    "Line up three learners at the front and ask who is first, second and third.",
+    "Use real places where these words come up: the second floor, the first door on the left.",
+    "Next, play [Ordinal Numbers](ordinal-numbers) for first to thirtieth."
    ]
   },
   {
@@ -1412,6 +1531,16 @@
     "ordinal numbers 1 to 30",
     "dates in English ESL",
     "thirteenth or thirtieth"
+   ],
+   "inside": [
+    "Ordinal numbers from first to thirtieth, the range used for dates.",
+    "Three kinds of round: hear Tap twelfth and choose 12th, hear Tap the twelfth one and tap it from numbers in counting order, or see one number marked on a grid of 1 to 30 and choose its word.",
+    "The wrong choices are the ones people mix up: the numbers either side, the same last digit, and thirteenth against thirtieth."
+   ],
+   "tips": [
+    "First, second, third, twenty-first and thirtieth do not follow the th pattern. Practise them on their own.",
+    "Say the dates of this month's classes aloud: Monday the third, Monday the tenth.",
+    "Follow with [Find the Date](find-the-date)."
    ]
   },
   {
@@ -1436,6 +1565,16 @@
     "left and right game",
     "prepositions of place",
     "directions ESL"
+   ],
+   "inside": [
+    "Six words: up, down, left, right, in front and behind.",
+    "Arrow rounds ask which way the arrow points. Picture rounds show a person and a box, and ask whether the box is in front or behind.",
+    "The four choices can be heard as well as read."
+   ],
+   "tips": [
+    "Play it standing up: point left, point right, then put a bag in front of you and behind you.",
+    "Left and right are hard for many adults in any language. Use a mark on the left hand as a reminder.",
+    "Next, use these words on a map with [Directions](directions)."
    ]
   },
   {
@@ -1462,6 +1601,17 @@
     "analogue clock practice",
     "quarter past and quarter to",
     "teaching clocks to adults"
+   ],
+   "inside": [
+    "An analogue clock with an hour hand and a minute hand.",
+    "Two kinds of round, taking turns: read the clock and choose the time, and drag the hands to set a time.",
+    "The game moves up in steps: o'clock, then half past, then quarter past and quarter to, then five-minute steps.",
+    "The wrong choices are real mistakes, like reading the hands the wrong way round or being an hour out."
+   ],
+   "tips": [
+    "Times are said the analogue way here: half past seven, quarter to three. Teach both ways of saying a time.",
+    "The short hand is the hour, the long hand is the minutes. Use a real clock in the room.",
+    "For the times on phones and appointment cards, play [Digital Time](digital-time)."
    ]
   },
   {
@@ -1486,6 +1636,17 @@
     "digital time game",
     "AM and PM ESL",
     "telling the time in numbers"
+   ],
+   "inside": [
+    "Two kinds of round, taking turns.",
+    "Whole hours, like 7:00: the learner hears the time and taps the clock that shows it.",
+    "Times on the hour or quarter hour with AM or PM, like 7:15 AM: the learner hears seven fifteen in the morning and types the time.",
+    "Times are said the digital way, seven fifteen, not quarter past seven."
+   ],
+   "tips": [
+    "Bring in real appointment cards, bus timetables or a phone screen, and read the times aloud.",
+    "AM is the morning and PM is the afternoon and evening. Link them to daily routine: I wake up at 7 AM.",
+    "For reading an analogue clock, play [Clock](clock)."
    ]
   },
   {
@@ -1499,7 +1660,7 @@
    "meta": "Tap real Australian coins and notes to pay a price, then work out the change. Free money game for adult English learners.",
    "sub": "Count the coins and pay the right amount.",
    "blurb": "Pay for everyday items with real Australian coins and notes, from 5c to $50, and work out the change.",
-   "about": "A money game with pictures of real Australian coins and notes, from 5c to $50. The learner pays the right amount for an everyday item at a believable price. Other rounds ask for the change: \"It costs $7.00. You give $10.00. Tap your change.\"",
+   "about": "A money game with pictures of real Australian coins and notes, from 5c to $50. The learner pays the right amount for an everyday item at a believable price. Other rounds ask for the change: \"It costs $34.50. You give $50.00. Tap your change.\"",
    "how": [
     "Read the price.",
     "Tap coins and notes to pay.",
@@ -1511,6 +1672,17 @@
     "coins and notes activity",
     "giving change",
     "money for newly arrived migrants"
+   ],
+   "inside": [
+    "Pictures of real Australian coins and notes, from 5c to $50, to tap and pay with.",
+    "Two kinds of round, taking turns: pay the exact price, and work out the change.",
+    "Pay rounds use prices from $50 to $99.50, for things like a chair, shoes, a jacket or a bicycle.",
+    "Change rounds show what you paid with, a $20, $50 or $100 note, and the learner taps the change."
+   ],
+   "tips": [
+    "Bring real coins and notes, or printed ones, and set up a shop in the classroom.",
+    "Teach the phrases for paying: How much is it? Here you are. Here is your change.",
+    "For smaller amounts, start with [Write the Number](write-the-number) and [Add the Money](add-the-money)."
    ]
   },
   {
@@ -1535,6 +1707,17 @@
     "dice game maths",
     "adding game for adults",
     "whole class number game"
+   ],
+   "inside": [
+    "Two dice, a running score and a target.",
+    "The learner rolls, adds the dice to their score and types the new score, then chooses to roll again or stop.",
+    "Going over the target means you are out. The target can be 20, 30, 50, 75 or 100, or your own number.",
+    "You choose whether a wrong sum ends the game or gives one more try."
+   ],
+   "tips": [
+    "Play it as a class from the Teacher Game, where everyone races to the target on the projector.",
+    "Ask learners to say each sum aloud: twelve plus five is seventeen.",
+    "Talk about the choice to stop or roll again. It is a natural way to practise more, less and close to."
    ]
   },
   {
@@ -1634,6 +1817,18 @@
     "giving directions game",
     "prepositions of place",
     "map reading for adult learners"
+   ],
+   "inside": [
+    "A street map with 15 kinds of place, such as a bank, school, park, café, library, chemist, post office, bus stop and train station.",
+    "The learner hears and reads directions, then draws the way with a finger from You are here.",
+    "The place being looked for has no name on the map. Place words like next to, opposite, between and on the corner are what find it.",
+    "Directions start short and get longer through the game.",
+    "The right place reached by another way, or the right street but the wrong building, scores part marks."
+   ],
+   "tips": [
+    "Teach turn left, turn right and go straight ahead with gestures before playing.",
+    "Practise the place words with real buildings near your centre: the chemist is next to the bank.",
+    "Learn the position words first with [Where Is It](where-is-it)."
    ]
   },
   {
