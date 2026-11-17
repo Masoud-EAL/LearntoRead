@@ -528,6 +528,7 @@
    "inside": [
     "Every word from the vocabulary games in one mix: number words one to ten, days of the week, months, weather, fruit, parts of the body and clothes.",
     "The learner hears a word and types it. Multiple choice is off at the start and can be switched on for an easier game.",
+    "A Hint button sounds the word out, then shows it one part at a time.",
     "When a word is wrong, the learner sees their spelling under the right one, part by part, and can tap each part to hear its sound."
    ],
    "tips": [
@@ -558,6 +559,17 @@
     "spelling days ESL",
     "Wednesday spelling",
     "adult beginner vocabulary"
+   ],
+   "inside": [
+    "The seven days, Monday to Sunday.",
+    "The learner hears a day and types it. A Hint button sounds the word out, then shows it one part at a time.",
+    "A day spelled correctly without its capital scores part marks, because days always take a capital in English.",
+    "Multiple choice is on at the start, for learners who cannot type yet. Switch it off for a spelling game."
+   ],
+   "tips": [
+    "Wednesday, Thursday and Saturday are the hardest to spell. Say Wed-nes-day slowly, the way it is written, to help learners remember the letters.",
+    "Start each lesson by asking what day it is today, and what day it was yesterday.",
+    "Next, play [Months](months), then [Find the Date](find-the-date) to read days on a calendar."
    ]
   },
   {
@@ -582,6 +594,17 @@
     "months of the year game",
     "spelling months ESL",
     "birthday month vocabulary"
+   ],
+   "inside": [
+    "The twelve months, January to December.",
+    "The learner hears a month and types it. A Hint button sounds the word out, then shows it one part at a time.",
+    "A month spelled correctly without its capital scores part marks.",
+    "Multiple choice is on at the start and can be switched off for a spelling game."
+   ],
+   "tips": [
+    "February, August and September cause the most mistakes. February has an r that many people do not say.",
+    "Ask each learner to say and write the month of their birthday.",
+    "Follow with [Find the Date](find-the-date) and [Ordinal Numbers](ordinal-numbers), which practise saying dates."
    ]
   },
   {
@@ -607,6 +630,16 @@
     "weather words game",
     "small talk English",
     "weather adjectives"
+   ],
+   "inside": [
+    "12 weather words: sunny, cloudy, rainy, windy, snowy, stormy, foggy, hot, cold, warm, cool and humid.",
+    "The learner hears a word and types it, or in multiple choice taps the matching picture.",
+    "Multiple choice is on at the start. Switch it off for a spelling game."
+   ],
+   "tips": [
+    "Point out the pattern in sunny, cloudy, rainy, windy, snowy, stormy and foggy: a weather word with y on the end.",
+    "Look at today's weather forecast on the projector and ask learners to find the words.",
+    "Pair it with [Clothes](clothes): It is cold. Wear a jumper."
    ]
   },
   {
@@ -632,6 +665,16 @@
     "food words for shopping",
     "spelling fruit names",
     "picture vocabulary for adults"
+   ],
+   "inside": [
+    "15 fruits: apple, banana, orange, grape, mango, peach, plum, pear, lemon, cherry, strawberry, watermelon, pineapple, coconut and kiwi.",
+    "The learner hears a word and types it, or in multiple choice taps the matching picture.",
+    "Multiple choice is on at the start. Switch it off for a spelling game."
+   ],
+   "tips": [
+    "Strawberry, watermelon and pineapple are two words joined together. Splitting them, straw and berry, makes them easier to spell.",
+    "Bring in a supermarket catalogue and ask learners to find the fruit and its price.",
+    "Follow with [Shop](shop) or [Read the List](read-the-list) for prices and money."
    ]
   },
   {
@@ -657,6 +700,16 @@
     "health English",
     "at the doctor English",
     "parts of the body for adults"
+   ],
+   "inside": [
+    "24 body words: head, eye, ear, nose, mouth, tooth, tongue, neck, shoulder, arm, elbow, wrist, hand, finger, thumb, chest, stomach, back, hip, leg, knee, ankle, foot and toe.",
+    "Each word has a clear drawing. In multiple choice the learner taps the matching picture.",
+    "Multiple choice is on at the start. Switch it off for a spelling game."
+   ],
+   "tips": [
+    "Some of these words have letters you do not hear, like the k in knee, the w in wrist and the b in thumb. Point these out before a spelling game.",
+    "Practise the sentence for the doctor: My knee hurts. My back hurts.",
+    "Teach the plurals that change, too: one tooth, two teeth, and one foot, two feet."
    ]
   },
   {
@@ -681,6 +734,16 @@
     "clothes vocabulary ESL",
     "Australian English words",
     "shopping for clothes English"
+   ],
+   "inside": [
+    "34 words for clothes and accessories, including shirt, jumper, jacket, dress, pants, jeans, singlet, hoodie, socks, boots, thongs, beanie, helmet, scarf, gloves, glasses, watch, wallet, backpack and umbrella.",
+    "Australian English is used throughout: jumper rather than sweater, pants rather than trousers, and thongs for the footwear.",
+    "The learner hears a word and types it, or in multiple choice taps the matching picture."
+   ],
+   "tips": [
+    "Thongs means footwear in Australia. Learners may know a different meaning from other English, so it is worth a quick explanation.",
+    "Ask learners to describe what they are wearing today: I am wearing a jumper and jeans.",
+    "Pair it with [Weather](weather): It is raining. Take an umbrella."
    ]
   },
   {
@@ -706,6 +769,16 @@
     "word categories ESL",
     "vocabulary groups",
     "thinking game for adult learners"
+   ],
+   "inside": [
+    "Ten groups: animals, fruit, transport, clothes, the body, food, weather, colours, numbers and actions.",
+    "Each round shows three pictures from one group and one from another group. The learner taps the one that does not belong.",
+    "Groups that overlap are never mixed. For example, fruit is never set against food, so there is only ever one right answer."
+   ],
+   "tips": [
+    "After each round, ask learners to say why: The bus is not an animal.",
+    "Ask learners to name the group as well as the odd one out. It builds the words for categories, like transport and clothes.",
+    "Use [Test Yourself: Vocabulary](test-vocabulary) to see which topics a learner already knows."
    ]
   },
   {
