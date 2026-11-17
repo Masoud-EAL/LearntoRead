@@ -580,16 +580,18 @@ check('prices', 'a shop round names something its price would buy', async ctx =>
   if (out.gaps.length) bad('prices: nothing in the shop costs ' + out.gaps.join(', '));
 });
 
-/* Directions are only fair if the words lead to one place. Every question is
-   built and then checked against its own words before it is dealt; this runs
-   the same two readings over hundreds more, and then draws on the real map
-   with a finger, because a line that snaps to the wrong street is a wrong
-   answer the learner did not give. */
-check('routes', 'directions lead to one place, and the map marks the line that was drawn', async ctx => {
+/* Directions are only fair if the words lead to one place, by a way somebody
+   would really send you. Every question is built and then checked against its
+   own words before it is dealt; this runs the same readings over hundreds
+   more, and then draws on the real map with a finger, steady and unsteady,
+   because a line that snaps to the wrong street, or is left behind when a
+   corner is cut, is a wrong answer the learner did not give. */
+check('routes', 'directions lead to one place by the short way, and the map marks the line that was drawn', async ctx => {
   const out = await ctx.page.evaluate(() => {
-    const bad = [], words = {}, steps = {};
+    const bad = [], words = {}, steps = {}, homes = {}, twoTurn = {};
     const lots = Object.values(routeLots());
-    // Buildings do not overlap each other or the roads.
+    // Buildings do not overlap each other or the roads, and a line going in
+    // stops inside its own building.
     lots.forEach(a => {
       lots.forEach(b => {
         if (a.id < b.id && a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h)
@@ -597,15 +599,23 @@ check('routes', 'directions lead to one place, and the map marks the line that w
       });
       ROUTE_X.forEach(x => { if (a.x < x + 10 && x - 10 < a.x + a.w) bad.push(a.id + ' sits on a road'); });
       ROUTE_Y.forEach(y => { if (a.y < y + 10 && y - 10 < a.y + a.h) bad.push(a.id + ' sits on a road'); });
+      a.keys.forEach(k => {
+        const at = a.faces[k].at;
+        if (!(at[0] > a.x && at[0] < a.x + a.w && at[1] > a.y && at[1] < a.y + a.h)) bad.push(a.id + ' is entered outside its walls');
+      });
+      if (!!a.corner !== (a.keys.length === 2)) bad.push(a.id + ' is a corner building with ' + a.keys.length + ' streets');
     });
     for (const from of [0, 1, 2, undefined]) {
       const qs = GEN_BANKS.route(100, from);
       if (qs.length !== 100) bad.push('round ' + from + ' dealt ' + qs.length + ' of 100');
       qs.forEach(q => {
-        const said = q.question;
+        const said = q.question, D = routeLots()[q.dest];
         // The words walk to the street the place is on, by the way the answer takes.
-        const walked = routeFollow(q.steps, q.places, q.dest);
+        const walked = routeFollow(q.steps, q.places, q.dest, q.home);
         if (!walked || walked.join(' ') !== q.route.join(' ')) bad.push('the words lead elsewhere: ' + said);
+        if (!D.faces[q.via]) bad.push('the place is not on the last street: ' + said);
+        // Nobody is sent the long way round.
+        if (routeWalk(q.route, q.dest, q.via, q.home) > routeShortest(q.dest, q.home) + 1) bad.push('the long way round: ' + said);
         // The place words fit one plain building, the right one.
         const fit = routeMatches(q.rel, q.places);
         if (fit.length !== 1 || fit[0] !== q.dest) bad.push('the place words fit ' + fit.length + ' buildings: ' + said);
@@ -615,19 +625,28 @@ check('routes', 'directions lead to one place, and the map marks the line that w
         Object.values(q.places).concat(q.destName).forEach(n => { if (!routePlace(n) || !routePlace(n).icon) bad.push('no picture for ' + n); });
         // Every landmark the words name is on the map.
         q.steps.forEach(s => { if (s.lot && !q.places[s.lot]) bad.push('the words name a building with no name: ' + said); });
-        if (/\u2014|\u2013/.test(said)) bad.push('a dash in: ' + said);
+        if (/—|–/.test(said)) bad.push('a dash in: ' + said);
         if (q.say !== said) bad.push('what is heard is not what is shown: ' + said);
         // Marking: its own answer is right, and nothing drawn is nothing.
         if (answerTier(q, q.answer) !== 'correct') bad.push('its own answer is not marked right: ' + said);
         if (answerTier(q, '') !== 'wrong' || answerGiven(q, '')) bad.push('an empty map is marked as an answer');
         // Past the door to the far corner and back in is the same way.
-        const D = routeLots()[q.dest], far = D.seg.find(n => n !== q.route[q.route.length - 1]);
-        if (answerTier(q, q.route.concat(far).join(' ') + ' @' + q.dest) !== 'correct') bad.push('in from the far corner is not marked right');
+        const far = D.faces[q.via].seg.find(n => n !== q.route[q.route.length - 1]);
+        if (answerTier(q, q.route.concat(far).join(' ') + ' @' + q.dest) !== 'correct') bad.push('in from the far corner is not marked right: ' + said);
         // The right way to the wrong building on the right street is half right.
-        lots.filter(l => l.segKey === D.segKey && l.id !== q.dest).forEach(l => {
-          if (routeVerdict(q, q.route.join(' ') + ' @' + l.id) !== 'street') bad.push('the wrong building on the right street is not part marked');
+        lots.filter(l => l.faces[q.via] && l.id !== q.dest).forEach(l => {
+          if (routeVerdict(q, q.route.join(' ') + ' @' + l.id) !== 'street') bad.push('the wrong building on the right street is not part marked: ' + said);
         });
+        // The right building by another way is half right too.
+        const other = D.faces[q.via].seg.find(n => n !== q.route[q.route.length - 1]);
+        if (q.route.indexOf(other) < 0 && routeVerdict(q, 'S ' + q.home + ' X ' + other + ' @' + q.dest) !== 'place')
+          bad.push('the right place another way is not part marked: ' + said);
+        // A line that stops in the street has not answered.
+        if (routeTier(q, q.route.join(' ')) !== 'wrong') bad.push('a line with no building is given marks');
         words[q.rel.rel] = (words[q.rel.rel] || 0) + 1;
+        homes[q.home] = (homes[q.home] || 0) + 1;
+        const turns = q.steps.filter(s => s.do === 'turn').length;
+        if (turns === 2) twoTurn[q.dest] = 1;
         q.steps.forEach(s => { const k = s.do === 'turn' ? s.how : s.do; steps[k] = (steps[k] || 0) + 1; });
       });
     }
@@ -637,9 +656,13 @@ check('routes', 'directions lead to one place, and the map marks the line that w
       bad.push('a game does not run short to long: ' + st.join(','));
     ['next', 'opposite', 'between', 'corner'].forEach(w => { if (!words[w]) bad.push('no question uses "' + w + '"'); });
     ['ahead', 'past', 'end', 'lot', 'count'].forEach(w => { if (!steps[w]) bad.push('no question uses the "' + w + '" step'); });
-    return { bad: [...new Set(bad)], words: words, steps: steps };
+    ['N02', 'N12', 'N22'].forEach(h => { if (!homes[h]) bad.push('no question starts at ' + h); });
+    // Two turns once ended at the same four buildings every time.
+    if (Object.keys(twoTurn).length < 10) bad.push('two-turn questions end at only ' + Object.keys(twoTurn).length + ' buildings');
+    return { bad: [...new Set(bad)], words: words, steps: steps, two: Object.keys(twoTurn).length };
   });
-  say('  400 questions: place words ' + JSON.stringify(out.words) + ', steps ' + JSON.stringify(out.steps));
+  say('  400 questions: place words ' + JSON.stringify(out.words) + ', steps ' + JSON.stringify(out.steps) +
+      ', two turns end at ' + out.two + ' buildings');
   out.bad.slice(0, 10).forEach(x => bad('routes: ' + x));
 
   // Now with a finger on the real map, on a phone-sized screen.
@@ -647,6 +670,68 @@ check('routes', 'directions lead to one place, and the map marks the line that w
   await page.setViewportSize({ width: 390, height: 844 });
   await page.evaluate(() => { soloSelectedType = 'route'; soloMode = true; startSoloGame(); });
   await page.waitForSelector('#screen-student-answer.active', { timeout: 15000 });
+
+  /* Fingers are not rulers. Each of these draws the right way over 150
+     questions the way a hand does it: wobbling off the road, cutting corners,
+     and moving faster than the phone reports. Every one has to write the
+     right answer; the first-corner cut is the one that used to leave the
+     line behind at the blue dot. */
+  const hands = await page.evaluate(() => {
+    function draw(q, o) {
+      const pts = routeTarget(q), poly = [pts[0]];
+      for (let i = 1; i < pts.length - 1; i++) {
+        const a = pts[i - 1], c = pts[i], d = pts[i + 1];
+        const la = Math.hypot(c[0] - a[0], c[1] - a[1]), ld = Math.hypot(d[0] - c[0], d[1] - c[1]);
+        const r = Math.min(o.cut, la / 2, ld / 2);
+        if (r < 1) { poly.push(c); continue; }
+        const p1 = [c[0] + (a[0] - c[0]) * r / la, c[1] + (a[1] - c[1]) * r / la];
+        const p2 = [c[0] + (d[0] - c[0]) * r / ld, c[1] + (d[1] - c[1]) * r / ld];
+        for (let k = 0; k <= 4; k++) {
+          const t = k / 4;
+          poly.push([(1 - t) * (1 - t) * p1[0] + 2 * t * (1 - t) * c[0] + t * t * p2[0],
+                     (1 - t) * (1 - t) * p1[1] + 2 * t * (1 - t) * c[1] + t * t * p2[1]]);
+        }
+      }
+      poly.push(pts[pts.length - 1]);
+      const phase = Math.random() * 6.28;
+      let gone = 0, strayed = 0, was = null;
+      renderRouteWidget(q); answered = false;
+      for (let i = 1; i < poly.length; i++) {
+        const a = poly[i - 1], c = poly[i], L = Math.hypot(c[0] - a[0], c[1] - a[1]);
+        if (L < .01) continue;
+        const nx = -(c[1] - a[1]) / L, ny = (c[0] - a[0]) / L, last = i === poly.length - 1;
+        for (let s = 0; s < L; s += o.step * (.6 + Math.random() * .8)) {
+          const w = last ? 0 : Math.sin((gone + s) / 40 + phase) * o.wob + (Math.random() - .5) * o.noise;
+          routeMoveTo([a[0] + (c[0] - a[0]) * s / L + nx * w, a[1] + (c[1] - a[1]) * s / L + ny * w]);
+          // A building lit up on the way past, before the last stretch.
+          if (routeIn && routeIn !== was && i < poly.length - 2) strayed++;
+          was = routeIn;
+        }
+        gone += L;
+      }
+      routeMoveTo(pts[pts.length - 1]);
+      return { ok: routeTier(q, document.getElementById('student-ans-input').value) === 'correct', strayed: strayed,
+               got: document.getElementById('student-ans-input').value };
+    }
+    const kinds = { steady: { step: 6, wob: 4, noise: 3, cut: 10 }, shaky: { step: 10, wob: 10, noise: 8, cut: 20 },
+                    fast: { step: 28, wob: 8, noise: 6, cut: 30 }, wide: { step: 12, wob: 14, noise: 8, cut: 34 },
+                    swipe: { step: 55, wob: 6, noise: 6, cut: 35 } };
+    const keep = currentStudentQ, qs = [0, 1, 2].reduce((o, st) => o.concat(GEN_BANKS.route(50, st)), []), res = {};
+    Object.keys(kinds).forEach(k => {
+      let ok = 0, strayed = 0, miss = '';
+      qs.forEach(q => { const r = draw(q, kinds[k]); if (r.ok) ok++; else if (!miss) miss = q.answer + ' drew ' + (r.got || 'nothing'); strayed += r.strayed; });
+      res[k] = { ok: ok, of: qs.length, strayed: strayed, miss: miss };
+    });
+    renderRouteWidget(keep); answered = false;
+    return res;
+  });
+  say('  hands: ' + Object.keys(hands).map(k => k + ' ' + hands[k].ok + '/' + hands[k].of).join(', '));
+  Object.keys(hands).forEach(k => {
+    const h = hands[k];
+    if (h.ok !== h.of) bad('routes: a ' + k + ' hand drawing the right way wrote the wrong answer ' + (h.of - h.ok) + ' times in ' + h.of + ', e.g. ' + h.miss);
+    if (k === 'steady' && h.strayed) bad('routes: a steady hand lit up a building on the way past ' + h.strayed + ' times');
+  });
+
   const screen = (pts) => page.evaluate(pts => {
     const svg = document.getElementById('route-svg'), m = svg.getScreenCTM();
     return pts.map(([x, y]) => { const p = svg.createSVGPoint(); p.x = x; p.y = y; const r = p.matrixTransform(m); return [r.x, r.y]; });
@@ -664,31 +749,52 @@ check('routes', 'directions lead to one place, and the map marks the line that w
     return page.evaluate(() => document.getElementById('student-ans-input').value);
   };
   const results = [];
-  for (const how of ['right', 'nothing', 'back']) {
+  for (const how of ['right', 'nothing', 'back', 'street']) {
     const q = await page.evaluate(() => currentStudentQ);
-    const pts = await page.evaluate(q => routePoints(q.route, q.dest), q);
-    let got;
-    if (how === 'right') got = await draw(pts, 5);
+    const pts = await page.evaluate(q => routeTarget(q), q);
+    const along = pts.slice(0, pts.length - 2);
+    let got, want = '';
+    if (how === 'right') { got = await draw(pts, 5); want = q.answer; }
     else if (how === 'nothing') got = await page.evaluate(() => document.getElementById('student-ans-input').value);
-    else {
+    else if (how === 'back') {
       // Out along the way and all the way back again rubs the line out.
-      const there = await draw(pts.slice(0, pts.length - 2), 0);
+      const there = await draw(along, 0);
       if (there === '') results.push('a line along the streets wrote nothing');
-      got = await draw(pts.slice(0, pts.length - 2).reverse(), 0);
+      got = await draw(along.slice().reverse(), 0);
+    } else {
+      // Stops in the street outside. Submit asks once for a building, then takes it.
+      got = await draw(along, 0); want = q.route.join(' ');
+      await page.click('#student-submit-btn');
+      const held = await page.evaluate(() => ({ on: document.querySelector('.screen.active').id,
+        hint: document.getElementById('route-hint').textContent, loud: document.getElementById('route-hint').classList.contains('nudge') }));
+      if (held.on !== 'screen-student-answer' || !held.loud || !/building/i.test(held.hint))
+        results.push('Submit over a line in the street was taken without asking for a building');
     }
-    const want = how === 'right' ? q.answer : '';
     if (got !== want) results.push(how + ': the map wrote "' + got + '", wanted "' + want + '" for: ' + q.question);
+    if (how === 'right') {
+      const lit = await page.evaluate(q => !!document.querySelector('#route-lot-' + q.dest + '.on'), q);
+      if (!lit) results.push('the building the line went into did not light up');
+    }
     await page.click('#student-submit-btn');
     await page.waitForSelector('#screen-student-result.active', { timeout: 5000 });
     const pts2 = await page.textContent('#result-points');
-    const map = await page.evaluate(() => !!document.querySelector('#result-word svg .rm-right'));
-    if (!map) results.push(how + ': the result does not show the way on the map');
+    const seen = await page.evaluate(() => {
+      const svg = document.querySelector('#result-word svg'), right = svg && svg.querySelector('.rm-right'), mine = svg && svg.querySelector('.rm-ink');
+      const next = document.querySelector('#solo-next-wrap .btn').getBoundingClientRect();
+      // The right way is drawn after the learner's line, so it shows on top of it.
+      return { right: !!right, onTop: !right || !mine || !!(mine.compareDocumentPosition(right) & Node.DOCUMENT_POSITION_FOLLOWING),
+               nextOn: next.bottom <= innerHeight, ids: document.querySelectorAll('#route-dot').length };
+    });
+    if (!seen.right) results.push(how + ': the result does not show the way on the map');
+    if (!seen.onTop) results.push(how + ': the right way is hidden under the learner\'s line');
+    if (!seen.nextOn) results.push(how + ': Next is off the bottom of the result screen');
+    if (seen.ids > 1) results.push('two maps on the page share an id');
     if (how === 'right' && !/points 🎯/.test(pts2)) results.push('the right line was not marked right: ' + pts2);
     if (how !== 'right' && !/No points/.test(pts2)) results.push(how + ' was given points: ' + pts2);
     await page.evaluate(() => soloNextQuestion());
     await page.waitForSelector('#screen-student-answer.active', { timeout: 5000 });
   }
-  say('  drew the right way, nothing, and out and back on the real map');
+  say('  drew the right way, nothing, out and back, and a line left in the street, on the real map');
   results.forEach(x => bad('routes: ' + x));
   page.errs.forEach(x => bad('routes: ' + x));
   await page.close();

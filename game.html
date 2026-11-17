@@ -920,8 +920,6 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
   #screen-student-answer > .unscramble-section,
   #screen-student-answer > .ans-input-wrap,
   #screen-student-answer > #hint-wrap{flex:1 1 46%;max-width:52%;align-self:stretch;}
-  /* Sideways the map sits beside the directions and takes the height. */
-  #screen-student-answer #route-svg{height:min(calc(var(--vh,1vh)*62),calc(46vw*1.13),460px);}
   #screen-student-answer .route-hint{display:none;}
   #screen-student-answer > .submit-btn{flex:0 0 100%;max-width:420px;margin-top:2px;}
   #screen-student-answer > .submitted-msg{flex:0 0 100%;text-align:center;}
@@ -1343,17 +1341,21 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
    learner's line is the app's red; the right way, on the answer screens, is
    green and dotted so the two can be told apart where they run together. */
 .route-section{display:none;flex-direction:column;align-items:center;gap:clamp(3px,calc(var(--vh,1vh)*1),8px);width:100%;}
-#route-svg{display:block;height:min(calc(var(--vh,1vh)*48),calc((100vw - 28px)*1.13),540px);width:auto;max-width:100%;
+#route-svg{display:block;height:min(calc(var(--vh,1vh)*48),calc((100vw - 28px)*1.11),540px);width:auto;max-width:100%;
   touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:crosshair;}
 .route-tools{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;}
 .route-tools .btn{padding:6px 14px;}
 .route-hint{font-size:.88rem;color:var(--muted);font-weight:700;}
-.route-hint.nudge{color:var(--gold);}
+/* A nudge is shown even where the resting line is hidden to save the row. */
+.route-hint.nudge{color:var(--gold);display:inline!important;}
 .rm-bg{fill:#e4ecd9;}
-.rm-road{stroke:#c3c8ce;stroke-width:20;}
+/* Square ends, so two roads meeting at the edge of the map make a whole corner. */
+.rm-road{stroke:#c3c8ce;stroke-width:20;stroke-linecap:square;}
 .rm-green{fill:#cfe0bd;}
 .rm-lot{fill:#d8d1c7;stroke:#b4a99b;stroke-width:1;}
 .rm-lot.named{fill:#fffdf8;stroke:#7a6f65;stroke-width:1.3;}
+/* The building the line has gone into. */
+.rm-lot.on,.rm-lot.named.on{fill:#fde4e9;stroke:#e94560;stroke-width:3;}
 .rm-lot.dest{fill:#e3f7ea;stroke:#00a152;stroke-width:3;}
 .rm-icon{font-size:17px;text-anchor:middle;dominant-baseline:central;}
 .rm-name{font-family:'Nunito',sans-serif;font-weight:800;font-size:10.5px;fill:#2d2a26;text-anchor:middle;}
@@ -1362,11 +1364,17 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .rm-end{fill:#e94560;stroke:#fff;stroke-width:2.5;}
 .rm-right{fill:none;stroke:#00a152;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 11;}
 .rm-dot{fill:#2f7fd6;stroke:#fff;stroke-width:3;}
-.rm-dot.nudge{animation:rmPulse .5s ease-in-out 3;transform-origin:170px 366px;transform-box:view-box;}
+.rm-dot,.rm-end{transform-box:fill-box;transform-origin:center;}
+.rm-dot.nudge,.rm-end.nudge{animation:rmPulse .5s ease-in-out 3;}
 @keyframes rmPulse{50%{transform:scale(1.6);}}
 .rm-face{fill:#2f7fd6;}
 .rm-here{font-family:'Nunito',sans-serif;font-weight:900;font-size:12px;fill:#1d4f8a;}
-.route-static{display:block;height:min(calc(var(--vh,1vh)*46),400px);width:auto;max-width:100%;margin:0 auto;}
+.route-static{display:block;height:min(calc(var(--vh,1vh)*40),calc((100vw - 40px)*1.11),380px);width:auto;max-width:100%;margin:0 auto;}
+/* The answer here is a map, which is taller than a word. The party popper
+   and the gaps give way so Next stays on the screen without scrolling. */
+#screen-student-result[data-round="route"]{gap:8px;padding-top:14px;padding-bottom:14px;}
+#screen-student-result[data-round="route"] .result-icon{font-size:clamp(1.8rem,calc(var(--vh,1vh)*5),3rem);line-height:1.1;}
+#screen-student-result[data-round="route"] .logo-bar{display:none;}
 /* On the projector the answers card under it has to stay in view. */
 .q-emoji-big .route-static{height:min(32vh,330px);}
 .route-result{display:flex;flex-direction:column;align-items:center;gap:8px;font-family:'Nunito',sans-serif;font-size:1rem;}
@@ -1379,9 +1387,22 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 /* The directions are the longest prompt in the app, and the map below them
    cannot give way, so the words run a size smaller than other rounds. */
 #screen-student-answer[data-qtype="route"] .s-q-text{font-size:clamp(.95rem,calc(var(--vh,1vh)*2.7),1.35rem);line-height:1.35;}
-:root[data-app-h~="lt620"] #screen-student-answer #route-svg{height:min(calc(var(--vh,1vh)*45),calc((100vw - 24px)*1.13));}
+:root[data-app-h~="lt620"] #screen-student-answer #route-svg{height:min(calc(var(--vh,1vh)*45),calc((100vw - 24px)*1.11));}
 :root[data-app-h~="lt620"] #screen-student-answer .route-hint{display:none;}
-:root[data-app-h~="lt500"] #screen-student-answer #route-svg{height:min(calc(var(--vh,1vh)*42),calc((100vw - 20px)*1.13));}
+:root[data-app-h~="lt500"] #screen-student-answer #route-svg{height:min(calc(var(--vh,1vh)*42),calc((100vw - 20px)*1.11));}
+/* Sideways. On the answer screen the map sits beside the directions and takes
+   the height: written here, after the short-screen sizes and as specific as
+   they are, because a phone on its side is also a short screen and those
+   sizes were winning. On the result screen the map goes beside the score. */
+@media (max-height:520px) and (min-aspect-ratio:1/1){
+  :root[data-app-h] #screen-student-answer #route-svg{height:min(calc(var(--vh,1vh)*60),calc(46vw*1.11),460px);}
+  #screen-student-result[data-round="route"].active{display:grid;grid-template-columns:auto minmax(0,1fr);
+    align-content:center;align-items:center;justify-items:center;column-gap:18px;row-gap:4px;padding:8px 16px;}
+  #screen-student-result[data-round="route"] > *{grid-column:2;}
+  #screen-student-result[data-round="route"] > .result-word{grid-column:1;grid-row:1 / span 7;}
+  #screen-student-result[data-round="route"] .route-static{height:min(calc(var(--vh,1vh)*74),380px);}
+  #screen-student-result[data-round="route"] .route-verdict{font-size:.9rem;max-width:300px;}
+}
 
 /* ── Fill the form ── */
 .form-section{display:none;flex-direction:column;gap:clamp(5px,1.4vh,12px);width:100%;max-width:460px;}
@@ -2468,7 +2489,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   <!-- Directions: draw the way on the map. Writes the corners passed and the
        building reached into #student-ans-input. -->
   <div class="route-section" id="route-section" style="display:none;">
-    <svg id="route-svg" viewBox="0 0 340 384" aria-label="Street map: draw the way"></svg>
+    <svg id="route-svg" viewBox="0 0 356 396" aria-label="Street map: draw the way"></svg>
     <div class="route-tools">
       <span class="route-hint" id="route-hint">Draw from the blue dot</span>
       <button class="btn btn-ghost btn-sm" id="route-clear" onclick="routeClear()">↺ Start again</button>
@@ -4185,24 +4206,27 @@ const POSITIONS=[
    A sentence of directions and a street map. The learner draws the way from
    the blue dot ("You are here") to the place the sentence names.
 
-   The streets never change: three roads across, three down, and a short road
-   at the bottom where the learner starts, facing up the map. Left and right
-   are always the learner's own left and right as they walk, which is why
-   the start shows which way they are facing.
+   The streets never change: three roads across and three down. The learner
+   starts at the bottom of one of the three roads that run up the map, facing
+   up it. Left and right are always the learner's own left and right as they
+   walk, which is why the start shows which way they are facing.
 
-   Only the buildings change. Each block has eight, and each building faces
-   one street. A building with a place in it shows a picture and a name; the
-   rest are plain. The place the learner is looking for is always a plain
-   one, and that is what the place words are for: "next to the bank" is how
-   you know which plain building is the post office.
+   Only the buildings change. Each block has eight. A building in the middle
+   of a side faces one street; a building on a corner faces both of its
+   streets, and can be reached from either. A building with a place in it
+   shows a picture and a name; the rest are plain. The place the learner is
+   looking for is always a plain one, and that is what the place words are
+   for: "next to the bank" is how you know which plain building is the post
+   office.
 
    Every question is built and then checked against its own words before it
-   is dealt: routeFollow walks the directions as written, and routeMatches
-   reads the place words over every plain building. If the words lead
-   anywhere else, or fit two buildings, the question is thrown away and built
-   again. The routes check in tools/checks runs the same two functions. */
-const ROUTE_X=[10,170,330], ROUTE_Y=[10,170,330];
-const ROUTE_W=340, ROUTE_H=384, ROUTE_START=[170,366];
+   is dealt: routeFollow walks the directions as written, routeMatches reads
+   the place words over every plain building, and the way has to be the
+   shortest there is, because nobody gives directions that go round three
+   sides of the block. If any of that fails the question is thrown away and
+   built again. The routes check in tools/checks runs the same functions. */
+const ROUTE_X=[18,178,338], ROUTE_Y=[18,178,338];
+const ROUTE_W=356, ROUTE_H=396, ROUTE_HOME_Y=374, ROUTE_BLOCK=160;
 const ROUTE_INSET=13, ROUTE_LOT=42, ROUTE_GAP=4, ROUTE_DEEP=38;
 const ROUTE_UP=[0,-1];
 /* Places a learner goes to, by the name they are called in Australia, each
@@ -4219,76 +4243,83 @@ const ROUTE_PLACES=[
 function routePlace(name){ return ROUTE_PLACES.find(p=>p.name===name)||null; }
 function routePick(a){ return a[Math.floor(Math.random()*a.length)]; }
 
-/* Corners are N<column><row>; S is You are here. */
-function routeXY(id){ return id==='S'?ROUTE_START:[ROUTE_X[+id[1]],ROUTE_Y[+id[2]]]; }
-function routeNbrs(id){
-  if(id==='S') return ['N12'];
+/* Corners are N<column><row>. S is You are here, and `home` is the corner it
+   leads up to: N02, N12 or N22. */
+function routeXY(id,home){
+  return id==='S'?[ROUTE_X[+(home||'N12')[1]],ROUTE_HOME_Y]:[ROUTE_X[+id[1]],ROUTE_Y[+id[2]]];
+}
+function routeNbrs(id,home){
+  home=home||'N12';
+  if(id==='S') return [home];
   const c=+id[1], r=+id[2], out=[];
   if(r>0) out.push('N'+c+(r-1));
   if(c<2) out.push('N'+(c+1)+r);
   if(r<2) out.push('N'+c+(r+1));
   if(c>0) out.push('N'+(c-1)+r);
-  if(id==='N12') out.push('S');
+  if(id===home) out.push('S');
   return out;
 }
-function routeDir(a,b){ const p=routeXY(a), q=routeXY(b); return [Math.sign(q[0]-p[0]),Math.sign(q[1]-p[1])]; }
-function routeAhead(id,h){
-  return routeNbrs(id).find(n=>{ const d=routeDir(id,n); return d[0]===h[0]&&d[1]===h[1]; })||null;
+function routeDir(a,b,home){ const p=routeXY(a,home), q=routeXY(b,home); return [Math.sign(q[0]-p[0]),Math.sign(q[1]-p[1])]; }
+function routeAhead(id,h,home){
+  return routeNbrs(id,home).find(n=>{ const d=routeDir(id,n,home); return d[0]===h[0]&&d[1]===h[1]; })||null;
 }
 /* Left of the way you face. On the screen y grows downwards, so facing up the
    map, [0,-1], left is [-1,0]. */
 function routeTurn(h,dir){ return dir==='left'?[h[1],-h[0]]:[-h[1],h[0]]; }
 function routeSeg(a,b){ return [a,b].sort().join('-'); }
+function routeGap(p,q){ return Math.hypot(p[0]-q[0],p[1]-q[1]); }
 
 /* The buildings. L<block column><block row><0-7>, clockwise round the block
    from the top left corner: three along the top, one on the right, three
-   along the bottom, one on the left. ring holds the two it touches. */
+   along the bottom, one on the left. ring holds the two it touches.
+   faces holds each street it can be reached from, by the name of that piece
+   of street: the door is the point on the road in front of it, and `at` is
+   where a line going in stops, just inside the wall, so the name stays
+   readable. */
 let ROUTE_LOTS=null;
 function routeLots(){
   if(ROUTE_LOTS) return ROUTE_LOTS;
-  const lots={}, step=ROUTE_LOT+ROUTE_GAP;
+  const lots={}, step=ROUTE_LOT+ROUTE_GAP, N=(c,r)=>'N'+c+r;
   for(let bc=0;bc<2;bc++) for(let br=0;br<2;br++){
     const bx=ROUTE_X[bc]+ROUTE_INSET, by=ROUTE_Y[br]+ROUTE_INSET;
-    const size=ROUTE_X[bc+1]-ROUTE_X[bc]-2*ROUTE_INSET;
+    const size=ROUTE_BLOCK-2*ROUTE_INSET;
     const midY=by+ROUTE_DEEP+ROUTE_GAP, midH=size-2*(ROUTE_DEEP+ROUTE_GAP);
-    const N=(c,r)=>'N'+c+r;
+    const yB=by+size-ROUTE_DEEP;
+    const NW=N(bc,br), NE=N(bc+1,br), SE=N(bc+1,br+1), SW=N(bc,br+1);
+    const top=[NW,NE], right=[NE,SE], bottom=[SW,SE], left=[NW,SW];
     const spec=[
-      {x:bx,         y:by, a:N(bc,br), b:N(bc+1,br), corner:N(bc,br)},
-      {x:bx+step,    y:by, a:N(bc,br), b:N(bc+1,br)},
-      {x:bx+2*step,  y:by, a:N(bc,br), b:N(bc+1,br), corner:N(bc+1,br)},
-      {x:bx+size-ROUTE_LOT, y:midY, h:midH, a:N(bc+1,br), b:N(bc+1,br+1), v:true},
-      {x:bx+2*step,  y:by+size-ROUTE_DEEP, a:N(bc,br+1), b:N(bc+1,br+1), corner:N(bc+1,br+1)},
-      {x:bx+step,    y:by+size-ROUTE_DEEP, a:N(bc,br+1), b:N(bc+1,br+1)},
-      {x:bx,         y:by+size-ROUTE_DEEP, a:N(bc,br+1), b:N(bc+1,br+1), corner:N(bc,br+1)},
-      {x:bx,         y:midY, h:midH, a:N(bc,br), b:N(bc,br+1), v:true}
+      {x:bx,        y:by,   on:[top,left],     corner:NW},
+      {x:bx+step,   y:by,   on:[top]},
+      {x:bx+2*step, y:by,   on:[top,right],    corner:NE},
+      {x:bx+2*step, y:midY, on:[right], h:midH},
+      {x:bx+2*step, y:yB,   on:[bottom,right], corner:SE},
+      {x:bx+step,   y:yB,   on:[bottom]},
+      {x:bx,        y:yB,   on:[bottom,left],  corner:SW},
+      {x:bx,        y:midY, on:[left], h:midH}
     ];
     const ids=spec.map((s,i)=>'L'+bc+br+i);
     spec.forEach((s,i)=>{
-      const w=ROUTE_LOT, h=s.h||ROUTE_DEEP;
-      const A=routeXY(s.a);
-      // The door is the point on the street the building faces.
-      const door=s.v?[A[0],s.y+h/2]:[s.x+w/2,A[1]];
-      lots[ids[i]]={id:ids[i], x:s.x, y:s.y, w:w, h:h, seg:[s.a,s.b], segKey:routeSeg(s.a,s.b),
-        corner:s.corner||null, v:!!s.v, door:door, mid:[s.x+w/2,s.y+h/2],
-        ring:[ids[(i+7)%8],ids[(i+1)%8]]};
+      const w=ROUTE_LOT, h=s.h||ROUTE_DEEP, mid=[s.x+w/2,s.y+h/2], faces={};
+      s.on.forEach(seg=>{
+        const A=routeXY(seg[0]), B=routeXY(seg[1]), across=A[1]===B[1];
+        const door=across?[mid[0],A[1]]:[A[0],mid[1]];
+        // 3 inside the wall on the street side.
+        const at=across?[mid[0],A[1]<s.y?s.y+3:s.y+h-3]:[A[0]<s.x?s.x+3:s.x+w-3,mid[1]];
+        faces[routeSeg(seg[0],seg[1])]={seg:seg,door:door,at:at};
+      });
+      lots[ids[i]]={id:ids[i], x:s.x, y:s.y, w:w, h:h, mid:mid, corner:s.corner||null,
+        faces:faces, keys:Object.keys(faces), ring:[ids[(i+7)%8],ids[(i+1)%8]]};
     });
   }
   return (ROUTE_LOTS=lots);
 }
 /* Across the street: the building facing the same street from the other
-   side, at the same door. A corner building is also opposite the corner
-   building across the side street (on the same side of the main street, not
-   the one diagonally across the crossroads), because that is how anybody
-   standing there would describe it, so both count when a description is
-   checked. */
-function routeOpp(id){
+   side, door to door. A corner building has two streets, so it can be
+   opposite one building over each. `key` asks about one street only. */
+function routeOpp(id,key){
   const all=routeLots(), L=all[id];
-  return Object.values(all).filter(M=>{
-    if(M.id===id) return false;
-    if(M.segKey===L.segKey&&M.door[0]===L.door[0]&&M.door[1]===L.door[1]) return true;
-    return !!L.corner&&M.corner===L.corner&&!M.v&&!L.v&&M.door[1]===L.door[1]
-      &&Math.sign(M.mid[1]-M.door[1])===Math.sign(L.mid[1]-L.door[1]);
-  }).map(M=>M.id);
+  return Object.values(all).filter(M=>M.id!==id&&L.keys.some(k=>(!key||k===key)&&M.faces[k]
+    &&M.faces[k].door[0]===L.faces[k].door[0]&&M.faces[k].door[1]===L.faces[k].door[1])).map(M=>M.id);
 }
 /* Does the description fit this building? Only plain buildings can be the
    place being looked for, so a named one never fits. */
@@ -4322,15 +4353,16 @@ function routeStepText(s,places){
    corners the walk goes through up to the street the place is on. Null when
    the words cannot be followed: a turn with no road, a landmark never
    reached, a count that runs out of corners. */
-function routeFollow(steps,places,destLot){
-  const path=['S','N12'], turns=steps.filter(s=>s.do==='turn'), D=routeLots()[destLot];
+function routeFollow(steps,places,destLot,home){
+  home=home||'N12';
+  const path=['S',home], turns=steps.filter(s=>s.do==='turn'), D=routeLots()[destLot];
   let h=ROUTE_UP;
   if(!D) return null;
   for(let i=0;i<turns.length;i++){
     const t=turns[i];
     let count=0, done=false;
     for(let g=0;g<8&&!done;g++){
-      const at=path[path.length-1], side=routeAhead(at,routeTurn(h,t.dir)), ahead=routeAhead(at,h);
+      const at=path[path.length-1], side=routeAhead(at,routeTurn(h,t.dir),home), ahead=routeAhead(at,h,home);
       if(side) count++;
       const here=t.how==='end'?!ahead
         :t.how==='lot'?(!!places[t.lot]&&routeLots()[t.lot]&&routeLots()[t.lot].corner===at)
@@ -4348,12 +4380,28 @@ function routeFollow(steps,places,destLot){
     if(!done) return null;
   }
   for(let g=0;g<8;g++){
-    const at=path[path.length-1], ahead=routeAhead(at,h);
+    const at=path[path.length-1], ahead=routeAhead(at,h,home);
     if(!ahead) return null;
-    if(routeSeg(at,ahead)===D.segKey) return path;
+    if(D.keys.indexOf(routeSeg(at,ahead))>=0) return path;
     path.push(ahead);
   }
   return null;
+}
+/* How far the walk is, from the first corner to the door, and the shortest
+   it could be. Every block is the same length, so the shortest way between
+   two corners is the blocks across plus the blocks down. */
+function routeWalk(path,lot,via,home){
+  const f=routeLots()[lot].faces[via];
+  return (path.length-2)*ROUTE_BLOCK+routeGap(routeXY(path[path.length-1],home),f.door);
+}
+function routeShortest(lot,home){
+  const L=routeLots()[lot];
+  let best=Infinity;
+  L.keys.forEach(k=>L.faces[k].seg.forEach(e=>{
+    const d=(Math.abs(+e[1]-+home[1])+Math.abs(+e[2]-+home[2]))*ROUTE_BLOCK+routeGap(routeXY(e),L.faces[k].door);
+    if(d<best) best=d;
+  }));
+  return best;
 }
 
 /* The three stages, which a game deals in order (see drawGen):
@@ -4361,35 +4409,38 @@ function routeFollow(steps,places,destLot){
         or opposite something.
      1  a turn counted out ("Take the second left") or two turns, and
         between or on the corner.
-     2  the longest: usually two turns, often with "Go past". Two turns
-        always end on a street running up the map, where no building is on
-        a corner, so some are one turn, to keep "on the corner" in play. */
+     2  the longest: usually two turns, often with "Go past". */
 function routeBuild(stage){
-  const turns=stage===0?(Math.random()<.35?0:1):stage===1?(Math.random()<.6?1:2):(Math.random()<.7?2:1);
-  const path=['S','N12'], seen=new Set(path), turnAt=[];
+  // The middle road a little more often: it has turns both ways.
+  const home='N'+routePick([0,1,1,2])+'2';
+  const turns=stage===0?(Math.random()<.25?0:1):stage===1?(Math.random()<.55?1:2):(Math.random()<.75?2:1);
+  const path=['S',home], seen=new Set(path), turnAt=[];
   let h=ROUTE_UP;
   for(let g=0;turnAt.length<turns;g++){
     if(g>8) return null;
-    const at=path[path.length-1], ahead=routeAhead(at,h);
-    const ways=['left','right'].filter(d=>{ const n=routeAhead(at,routeTurn(h,d)); return n&&!seen.has(n); });
+    const at=path[path.length-1], ahead=routeAhead(at,h,home);
+    const ways=['left','right'].filter(d=>{ const n=routeAhead(at,routeTurn(h,d),home); return n&&!seen.has(n); });
     const goOn=!!ahead&&!seen.has(ahead);
     const move=ways.length&&(!goOn||Math.random()<.45)?routePick(ways):goOn?'on':null;
     if(!move) return null;
     if(move==='on'){ path.push(ahead); seen.add(ahead); continue; }
     turnAt.push({node:at,dir:move,h:h,idx:path.length-1});
     h=routeTurn(h,move);
-    if(turnAt.length<turns){ const n=routeAhead(at,h); path.push(n); seen.add(n); }
+    if(turnAt.length<turns){ const n=routeAhead(at,h,home); path.push(n); seen.add(n); }
   }
   // Sometimes the place is a block further on.
   if((stage>0||!turns)&&Math.random()<.35){
-    const n=routeAhead(path[path.length-1],h);
+    const n=routeAhead(path[path.length-1],h,home);
     if(n&&!seen.has(n)){ path.push(n); seen.add(n); }
   }
-  const at=path[path.length-1], to=routeAhead(at,h);
+  const at=path[path.length-1], to=routeAhead(at,h,home);
   if(!to||seen.has(to)) return null;
-  const onStreet=Object.values(routeLots()).filter(l=>l.segKey===routeSeg(at,to));
+  const via=routeSeg(at,to);
+  const onStreet=Object.values(routeLots()).filter(l=>l.faces[via]);
   if(!onStreet.length) return null;
   const D=routePick(onStreet);
+  // Not the long way round.
+  if(routeWalk(path,D.id,via,home)>routeShortest(D.id,home)+1) return null;
 
   const places={}, used=new Set();
   const name=id=>{
@@ -4401,16 +4452,16 @@ function routeBuild(stage){
     return places[id];
   };
 
-  // Where the place is.
-  const rels=[];
+  // Where the place is. "Opposite" is said over the street the learner is
+  // on, though any street counts when the words are checked.
+  const rels=[], over=routeOpp(D.id,via);
   D.ring.forEach(a=>rels.push({rel:'next',a:a}));
-  routeOpp(D.id).forEach(a=>rels.push({rel:'opposite',a:a}));
+  over.forEach(a=>rels.push({rel:'opposite',a:a}));
   if(stage>0&&!D.corner) rels.push({rel:'between',a:D.ring[0],b:D.ring[1]});
-  if(stage>0&&D.corner) routeOpp(D.id).forEach(a=>rels.push({rel:'corner',a:a}));
-  if(!rels.length) return null;
+  if(stage>0&&D.corner) over.forEach(a=>rels.push({rel:'corner',a:a}));
   // Later stages lean on the newer words rather than always "next to".
-  const fresh=rels.filter(r=>stage>0?r.rel==='corner'||r.rel==='between':true);
-  const rel=routePick(fresh.length&&Math.random()<.6?fresh:rels);
+  const fresh=rels.filter(r=>stage>0?r.rel==='corner'||r.rel==='between':r.rel==='opposite');
+  const rel=routePick(fresh.length&&Math.random()<(stage>0?.65:.45)?fresh:rels);
   name(rel.a); if(rel.b) name(rel.b);
   // Any other plain building the words would also fit gets a name of its
   // own, so the words fit one building only: "next to the bank" works when
@@ -4422,24 +4473,21 @@ function routeBuild(stage){
   turnAt.forEach((t,i)=>{
     const from=i===0?1:turnAt[i-1].idx+1;
     let n=0;
-    for(let j=from;j<=t.idx;j++) if(routeAhead(path[j],routeTurn(t.h,t.dir))) n++;
+    for(let j=from;j<=t.idx;j++) if(routeAhead(path[j],routeTurn(t.h,t.dir),home)) n++;
     const ways=[];
-    if(!routeAhead(t.node,t.h)) ways.push({how:'end'});
+    if(!routeAhead(t.node,t.h,home)) ways.push({how:'end'});
     if(n<=3&&(stage>0||n===1)) ways.push({how:'count',n:n});
     const corners=Object.values(routeLots()).filter(l=>l.corner===t.node&&l.id!==D.id);
     if(corners.length) ways.push({how:'lot',lot:routePick(corners).id});
     if(!ways.length) return;
-    const way=ways[0].how==='end'&&Math.random()<.5?ways[0]:routePick(ways);
+    const way=routePick(ways);
     if(way.how==='lot') name(way.lot);
     // "Go past" names something on the way to the first turn.
     if(i===0&&stage===2&&t.idx>from&&Math.random()<.7){
-      const segs=new Set(), mids=new Set();
-      for(let j=from;j<=t.idx;j++){
-        if(j>from) segs.add(routeSeg(path[j-1],path[j]));
-        if(j<t.idx) mids.add(path[j]);
-      }
+      const segs=new Set();
+      for(let j=from+1;j<=t.idx;j++) segs.add(routeSeg(path[j-1],path[j]));
       const by=Object.values(routeLots()).filter(l=>l.id!==D.id&&l.id!==way.lot
-        &&(segs.has(l.segKey)&&l.corner!==t.node||mids.has(l.corner)));
+        &&l.corner!==t.node&&l.keys.some(k=>segs.has(k)));
       if(by.length){ const p=routePick(by); name(p.id); steps.push({do:'past',lot:p.id}); }
     }
     steps.push(Object.assign({do:'turn',dir:t.dir},way));
@@ -4454,12 +4502,14 @@ function routeBuild(stage){
   const target=9+Math.floor(Math.random()*3);
   const spare=shuffle(Object.keys(routeLots()).filter(id=>id!==D.id&&!places[id]));
   while(Object.keys(places).length<target&&spare.length) name(spare.pop());
-  const destName=routePick(ROUTE_PLACES.filter(p=>!used.has(p.name))).name;
+  const left=ROUTE_PLACES.filter(p=>!used.has(p.name));
+  if(!left.length) return null;
+  const destName=routePick(left).name;
 
   // Check the question against its own words.
   const found=routeMatches(rel,places);
   if(found.length!==1||found[0]!==D.id) return null;
-  const walked=routeFollow(steps,places,D.id);
+  const walked=routeFollow(steps,places,D.id,home);
   if(!walked||walked.join(' ')!==path.join(' ')) return null;
 
   const sentences=steps.map((s,i)=>{
@@ -4469,8 +4519,8 @@ function routeBuild(stage){
   });
   sentences.push('The '+destName+' is '+routeRelText(rel,places)+'.');
   const text=sentences.join(' ');
-  return {type:'route', stage:stage, places:places, dest:D.id, destName:destName,
-    route:path, steps:steps, rel:rel, question:text, say:text,
+  return {type:'route', stage:stage, home:home, places:places, dest:D.id, destName:destName,
+    via:via, route:path, steps:steps, rel:rel, question:text, say:text,
     answer:path.join(' ')+' @'+D.id};
 }
 function genRouteQuestions(n,from){
@@ -4478,7 +4528,7 @@ function genRouteQuestions(n,from){
   for(let i=0;i<(n||10);i++){
     const stage=from==null?i%3:Math.max(0,Math.min(2,+from||0));
     let q=null;
-    for(let t=0;t<300&&!q;t++) q=routeBuild(stage);
+    for(let t=0;t<400&&!q;t++) q=routeBuild(stage);
     if(q) out.push(q);
   }
   return out;
@@ -4486,9 +4536,10 @@ function genRouteQuestions(n,from){
 
 /* ── Marking ──
    The answer is the corners the line went through and the building it
-   ended in: "S N12 N11 @L011". A line that ran past the door to the far
-   corner and came back into the building from there went the same way, so
-   that last corner is dropped before comparing. */
+   ended in: "S N12 N11 @L011". A line that ran along the building's own
+   street to the corner past its door, and went in from there, went the same
+   way, so that last corner is dropped before comparing, from the answer and
+   from the learner's line alike. */
 function routeParse(ans){
   const s=String(ans==null?'':ans).trim();
   if(!s) return null;
@@ -4498,7 +4549,7 @@ function routeParse(ans){
 }
 function routeCanon(nodes,lot){
   const L=routeLots()[lot];
-  if(L&&nodes.length>=2&&routeSeg(nodes[nodes.length-2],nodes[nodes.length-1])===L.segKey)
+  if(L&&nodes.length>=2&&L.faces[routeSeg(nodes[nodes.length-2],nodes[nodes.length-1])])
     return nodes.slice(0,-1);
   return nodes;
 }
@@ -4508,10 +4559,10 @@ function routeCanon(nodes,lot){
 function routeVerdict(q,ans){
   const a=routeParse(ans);
   if(!a) return 'blank';
-  const way=routeCanon(a.nodes,a.lot).join(' ')===q.route.join(' ');
-  if(a.lot===q.dest) return way?'way':'place';
   const L=routeLots()[a.lot], D=routeLots()[q.dest];
-  if(way&&L&&D&&L.segKey===D.segKey) return 'street';
+  const way=routeCanon(a.nodes,a.lot).join(' ')===routeCanon(q.route,L?a.lot:q.dest).join(' ');
+  if(a.lot===q.dest) return way?'way':'place';
+  if(way&&L&&D&&L.keys.some(k=>D.faces[k])) return 'street';
   return 'wrong';
 }
 function routeTier(q,ans){
@@ -4539,43 +4590,65 @@ function routeLabel(L,name,cls){
   });
   return out;
 }
-function routePoints(nodes,lot){
-  const pts=nodes.map(routeXY), L=routeLots()[lot];
-  if(L){ pts.push(L.door); pts.push(L.mid); }
+/* The street a line goes into a building by. A corner building has two, so
+   it is the one asked for, or the one the line did not just come along. */
+function routeFace(nodes,lot,via){
+  const L=routeLots()[lot], n=nodes[nodes.length-1];
+  if(!L) return null;
+  if(via&&L.faces[via]&&L.faces[via].seg.indexOf(n)>=0) return L.faces[via];
+  const open=L.keys.filter(k=>L.faces[k].seg.indexOf(n)>=0);
+  if(!open.length) return null;
+  const back=nodes.length>1?routeSeg(nodes[nodes.length-2],n):'';
+  return L.faces[open.find(k=>k!==back)||open[0]];
+}
+/* The line as it is drawn: along the corners, to the door, and in. */
+function routeInk(nodes,lot,home,via){
+  const pts=nodes.map(n=>routeXY(n,home)), f=routeFace(nodes,lot,via);
+  if(f){ pts.push(f.door); pts.push(f.at); }
   return pts;
+}
+/* Where a finger goes to draw the right way: the same, to the middle of the
+   building. The checks draw along this. */
+function routeTarget(q){
+  const D=routeLots()[q.dest];
+  return q.route.map(n=>routeXY(n,q.home)).concat([D.faces[q.via].door,D.mid]);
 }
 function routeD(pts){ return pts.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join(' '); }
 /* opt.reveal shows the place and the right way; opt.mine is a learner's
-   answer to draw over it. */
+   answer to draw under it; opt.ink is the map being drawn on, the only one
+   whose parts carry ids. */
 function routeMapInner(q,opt){
   opt=opt||{};
-  const places=q.places||{}, lots=routeLots();
+  const places=q.places||{}, lots=routeLots(), home=q.home||'N12';
+  const mine=opt.mine?routeParse(opt.mine):null;
   let s='<rect class="rm-bg" x="0" y="0" width="'+ROUTE_W+'" height="'+ROUTE_H+'" rx="14"/>';
-  ROUTE_Y.forEach(y=>{ s+='<line class="rm-road" x1="0" y1="'+y+'" x2="'+ROUTE_W+'" y2="'+y+'"/>'; });
-  ROUTE_X.forEach(x=>{ s+='<line class="rm-road" x1="'+x+'" y1="0" x2="'+x+'" y2="'+ROUTE_Y[2]+'"/>'; });
-  s+='<line class="rm-road" x1="'+ROUTE_START[0]+'" y1="'+ROUTE_Y[2]+'" x2="'+ROUTE_START[0]+'" y2="'+ROUTE_H+'"/>';
+  const x0=ROUTE_X[0], x2=ROUTE_X[2], y0=ROUTE_Y[0], y2=ROUTE_Y[2], [sx,sy]=routeXY('S',home);
+  ROUTE_Y.forEach(y=>{ s+='<line class="rm-road" x1="'+x0+'" y1="'+y+'" x2="'+x2+'" y2="'+y+'"/>'; });
+  ROUTE_X.forEach(x=>{ s+='<line class="rm-road" x1="'+x+'" y1="'+y0+'" x2="'+x+'" y2="'+y2+'"/>'; });
+  s+='<line class="rm-road" x1="'+sx+'" y1="'+y2+'" x2="'+sx+'" y2="'+sy+'"/>';
   // Trees in the middle of each block, so a block reads as a block.
   for(let bc=0;bc<2;bc++) for(let br=0;br<2;br++){
     const x=ROUTE_X[bc]+ROUTE_INSET+ROUTE_LOT+ROUTE_GAP+3, y=ROUTE_Y[br]+ROUTE_INSET+ROUTE_DEEP+ROUTE_GAP+3;
-    s+='<rect class="rm-green" x="'+x+'" y="'+y+'" width="'+(ROUTE_LOT-6)+'" height="'+(ROUTE_X[1]-ROUTE_X[0]-2*ROUTE_INSET-2*(ROUTE_DEEP+ROUTE_GAP)-6)+'" rx="8"/>';
+    s+='<rect class="rm-green" x="'+x+'" y="'+y+'" width="'+(ROUTE_LOT-6)+'" height="'+(ROUTE_BLOCK-2*ROUTE_INSET-2*(ROUTE_DEEP+ROUTE_GAP)-6)+'" rx="8"/>';
   }
   Object.values(lots).forEach(L=>{
     const named=places[L.id], dest=opt.reveal&&L.id===q.dest;
-    s+='<rect class="rm-lot'+(named?' named':'')+(dest?' dest':'')+'" x="'+L.x+'" y="'+L.y+'" width="'+L.w+'" height="'+L.h+'" rx="4"/>';
+    const picked=mine&&mine.lot===L.id&&!dest;
+    s+='<rect class="rm-lot'+(named?' named':'')+(dest?' dest':'')+(picked?' on':'')+'"'+(opt.ink?' id="route-lot-'+L.id+'"':'')
+      +' x="'+L.x+'" y="'+L.y+'" width="'+L.w+'" height="'+L.h+'" rx="4"/>';
     if(named) s+=routeLabel(L,named);
     else if(dest) s+=routeLabel(L,q.destName,'dest');
   });
-  if(opt.reveal) s+='<path class="rm-right" d="'+routeD(routePoints(q.route,q.dest))+'"/>';
-  if(opt.mine){
-    const a=routeParse(opt.mine);
-    if(a&&a.nodes.length) s+='<path class="rm-ink" d="'+routeD(routePoints(a.nodes,a.lot))+'"/>';
-  }
+  if(mine&&mine.nodes.length) s+='<path class="rm-ink" d="'+routeD(routeInk(mine.nodes,mine.lot,home))+'"/>';
+  // Over the learner's line, and dotted, so both show where they run together.
+  if(opt.reveal) s+='<path class="rm-right" d="'+routeD(routeInk(q.route,q.dest,home,q.via))+'"/>';
   if(opt.ink) s+='<path class="rm-ink" id="route-ink" d=""/><circle class="rm-end" id="route-end" r="0" cx="0" cy="0"/>';
-  // You are here: a dot, and an arrow for the way you are facing.
-  const [sx,sy]=ROUTE_START;
+  // You are here: a dot, and an arrow for the way you are facing. The words
+  // go on whichever side has room.
+  const rightSide=sx>ROUTE_W*.7;
   s+='<path class="rm-face" d="M'+sx+' '+(sy-27)+' l-8 11 h16 z"/>'
-    +'<circle class="rm-dot" id="route-dot" cx="'+sx+'" cy="'+sy+'" r="9"/>'
-    +'<text class="rm-here" x="'+(sx+16)+'" y="'+(sy+4)+'">You are here</text>';
+    +'<circle class="rm-dot"'+(opt.ink?' id="route-dot"':'')+' cx="'+sx+'" cy="'+sy+'" r="9"/>'
+    +'<text class="rm-here" x="'+(rightSide?sx-16:sx+16)+'" y="'+(sy+4)+'"'+(rightSide?' text-anchor="end"':'')+'>You are here</text>';
   return s;
 }
 function routeMapSvg(q,opt,cls){
@@ -10218,6 +10291,8 @@ function showSoloResult(submittedAns,correctAns,timeLeft,timedOut){
   myScore+=pts;
   testRecord(tier,pts,timedOut,submittedAns);
   document.getElementById('result-icon').textContent=tier==='correct'?'🎉':tier==='partial'?'🌟':'😔';
+  // Lets the stylesheet make room for a round whose answer is a picture.
+  document.getElementById('screen-student-result').dataset.round=currentStudentQ?currentStudentQ.type:'';
   if(currentStudentQ&&currentStudentQ.type==='translate'){
     document.getElementById('result-word').innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;line-height:2;text-align:center;">'+diffHtml(submittedAns||'',correctAns)+'</div>'+(tier!=='correct'?'<div style="font-size:.78rem;color:var(--muted);margin-top:6px;">Correct: <em style="color:var(--green)">'+correctAns+'</em></div>':'');
   } else if(isSpellingQ(currentStudentQ)){
@@ -12147,51 +12222,74 @@ function clockUp(){ clockDrag=null; }
    finger goes, the line follows the nearest street out of the corner it has
    reached, and takes the next corner when the finger gets there. Drawing back
    along the line rubs it out, which is the undo. To finish, the finger goes
-   into a building that faces the street the line is on.
+   into a building on a street the line has reached, and the building lights
+   up to say it has been chosen.
    The answer is written into the hidden input as the corners passed and the
    building reached ("S N12 N11 @L011"), and stays empty until something is
    drawn, so Submit over an untouched map is not an attempt. */
-let routeQ=null, routeLine=['S'], routeTip=null, routeIn=null, routeDrawing=false, routeNudgeT=null;
+let routeQ=null, routeLine=['S'], routeTip=null, routeIn=null, routeInKey=null,
+    routeDrawing=false, routeNudgeT=null, routeAsked=false;
 function renderRouteWidget(q){
-  routeQ=q; routeLine=['S']; routeTip=null; routeIn=null; routeDrawing=false;
+  routeQ=q; routeLine=['S']; routeTip=null; routeIn=null; routeInKey=null;
+  routeDrawing=false; routeAsked=false;
   document.getElementById('route-svg').innerHTML=routeMapInner(q,{ink:true});
-  routeHint(false);
   routeApply();
 }
 function routeClear(){
   if(answered||!routeQ) return;
-  routeLine=['S']; routeTip=null; routeIn=null;
+  routeLine=['S']; routeTip=null; routeIn=null; routeInKey=null;
   routeApply();
 }
+function routeDrawn(){ return routeLine.length>1||!!routeTip||!!routeIn; }
+/* The one line under the map says the next thing to do. `nudge` is the same
+   line said louder, for a press in the wrong place or a Submit too soon. */
 function routeHint(nudge){
   const el=document.getElementById('route-hint');
-  el.textContent=nudge?'Start at the blue dot':'Draw from the blue dot';
+  if(!el) return;
+  el.textContent=nudge||(!routeDrawn()?'Draw from the blue dot':routeIn?'Press Submit':'Finish in a building');
   el.classList.toggle('nudge',!!nudge);
-  const dot=document.getElementById('route-dot');
-  if(dot) dot.classList.toggle('nudge',!!nudge);
+  // The thing to press pulses with it: the dot, or the end of the line.
+  const mark=document.getElementById(routeDrawn()?'route-end':'route-dot');
+  ['route-end','route-dot'].forEach(id=>{ const m=document.getElementById(id); if(m) m.classList.remove('nudge'); });
+  if(nudge&&mark&&!routeIn) mark.classList.add('nudge');
   clearTimeout(routeNudgeT);
-  if(nudge) routeNudgeT=setTimeout(()=>routeHint(false),1800);
+  if(nudge) routeNudgeT=setTimeout(()=>routeHint(),2000);
+}
+/* Submit over a line that stops in the street: it has not said which
+   building. Said once, so a learner who cannot find the place can still
+   hand in what they have. */
+function routeUnfinished(){
+  if(!routeQ||!routeDrawn()||routeIn||routeAsked) return false;
+  routeAsked=true;
+  routeHint('Finish in a building');
+  return true;
 }
 function routeEndXY(){
   const L=routeIn&&routeLots()[routeIn];
   if(L) return L.mid;
   if(routeTip) return [routeTip.x,routeTip.y];
-  return routeXY(routeLine[routeLine.length-1]);
+  return routeXY(routeLine[routeLine.length-1],routeQ.home);
 }
 function routeApply(){
-  const pts=routeLine.map(routeXY);
-  if(routeTip) pts.push([routeTip.x,routeTip.y]);
+  const home=routeQ.home, pts=routeLine.map(n=>routeXY(n,home));
   const L=routeIn&&routeLots()[routeIn];
-  if(L){ pts.push(L.door); pts.push(L.mid); }
+  if(L){ const f=L.faces[routeInKey]; pts.push(f.door); pts.push(f.at); }
+  else if(routeTip) pts.push([routeTip.x,routeTip.y]);
+  const svg=document.getElementById('route-svg');
   const ink=document.getElementById('route-ink'), end=document.getElementById('route-end');
   const drawn=pts.length>1;
   if(ink) ink.setAttribute('d',drawn?routeD(pts):'');
+  // In the street the line ends in a dot to pick it up by. In a building the
+  // building is the end, and a dot would sit on its name.
   if(end){
     const e=pts[pts.length-1];
-    end.setAttribute('cx',e[0]); end.setAttribute('cy',e[1]); end.setAttribute('r',drawn?7:0);
+    end.setAttribute('cx',e[0]); end.setAttribute('cy',e[1]); end.setAttribute('r',drawn&&!L?7:0);
   }
+  [].forEach.call(svg.querySelectorAll('.rm-lot.on'),r=>r.classList.remove('on'));
+  if(L){ const r=document.getElementById('route-lot-'+L.id); if(r) r.classList.add('on'); }
   document.getElementById('student-ans-input').value=
     drawn?routeLine.join(' ')+(routeIn?' @'+routeIn:''):'';
+  if(!document.getElementById('route-hint').classList.contains('nudge')) routeHint();
 }
 function routePt(e){
   const svg=document.getElementById('route-svg');
@@ -12204,46 +12302,105 @@ function routePt(e){
   const r=svg.getBoundingClientRect();
   return [(e.clientX-r.left)/r.width*ROUTE_W,(e.clientY-r.top)/r.height*ROUTE_H];
 }
-/* A building the line can go into from this corner: one facing a street
-   that starts here, with the finger well inside it rather than brushing its
-   edge on the way past. */
+/* A building the line can go into from this corner: one on a street that
+   starts here, with the finger well inside it. A finger following a street
+   strays over the fronts of the buildings along it, so the front strip of a
+   building does not count: 10 in from each street it faces, 4 from its
+   other walls. */
 function routeLotAt(p,at){
-  const m=6;
-  return Object.values(routeLots()).find(L=>(L.seg[0]===at||L.seg[1]===at)
-    &&p[0]>L.x+m&&p[0]<L.x+L.w-m&&p[1]>L.y+m&&p[1]<L.y+L.h-m)||null;
+  return Object.values(routeLots()).find(L=>{
+    if(!L.keys.some(k=>L.faces[k].seg.indexOf(at)>=0)) return false;
+    let x0=L.x+4, x1=L.x+L.w-4, y0=L.y+4, y1=L.y+L.h-4;
+    L.keys.forEach(k=>{
+      const d=L.faces[k].door;
+      if(d[1]<L.y) y0=L.y+10; else if(d[1]>L.y+L.h) y1=L.y+L.h-10;
+      else if(d[0]<L.x) x0=L.x+10; else x1=L.x+L.w-10;
+    });
+    return p[0]>x0&&p[0]<x1&&p[1]>y0&&p[1]<y1;
+  })||null;
+}
+/* The nearest point of any street to the finger. */
+function routeNearest(p,home){
+  let best=null;
+  const ids=['S'];
+  for(let c=0;c<3;c++) for(let r=0;r<3;r++) ids.push('N'+c+r);
+  ids.forEach(a=>routeNbrs(a,home).forEach(b=>{
+    if(a>b) return;
+    const A=routeXY(a,home), B=routeXY(b,home), dx=B[0]-A[0], dy=B[1]-A[1];
+    const t=Math.max(0,Math.min(1,((p[0]-A[0])*dx+(p[1]-A[1])*dy)/(dx*dx+dy*dy)));
+    const d=Math.hypot(p[0]-A[0]-t*dx,p[1]-A[1]-t*dy);
+    if(!best||d<best.d) best={a:a,b:b,d:d};
+  }));
+  return best;
+}
+/* The finger has got ahead of the line: it cut a corner wide, or moved
+   faster than the phone reported it. Find the street it is on now and catch
+   the line up, by going back if that street is one the line has drawn, or
+   on by a corner or two if it is not. True if the line changed. */
+function routeCatchUp(p){
+  const home=routeQ.home, e=routeNearest(p,home);
+  if(!e||e.d>48) return false;
+  for(let i=0;i<routeLine.length-1;i++){
+    if(routeSeg(routeLine[i],routeLine[i+1])===routeSeg(e.a,e.b)){ routeLine.length=i+1; return true; }
+  }
+  const at=routeLine[routeLine.length-1], used=new Set(routeLine);
+  const ends=[e.a,e.b], free=n=>!used.has(n);
+  const one=routeNbrs(at,home).filter(free);
+  const hit=one.find(n=>ends.indexOf(n)>=0);
+  if(hit){ routeLine.push(hit); return true; }
+  let best=null;
+  one.forEach(m=>routeNbrs(m,home).filter(free).forEach(n=>{
+    if(ends.indexOf(n)<0) return;
+    const d=routeGap(routeXY(m,home),p);
+    if(!best||d<best.d) best={m:m,n:n,d:d};
+  }));
+  if(best){ routeLine.push(best.m,best.n); return true; }
+  return false;
 }
 function routeMoveTo(p){
-  for(let g=0;g<8;g++){
-    const at=routeLine[routeLine.length-1], A=routeXY(at);
+  const home=routeQ.home;
+  for(let g=0;g<12;g++){
+    const at=routeLine[routeLine.length-1], A=routeXY(at,home);
     const lot=routeLotAt(p,at);
-    if(lot){ routeIn=lot.id; routeTip=null; break; }
-    routeIn=null;
+    if(lot){
+      // By the street the line is on if the building faces it, or else the
+      // nearer of its doors.
+      const open=lot.keys.filter(k=>lot.faces[k].seg.indexOf(at)>=0);
+      const tipOn=routeTip&&open.find(k=>k===routeTip.key);
+      routeInKey=routeIn===lot.id&&routeInKey?routeInKey
+        :tipOn||open.sort((a,b)=>routeGap(lot.faces[a].door,p)-routeGap(lot.faces[b].door,p))[0];
+      routeIn=lot.id; routeTip=null; break;
+    }
+    routeIn=null; routeInKey=null;
     let best=null;
-    routeNbrs(at).forEach(n=>{
-      const B=routeXY(n), dx=B[0]-A[0], dy=B[1]-A[1];
+    routeNbrs(at,home).forEach(n=>{
+      const B=routeXY(n,home), dx=B[0]-A[0], dy=B[1]-A[1];
       let t=((p[0]-A[0])*dx+(p[1]-A[1])*dy)/(dx*dx+dy*dy);
       t=Math.max(0,Math.min(1,t));
       const x=A[0]+t*dx, y=A[1]+t*dy, d=Math.hypot(p[0]-x,p[1]-y);
       if(!best||d<best.d) best={n:n,t:t,d:d,x:x,y:y};
     });
-    // At the corner, or nowhere near a street: the line waits where it is.
-    if(!best||best.d>48||best.t<.12){ routeTip=null; break; }
+    // Nowhere near a street out of this corner. Catch up if the finger is
+    // on a street further on; otherwise the line waits where it is.
+    if(!best||best.d>48){ if(g<10&&routeCatchUp(p)) continue; break; }
+    // At the corner itself.
+    if(best.t<.12){ routeTip=null; break; }
     const prev=routeLine[routeLine.length-2];
     // Back the way it came: rub out that piece and look again from there.
     if(best.n===prev){ routeLine.pop(); continue; }
     // A line does not cross itself.
     if(routeLine.indexOf(best.n)>=0){ routeTip=null; break; }
     if(best.t>.88){ routeLine.push(best.n); routeTip=null; continue; }
-    routeTip={x:best.x,y:best.y}; break;
+    routeTip={x:best.x,y:best.y,key:routeSeg(at,best.n)}; break;
   }
   routeApply();
 }
 function routeDown(e){
   if(answered||!routeQ) return;
-  const p=routePt(e), end=routeEndXY(), last=routeXY(routeLine[routeLine.length-1]);
+  const p=routePt(e), end=routeEndXY(), last=routeXY(routeLine[routeLine.length-1],routeQ.home);
   // The line is picked up at its end, or at You are here to start it.
-  if(Math.hypot(p[0]-end[0],p[1]-end[1])>36&&Math.hypot(p[0]-last[0],p[1]-last[1])>36){
-    routeHint(true); return;
+  if(routeGap(p,end)>44&&routeGap(p,last)>44){
+    routeHint(routeDrawn()?'Start at the end of your line':'Start at the blue dot'); return;
   }
   routeDrawing=true;
   try{ document.getElementById('route-svg').setPointerCapture(e.pointerId); }catch(err){}
@@ -12529,7 +12686,10 @@ function startStudentTimer(startedAt,dur){
 }
 
 function submitAnswer(auto){
-  if(answered) return; answered=true; clearInterval(studentTimerInt);
+  if(answered) return;
+  // A line on the map that stops in the street is asked, once, to finish.
+  if(!auto&&currentStudentQ&&currentStudentQ.type==='route'&&routeUnfinished()) return;
+  answered=true; clearInterval(studentTimerInt);
   if(!auto) playSubmitSound();
   const elapsed=parseInt(document.getElementById('student-timer').textContent)||0;
   let ans;
@@ -12739,6 +12899,7 @@ function showStudentResult(correctAnswer){
     }
     myScore+=pts;
     document.getElementById('result-icon').textContent=tier==='correct'?'🎉':tier==='partial'?'🌟':'😔';
+    document.getElementById('screen-student-result').dataset.round=currentStudentQ?currentStudentQ.type:'';
     if(currentStudentQ&&currentStudentQ.type==='translate'){
       document.getElementById('result-word').innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-size:1rem;line-height:2;text-align:center;">'+diffHtml(myAnswer||'',correctAnswer)+'</div>'+(tier!=='correct'?'<div style="font-size:.78rem;color:var(--muted);margin-top:6px;">Correct: <em style="color:var(--green)">'+correctAnswer+'</em></div>':'');
     } else if(isSpellingQ(currentStudentQ)){
