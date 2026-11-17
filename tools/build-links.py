@@ -390,6 +390,23 @@ def settings_for(g):
     return '    <div class="launch-settings">\n' + ''.join(rows) + '    </div>\n'
 
 
+LINK = re.compile(r'\[([^\]]+)\]\(([^)\s]+)\)')
+
+
+def linked(text):
+    """Escape a line of teacher notes, turning [words](page) into a link. The
+    page must exist: a short address with a file behind it, or a real file."""
+    out, pos = '', 0
+    for m in LINK.finditer(text):
+        href = m.group(2)
+        target = href.split('?')[0].split('#')[0]
+        if not os.path.exists(os.path.join(ROOT, target if '.' in target else target + '.html')):
+            raise SystemExit('notes link to %s, which is not a page' % href)
+        out += esc(text[pos:m.start()]) + '<a href="%s">%s</a>' % (esc(href), esc(m.group(1)))
+        pos = m.end()
+    return out + esc(text[pos:])
+
+
 def extra_sections(g):
     """The longer teacher notes, for the games that have them: what the game
     actually holds (the words, the families, the kinds of round), read from the
@@ -400,7 +417,7 @@ def extra_sections(g):
         items = g.get(key)
         if items:
             out += ('    <h2>%s</h2>\n    <ul class="gp-list">\n' % title
-                    + ''.join('      <li>%s</li>\n' % esc(x) for x in items)
+                    + ''.join('      <li>%s</li>\n' % linked(x) for x in items)
                     + '    </ul>\n')
     return out
 
