@@ -11,7 +11,7 @@
    "seo": "Letter Names Game: Hear an English Letter and Tap It | Free Alphabet Practice for Adults",
    "meta": "Free alphabet game for adult English learners. Hear a letter name, tap the right letter. Printed and handwritten letters. No sign-up.",
    "sub": "Hear a letter name and choose the letter.",
-   "blurb": "Hear a letter name and tap the letter, in printed and handwritten styles. Builds the alphabet knowledge every later game depends on.",
+   "blurb": "Hear a letter name and tap it from four, in printed or handwritten letters. Letters that sound alike, such as B, D, P and V, come up often.",
    "about": "An alphabet listening game for adults learning English letters for the first time. The learner hears a letter name, like \"G\" or \"J\", and taps it from four letters. Some rounds show the letters handwritten instead of printed, so learners recognise both. Letters that sound alike, like B, D, P, E, G and V, come up often.",
    "how": [
     "Listen to the letter.",
@@ -37,7 +37,7 @@
    "seo": "Big and Small Letters: Match Capital and Lowercase Letters | Free Game for Adult Learners",
    "meta": "Match uppercase and lowercase letters, then write names with a capital letter. Free English literacy game for adults.",
    "sub": "Match big and small letters.",
-   "blurb": "Match capital letters to small letters, then write names with a capital at the start. Practises the letter case that forms and ID cards expect.",
+   "blurb": "Find the small partner of a capital letter, or the capital of a small one. Writing rounds turn a name like fatima into Fatima.",
    "about": "A matching game for uppercase and lowercase letters. The learner sees a capital letter and finds its small letter, or the other way round. Other rounds show a name in small letters, like \"fatima\", and ask the learner to write it with a capital at the start.",
    "how": [
     "Look at the letter.",
@@ -62,7 +62,7 @@
    "seo": "Beginner Sound Gap: CVC Word Families Phonics Game | Free Phonics for Adult Beginners",
    "meta": "Phonics game with CVC word families like -at, -an, -ig and -ot. Hear the word, tap the missing first sound. Free for adult learners.",
    "sub": "Hear the missing sound and tap it.",
-   "blurb": "Hear a word like cat and tap its missing first sound, one rhyming family at a time. A first phonics step with short vowel words.",
+   "blurb": "Hear a short word like cat and tap the missing first sound in _at. Each round stays in one rhyming family, from -an to -un.",
    "about": "A first phonics game built on short CVC word families: -an, -at, -ap, -et, -en, -ig, -in, -ip, -op, -ot, -ug and -un. The learner hears a word like \"cat\", sees \"_at\" and taps the missing first sound. Every round stays in one rhyming family, so one sound decides the answer.",
    "how": [
     "Listen to the word.",
@@ -88,7 +88,7 @@
    "seo": "Beginner Tap Word: Read CVC Rhyming Words | Free Decoding Game for Adult Learners",
    "meta": "Hear a short word and tap it from rhyming words like cat, bat, hat. A free decoding game for adults learning to read English.",
    "sub": "Hear a word and tap it.",
-   "blurb": "Hear pen and choose it from pen, hen, ten and men. The choices differ by one sound, so the learner reads rather than guesses.",
+   "blurb": "Hear a word like pen and pick it from pen, hen, ten and men. Only the first sound changes, so the learner must read it.",
    "about": "A decoding game with short rhyming words. The learner hears \"pen\" and chooses from pen, hen, ten and men. The words differ by one sound, so the learner has to read the first letter, not guess. It uses the same word families as Beginner Sound Gap.",
    "how": [
     "Listen to the word.",
@@ -113,7 +113,7 @@
    "seo": "Beginner Build Word: Build CVC Words From Sounds | Free Blending Game for Adults",
    "meta": "Put the sounds in order to build short words like man, pig and sun. Free phonics blending and segmenting game for adult learners.",
    "sub": "Build the word from its sounds.",
-   "blurb": "Put sound tiles in order to build a word you hear, like m, a, n. Each tile plays its sound in a real voice, linking listening to spelling.",
+   "blurb": "Put sound tiles in order to spell a word you hear, like m, a, n for man. Every tile plays its own sound in a real voice.",
    "about": "A blending and segmenting game. The learner hears a short word and puts its sound tiles in order, like m, a, n for \"man\". Each tile plays its sound, recorded by a real voice. It is the step from hearing sounds to spelling words.",
    "how": [
     "Listen to the word.",
@@ -138,7 +138,7 @@
    "seo": "Elementary Sound Gap: Digraphs and Vowel Teams Phonics Game | sh, ch, th, ee, ai, oa",
    "meta": "Phonics game for digraphs and vowel teams: sh, ch, th, wh, ph, ee, ea, ai, ay, oa, oo, ou. Hear the word, tap the missing sound.",
    "sub": "Hear the missing sound in a longer word.",
-   "blurb": "Tap the missing two-letter sound in words like rain, ship and moon. Covers digraphs such as sh, ch and th and vowel teams such as ee, ai and oa.",
+   "blurb": "Tap the missing two-letter sound in everyday words like ship, phone and train. Covers sh, ch, th and vowel teams such as ee, ai and oa.",
    "about": "The next step in phonics, built on two-letter sounds: consonant digraphs (sh, ch, th, wh, ph) and vowel teams (ee, ea, ai, ay, oa, oe, ie, ue, oo, ou and more). The learner hears a word like \"rain\" and taps the missing sound. The words are from everyday life: ship, chips, phone, train, boat.",
    "how": [
     "Listen to the word.",
@@ -164,7 +164,7 @@
    "seo": "Elementary Tap Word: Read Words With Digraphs and Vowel Teams | Free Game for Adults",
    "meta": "Hear a word and tap it from words with the same sound pattern, like boat, coat, road. Free English decoding game for adults.",
    "sub": "Hear a longer word and tap it.",
-   "blurb": "Choose the word you hear from four that share a pattern, like moon, food, soon and pool. The learner has to read the whole word.",
+   "blurb": "Hear a word and choose it from four with the same pattern, like moon, food, soon and pool. Reading the whole word is the only way to be sure.",
    "about": "A decoding game for words with digraphs and vowel teams. The four choices share a sound pattern, like moon, food, soon and pool, so the learner has to read the whole word.",
    "how": [
     "Listen to the word.",
@@ -188,7 +188,7 @@
    "seo": "Elementary Build Word: Build Words From Sound Tiles (Graphemes) | Free Phonics for Adults",
    "meta": "Build words like ship, train and moon from grapheme tiles, where two letters can make one sound. Free phonics game for adults.",
    "sub": "Build a longer word from its sounds.",
-   "blurb": "Build words from sound tiles where two letters make one sound, like sh, i, p. The bridge to spelling longer words.",
+   "blurb": "Build words from tiles where two letters make one sound: ship is sh, i, p and train is t, r, ai, n. A key step towards spelling longer words.",
    "about": "The learner builds words from sound tiles, not single letters: \"ship\" is sh, i, p and \"train\" is t, r, ai, n. It teaches that two letters can make one sound, which is the key to spelling longer English words.",
    "how": [
     "Listen to the word.",
@@ -213,7 +213,7 @@
    "seo": "Sight Words Game: Hear and Tap Common English Words | Free High-Frequency Words for Adults",
    "meta": "Hear a common word like the, was, have or would, and tap it. A free sight words and high-frequency words game for adults.",
    "sub": "The words you see everywhere.",
-   "blurb": "Hear a common word like the, was or come and tap it from four. These are the words learners need to know by sight because they cannot be sounded out.",
+   "blurb": "Hear a common word like the, was or come and tap it from four. Many of these words cannot be sounded out, so they need to be known on sight.",
    "about": "A game for high-frequency sight words like the, and, you, was, have, come, would and little. Many of them cannot be sounded out, so learners need to know them by sight. The learner hears the word and taps it from four written words.",
    "how": [
     "Listen to the word.",
@@ -238,7 +238,7 @@
    "seo": "Picture and Word: Match a Picture to Its English Word | Free Reading Game for Adults",
    "meta": "Look at a picture and tap its word. A free vocabulary and early reading game for adult English learners. No typing.",
    "sub": "Look at the picture and tap its word.",
-   "blurb": "See a picture, like a bus or an apple, and tap its written word. An early reading game with spoken instructions and no typing.",
+   "blurb": "Look at a picture, such as a bus or an apple, and tap its word from four. The instruction is spoken and there is no typing.",
    "about": "An early reading game where a picture carries the meaning. The learner sees a picture, like a bus or an apple, and taps its word from four written words. There is no typing, and the instruction is spoken.",
    "how": [
     "Look at the picture.",
@@ -262,7 +262,7 @@
    "seo": "Read the Notice: Find the Date, Time and Price on a Notice | Free Reading Practice for Adults",
    "meta": "Read short notices like a class time, a shop closure or a bus timetable. Find what, when and how much. Free survival English reading.",
    "sub": "Find what a notice tells you.",
-   "blurb": "Read a short real-world notice, such as a bus timetable or a closed sign, and answer what, when or how much. Practises scanning for key details.",
+   "blurb": "Read a short notice, like a shop closed sign or a bus timetable, and answer what, when or how much. Practises finding the key detail.",
    "about": "A reading game with short everyday notices: an English class, a shop closed sign, a bus timetable, a doctor's appointment and a for sale sign. The learner answers one question: what is it about, when is it, or how much is it. It practises scanning for the key information.",
    "how": [
     "Read the notice.",
@@ -287,7 +287,7 @@
    "seo": "Copy It: Copy Words, Names and Numbers | Free Writing and Typing Practice for Adults",
    "meta": "Copy a word, a full name or a number exactly, with capitals in the right place. Free copying practice for adult literacy learners.",
    "sub": "Copy a word, a name or a number.",
-   "blurb": "Copy a word, a full name or a number exactly, capitals included. Early writing practice shaped around how forms want names written.",
+   "blurb": "Copy a word, a full name like Mai Nguyen, or a number. Capitals have to match, the same way a form expects a name to be written.",
    "about": "Copying practice for learners starting to write. Rounds take turns between a word (some with a picture), a full name like \"Mai Nguyen\" and a number. Capital letters must match, so learners practise writing names the way forms expect them.",
    "how": [
     "Look at the word, name or number.",
@@ -312,7 +312,7 @@
    "seo": "Capitals and Full Stops: Punctuation Game for Adult English Learners | Free",
    "meta": "Choose the correctly written sentence, or add the capital letter and full stop. Free punctuation practice for adults.",
    "sub": "Start big, end with a full stop.",
-   "blurb": "Spot the correctly written sentence, or rewrite one with a capital letter and a full stop. The first two punctuation rules.",
+   "blurb": "Choose the sentence that is written correctly, or rewrite one with a capital letter and a full stop. Everyday sentences like I live in Springvale.",
    "about": "A punctuation game for the first two rules: a sentence starts with a capital letter and ends with a full stop. Some rounds ask which of four sentences is written correctly. Others give a sentence in small letters to write again properly. The sentences are about everyday life, like \"I live in Springvale.\"",
    "how": [
     "Read the sentence.",
@@ -336,7 +336,7 @@
    "seo": "Write a Sentence About Yourself: Model Sentences for Adult English Learners | Free",
    "meta": "Follow a model like \"My name is David. I am from Vietnam.\" and write two sentences about yourself. Free writing practice for adults.",
    "sub": "Write a sentence about you.",
-   "blurb": "Read two model sentences, like My name is David. I am from Vietnam., then write your own the same way. Guided writing about name, home, family and work.",
+   "blurb": "Follow two model sentences to write two of your own, about your name, country, home, family or work. The capital letters and full stops are checked too.",
    "about": "Guided writing from a model. The learner sees two model sentences, like \"My name is David. I am from Vietnam.\", and writes two sentences about themselves the same way. Topics are name and country, where you live, family, class day, language and work. Capitals and full stops count.",
    "how": [
     "Read the model sentences.",
@@ -361,7 +361,7 @@
    "seo": "All Spelling: Hear and Spell English Words From Every Topic | Free Spelling Game for Adults",
    "meta": "Mixed spelling game: numbers, days, months, weather, fruit, body and clothes words. Type it or choose it. Free for adult English learners.",
    "sub": "Spell words from every topic.",
-   "blurb": "Hear a word from any vocabulary topic, such as days, weather or clothes, and type it. A mixed spelling review with an easier multiple choice option.",
+   "blurb": "A mixed spelling round from every topic: number words, days, months, weather, fruit, body and clothes. Multiple choice makes it easier.",
    "about": "A mixed spelling review across the vocabulary topics: number words, days, months, weather, fruit, parts of the body and clothes. The learner hears a word and types it. Multiple choice is there for an easier round.",
    "how": [
     "Listen to the word.",
@@ -386,7 +386,7 @@
    "seo": "Days of the Week Game: Hear and Spell Monday to Sunday | Free English for Adults",
    "meta": "Hear a day of the week and spell it, with a capital letter. Free English vocabulary and spelling game for adult learners.",
    "sub": "Hear a day of the week and write it.",
-   "blurb": "Hear a day of the week and type it with its capital letter, or tap it if typing is not yet possible.",
+   "blurb": "Hear a day of the week and type it, capital letter included. Learners who cannot type yet can tap instead.",
    "about": "A listening and spelling game for the seven days, Monday to Sunday. Days start with a capital letter and the game marks that, so learners learn to write them properly. Multiple choice is there for learners who cannot type yet.",
    "how": [
     "Listen to the day.",
@@ -411,7 +411,7 @@
    "seo": "Months of the Year Game: Hear and Spell January to December | Free English for Adults",
    "meta": "Hear a month and spell it, with a capital letter. Free months of the year spelling game for adult English learners.",
    "sub": "Hear a month and write it.",
-   "blurb": "Hear a month and spell it with its capital. February, August and September usually take the most practice.",
+   "blurb": "Hear a month and type it with a capital letter. February, August and September usually need the most practice.",
    "about": "A listening and spelling game for the twelve months. Learners hear the month and type it with its capital letter. February, August and September are the usual hard ones.",
    "how": [
     "Listen to the month.",
@@ -435,7 +435,7 @@
    "seo": "Weather Words Game: Sunny, Rainy, Windy, Humid | Free English Vocabulary for Adults",
    "meta": "Hear and spell weather words: sunny, cloudy, rainy, windy, stormy, foggy, hot, cold, warm, humid. Free ESL game for adults.",
    "sub": "Hear a weather word and write it.",
-   "blurb": "Learn words like sunny, windy, cold and humid, with pictures. The vocabulary for small talk and reading a forecast.",
+   "blurb": "Hear and spell words like sunny, windy, cold and humid, or tap the matching picture. Words for small talk and the weather forecast.",
    "about": "Vocabulary and spelling for the weather: sunny, cloudy, rainy, windy, snowy, stormy, foggy, hot, cold, warm, cool and humid. These are the words for small talk and for reading a weather forecast. In multiple choice the learner taps the matching picture.",
    "how": [
     "Listen to the word.",
@@ -460,7 +460,7 @@
    "seo": "Fruit Names Game: Hear and Spell Fruits in English | Free Vocabulary for Adult Learners",
    "meta": "Apple, banana, mango, watermelon and more. Hear a fruit name and spell it, or tap its picture. Free English game for adults.",
    "sub": "Hear the fruit and write its name.",
-   "blurb": "Hear and spell fruit names from apple to watermelon, or tap the matching picture. Useful vocabulary for shopping.",
+   "blurb": "Hear and spell fruit names from apple to watermelon, or tap the picture in multiple choice. Handy words for the shops.",
    "about": "Fruit vocabulary for shopping: apple, banana, orange, grape, mango, peach, plum, pear, lemon, cherry, strawberry, watermelon, pineapple, coconut and kiwi. The learner hears the word and spells it, or in multiple choice taps the matching picture.",
    "how": [
     "Listen to the fruit name.",
@@ -485,7 +485,7 @@
    "seo": "Parts of the Body Game: Head, Knee, Wrist, Stomach | Free English for the Doctor",
    "meta": "Hear and spell 24 parts of the body, from head to toe. Free English vocabulary for adults, useful at the doctor or chemist.",
    "sub": "Hear a part of the body and write it.",
-   "blurb": "Name parts of the body from head to toe with clear drawings. The words a learner needs to tell a doctor where it hurts.",
+   "blurb": "Hear and spell body words from head to toe, with clear drawings. The words for telling a doctor where it hurts.",
    "about": "Body vocabulary with clear drawings: head, eye, ear, nose, mouth, tooth, tongue, neck, shoulder, arm, elbow, wrist, hand, finger, thumb, chest, stomach, back, hip, leg, knee, ankle, foot and toe. These are the words for telling a doctor where it hurts.",
    "how": [
     "Listen to the word.",
@@ -510,7 +510,7 @@
    "seo": "Clothes Vocabulary Game: Jumper, Thongs, Beanie, Hoodie | Free Australian English for Adults",
    "meta": "Hear and spell 34 clothing words, including Australian ones like jumper, thongs and singlet. Free ESL vocabulary for adults.",
    "sub": "Hear the clothing word and write it.",
-   "blurb": "Clothes and accessories with drawings, including Australian words like jumper, thongs and beanie.",
+   "blurb": "Hear and spell clothes and accessories, with drawings. Includes Australian words like jumper, thongs and beanie.",
    "about": "Clothes and accessories with drawings, including Australian English words: shirt, jumper, jacket, coat, pants, jeans, shorts, singlet, hoodie, socks, shoes, boots, sandals, thongs, hat, cap, beanie, helmet, scarf, gloves, belt, glasses, watch, wallet, backpack, umbrella and more.",
    "how": [
     "Listen to the word.",
@@ -534,7 +534,7 @@
    "seo": "Odd One Out Picture Game: Find the One That Does Not Belong | Free English for Adults",
    "meta": "Four pictures, three belong together. Animals, fruit, transport, clothes, food, weather, colours and more. Free ESL game for adults.",
    "sub": "Find the word that does not belong.",
-   "blurb": "See four pictures and tap the one that does not belong, such as a banana among animals. Builds vocabulary in groups.",
+   "blurb": "Look at four pictures and tap the one that is not from the same group, like animals, transport or clothes. Builds vocabulary by meaning.",
    "about": "A picture game for grouping words by meaning. The learner sees four pictures, three from one group (animals, fruit, transport, clothes, body, food, weather, colours, numbers or actions), and taps the one that is different. It builds vocabulary in categories.",
    "how": [
     "Look at the four pictures.",
@@ -559,7 +559,7 @@
    "seo": "Beginner Listening Game: Hear a Sentence and Fill the Gap | Free English for Adults",
    "meta": "Hear simple sentences about you, like \"I live in Springvale.\", and write the missing word. Free listening practice for adults.",
    "sub": "Listen to a sentence and fill the gaps.",
-   "blurb": "Hear a short sentence about yourself, like My name is David, and fill in the missing word. Audio plays at three speeds.",
+   "blurb": "Hear a short sentence about someone, like My ___ is David, and type or tap the missing word. The sentence can be played again.",
    "about": "A listening gap-fill with short personal sentences, like \"My ___ is David.\", \"I am ___ Vietnam.\" and \"I go to English ___ three days a week.\" The learner hears the whole sentence and types the missing word, or taps it in multiple choice. The audio can be played again.",
    "how": [
     "Listen to the sentence.",
@@ -584,7 +584,7 @@
    "seo": "Elementary Listening Game: Fill the Gap in Longer Sentences | Free English for Adults",
    "meta": "Hear longer everyday sentences and write the missing word. Free listening and gap-fill practice for adult English learners.",
    "sub": "Listen to a longer sentence and fill the gaps.",
-   "blurb": "Fill the gap in longer spoken sentences that use the elementary sound patterns. Joins listening practice with phonics.",
+   "blurb": "Hear a longer sentence and fill the gap. The sentences use the elementary sound patterns, so listening supports phonics.",
    "about": "A listening gap-fill with longer sentences, like \"She ___ at the fish shop on the main street.\" The sentences use the Elementary sound patterns (sh, ee, oo, ai), so listening and phonics go together. The learner types the missing word, or taps it in multiple choice.",
    "how": [
     "Listen to the sentence.",
@@ -608,7 +608,7 @@
    "seo": "Listen and Unscramble: Hear a Sentence, Put the Words in Order | Free Game for Adults",
    "meta": "Hear a sentence, then drag the word tiles into order. Sentences about name, family, home and daily routine. Free ESL game.",
    "sub": "Listen, then put the words in order.",
-   "blurb": "Hear a sentence about family, home or the weekend, then put the mixed-up word tiles in order. Trains listening for word order.",
+   "blurb": "Hear a sentence about family, home or the weekend, then put the word tiles in order. In multiple choice, tap the correct sentence.",
    "about": "A listening and word order game. The learner hears a sentence, like \"I have one son and one daughter.\", then puts the mixed-up word tiles in order. The sentences cover personal information, family, home, daily routine and the weekend. In multiple choice the learner taps the sentence in the right order.",
    "how": [
     "Listen to the sentence.",
@@ -633,7 +633,7 @@
    "seo": "Greetings Game: Hello, How Are You, Thank You | Free English Listening for Adult Beginners",
    "meta": "Hear a greeting or a question like \"Where are you from?\" and tap the right reply. Free everyday English for adults.",
    "sub": "Hear a greeting and answer it.",
-   "blurb": "Hear How are you? or See you next week and tap the right reply. The everyday exchanges learners need in their first weeks.",
+   "blurb": "Hear a greeting or a simple question, like How are you? or Where are you from?, and tap the right reply. Social English for the first weeks.",
    "about": "Everyday exchanges for the first weeks of English. The learner hears a greeting or courtesy phrase, like \"How are you?\", \"Thank you.\" or \"See you next week.\", and taps the right reply. Other rounds ask short personal questions: \"What is your name?\", \"Where are you from?\", \"How old are you?\"",
    "how": [
     "Listen to what the person says.",
@@ -658,7 +658,7 @@
    "seo": "Do What It Says: Follow Simple Spoken Instructions | Free English Listening for Adults",
    "meta": "Hear \"Tap the book\", \"Open the door\" or \"Turn the sound off\" and tap the right picture. Free listening game for adults.",
    "sub": "Listen, then tap what it says.",
-   "blurb": "Follow short spoken instructions, such as Open the door or Charge the battery, by tapping the right picture. Classroom and phone instructions both appear.",
+   "blurb": "Hear a short instruction, like Open the door or Take a photo, and tap the matching picture. Covers classroom and phone instructions.",
    "about": "A game for following short spoken instructions. Classroom rounds use everyday things: \"Tap the book.\", \"Open the door.\", \"Tap the cup.\" Device rounds use phone instructions: \"Turn the sound off.\", \"Charge the battery.\", \"Take a photo.\" Every answer has a picture.",
    "how": [
     "Listen to the instruction.",
@@ -683,7 +683,7 @@
    "seo": "Speaking Practice Game: Answer Everyday Questions in English | Free for Adult Learners",
    "meta": "Hear a question like \"What did you do on Saturday?\" and build the answer from word tiles. Free English speaking preparation for adults.",
    "sub": "Hear the question and build your answer.",
-   "blurb": "Hear a question like Where do you live? or How was your weekend? and build a full answer from word tiles. Prepares learners for real conversation.",
+   "blurb": "Hear a question like Where do you live? and build the answer from word tiles. The answer is then read aloud so the learner can say it too.",
    "about": "Practice for common conversation questions. The learner hears a question, like \"Where do you live?\", \"What is your favourite food?\", \"Can you drive?\" or \"How was your weekend?\", and builds a full answer from word tiles, like \"On Saturday, I stayed at home.\" The answer is read aloud afterwards so the learner can say it too. In multiple choice the learner taps the right answer instead. To record their own voice, learners can use Speaking Practice on the home page.",
    "how": [
     "Listen to the question.",
@@ -708,7 +708,7 @@
    "seo": "Question Words Game: What, Where, How, Who | Free English Grammar for Adults",
    "meta": "Choose the right question word for everyday questions like \"___ old are you?\" and \"___ do you live?\". Free ESL grammar game.",
    "sub": "Choose the right question word.",
-   "blurb": "Choose the missing question word in sentences like ___ is your name?. These are the questions asked at enrolment, the doctor and the bank.",
+   "blurb": "Read a question with its first word missing, like ___ is your name?, and choose the question word. The questions asked at enrolment, the doctor and work.",
    "about": "A reading game for question words. The learner sees an everyday question with its first word missing, like \"___ is your name?\" or \"___ do you spell your name?\", and taps or writes the right question word. These are the questions asked at enrolment, at the doctor and at work.",
    "how": [
     "Read the question.",
@@ -733,7 +733,7 @@
    "seo": "Grammar Unscramble: Put English Words in the Right Order | Free Sentence Game for Adults",
    "meta": "Drag the word tiles into a correct sentence, like \"I live in a three-bedroom house.\" Free English word order practice for adults.",
    "sub": "Put the words in the right order.",
-   "blurb": "Put the mixed-up words of a written sentence back in order, with no audio. Sentences about personal information, family and daily routine.",
+   "blurb": "Put the mixed-up words of a written sentence in order, with no audio. The sentences are about yourself, your family and your day.",
    "about": "A word order game with no audio. The learner sees the words of a sentence mixed up and puts them in order. The sentences are about personal information, family, home and daily routine, so they are useful for speaking and writing about yourself.",
    "how": [
     "Read the mixed-up words.",
@@ -758,7 +758,7 @@
    "seo": "Translate to English: Arabic, Dari, Persian, Pashto, Vietnamese, Chinese and More | Free",
    "meta": "Read a sentence in your language and write it in English. Arabic, Burmese, Chinese, Dari, Hindi, Khmer, Pashto, Persian, Thai, Urdu, Vietnamese.",
    "sub": "Read it in your language, write it in English.",
-   "blurb": "Read a sentence in a first language, such as Arabic, Dari or Vietnamese, and write it in English. For learners who already read their own language.",
+   "blurb": "Read a sentence in your first language, such as Arabic, Dari or Vietnamese, and write it in English. For learners who can read their own language.",
    "about": "A translation game for learners who can read their first language. The learner reads a sentence in Arabic, Burmese, Chinese, Dari, Hindi, Khmer, Pashto, Persian, Thai, Urdu or Vietnamese and writes it in English. In multiple choice they choose the right English sentence. The sentences are about name, family, home, daily routine and the weekend.",
    "how": [
     "Choose your language.",
@@ -783,7 +783,7 @@
    "seo": "Number Words 1 to 10: Hear and Spell One to Ten | Free English Numbers for Adults",
    "meta": "Hear a number and spell its word: one, two, three... ten. Type it or choose it. Free English number words game for adults.",
    "sub": "Hear a number from 1 to 10 and spell it.",
-   "blurb": "Hear a number and type its word, one to ten. A tap option is there for learners who cannot type yet.",
+   "blurb": "Hear a number from one to ten and type its word. Learners who cannot type yet can tap instead.",
    "about": "A spelling game for the number words one to ten. The learner hears the number and types the word, like \"seven\" or \"eight\". Multiple choice is there for learners who cannot type yet.",
    "how": [
     "Listen to the number.",
@@ -807,7 +807,7 @@
    "seo": "Number Words 11 to 20: Thirteen or Thirty? | Free English Numbers Game for Adults",
    "meta": "Hear and spell eleven to twenty, the hardest English numbers to hear and spell. Free number words game for adult learners.",
    "sub": "Hear a number from 11 to 20 and spell it.",
-   "blurb": "Spell eleven to twenty, including the teen numbers that are hard to hear apart, like fifteen and fifty.",
+   "blurb": "Hear a number from eleven to twenty and type its word. The teen numbers, like twelve, fifteen and eighteen, are the hard ones.",
    "about": "A spelling game for eleven to twenty. The teen numbers are hard to hear and hard to spell: twelve, fifteen, eighteen. The learner hears the number and types the word.",
    "how": [
     "Listen to the number.",
@@ -831,7 +831,7 @@
    "seo": "Number Words 21 to 99: Hear and Spell Twenty-One to Ninety-Nine | Free for Adults",
    "meta": "Hear a number and spell it with its hyphen, like forty-two. Free English number words game for adult learners.",
    "sub": "Hear a number from 21 to 99 and spell it.",
-   "blurb": "Spell two-digit numbers like forty-two, hyphen included. Needed for writing amounts in words on forms.",
+   "blurb": "Hear a number like forty-two and spell it, hyphen included. Needed for writing amounts in words.",
    "about": "A spelling game for two-digit number words, like twenty-one, forty-two and ninety-nine. Learners practise the tens words and the hyphen, which they need for forms and for writing amounts in words.",
    "how": [
     "Listen to the number.",
@@ -855,7 +855,7 @@
    "seo": "Tap the Number: Hear a Number and Find It | Free Number Recognition Game for Adults",
    "meta": "Hear a number and tap it from four. The choices are close, like 13 and 31. Free number recognition game for adult learners.",
    "sub": "Hear a number and tap it.",
-   "blurb": "Hear a number and tap it from four close choices, such as one more, one less or digits swapped. Trains careful listening with no typing.",
+   "blurb": "Hear a number and tap it from four close choices: one more, one less, ten more or the digits swapped. Careful listening, no typing.",
    "about": "A number recognition game with no typing. The learner hears a number and taps it from four numbers. The wrong choices are close (one more, one less, ten more, or the digits swapped), so the learner has to listen carefully.",
    "how": [
     "Listen to the number.",
@@ -879,7 +879,7 @@
    "seo": "Write the Number: Write Numbers and Australian Money in Figures | Free for Adults",
    "meta": "Hear a number or price and write it in figures, or write what an Australian coin or note is worth. Free numeracy for adults.",
    "sub": "Write numbers and money in figures.",
-   "blurb": "Write numbers and money in figures: a number you hear, a coin or note value, or an amount like $4.50.",
+   "blurb": "Write numbers and money in figures: a number you hear or see, the value of an Australian coin or note, or an amount like $4.50.",
    "about": "Writing numbers and money in figures. Rounds mix four kinds: write a number you hear, copy a number, write what an Australian coin or note is worth (from 5c to $50), and write an amount of money you hear, like $4.50.",
    "how": [
     "Listen, or look at the coin or note.",
@@ -903,7 +903,7 @@
    "seo": "Add It Up: Simple Addition in English | Free Numeracy Game for Adult Learners",
    "meta": "Hear and read a simple sum like 4 + 3, then type the answer. Free numeracy and maths English for adults.",
    "sub": "Add two numbers together.",
-   "blurb": "Answer simple sums spoken in English, like What is four plus three?. The maths is easy so the focus stays on the English.",
+   "blurb": "Hear and read a simple sum, like four plus three, and type the answer. The maths stays easy so the English is the focus.",
    "about": "Simple addition, asked in English. The sum is spoken (\"What is four plus three?\") and shown on screen. The maths is easy on purpose: the aim is understanding numbers and \"plus\" in English.",
    "how": [
     "Listen to the sum.",
@@ -927,7 +927,7 @@
    "seo": "Add the Money: Add Two Amounts in Dollars | Free Money Maths for Adult English Learners",
    "meta": "Hear \"What is five dollars plus three dollars?\" and type the total. Free money and numeracy game for adults.",
    "sub": "Add two amounts of money.",
-   "blurb": "Add two amounts in whole dollars, like $5 and $3. Practises the word dollars and working out a shopping total.",
+   "blurb": "Add two amounts in whole dollars, like $5 and $3. The question is spoken and shown, like working out a total at the shops.",
    "about": "Adding two amounts of money in whole dollars. The question is spoken and shown, like \"$5 + $3 = ?\". It practises the word \"dollars\" and working out a total when shopping.",
    "how": [
     "Listen to the two amounts.",
@@ -951,7 +951,7 @@
    "seo": "Put In Order: Order Numbers, Australian Money, Days and Months | Free Game for Adults",
    "meta": "Drag numbers, coins and notes, days or months into order. Free ordering and sequencing game for adult English learners.",
    "sub": "Put numbers, money, days and months in order.",
-   "blurb": "Order numbers, Australian coins and notes, days of the week or months from first to last.",
+   "blurb": "Put numbers, Australian coins and notes, three days or three months in order. Tap or drag the tiles.",
    "about": "An ordering game with four kinds of rounds: numbers from smallest to biggest, Australian coins and notes from smallest to biggest, three days of the week in order, and three months in order.",
    "how": [
     "Look at the tiles.",
@@ -975,7 +975,7 @@
    "seo": "Tens and Ones: Place Value Game for Adult Learners | Free Numeracy in English",
    "meta": "How many tens in 47? How many ones? Free place value game for adult numeracy and English learners.",
    "sub": "How many tens and how many ones.",
-   "blurb": "Look at a number from 11 to 99 and answer how many tens or how many ones. Place value with spoken questions.",
+   "blurb": "See a number from 11 to 99 and answer how many tens or how many ones. Every question is read aloud and shown on screen.",
    "about": "A place value game for the numbers 11 to 99. The learner sees a number and answers \"How many tens?\" or \"How many ones?\". The question is spoken as well as shown.",
    "how": [
     "Look at the number.",
@@ -999,7 +999,7 @@
    "seo": "Read the List: Find Prices on a Price List | Free Shopping English for Adults",
    "meta": "Read a short price list, find how much something costs, and spot the cheaper item. Free reading and numeracy for adults.",
    "sub": "Find a price in a list.",
-   "blurb": "Read a price list like a shop board and answer how much, which is cheaper or which costs more.",
+   "blurb": "Read a price list for everyday groceries and answer how much, which is cheaper, or which is more expensive.",
    "about": "A price list reading game, like a menu or a shop board. Rounds ask \"How much is the bread?\", \"Which one is cheaper?\" or \"Which one is more expensive?\". The items are everyday groceries at believable prices.",
    "how": [
     "Read the price list.",
@@ -1024,7 +1024,7 @@
    "seo": "Find the Date: Read a Calendar in English | Free Calendar Game for Adult Learners",
    "meta": "Read a month calendar: what day is May 14? Which month is this? Free calendar reading practice for adults.",
    "sub": "Find a day and a date on a calendar.",
-   "blurb": "Find a date on a real month calendar and say which day it falls on. Practice for appointments, rent and school dates.",
+   "blurb": "Read a real month calendar to find what day a date falls on, or which month it shows. Practice for appointments and due dates.",
    "about": "Calendar reading with a real month grid. The learner answers \"What day is May 14?\" by finding the date and reading its column, or answers \"Which month is this?\". It is practice for appointments, rent and school dates.",
    "how": [
     "Look at the calendar.",
@@ -1048,7 +1048,7 @@
    "seo": "First, Second, Third: Ordinal Numbers Game | Free English for Adult Learners",
    "meta": "Hear \"Tap second\" or \"Tap the second one\", or say which one is marked. Free ordinal numbers game for adult English learners.",
    "sub": "Which one is first, second or third.",
-   "blurb": "Point to the first, second or third person in a row. The ordinal words for queues, floors and turns.",
+   "blurb": "Hear first, second or third and tap the right person in a row, or name a marked position. The words for queues and floors.",
    "about": "Ordinal numbers with a row of people. The learner hears \"Tap second.\" and chooses 2nd, hears \"Tap the second one.\" and taps the second of 1, 2 and 3, or sees one person marked and names the position. These are the words for queues, floors and dates.",
    "how": [
     "Look at the row.",
@@ -1072,7 +1072,7 @@
    "seo": "Ordinal Numbers 1st to 30th: Listening Game | Free English for Adult Learners",
    "meta": "Hear \"Tap twenty-first\" and choose 21st, or find the marked number and name it. Free game for ordinal numbers first to thirtieth.",
    "sub": "First to thirtieth.",
-   "blurb": "Ordinals from first to thirtieth, the way dates are said aloud, like the twelfth.",
+   "blurb": "Ordinals from first to thirtieth, the way dates are said. The wrong choices are the usual mix-ups, like thirteenth and thirtieth.",
    "about": "Ordinal numbers from first to thirtieth, the way dates are said. The learner hears \"Tap twelfth.\" and chooses 12th, hears \"Tap the twelfth one.\" and taps 12 from numbers in counting order, or sees one number marked on a grid of 1 to 30 and chooses its word. The wrong options are the ones people mix up: thirteenth and thirtieth, twelfth and twentieth.",
    "how": [
     "Listen to the number.",
@@ -1096,7 +1096,7 @@
    "seo": "Where Is It: Up, Down, Left, Right, In Front, Behind | Free English Game for Adults",
    "meta": "Position words game: which way does the arrow point? Where is the box? Free prepositions of place for adult learners.",
    "sub": "Up, down, left, right, in front, behind.",
-   "blurb": "Answer which way an arrow points, or whether a box is in front of or behind a person. Basic position and direction words.",
+   "blurb": "Say which way an arrow points, up, down, left or right, or whether a box is in front of or behind a person.",
    "about": "Direction and position words. The learner sees an arrow and answers which way it points (up, down, left or right), or sees a person and a box and answers whether the box is in front or behind.",
    "how": [
     "Look at the picture.",
@@ -1120,7 +1120,7 @@
    "seo": "Interactive Clock Game: Move the Hour and Minute Hands | Free Telling Time for Adults",
    "meta": "Drag the clock hands to set the time, and read analogue clocks. O'clock, half past, quarter past, quarter to, 5 minutes. Free.",
    "sub": "Read the clock and set the time.",
-   "blurb": "Read and set an analogue clock by dragging its hands, moving from o'clock to half past and quarter past.",
+   "blurb": "Read an analogue clock, then drag its hands to set a time. It moves from o'clock and half past to quarter past, quarter to and 5-minute steps.",
    "about": "An interactive analogue clock with hour and minute hands you can drag. Rounds take turns: read the clock and choose the time, then set the clock to a time, like \"Set the clock to 3:15, quarter past three\". It moves from o'clock to half past, then quarter past and quarter to, then 5-minute steps. The wrong choices are the real mistakes, like reading the hands the wrong way round.",
    "how": [
     "Read the clock and tap the time.",
@@ -1146,7 +1146,7 @@
    "seo": "Digital Time: Hear a Time and Read It in Numbers | Free Telling Time for Adults",
    "meta": "Hear \"nine thirty\" and tap 9:30, or type it. Whole hours, quarter hours, AM and PM. Free digital time game for adults.",
    "sub": "Hear a time and read it in numbers.",
-   "blurb": "Match a spoken time to a digital one, as on a phone or appointment card, including AM and PM.",
+   "blurb": "Hear a time and tap or type it in numbers, as on a phone or appointment card. Includes quarter hours and the difference between AM and PM.",
    "about": "Digital time, as on phones, tickets and appointment cards. The learner hears a time and taps the matching digital time, or types it in numbers. It includes whole hours, quarter hours and AM and PM.",
    "how": [
     "Listen to the time.",
@@ -1170,7 +1170,7 @@
    "seo": "Shop: Pay With Australian Coins and Notes, Work Out Change | Free Money Game for Adults",
    "meta": "Tap real Australian coins and notes to pay a price, then work out the change. Free money game for adult English learners.",
    "sub": "Count the coins and pay the right amount.",
-   "blurb": "Pay for everyday items with pictures of real Australian coins and notes, then work out the change.",
+   "blurb": "Pay for everyday items with real Australian coins and notes, from 5c to $50, and work out the change.",
    "about": "A money game with pictures of real Australian coins and notes, from 5c to $50. The learner pays the right amount for an everyday item at a believable price. Other rounds ask for the change: \"It costs $7.00. You give $10.00. Tap your change.\"",
    "how": [
     "Read the price.",
@@ -1195,7 +1195,7 @@
    "seo": "Dice Game: Roll, Add and Get Closest to the Target | Free Number Game for Adults",
    "meta": "Roll two dice, add to your score, and stop before you go over the target. Free maths and English game, great for a whole class.",
    "sub": "Roll two dice and get closest to the target.",
-   "blurb": "Roll two dice, add them to a running score and decide whether to stop or roll again. Adding practice with a little strategy.",
+   "blurb": "Roll two dice, add them to your score and choose to roll again or stop. The aim is to get closest to the target without going over.",
    "about": "A dice game for adding and deciding. The learner rolls two dice, adds them to their score and types the new score, then chooses to roll again or stop. Going over the target means you are out. You choose the target number, and whether a wrong sum ends your game or gives one more try.",
    "how": [
     "Roll the dice and type your new score.",
@@ -1219,7 +1219,7 @@
    "seo": "Signs Game: No Smoking, Wet Floor, Exit, First Aid | Free Safety Signs for English Learners",
    "meta": "What does this sign mean? Common safety and public signs in Australia: exit, toilets, wet floor, no entry. Free for adults.",
    "sub": "Read the signs you see around you.",
-   "blurb": "See a public or safety sign, such as wet floor or no parking, and tap what it means. The signs are pictures, so no reading is needed yet.",
+   "blurb": "See a public or safety sign with no words on it, like wet floor or no parking, and tap what it means from four choices.",
    "about": "Common public and safety signs shown as pictures, without words: no smoking, no parking, do not enter, wet floor, danger, first aid, exit, toilets, wheelchair access, no food or drink, and bus stop. The learner taps what the sign means.",
    "how": [
     "Look at the sign.",
@@ -1244,7 +1244,7 @@
    "seo": "Reading Text Messages: Appointment Reminders and SMS | Free English Reading for Adults",
    "meta": "Read a text message from a doctor, a dentist, a class or family, and answer a question about it. Free reading practice for adults.",
    "sub": "Read a short message and answer it.",
-   "blurb": "Read real-life text messages, like an appointment reminder, and answer what day, what time or what to bring.",
+   "blurb": "Read real text messages, like an appointment reminder or a shopping request from family, and answer what day, what time, who or what to bring.",
    "about": "Reading real-life text messages: a medical appointment reminder (\"Reply YES to confirm\"), a dental reminder, a class start time, or a message from family asking you to buy milk and bread. The learner answers what day, what time, who, or what to bring.",
    "how": [
     "Read the message.",
@@ -1268,7 +1268,7 @@
    "seo": "Filling In Forms: First Name, Family Name, Date of Birth, Postcode | Free Practice for Adults",
    "meta": "Put each detail in the right box on a form, and read an ID card. Free form-filling practice for adult English learners.",
    "sub": "Fill in a form with your details.",
-   "blurb": "Put a person's details into the right boxes on a form, such as family name, date of birth and postcode.",
+   "blurb": "Put a person's details into the right boxes on a form, from family name to postcode. Other rounds read the name or number on an ID card.",
    "about": "Form-filling practice. The learner gets a person's details and puts each one in the right box: first name, family name, date of birth, phone, address, postcode and country of birth. Other rounds show an ID card and ask for the name or the card number.",
    "how": [
     "Read the form.",
@@ -1293,7 +1293,7 @@
    "seo": "Directions Game: Go Straight Ahead, Turn Left, Next To, Opposite | Free English Map Game for Adults",
    "meta": "Read or hear directions and draw the way on a street map. Turn left, turn right, next to, opposite, between. Free for adult learners.",
    "sub": "Read the directions. Draw the way on the map.",
-   "blurb": "Read directions like Turn left at the bank and draw the route on a street map with a finger.",
+   "blurb": "Hear and read directions like Turn left at the bank, then draw the way on a street map. Words like next to and opposite find the place.",
    "about": "Giving and following directions on a street map. The learner hears and reads directions such as \"Go straight ahead. Turn left at the bank. The post office is next to the café.\" and draws the way with a finger, from You are here to the building the sentence describes. The place they are looking for has no name on the map, so the place words (next to, opposite, between, on the corner) are what find it. Directions start short and get longer through the game.",
    "how": [
     "Listen to the directions.",
@@ -1318,7 +1318,7 @@
    "seo": "Devices Game: Phone, Laptop, Printer, Charger | Free Digital Skills English for Adults",
    "meta": "Name a device, or choose which one you use to call, print, type or take a photo. Free digital literacy for adults.",
    "sub": "Name a device and say what it is for.",
-   "blurb": "Name common devices like a charger, printer and headphones. Digital literacy vocabulary for class, work and Centrelink offices.",
+   "blurb": "Name everyday devices like a printer, charger or headphones, and say what each one is for.",
    "about": "Digital literacy vocabulary: phone, laptop, screen, printer, camera, keyboard, mouse, headphones, charger and wifi. Rounds ask \"What is this called?\" or \"Which one do you use to put it on paper?\".",
    "how": [
     "Listen to the question.",
@@ -1342,7 +1342,7 @@
    "seo": "Screen Symbols: What Phone and Computer Icons Mean | Free Digital Literacy for Adults",
    "meta": "Search, home, back, play, pause, sound off, wifi, battery, settings, delete, save, menu. Learn what screen icons mean. Free.",
    "sub": "What the buttons on a screen do.",
-   "blurb": "Tap the meaning of common icons, like search, settings, back and delete, as seen on phones and kiosks.",
+   "blurb": "See an icon, like search, settings, back or delete, and tap its name. The symbols on phones, computers and kiosks.",
    "about": "The icons on phones, computers and kiosks: search, home, go back, play, pause, sound on, sound off, internet, battery, settings, delete, save, camera, message and menu. The learner sees the icon and taps its name.",
    "how": [
     "Look at the symbol.",
@@ -1366,7 +1366,7 @@
    "seo": "What Should You Do? Phone Messages, Battery Low, Scam Calls | Free Digital Skills for Adults",
    "meta": "Battery low, no internet, wrong password, unknown number. Read the phone message and choose what to do. Free.",
    "sub": "A message, or a problem with the phone.",
-   "blurb": "Decide what to do about phone messages like battery low, storage full or a call from an unknown number.",
+   "blurb": "Choose what to do about a phone message, like battery low or storage full, or a call from an unknown number. Also what to try when the phone will not turn on.",
    "about": "Common phone messages and what to do about them: battery low, no internet, storage full, wrong password, missed call, phone locked, an alarm, and a call from an unknown number. Other rounds ask what to check or tap when the phone will not turn on or nothing will load.",
    "how": [
     "Read the phone message.",
@@ -1390,7 +1390,7 @@
    "seo": "Security: What Not to Share Online | Free Scam Awareness and Digital Safety for Adults",
    "meta": "Can you share your PIN? Your first name? Learn what to keep private, and copy a verification code. Free.",
    "sub": "Copy a code, and what to keep private.",
-   "blurb": "Decide whether something is safe to share or must stay private, from a first name to a bank PIN. Basic online safety.",
+   "blurb": "Decide if something is safe to share, like a first name, or must stay private, like a PIN or passport photo. Other rounds copy a 4-digit SMS code.",
    "about": "Online safety with yes or no answers. The learner decides whether something is safe to share, like a first name, a class day or a favourite colour, or must stay private, like a bank PIN, a password, a card number or a photo of a passport. Other rounds practise copying a 4-digit code, like a verification code sent by SMS.",
    "how": [
     "Listen to what it is.",
@@ -1438,7 +1438,7 @@
    "seo": "Test Yourself: Free Adaptive English Test for Adult Learners | WordLink",
    "meta": "10 rounds of 3 questions from every game. It gets harder or easier as you go, and shows what to practise next.",
    "sub": "10 rounds of 3 questions, drawn from every game. It gets harder or easier as you go.",
-   "blurb": "An adaptive check across every skill that ends with the learner's strong areas and which games to play next.",
+   "blurb": "Ten rounds from every game that get harder or easier with each answer. The results show strong skills and which games to practise next.",
    "about": "An adaptive self-check. The questions get harder after right answers and easier after wrong ones. At the end the learner sees their strong skills and which games to practise next.",
    "how": [
     "Answer each round.",
@@ -1461,7 +1461,7 @@
    "seo": "Letters and Sounds Test: Free Adaptive Phonics Check for Adult Learners | WordLink",
    "meta": "10 rounds of 3 questions from every letters and sounds game: letter names, big and small letters, word families and digraphs.",
    "sub": "10 rounds of 3 questions, drawn from every letters and sounds game. It gets harder or easier as you go.",
-   "blurb": "An adaptive check across the alphabet and all six phonics games. Shows which sound patterns a learner has and which still need work.",
+   "blurb": "An adaptive check of the alphabet and all six phonics games. The results point to the phonics games to practise next.",
    "about": "An adaptive check of letters and phonics. It draws on Letter Names, Big and Small Letters and all six Sound Gap, Tap Word and Build Word games, from CVC word families up to digraphs and vowel teams.",
    "how": [
     "Answer each round.",
@@ -1581,7 +1581,7 @@
    "seo": "English Writing Test: Free Adaptive Writing Check for Adult Learners | WordLink",
    "meta": "10 rounds of 3 questions from every writing game: copying, capitals and full stops, spelling and model sentences.",
    "sub": "10 rounds of 3 questions, drawn from every writing game. It gets harder or easier as you go.",
-   "blurb": "An adaptive writing check covering copying, capitals and full stops, spelling, forms and sentences from a model.",
+   "blurb": "An adaptive check that runs from copying words and names up to writing sentences from a model.",
    "about": "An adaptive writing check: copying words and names, capital letters and full stops, spelling words and number words, filling in forms, and writing sentences from a model.",
    "how": [
     "Answer each round.",
@@ -1629,7 +1629,7 @@
    "seo": "Numeracy Test: Free Adaptive Numbers, Time and Money Check for Adult Learners | WordLink",
    "meta": "10 rounds of 3 questions from every numbers game: numbers, time, money, calendars and price lists.",
    "sub": "10 rounds of 3 questions, drawn from every numbers game. It gets harder or easier as you go.",
-   "blurb": "An adaptive numeracy check in English: numbers, money, time, dates and price lists.",
+   "blurb": "An adaptive check of numbers, money, time, dates and price lists, all asked in English.",
    "about": "An adaptive numeracy check in English. It draws on Tap the Number, Write the Number, Add It Up, Add the Money, Put In Order, Tens and Ones, Read the List, Clock, Digital Time, Find the Date, Shop and more.",
    "how": [
     "Answer each round.",
@@ -1653,7 +1653,7 @@
    "seo": "Translation Test: From Your Language to English | Free Adaptive Check for Adult Learners",
    "meta": "10 rounds of 3 questions: read a sentence in your language and write it in English. 11 languages.",
    "sub": "10 rounds of 3 questions, drawn from the translation game. It gets harder or easier as you go.",
-   "blurb": "An adaptive translation check in eleven languages, read in the learner's language and answered in English.",
+   "blurb": "An adaptive check in eleven languages: read a sentence in your own language and write or choose the English.",
    "about": "An adaptive translation check in Arabic, Burmese, Chinese, Dari, Hindi, Khmer, Pashto, Persian, Thai, Urdu or Vietnamese. The learner reads a sentence in their language and writes or chooses the English.",
    "how": [
     "Choose your language.",
@@ -1701,7 +1701,7 @@
    "seo": "Level Check: Free ACSF Pre Level English Placement Check for Adult Learners | WordLink",
    "meta": "12 rounds across every skill, ending with an indicative ACSF level and a strengths report a teacher can start from. Free.",
    "sub": "12 rounds of 3 questions, spread across every skill. It ends with an indicative ACSF level a teacher can start from.",
-   "blurb": "A placement check for teachers and tutors. It covers every skill and gives a report of where a learner sits at pre-level.",
+   "blurb": "A placement check for teachers and tutors. It ends with an indicative ACSF level, from Pre Level 1 Stage A to Level 1, and a report of strengths and gaps to confirm in an interview.",
    "about": "A placement check for teachers and tutors of adult pre-level learners. It covers every skill: letters and sounds, reading, writing, listening, numbers, everyday English and digital skills. Each skill moves up a stage only where the learner has shown the one below. It ends with an indicative ACSF level (Pre Level 1 Stage A, Stage B, or Level 1) and a report of strengths and gaps to confirm in an interview.",
    "how": [
     "Your teacher gives you the link.",
