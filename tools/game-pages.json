@@ -1743,6 +1743,16 @@
     "signs in Australia",
     "workplace safety signs",
     "survival English"
+   ],
+   "inside": [
+    "11 signs shown as pictures with no words: no smoking, no parking, do not enter, wet floor, danger, first aid, exit, toilets, wheelchair access, no food or drink, and bus stop.",
+    "The learner reads four meanings and taps the right one.",
+    "The wrong meanings are close on purpose, like No cooking and No matches beside No smoking, so the learner has to read carefully."
+   ],
+   "tips": [
+    "Walk around your building after the game and find the same signs on the walls.",
+    "Teach the pattern No plus a word: no smoking, no parking, no food.",
+    "Signs with words, like notices, come next in [Read the Notice](read-the-notice)."
    ]
   },
   {
@@ -1767,6 +1777,16 @@
     "reading text messages ESL",
     "appointment reminder SMS",
     "functional reading for adults"
+   ],
+   "inside": [
+    "Six text messages: a doctor's appointment, an English class, a request from Mum to buy milk and bread, a dental reminder, a class cancelled because the centre is closed, and a rent reminder from a housing office.",
+    "Each round shows one message and asks one question, like What time is the appointment?, Which room is the class in? or How much is the rent?",
+    "The wrong choices are close to the right one, like 2:13pm beside 2:30pm, or $302 beside $320."
+   ],
+   "tips": [
+    "Ask what the learner should do next: reply YES, bring the book, arrive early.",
+    "Show real reminder messages from a phone, with personal details removed, and ask the same questions.",
+    "Times and prices are where the mistakes happen. Practise reading them aloud with [Digital Time](digital-time)."
    ]
   },
   {
@@ -1792,6 +1812,17 @@
     "personal details form",
     "first name and family name",
     "form-filling for adults"
+   ],
+   "inside": [
+    "Two kinds of round, taking turns: filling in a form, and reading an ID card.",
+    "Form rounds give six people's details, such as Ali Hassan, Mai Nguyen and Fatima Ahmadi, and the learner puts each detail in the right box.",
+    "The boxes are first name, family name, date of birth, phone, address, postcode and country of birth.",
+    "Card rounds show an ID card and ask the learner to tap the name or the card number."
+   ],
+   "tips": [
+    "Family name and surname mean the same thing. Some forms say last name. Teach all three.",
+    "Follow up with a real paper enrolment form, filled in with each learner's own details.",
+    "For writing names correctly, play [Copy It](copy-it) and [Big and Small Letters](big-and-small-letters)."
    ]
   },
   {
@@ -1842,7 +1873,7 @@
    "meta": "Name a device, or choose which one you use to call, print, type or take a photo. Free digital literacy for adults.",
    "sub": "Name a device and say what it is for.",
    "blurb": "Name everyday devices like a printer, charger or headphones, and say what each one is for.",
-   "about": "Digital literacy vocabulary: phone, laptop, screen, printer, camera, keyboard, mouse, headphones, charger and wifi. Rounds ask \"What is this called?\" or \"Which one do you use to put it on paper?\".",
+   "about": "Digital literacy vocabulary: phone, laptop, screen, printer, camera, keyboard, mouse, headphones, charger and wifi. Rounds ask \"What is this called?\" or \"Which one do you use to print on paper?\".",
    "how": [
     "Listen to the question.",
     "Look at the pictures.",
@@ -1853,6 +1884,16 @@
     "digital literacy for adults",
     "technology vocabulary ESL",
     "computer words"
+   ],
+   "inside": [
+    "Ten things: phone, laptop, screen, printer, camera, keyboard, mouse, headphones, charger and wifi.",
+    "Two kinds of round, taking turns: What is this called?, and Which one do you use to call someone, print on paper, take a photo, type, point and click, listen, or give it power?",
+    "The charger is drawn as the small block and cable that comes with a phone, not a wall plug."
+   ],
+   "tips": [
+    "Point to the real devices in the room, or on learners' own phones: the camera, the charger, the headphones.",
+    "Many of these words are the same in other languages, like laptop and wifi. Ask learners which ones they already know.",
+    "Next, play [Screen Symbols](screen-symbols) for the icons on a screen."
    ]
   },
   {
@@ -1877,6 +1918,15 @@
     "computer icons ESL",
     "phone symbols",
     "digital literacy for seniors and migrants"
+   ],
+   "inside": [
+    "15 symbols: search, home, go back, play, pause, sound on, sound off, internet, battery, settings, delete, save, camera, message and menu.",
+    "Each round shows one symbol and asks What is this?. The learner taps its name from four."
+   ],
+   "tips": [
+    "Ask learners to find the same symbols on their own phones after the game.",
+    "The menu symbol, three short lines, is the one most learners do not know. Show where it opens on a real app.",
+    "Next, play [What Should You Do?](what-should-you-do) to act on what the phone shows."
    ]
   },
   {
@@ -1887,20 +1937,30 @@
    "level": "Elementary",
    "name": "What Should You Do?",
    "seo": "What Should You Do? Phone Messages, Battery Low, Scam Calls | Free Digital Skills for Adults",
-   "meta": "Battery low, no internet, wrong password, unknown number. Read the phone message and choose what to do. Free.",
+   "meta": "Battery low, no internet, wrong password, missed call. Read the phone message and choose what to do. Free.",
    "sub": "A message, or a problem with the phone.",
-   "blurb": "Choose what to do about a phone message, like battery low or storage full, or a call from an unknown number. Also what to try when the phone will not turn on.",
-   "about": "Common phone messages and what to do about them: battery low, no internet, storage full, wrong password, missed call, phone locked, an alarm, and a call from an unknown number. Other rounds ask what to check or tap when the phone will not turn on or nothing will load.",
+   "blurb": "Choose what to do about a phone message, like battery low, storage full or a missed call. Also what to check when the phone will not turn on.",
+   "about": "Common phone messages and what to do about them: battery low, no internet, storage full, wrong password, a missed call, a new message, someone calling, a locked phone and an alarm. Other rounds ask what to check or tap when the phone will not turn on or nothing will load.",
    "how": [
     "Read the phone message.",
     "Listen to the question.",
     "Tap what you should do."
    ],
-   "cls": "Choose What Should You Do? in the Teacher Game, and talk through the unknown number round as scam awareness.",
+   "cls": "Choose What Should You Do? in the Teacher Game, then try the same things on students' own phones.",
    "good": [
     "phone skills for adults",
     "digital literacy scenarios",
-    "scam awareness ESL"
+    "phone alerts and messages ESL"
+   ],
+   "inside": [
+    "Ten phone messages: battery low, no internet, delete this photo?, storage full, wrong password, missed call, new message, someone is calling, phone locked, and an alarm.",
+    "For each one the learner chooses what to do, like Charge it, Turn on wifi, Cancel or Call back.",
+    "Six more rounds are about fixing a problem, like It will not turn on. What do you check? The answers are pictures, such as a battery or a charger."
+   ],
+   "tips": [
+    "Do the same things for real on a learner's phone, like turning the sound off at the start of class.",
+    "Talk about Cancel. Many learners tap the first button on a message without reading it.",
+    "For staying safe online, play [Security](safe-or-private)."
    ]
   },
   {
@@ -1926,6 +1986,16 @@
     "scam awareness ESL",
     "keep your PIN private",
     "verification code practice"
+   ],
+   "inside": [
+    "Two kinds of round, taking turns: can you share this?, and copy a code.",
+    "The share rounds name one thing with a picture, and the learner taps yes or no. Keep private: bank PIN, password, bank card number and a photo of your passport. Safe to share: first name, class day, teacher's name and favourite colour.",
+    "The code rounds show a 4-digit code, like the one a bank or myGov sends by text, and the learner types it."
+   ],
+   "tips": [
+    "Talk about scams: a bank or the government will never ask for your PIN or password by text or phone.",
+    "Use it before helping learners set up banking or myGov on their phones.",
+    "Practise reading codes and numbers aloud with [Tap the Number](tap-the-number)."
    ]
   },
   {
