@@ -221,7 +221,7 @@ PAGE = """<!DOCTYPE html>
     <p class="gp-kicker">For teachers and tutors</p>
     <h2>About {name}</h2>
     <p>{about}</p>
-{shot}    <h2>How to play</h2>
+{shot}{extra}    <h2>How to play</h2>
     <ol class="gp-steps">
 {how}
     </ol>
@@ -390,6 +390,21 @@ def settings_for(g):
     return '    <div class="launch-settings">\n' + ''.join(rows) + '    </div>\n'
 
 
+def extra_sections(g):
+    """The longer teacher notes, for the games that have them: what the game
+    actually holds (the words, the families, the kinds of round), read from the
+    game itself, and a few tips for using it. Optional: a game without them
+    renders as before."""
+    out = ''
+    for key, title in (('inside', 'What is in the game'), ('tips', 'Teaching tips')):
+        items = g.get(key)
+        if items:
+            out += ('    <h2>%s</h2>\n    <ul class="gp-list">\n' % title
+                    + ''.join('      <li>%s</li>\n' % esc(x) for x in items)
+                    + '    </ul>\n')
+    return out
+
+
 def related(g, games):
     """Up to four other pages from the same skill, read on round the list from
     this one so that every page is linked from somewhere, not only the first
@@ -459,7 +474,7 @@ def page(g, games):
         skill_label=esc(skill_label + ' · ' + g['level']), emoji=g['emoji'], sub=esc(g['sub']),
         settings=settings_for(g),
         play_label='▶ Open' if game == 'target' else '▶ Play Game',
-        about=esc(g['about']), shot=shot,
+        about=esc(g['about']), shot=shot, extra=extra_sections(g),
         how='\n'.join('      <li>%s</li>' % esc(s) for s in g['how']),
         cls=esc(g['cls']).replace('Teacher Game', '<a href="%s">Teacher Game</a>' % TEACHER, 1),
         teacher=TEACHER,
