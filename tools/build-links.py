@@ -564,6 +564,7 @@ def main():
         written.append(write_file(g['slug'] + '.html', guide_page(g)))
     update_sw(written)
     update_sitemap([g['slug'] for g in games + guides])
+    update_about(games, guides)
     print('wrote %d pages' % len(written))
 
 
@@ -603,6 +604,54 @@ def update_sitemap(slugs):
     xml = xml.replace('</urlset>', '  <!-- %s -->\n%s  <!-- /game pages -->\n</urlset>' % (MARKER, entries))
     with open(path, 'w', encoding='utf-8') as f:
         f.write(xml)
+
+
+def update_about(games, guides):
+    """Write the grouped list of every game and guide into about.html.
+
+    The about page is one of the few pages search engines already index, so a
+    plain link to each page, with a line of its own about it, is how the rest
+    get found. Each entry's blurb lives in the JSON next to its other words."""
+    path = os.path.join(ROOT, 'about.html')
+    with open(path, encoding='utf-8') as f:
+        doc = f.read()
+    start = '<!-- %s: game directory -->' % MARKER
+    end = '<!-- /game directory -->'
+    if start not in doc or end not in doc:
+        raise SystemExit('about.html is missing the game directory markers')
+    missing = [g['slug'] for g in games + guides if not g.get('blurb')]
+    if missing:
+        raise SystemExit('no blurb for: ' + ', '.join(missing))
+
+    def is_test(g):
+        return g['game'].startswith('test:')
+    groups = [('Writing and tracing', [g for g in guides if g['label'] == 'Writing']),
+              ('Getting started with reading', [g for g in guides if g['label'] != 'Writing'])]
+    for key, (label, _, _) in SKILLS.items():
+        if key is None:
+            continue
+        items = [g for g in games if g['skill'] == key and not is_test(g)]
+        if items:
+            groups.append((label, items))
+    groups.append(('Mixed practice', [g for g in games if g['skill'] is None and not is_test(g)]))
+    groups.append(('Test yourself and Level Check', [g for g in games if is_test(g)]))
+    listed = sum(len(items) for _, items in groups)
+    if listed != len(games) + len(guides):
+        raise SystemExit('about.html directory lists %d of %d pages' % (listed, len(games) + len(guides)))
+
+    out = [start + '\n']
+    for label, items in groups:
+        if not items:
+            continue
+        out.append('    <h4>%s</h4>\n    <ul class="dir">\n' % esc(label))
+        for g in items:
+            out.append('      <li><a href="%s"><span aria-hidden="true">%s</span> %s</a>: %s</li>\n'
+                       % (g['slug'], g['emoji'], esc(g['name']), esc(g['blurb'])))
+        out.append('    </ul>\n')
+    out.append('    ' + end)
+    doc = re.sub(re.escape(start) + '.*?' + re.escape(end), lambda m: ''.join(out), doc, count=1, flags=re.S)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(doc)
 
 
 if __name__ == '__main__':
