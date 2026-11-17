@@ -707,27 +707,33 @@ check('routes', 'directions lead to one place by the short way, and the map mark
       poly.push(pts[pts.length - 1]);
       const phase = Math.random() * 6.28;
       let gone = 0, strayed = 0, was = null;
-      renderRouteWidget(q); answered = false;
+      renderRouteWidget(q); answered = false; routeDrawing = true;
       for (let i = 1; i < poly.length; i++) {
         const a = poly[i - 1], c = poly[i], L = Math.hypot(c[0] - a[0], c[1] - a[1]);
         if (L < .01) continue;
         const nx = -(c[1] - a[1]) / L, ny = (c[0] - a[0]) / L, last = i === poly.length - 1;
         for (let s = 0; s < L; s += o.step * (.6 + Math.random() * .8)) {
           const w = last ? 0 : Math.sin((gone + s) / 40 + phase) * o.wob + (Math.random() - .5) * o.noise;
-          routeMoveTo([a[0] + (c[0] - a[0]) * s / L + nx * w, a[1] + (c[1] - a[1]) * s / L + ny * w]);
+          routeMoveTo(routeLast = [a[0] + (c[0] - a[0]) * s / L + nx * w, a[1] + (c[1] - a[1]) * s / L + ny * w]);
           // A building lit up on the way past, before the last stretch.
           if (routeIn && routeIn !== was && i < poly.length - 2) strayed++;
           was = routeIn;
         }
         gone += L;
       }
-      routeMoveTo(pts[pts.length - 1]);
+      routeMoveTo(routeLast = o.end ? o.end(q) : pts[pts.length - 1]);
+      routeUp({});
       return { ok: routeTier(q, document.getElementById('student-ans-input').value) === 'correct', strayed: strayed,
                got: document.getElementById('student-ans-input').value };
     }
     const kinds = { steady: { step: 6, wob: 4, noise: 3, cut: 10 }, shaky: { step: 10, wob: 10, noise: 8, cut: 20 },
                     fast: { step: 28, wob: 8, noise: 6, cut: 30 }, wide: { step: 12, wob: 14, noise: 8, cut: 34 },
-                    swipe: { step: 55, wob: 6, noise: 6, cut: 35 } };
+                    swipe: { step: 55, wob: 6, noise: 6, cut: 35 },
+                    // The end of the line, where it was hard: lifting on the
+                    // pavement outside the door rather than deep in the building.
+                    kerb: { step: 8, wob: 4, noise: 3, cut: 15, end: q => {
+                      const f = routeLots()[q.dest].faces[q.via];
+                      return [f.door[0] + Math.sign(f.at[0] - f.door[0]) * 10, f.door[1] + Math.sign(f.at[1] - f.door[1]) * 10]; } } };
     const keep = currentStudentQ, qs = [0, 1, 2].reduce((o, st) => o.concat(GEN_BANKS.route(50, st)), []), res = {};
     Object.keys(kinds).forEach(k => {
       let ok = 0, strayed = 0, miss = '';
@@ -761,7 +767,7 @@ check('routes', 'directions lead to one place by the short way, and the map mark
     return page.evaluate(() => document.getElementById('student-ans-input').value);
   };
   const results = [];
-  for (const how of ['right', 'nothing', 'back', 'street']) {
+  for (const how of ['right', 'nothing', 'back', 'street', 'tap']) {
     const q = await page.evaluate(() => currentStudentQ);
     const pts = await page.evaluate(q => routeTarget(q), q);
     const along = pts.slice(0, pts.length - 2);
@@ -773,6 +779,13 @@ check('routes', 'directions lead to one place by the short way, and the map mark
       const there = await draw(along, 0);
       if (there === '') results.push('a line along the streets wrote nothing');
       got = await draw(along.slice().reverse(), 0);
+    } else if (how === 'tap') {
+      // Lifts in the street outside, then taps the building.
+      const s = await screen([pts[pts.length - 3], [(pts[pts.length - 3][0] + pts[pts.length - 2][0]) / 2, (pts[pts.length - 3][1] + pts[pts.length - 2][1]) / 2]]);
+      await draw(along, 0);
+      const m = await screen([pts[pts.length - 1]]);
+      await page.mouse.click(m[0][0], m[0][1]);
+      got = await page.evaluate(() => document.getElementById('student-ans-input').value); want = q.answer;
     } else {
       // Stops in the street outside. Submit asks once for a building, then takes it.
       got = await draw(along, 0); want = q.route.join(' ');
@@ -801,12 +814,12 @@ check('routes', 'directions lead to one place by the short way, and the map mark
     if (!seen.onTop) results.push(how + ': the right way is hidden under the learner\'s line');
     if (!seen.nextOn) results.push(how + ': Next is off the bottom of the result screen');
     if (seen.ids > 1) results.push('two maps on the page share an id');
-    if (how === 'right' && !/points 🎯/.test(pts2)) results.push('the right line was not marked right: ' + pts2);
-    if (how !== 'right' && !/No points/.test(pts2)) results.push(how + ' was given points: ' + pts2);
+    if ((how === 'right' || how === 'tap') && !/points 🎯/.test(pts2)) results.push('the right line was not marked right: ' + pts2);
+    if (how !== 'right' && how !== 'tap' && !/No points/.test(pts2)) results.push(how + ' was given points: ' + pts2);
     await page.evaluate(() => soloNextQuestion());
     await page.waitForSelector('#screen-student-answer.active', { timeout: 5000 });
   }
-  say('  drew the right way, nothing, out and back, and a line left in the street, on the real map');
+  say('  drew the right way, nothing, out and back, a line left in the street, and lift then tap the building, on the real map');
   results.forEach(x => bad('routes: ' + x));
   page.errs.forEach(x => bad('routes: ' + x));
   await page.close();

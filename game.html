@@ -12254,7 +12254,7 @@ function routeDrawn(){ return routeLine.length>1||!!routeTip||!!routeIn; }
 function routeHint(nudge){
   const el=document.getElementById('route-hint');
   if(!el) return;
-  el.textContent=nudge||(!routeDrawn()?'Draw from the blue dot':routeIn?'Press Submit':'Finish in a building');
+  el.textContent=nudge||(!routeDrawn()?'Draw from the blue dot':routeIn?'Press Submit':'Draw or tap into the building');
   el.classList.toggle('nudge',!!nudge);
   // The thing to press pulses with it: the dot, or the end of the line.
   const mark=document.getElementById(routeDrawn()?'route-end':'route-dot');
@@ -12269,7 +12269,7 @@ function routeHint(nudge){
 function routeUnfinished(){
   if(!routeQ||!routeDrawn()||routeIn||routeAsked) return false;
   routeAsked=true;
-  routeHint('Finish in a building');
+  routeHint('Tap the building');
   return true;
 }
 function routeEndXY(){
@@ -12310,22 +12310,38 @@ function routePt(e){
   const r=svg.getBoundingClientRect();
   return [(e.clientX-r.left)/r.width*ROUTE_W,(e.clientY-r.top)/r.height*ROUTE_H];
 }
+/* Where a finger counts as being in a building. On a phone a building is
+   about the size of a fingertip, and the finger hides it, so the target is
+   bigger than the building. While the finger moves it starts 15 from the
+   middle of the road, just past the kerb, so a wobbly finger following the
+   street does not light up the buildings it passes. Where the finger is
+   lifted, or taps, it starts 8 from the middle, over the near half of the
+   road: stopping outside the door is enough. */
+let routeReach=15;
+function routeInLot(L,p){
+  const r=routeReach;
+  let x0=L.x+2, x1=L.x+L.w-2, y0=L.y+2, y1=L.y+L.h-2;
+  L.keys.forEach(k=>{
+    const d=L.faces[k].door;
+    if(d[1]<L.y) y0=d[1]+r; else if(d[1]>L.y+L.h) y1=d[1]-r;
+    else if(d[0]<L.x) x0=d[0]+r; else x1=d[0]-r;
+  });
+  return p[0]>x0&&p[0]<x1&&p[1]>y0&&p[1]<y1;
+}
 /* A building the line can go into from this corner: one on a street that
-   starts here, with the finger well inside it. A finger following a street
-   strays over the fronts of the buildings along it, so the front strip of a
-   building does not count: 10 in from each street it faces, 4 from its
-   other walls. */
+   starts here. */
 function routeLotAt(p,at){
-  return Object.values(routeLots()).find(L=>{
-    if(!L.keys.some(k=>L.faces[k].seg.indexOf(at)>=0)) return false;
-    let x0=L.x+4, x1=L.x+L.w-4, y0=L.y+4, y1=L.y+L.h-4;
-    L.keys.forEach(k=>{
-      const d=L.faces[k].door;
-      if(d[1]<L.y) y0=L.y+10; else if(d[1]>L.y+L.h) y1=L.y+L.h-10;
-      else if(d[0]<L.x) x0=L.x+10; else x1=L.x+L.w-10;
-    });
-    return p[0]>x0&&p[0]<x1&&p[1]>y0&&p[1]<y1;
-  })||null;
+  return Object.values(routeLots()).find(L=>L.keys.some(k=>L.faces[k].seg.indexOf(at)>=0)&&routeInLot(L,p))||null;
+}
+/* A building one corner further on, for a finger that cut the last corner
+   straight into it: the corner it skipped, or null. */
+function routeLotAhead(p,at){
+  const home=routeQ.home;
+  for(const m of routeNbrs(at,home)){
+    if(routeLine.indexOf(m)>=0) continue;
+    if(Object.values(routeLots()).some(L=>L.keys.some(k=>L.faces[k].seg.indexOf(m)>=0)&&routeInLot(L,p))) return m;
+  }
+  return null;
 }
 /* The nearest point of any street to the finger. */
 function routeNearest(p,home){
@@ -12370,6 +12386,10 @@ function routeMoveTo(p){
   for(let g=0;g<12;g++){
     const at=routeLine[routeLine.length-1], A=routeXY(at,home);
     const lot=routeLotAt(p,at);
+    if(!lot){
+      const skipped=routeLotAhead(p,at);
+      if(skipped){ routeLine.push(skipped); routeTip=null; continue; }
+    }
     if(lot){
       // By the street the line is on if the building faces it, or else the
       // nearer of its doors.
@@ -12406,6 +12426,19 @@ function routeMoveTo(p){
 function routeDown(e){
   if(answered||!routeQ) return;
   const p=routePt(e), end=routeEndXY(), last=routeXY(routeLine[routeLine.length-1],routeQ.home);
+  // A tap on a building the line has reached finishes the line there, so a
+  // learner who lifted their finger in the street does not have to find the
+  // end of the line again.
+  if(routeDrawn()&&routeGap(p,end)>20){
+    routeReach=8;
+    const at=routeLine[routeLine.length-1], lot=routeLotAt(p,at);
+    routeReach=15;
+    let ahead=!lot&&routeTip?routeLotAhead(p,at):null;
+    // Only the corner the line was heading for.
+    if(ahead&&routeTip.key.split('-').indexOf(ahead)<0) ahead=null;
+    if(ahead) routeLine.push(ahead);
+    if(lot||ahead){ routeReach=8; routeMoveTo(p); routeReach=15; e.preventDefault(); return; }
+  }
   // The line is picked up at its end, or at You are here to start it.
   if(routeGap(p,end)>44&&routeGap(p,last)>44){
     routeHint(routeDrawn()?'Start at the end of your line':'Start at the blue dot'); return;
@@ -12413,14 +12446,22 @@ function routeDown(e){
   routeDrawing=true;
   try{ document.getElementById('route-svg').setPointerCapture(e.pointerId); }catch(err){}
   e.preventDefault();
-  routeMoveTo(p);
+  routeMoveTo(routeLast=p);
 }
+let routeLast=null;
 function routeMove(e){
   if(!routeDrawing) return;
-  routeMoveTo(routePt(e));
+  routeMoveTo(routeLast=routePt(e));
   e.preventDefault();
 }
-function routeUp(){ routeDrawing=false; }
+function routeUp(e){
+  if(!routeDrawing) return;
+  routeDrawing=false;
+  // Where the finger came off is read with the wide reach.
+  const p=e&&e.clientX!=null?routePt(e):routeLast;
+  if(p&&!routeIn){ routeReach=8; routeMoveTo(p); routeReach=15; }
+  routeLast=null;
+}
 (function bindRoute(){
   const svg=document.getElementById('route-svg');
   if(!svg) return;
