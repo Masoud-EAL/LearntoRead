@@ -2019,6 +2019,15 @@
    "good": [
     "ESL review game",
     "mixed English quiz for adults"
+   ],
+   "inside": [
+    "Questions drawn from every game, across letters and sounds, reading, writing, vocabulary, listening, speaking, grammar, numbers, everyday English and using a device.",
+    "You choose how many questions. It does not get harder or easier as you go."
+   ],
+   "tips": [
+    "Use it as a short warm-up or end-of-lesson review once learners know several games.",
+    "A mixed round is a good way to remind learners of games they have not played for a while.",
+    "For a check that adjusts to each learner, use [Test Yourself](test-yourself) instead."
    ]
   },
   {
@@ -2042,6 +2051,16 @@
    "good": [
     "free English level test for adults",
     "adaptive English quiz"
+   ],
+   "inside": [
+    "Questions from every skill in WordLink, from tapping a letter up to writing a missing word in a longer sentence.",
+    "Ten rounds of three questions. After a perfect round the test moves up two steps, and after a round the learner cannot do it moves down two.",
+    "At the end the learner sees their strong skills and which games to practise next."
+   ],
+   "tips": [
+    "Learners can take it on their own phones in a few minutes, at the start of a course and again later to see progress.",
+    "It is a self-check for the learner. For a placement result with an ACSF level, use the [Level Check](level-check).",
+    "To check one skill only, use the skill tests, like [Test Yourself: Reading](test-reading)."
    ]
   },
   {
@@ -2066,6 +2085,15 @@
     "phonics test for adults",
     "alphabet check ESL",
     "adaptive phonics quiz"
+   ],
+   "inside": [
+    "Nine steps, easiest first: hear a letter, match big and small letters, the three Beginner sound games, write a name with a capital, then the three Elementary sound games.",
+    "Ten rounds of three questions. After a perfect round the test moves up two steps, and after a round the learner cannot do it moves down two.",
+    "At the end the learner sees the step they reached, and that game is offered to practise next."
+   ],
+   "tips": [
+    "Use it in the first week to see who needs the alphabet and who is ready for phonics.",
+    "The step a learner reaches points straight to the game to practise, like [Beginner Build Word](beginner-build-word)."
    ]
   },
   {
@@ -2090,6 +2118,15 @@
     "vocabulary test for adults",
     "ESL word quiz",
     "everyday English vocabulary check"
+   ],
+   "inside": [
+    "18 steps, from tapping the word for a picture and finding the odd one out, through fruit, the body, devices, clothes, days and months, up to spelling words and translating.",
+    "Tapping a word comes before writing the same word, so a topic can appear twice.",
+    "Ten rounds of three questions. After a perfect round the test moves up two steps, and after a round the learner cannot do it moves down two."
+   ],
+   "tips": [
+    "Use it to see which topics a learner already knows, so class time goes on the ones they do not.",
+    "The single topic games, like [Fruits](fruits) and [Clothes](clothes), give practice on the gaps it finds."
    ]
   },
   {
@@ -2114,6 +2151,15 @@
     "listening test for adults",
     "ESL listening quiz",
     "adaptive listening check"
+   ],
+   "inside": [
+    "18 steps, from hearing a letter and replying to a greeting, through times, instructions and the sound games, up to writing a missing word and building an answer to a spoken question.",
+    "Ten rounds of three questions. After a perfect round the test moves up two steps, and after a round the learner cannot do it moves down two.",
+    "At the end the learner sees the step they reached, and that game is offered to practise next."
+   ],
+   "tips": [
+    "In a busy room, ask learners to use headphones.",
+    "For gaps it finds, the listening gap games are a good next step: [Beginner Listen and Fill Gaps](beginner-listening)."
    ]
   },
   {
@@ -2138,6 +2184,15 @@
     "speaking test preparation ESL",
     "conversation questions quiz",
     "adult English speaking check"
+   ],
+   "inside": [
+    "Eight steps: reply to a greeting, choose a question word, answer a spoken question, put a heard sentence in order, write a question word, and build a full answer from word tiles.",
+    "It checks the language learners need to speak. It does not record or mark the learner's own voice.",
+    "Ten rounds of three questions. After a perfect round the test moves up two steps, and after a round the learner cannot do it moves down two."
+   ],
+   "tips": [
+    "Follow it with real speaking in pairs, using the same questions.",
+    "To record their voice and compare it with a model, learners can use [Speaking Practice](speaking) on the home page."
    ]
   },
   {
@@ -2162,6 +2217,15 @@
     "reading test for adults",
     "functional reading check ESL",
     "adaptive reading quiz"
+   ],
+   "inside": [
+    "17 steps, from a word with a picture and a sign, through sight words, notices, price lists and text messages, up to forms and writing a missing word in a longer sentence.",
+    "Ten rounds of three questions. After a perfect round the test moves up two steps, and after a round the learner cannot do it moves down two.",
+    "At the end the learner sees the step they reached, and that game is offered to practise next."
+   ],
+   "tips": [
+    "The steps follow the kinds of text adults meet, so the result says which everyday texts a learner can already read.",
+    "Gaps in the early steps point to [Sight Words](sight-words) and [Picture and Word](picture-and-word)."
    ]
   },
   {
@@ -2186,6 +2250,15 @@
     "writing test for adults",
     "ESL writing check",
     "adaptive spelling and writing quiz"
+   ],
+   "inside": [
+    "19 steps, from copying a word, a name and a number, through number words, capitals and full stops, and forms, up to spelling words from every topic and writing a sentence about yourself.",
+    "Ten rounds of three questions. After a perfect round the test moves up two steps, and after a round the learner cannot do it moves down two.",
+    "At the end the learner sees the step they reached, and that game is offered to practise next."
+   ],
+   "tips": [
+    "Typing is not handwriting. Ask learners to write a few words on paper as well.",
+    "Learners who stop at the copying steps can practise with [Copy It](copy-it) and [Trace the Letters](trace-letters)."
    ]
   },
   {
@@ -2210,6 +2283,14 @@
     "grammar test for adults",
     "ESL grammar quiz",
     "word order check"
+   ],
+   "inside": [
+    "Eight steps: choose a question word, choose the sentence written correctly, put a sentence in order with and without audio, write a question word, and write a sentence with a capital and a full stop.",
+    "Ten rounds of three questions. After a perfect round the test moves up two steps, and after a round the learner cannot do it moves down two.",
+    "At the end the learner sees the step they reached, and that game is offered to practise next."
+   ],
+   "tips": [
+    "Use the result to pick between [Question Words](question-words), [Grammar Unscramble](word-order) and [Capitals and Full Stops](capitals-and-full-stops)."
    ]
   },
   {
@@ -2234,6 +2315,15 @@
     "numeracy test for adults",
     "time and money quiz ESL",
     "adaptive maths English check"
+   ],
+   "inside": [
+    "18 steps, from hearing a number and tapping it, through ordinals, adding, ordering, place value and price lists, up to reading the clock, adding bigger numbers and counting change.",
+    "Ten rounds of three questions. After a perfect round the test moves up two steps, and after a round the learner cannot do it moves down two.",
+    "At the end the learner sees the step they reached, and that game is offered to practise next."
+   ],
+   "tips": [
+    "All questions are asked in English, so a learner who is strong at maths may still stop early because of the words.",
+    "Gaps in money and time point to [Shop](shop), [Clock](clock) and [Digital Time](digital-time)."
    ]
   },
   {
@@ -2258,6 +2348,15 @@
     "translation test ESL",
     "first language to English check",
     "bilingual English quiz"
+   ],
+   "inside": [
+    "Two steps: tap the right English sentence, then write it in English.",
+    "Eleven languages: Arabic, Burmese, Chinese, Dari, Hindi, Khmer, Pashto, Persian, Thai, Urdu and Vietnamese.",
+    "Ten rounds of three questions. After a perfect round the test moves up two steps, and after a round the learner cannot do it moves down two."
+   ],
+   "tips": [
+    "Only for learners who can read their first language.",
+    "Each learner chooses their own language on their phone, so a mixed class can take it together."
    ]
   },
   {
@@ -2282,6 +2381,15 @@
     "survival English test",
     "everyday English quiz for adults",
     "functional English check"
+   ],
+   "inside": [
+    "Steps from reading a sign and replying to a greeting, through notices, messages, times, calendars and money, up to forms, the clock and counting change.",
+    "Ten rounds of three questions. After a perfect round the test moves up two steps, and after a round the learner cannot do it moves down two.",
+    "At the end the learner sees the step they reached, and that game is offered to practise next."
+   ],
+   "tips": [
+    "Useful at the start of a course to see which everyday tasks a learner can already manage.",
+    "Gaps point to the everyday games: [Signs](signs), [Messages](messages) and [Forms](forms)."
    ]
   },
   {
@@ -2292,8 +2400,8 @@
    "level": "For your teacher",
    "name": "Level Check",
    "seo": "Level Check: Free ACSF Pre Level English Placement Check for Adult Learners | WordLink",
-   "meta": "12 rounds across every skill, ending with an indicative ACSF level and a strengths report a teacher can start from. Free.",
-   "sub": "12 rounds of 3 questions, spread across every skill. It ends with an indicative ACSF level a teacher can start from.",
+   "meta": "Rounds across every skill, ending with an indicative ACSF level and a strengths report a teacher can start from. Free.",
+   "sub": "Rounds of 3 questions across every skill. It ends with an indicative ACSF level a teacher can start from.",
    "blurb": "A placement check for teachers and tutors. It ends with an indicative ACSF level, from Pre Level 1 Stage A to Level 1, and a report of strengths and gaps to confirm in an interview.",
    "about": "A placement check for teachers and tutors of adult pre-level learners. It covers every skill: letters and sounds, reading, writing, listening, numbers, everyday English and digital skills. Each skill moves up a stage only where the learner has shown the one below. It ends with an indicative ACSF level (Pre Level 1 Stage A, Stage B, or Level 1) and a report of strengths and gaps to confirm in an interview.",
    "how": [
@@ -2307,6 +2415,17 @@
     "English placement test for adults",
     "ESL level test",
     "assessing new literacy learners"
+   ],
+   "inside": [
+    "Rounds of three questions, one skill at a time: letters and sounds, reading, writing, listening, numbers, everyday English and digital skills.",
+    "A skill moves up a stage only when the learner has shown the stage below, and stops when the learner reaches their limit.",
+    "There is no fixed number of rounds. It ends when every skill is settled, so it is short for a learner who is not ready for it and longer for one who is.",
+    "It ends with an indicative ACSF level, Pre Level 1 Stage A, Stage B or Level 1, and a report of strengths and gaps."
+   ],
+   "tips": [
+    "Treat the result as a starting point to confirm in an interview, not a final assessment.",
+    "Run it for the whole class from the Teacher Game, and every report comes back to your screen.",
+    "Learners can retake skills later with the skill tests, like [Test Yourself: Reading](test-reading)."
    ]
   }
  ]
