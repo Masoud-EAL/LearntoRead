@@ -4452,10 +4452,18 @@ function routeBuild(stage){
     return places[id];
   };
 
-  // Where the place is. "Opposite" is said over the street the learner is
-  // on, though any street counts when the words are checked.
-  const rels=[], over=routeOpp(D.id,via);
-  D.ring.forEach(a=>rels.push({rel:'next',a:a}));
+  // Where the place is, told by what the learner can see from the street
+  // they are walking on. "Next to" names a building on that street, and the
+  // one they pass on the way if there is one: a school on the corner is
+  // "next to the bakery" they have just walked past, not the chemist round
+  // the corner on a street they never took. "Opposite" is said over that
+  // street too. Any street counts when the words are checked for a second
+  // building they might fit.
+  const rels=[], over=routeOpp(D.id,via), lotsAll=routeLots();
+  const along=id=>routeGap(routeXY(at,home),lotsAll[id].faces[via].door);
+  const beside=D.ring.filter(a=>lotsAll[a].faces[via]);
+  const passed=beside.filter(a=>along(a)<along(D.id));
+  (passed.length?passed:beside).forEach(a=>rels.push({rel:'next',a:a}));
   over.forEach(a=>rels.push({rel:'opposite',a:a}));
   if(stage>0&&!D.corner) rels.push({rel:'between',a:D.ring[0],b:D.ring[1]});
   if(stage>0&&D.corner) over.forEach(a=>rels.push({rel:'corner',a:a}));

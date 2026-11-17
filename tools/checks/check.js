@@ -619,6 +619,18 @@ check('routes', 'directions lead to one place by the short way, and the map mark
         // The place words fit one plain building, the right one.
         const fit = routeMatches(q.rel, q.places);
         if (fit.length !== 1 || fit[0] !== q.dest) bad.push('the place words fit ' + fit.length + ' buildings: ' + said);
+        // The place words point at what is on the learner's own street: never
+        // a building round the corner, and for "next to", the one walked past
+        // when there is one.
+        const entry = routeXY(q.route[q.route.length - 1], q.home);
+        const along = id => routeGap(entry, routeLots()[id].faces[q.via].door);
+        [q.rel.a, q.rel.b].filter(Boolean).forEach(id => {
+          if (!routeLots()[id].faces[q.via]) bad.push('the place words name a building on another street: ' + said);
+        });
+        if (q.rel.rel === 'next') {
+          const passed = D.ring.filter(a => routeLots()[a].faces[q.via] && along(a) < along(q.dest));
+          if (passed.length && passed.indexOf(q.rel.a) < 0) bad.push('"next to" names the building beyond, not the one walked past: ' + said);
+        }
         if (q.places[q.dest]) bad.push('the place is named on the map: ' + said);
         if (Object.values(q.places).indexOf(q.destName) >= 0) bad.push(q.destName + ' is on the map as well: ' + said);
         if (new Set(Object.values(q.places)).size !== Object.keys(q.places).length) bad.push('a name twice on one map');
