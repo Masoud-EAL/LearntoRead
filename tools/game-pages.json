@@ -1232,6 +1232,30 @@
    ]
   },
   {
+   "slug": "directions",
+   "game": "route",
+   "emoji": "🗺️",
+   "skill": "everyday",
+   "level": "Beginner",
+   "name": "Directions",
+   "seo": "Directions Game: Go Straight Ahead, Turn Left, Next To, Opposite | Free English Map Game for Adults",
+   "meta": "Read or hear directions and draw the way on a street map. Turn left, turn right, next to, opposite, between. Free for adult learners.",
+   "sub": "Read the directions. Draw the way on the map.",
+   "about": "Giving and following directions on a street map. The learner hears and reads directions such as \"Go straight ahead. Turn left at the bank. The post office is next to the café.\" and draws the way with a finger, from You are here to the building the sentence describes. The place they are looking for has no name on the map, so the place words (next to, opposite, between, on the corner) are what find it. Directions start short and get longer through the game.",
+   "how": [
+    "Listen to the directions.",
+    "Start at the blue dot.",
+    "Draw the way to the place."
+   ],
+   "cls": "Choose Directions in the Teacher Game. The map goes on the projector, and the answer screen shows who found the place, who went another way and who stopped at the wrong building.",
+   "good": [
+    "directions ESL",
+    "giving directions game",
+    "prepositions of place",
+    "map reading for adult learners"
+   ]
+  },
+  {
    "slug": "devices",
    "game": "devices",
    "emoji": "💻",

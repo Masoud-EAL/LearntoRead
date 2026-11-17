@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v49';
+const CACHE = 'learntoread-v50';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -62,6 +62,8 @@ const OPTIONAL = [
   './dice',
   './digital-time.html',
   './digital-time',
+  './directions.html',
+  './directions',
   './do-what-it-says.html',
   './do-what-it-says',
   './elementary-build-word.html',

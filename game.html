@@ -807,6 +807,7 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 #screen-student-answer > .clock-section,
 #screen-student-answer > .shop-section,
 #screen-student-answer > .form-section,
+#screen-student-answer > .route-section,
 #screen-student-answer > .unscramble-section,
 #screen-student-answer > .ans-input-wrap,
 #screen-student-answer > #hint-wrap{flex:0 1 auto;min-height:0;overflow-y:auto;}
@@ -817,7 +818,9 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
    prompt above it shrinks and scrolls first. Same for the form's chips and
    the answer choices. */
 #screen-student-answer > .shop-section,
+#screen-student-answer > .route-section,
 #screen-student-answer > .mc-section{flex-shrink:0;}
+#screen-student-answer[data-qtype="route"] > .s-q-card,
 #screen-student-answer[data-qtype="shop"] > .s-q-card,
 #screen-student-answer[data-qtype="form"] > .s-q-card,
 #screen-student-answer[data-qtype="mc"] > .s-q-card{flex-shrink:6;}
@@ -863,6 +866,7 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
 /* Dragging is discoverable from the pulsing hands; the sentence is not
    worth the row it costs on a screen this short. */
 :root[data-app-h~="lt500"] #screen-student-answer .clock-hint{display:none;}
+:root[data-app-h~="lt500"] #screen-student-answer .route-hint{display:none;}
 /* Once the timer shrinks to 1.1rem it no longer fills the band the fixed
    Back and Music chips occupy, and the question card slid up underneath
    them. Same answer as the landscape rule below: reserve the band, and put
@@ -912,9 +916,13 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
   #screen-student-answer > .clock-section,
   #screen-student-answer > .shop-section,
   #screen-student-answer > .form-section,
+  #screen-student-answer > .route-section,
   #screen-student-answer > .unscramble-section,
   #screen-student-answer > .ans-input-wrap,
   #screen-student-answer > #hint-wrap{flex:1 1 46%;max-width:52%;align-self:stretch;}
+  /* Sideways the map sits beside the directions and takes the height. */
+  #screen-student-answer #route-svg{height:min(calc(var(--vh,1vh)*62),calc(46vw*1.13),460px);}
+  #screen-student-answer .route-hint{display:none;}
   #screen-student-answer > .submit-btn{flex:0 0 100%;max-width:420px;margin-top:2px;}
   #screen-student-answer > .submitted-msg{flex:0 0 100%;text-align:center;}
   /* The exit needs nothing here: sideways is where a wrapped row of answers
@@ -1329,6 +1337,51 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .q-emoji-big .paid-with img{width:38px;height:38px;}
 .q-emoji-big .shop-item{font-size:2.2rem;}
 .q-emoji-big .price-tag{font-size:1.1rem;padding:5px 12px;}
+
+/* ── Directions ──
+   A light map on the dark answer screen, the same as the clock face. The
+   learner's line is the app's red; the right way, on the answer screens, is
+   green and dotted so the two can be told apart where they run together. */
+.route-section{display:none;flex-direction:column;align-items:center;gap:clamp(3px,calc(var(--vh,1vh)*1),8px);width:100%;}
+#route-svg{display:block;height:min(calc(var(--vh,1vh)*48),calc((100vw - 28px)*1.13),540px);width:auto;max-width:100%;
+  touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:crosshair;}
+.route-tools{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;}
+.route-tools .btn{padding:6px 14px;}
+.route-hint{font-size:.88rem;color:var(--muted);font-weight:700;}
+.route-hint.nudge{color:var(--gold);}
+.rm-bg{fill:#e4ecd9;}
+.rm-road{stroke:#c3c8ce;stroke-width:20;}
+.rm-green{fill:#cfe0bd;}
+.rm-lot{fill:#d8d1c7;stroke:#b4a99b;stroke-width:1;}
+.rm-lot.named{fill:#fffdf8;stroke:#7a6f65;stroke-width:1.3;}
+.rm-lot.dest{fill:#e3f7ea;stroke:#00a152;stroke-width:3;}
+.rm-icon{font-size:17px;text-anchor:middle;dominant-baseline:central;}
+.rm-name{font-family:'Nunito',sans-serif;font-weight:800;font-size:10.5px;fill:#2d2a26;text-anchor:middle;}
+.rm-name.dest{fill:#00782f;}
+.rm-ink{fill:none;stroke:#e94560;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;opacity:.92;}
+.rm-end{fill:#e94560;stroke:#fff;stroke-width:2.5;}
+.rm-right{fill:none;stroke:#00a152;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 11;}
+.rm-dot{fill:#2f7fd6;stroke:#fff;stroke-width:3;}
+.rm-dot.nudge{animation:rmPulse .5s ease-in-out 3;transform-origin:170px 366px;transform-box:view-box;}
+@keyframes rmPulse{50%{transform:scale(1.6);}}
+.rm-face{fill:#2f7fd6;}
+.rm-here{font-family:'Nunito',sans-serif;font-weight:900;font-size:12px;fill:#1d4f8a;}
+.route-static{display:block;height:min(calc(var(--vh,1vh)*46),400px);width:auto;max-width:100%;margin:0 auto;}
+/* On the projector the answers card under it has to stay in view. */
+.q-emoji-big .route-static{height:min(32vh,330px);}
+.route-result{display:flex;flex-direction:column;align-items:center;gap:8px;font-family:'Nunito',sans-serif;font-size:1rem;}
+.route-verdict{font-weight:800;line-height:1.35;text-align:center;max-width:360px;}
+.route-key{display:flex;gap:16px;font-size:.8rem;color:var(--muted);font-weight:700;}
+.route-key span{display:inline-flex;align-items:center;gap:6px;}
+.route-key i{display:inline-block;width:22px;height:0;border-top:5px solid #e94560;border-radius:3px;}
+.route-key i.k-right{border-top:5px dotted #00a152;}
+.route-said{font-size:clamp(1rem,2.4vw,1.4rem);line-height:1.45;}
+/* The directions are the longest prompt in the app, and the map below them
+   cannot give way, so the words run a size smaller than other rounds. */
+#screen-student-answer[data-qtype="route"] .s-q-text{font-size:clamp(.95rem,calc(var(--vh,1vh)*2.7),1.35rem);line-height:1.35;}
+:root[data-app-h~="lt620"] #screen-student-answer #route-svg{height:min(calc(var(--vh,1vh)*45),calc((100vw - 24px)*1.13));}
+:root[data-app-h~="lt620"] #screen-student-answer .route-hint{display:none;}
+:root[data-app-h~="lt500"] #screen-student-answer #route-svg{height:min(calc(var(--vh,1vh)*42),calc((100vw - 20px)*1.13));}
 
 /* ── Fill the form ── */
 .form-section{display:none;flex-direction:column;gap:clamp(5px,1.4vh,12px);width:100%;max-width:460px;}
@@ -1944,6 +1997,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
         <button data-type="ordinals" class="q-type-tab" onclick="selectSoloType('ordinals',this)">🥇 First, Second, Third</button>
         <button data-type="ordinals30" class="q-type-tab" onclick="selectSoloType('ordinals30',this)">🏅 Ordinal Numbers</button>
         <button data-type="position" class="q-type-tab" onclick="selectSoloType('position',this)">🧭 Where Is It</button>
+        <button data-type="route" class="q-type-tab" onclick="selectSoloType('route',this)">🗺️ Directions</button>
         <button data-type="devices" class="q-type-tab" onclick="selectSoloType('devices',this)">💻 Devices</button>
         <button data-type="digisymbols" class="q-type-tab" onclick="selectSoloType('digisymbols',this)">🔣 Screen Symbols</button>
         <button data-type="prompts" class="q-type-tab" onclick="selectSoloType('prompts',this)">⚠️ What Should You Do?</button>
@@ -2148,6 +2202,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
             <button data-type="ordinals" class="q-type-tab" onclick="selectQType('ordinals',this)">🥇 First, Second, Third</button>
             <button data-type="ordinals30" class="q-type-tab" onclick="selectQType('ordinals30',this)">🏅 Ordinal Numbers</button>
             <button data-type="position" class="q-type-tab" onclick="selectQType('position',this)">🧭 Where Is It</button>
+            <button data-type="route" class="q-type-tab" onclick="selectQType('route',this)">🗺️ Directions</button>
             <button data-type="devices" class="q-type-tab" onclick="selectQType('devices',this)">💻 Devices</button>
             <button data-type="digisymbols" class="q-type-tab" onclick="selectQType('digisymbols',this)">🔣 Screen Symbols</button>
             <button data-type="prompts" class="q-type-tab" onclick="selectQType('prompts',this)">⚠️ What Should You Do?</button>
@@ -2409,6 +2464,15 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
     <div class="form-fields" id="form-fields"></div>
     <div class="unscrm-label">Tap an answer to put it in the next box</div>
     <div class="word-bank-area" id="form-chips"></div>
+  </div>
+  <!-- Directions: draw the way on the map. Writes the corners passed and the
+       building reached into #student-ans-input. -->
+  <div class="route-section" id="route-section" style="display:none;">
+    <svg id="route-svg" viewBox="0 0 340 384" aria-label="Street map: draw the way"></svg>
+    <div class="route-tools">
+      <span class="route-hint" id="route-hint">Draw from the blue dot</span>
+      <button class="btn btn-ghost btn-sm" id="route-clear" onclick="routeClear()">↺ Start again</button>
+    </div>
   </div>
   <button class="submit-btn" id="student-submit-btn" onclick="submitAnswer()">✓ Submit</button>
   <div class="submitted-msg" id="submitted-msg"></div>
@@ -4117,6 +4181,408 @@ const POSITIONS=[
   {w:'in front', art:'🚶‍➡️📦', q:'Where is the box?'},
   {w:'behind',   art:'📦🚶‍➡️', q:'Where is the box?'},
 ];
+/* ── DIRECTIONS: read the way, then draw it ──
+   A sentence of directions and a street map. The learner draws the way from
+   the blue dot ("You are here") to the place the sentence names.
+
+   The streets never change: three roads across, three down, and a short road
+   at the bottom where the learner starts, facing up the map. Left and right
+   are always the learner's own left and right as they walk, which is why
+   the start shows which way they are facing.
+
+   Only the buildings change. Each block has eight, and each building faces
+   one street. A building with a place in it shows a picture and a name; the
+   rest are plain. The place the learner is looking for is always a plain
+   one, and that is what the place words are for: "next to the bank" is how
+   you know which plain building is the post office.
+
+   Every question is built and then checked against its own words before it
+   is dealt: routeFollow walks the directions as written, and routeMatches
+   reads the place words over every plain building. If the words lead
+   anywhere else, or fit two buildings, the question is thrown away and built
+   again. The routes check in tools/checks runs the same two functions. */
+const ROUTE_X=[10,170,330], ROUTE_Y=[10,170,330];
+const ROUTE_W=340, ROUTE_H=384, ROUTE_START=[170,366];
+const ROUTE_INSET=13, ROUTE_LOT=42, ROUTE_GAP=4, ROUTE_DEEP=38;
+const ROUTE_UP=[0,-1];
+/* Places a learner goes to, by the name they are called in Australia, each
+   with a picture every phone has had for years. Two-word names are drawn on
+   two lines. */
+const ROUTE_PLACES=[
+  {name:'bank',icon:'🏦'},{name:'school',icon:'🏫'},{name:'park',icon:'🌳'},
+  {name:'café',icon:'☕'},{name:'library',icon:'📚'},{name:'hospital',icon:'🏥'},
+  {name:'chemist',icon:'💊'},{name:'bakery',icon:'🥖'},{name:'cinema',icon:'🎬'},
+  {name:'hotel',icon:'🏨'},{name:'post office',icon:'🏤'},{name:'bus stop',icon:'🚏'},
+  {name:'police station',icon:'🚓'},{name:'train station',icon:'🚉'},
+  {name:'petrol station',icon:'⛽'}
+];
+function routePlace(name){ return ROUTE_PLACES.find(p=>p.name===name)||null; }
+function routePick(a){ return a[Math.floor(Math.random()*a.length)]; }
+
+/* Corners are N<column><row>; S is You are here. */
+function routeXY(id){ return id==='S'?ROUTE_START:[ROUTE_X[+id[1]],ROUTE_Y[+id[2]]]; }
+function routeNbrs(id){
+  if(id==='S') return ['N12'];
+  const c=+id[1], r=+id[2], out=[];
+  if(r>0) out.push('N'+c+(r-1));
+  if(c<2) out.push('N'+(c+1)+r);
+  if(r<2) out.push('N'+c+(r+1));
+  if(c>0) out.push('N'+(c-1)+r);
+  if(id==='N12') out.push('S');
+  return out;
+}
+function routeDir(a,b){ const p=routeXY(a), q=routeXY(b); return [Math.sign(q[0]-p[0]),Math.sign(q[1]-p[1])]; }
+function routeAhead(id,h){
+  return routeNbrs(id).find(n=>{ const d=routeDir(id,n); return d[0]===h[0]&&d[1]===h[1]; })||null;
+}
+/* Left of the way you face. On the screen y grows downwards, so facing up the
+   map, [0,-1], left is [-1,0]. */
+function routeTurn(h,dir){ return dir==='left'?[h[1],-h[0]]:[-h[1],h[0]]; }
+function routeSeg(a,b){ return [a,b].sort().join('-'); }
+
+/* The buildings. L<block column><block row><0-7>, clockwise round the block
+   from the top left corner: three along the top, one on the right, three
+   along the bottom, one on the left. ring holds the two it touches. */
+let ROUTE_LOTS=null;
+function routeLots(){
+  if(ROUTE_LOTS) return ROUTE_LOTS;
+  const lots={}, step=ROUTE_LOT+ROUTE_GAP;
+  for(let bc=0;bc<2;bc++) for(let br=0;br<2;br++){
+    const bx=ROUTE_X[bc]+ROUTE_INSET, by=ROUTE_Y[br]+ROUTE_INSET;
+    const size=ROUTE_X[bc+1]-ROUTE_X[bc]-2*ROUTE_INSET;
+    const midY=by+ROUTE_DEEP+ROUTE_GAP, midH=size-2*(ROUTE_DEEP+ROUTE_GAP);
+    const N=(c,r)=>'N'+c+r;
+    const spec=[
+      {x:bx,         y:by, a:N(bc,br), b:N(bc+1,br), corner:N(bc,br)},
+      {x:bx+step,    y:by, a:N(bc,br), b:N(bc+1,br)},
+      {x:bx+2*step,  y:by, a:N(bc,br), b:N(bc+1,br), corner:N(bc+1,br)},
+      {x:bx+size-ROUTE_LOT, y:midY, h:midH, a:N(bc+1,br), b:N(bc+1,br+1), v:true},
+      {x:bx+2*step,  y:by+size-ROUTE_DEEP, a:N(bc,br+1), b:N(bc+1,br+1), corner:N(bc+1,br+1)},
+      {x:bx+step,    y:by+size-ROUTE_DEEP, a:N(bc,br+1), b:N(bc+1,br+1)},
+      {x:bx,         y:by+size-ROUTE_DEEP, a:N(bc,br+1), b:N(bc+1,br+1), corner:N(bc,br+1)},
+      {x:bx,         y:midY, h:midH, a:N(bc,br), b:N(bc,br+1), v:true}
+    ];
+    const ids=spec.map((s,i)=>'L'+bc+br+i);
+    spec.forEach((s,i)=>{
+      const w=ROUTE_LOT, h=s.h||ROUTE_DEEP;
+      const A=routeXY(s.a);
+      // The door is the point on the street the building faces.
+      const door=s.v?[A[0],s.y+h/2]:[s.x+w/2,A[1]];
+      lots[ids[i]]={id:ids[i], x:s.x, y:s.y, w:w, h:h, seg:[s.a,s.b], segKey:routeSeg(s.a,s.b),
+        corner:s.corner||null, v:!!s.v, door:door, mid:[s.x+w/2,s.y+h/2],
+        ring:[ids[(i+7)%8],ids[(i+1)%8]]};
+    });
+  }
+  return (ROUTE_LOTS=lots);
+}
+/* Across the street: the building facing the same street from the other
+   side, at the same door. A corner building is also opposite the corner
+   building across the side street (on the same side of the main street, not
+   the one diagonally across the crossroads), because that is how anybody
+   standing there would describe it, so both count when a description is
+   checked. */
+function routeOpp(id){
+  const all=routeLots(), L=all[id];
+  return Object.values(all).filter(M=>{
+    if(M.id===id) return false;
+    if(M.segKey===L.segKey&&M.door[0]===L.door[0]&&M.door[1]===L.door[1]) return true;
+    return !!L.corner&&M.corner===L.corner&&!M.v&&!L.v&&M.door[1]===L.door[1]
+      &&Math.sign(M.mid[1]-M.door[1])===Math.sign(L.mid[1]-L.door[1]);
+  }).map(M=>M.id);
+}
+/* Does the description fit this building? Only plain buildings can be the
+   place being looked for, so a named one never fits. */
+function routeFits(rel,id,places){
+  if(places[id]) return false;
+  const L=routeLots()[id];
+  if(rel.rel==='next') return L.ring.indexOf(rel.a)>=0;
+  if(rel.rel==='opposite') return routeOpp(id).indexOf(rel.a)>=0;
+  if(rel.rel==='between') return !L.corner&&L.ring.indexOf(rel.a)>=0&&L.ring.indexOf(rel.b)>=0;
+  if(rel.rel==='corner') return !!L.corner&&routeOpp(id).indexOf(rel.a)>=0;
+  return false;
+}
+function routeMatches(rel,places){ return Object.keys(routeLots()).filter(id=>routeFits(rel,id,places)); }
+function routeRelText(rel,places){
+  const A='the '+places[rel.a];
+  if(rel.rel==='next') return 'next to '+A;
+  if(rel.rel==='opposite') return 'opposite '+A;
+  if(rel.rel==='between') return 'between '+A+' and the '+places[rel.b];
+  return 'on the corner, opposite '+A;
+}
+const ROUTE_NTH=['','first','second','third'];
+function routeStepText(s,places){
+  if(s.do==='ahead') return 'Go straight ahead.';
+  if(s.do==='past') return 'Go past the '+places[s.lot]+'.';
+  if(s.how==='count') return 'Take the '+ROUTE_NTH[s.n]+' '+s.dir+'.';
+  if(s.how==='end') return 'Turn '+s.dir+' at the end of the street.';
+  return 'Turn '+s.dir+' at the '+places[s.lot]+'.';
+}
+
+/* Walk the directions exactly as written, from You are here, and return the
+   corners the walk goes through up to the street the place is on. Null when
+   the words cannot be followed: a turn with no road, a landmark never
+   reached, a count that runs out of corners. */
+function routeFollow(steps,places,destLot){
+  const path=['S','N12'], turns=steps.filter(s=>s.do==='turn'), D=routeLots()[destLot];
+  let h=ROUTE_UP;
+  if(!D) return null;
+  for(let i=0;i<turns.length;i++){
+    const t=turns[i];
+    let count=0, done=false;
+    for(let g=0;g<8&&!done;g++){
+      const at=path[path.length-1], side=routeAhead(at,routeTurn(h,t.dir)), ahead=routeAhead(at,h);
+      if(side) count++;
+      const here=t.how==='end'?!ahead
+        :t.how==='lot'?(!!places[t.lot]&&routeLots()[t.lot]&&routeLots()[t.lot].corner===at)
+        :(!!side&&count===t.n);
+      if(here){
+        if(!side) return null;
+        h=routeTurn(h,t.dir);
+        if(i<turns.length-1) path.push(side);
+        done=true;
+      } else {
+        if(!ahead) return null;
+        path.push(ahead);
+      }
+    }
+    if(!done) return null;
+  }
+  for(let g=0;g<8;g++){
+    const at=path[path.length-1], ahead=routeAhead(at,h);
+    if(!ahead) return null;
+    if(routeSeg(at,ahead)===D.segKey) return path;
+    path.push(ahead);
+  }
+  return null;
+}
+
+/* The three stages, which a game deals in order (see drawGen):
+     0  one step: "Go straight ahead." or a single turn, and a place next to
+        or opposite something.
+     1  a turn counted out ("Take the second left") or two turns, and
+        between or on the corner.
+     2  the longest: usually two turns, often with "Go past". Two turns
+        always end on a street running up the map, where no building is on
+        a corner, so some are one turn, to keep "on the corner" in play. */
+function routeBuild(stage){
+  const turns=stage===0?(Math.random()<.35?0:1):stage===1?(Math.random()<.6?1:2):(Math.random()<.7?2:1);
+  const path=['S','N12'], seen=new Set(path), turnAt=[];
+  let h=ROUTE_UP;
+  for(let g=0;turnAt.length<turns;g++){
+    if(g>8) return null;
+    const at=path[path.length-1], ahead=routeAhead(at,h);
+    const ways=['left','right'].filter(d=>{ const n=routeAhead(at,routeTurn(h,d)); return n&&!seen.has(n); });
+    const goOn=!!ahead&&!seen.has(ahead);
+    const move=ways.length&&(!goOn||Math.random()<.45)?routePick(ways):goOn?'on':null;
+    if(!move) return null;
+    if(move==='on'){ path.push(ahead); seen.add(ahead); continue; }
+    turnAt.push({node:at,dir:move,h:h,idx:path.length-1});
+    h=routeTurn(h,move);
+    if(turnAt.length<turns){ const n=routeAhead(at,h); path.push(n); seen.add(n); }
+  }
+  // Sometimes the place is a block further on.
+  if((stage>0||!turns)&&Math.random()<.35){
+    const n=routeAhead(path[path.length-1],h);
+    if(n&&!seen.has(n)){ path.push(n); seen.add(n); }
+  }
+  const at=path[path.length-1], to=routeAhead(at,h);
+  if(!to||seen.has(to)) return null;
+  const onStreet=Object.values(routeLots()).filter(l=>l.segKey===routeSeg(at,to));
+  if(!onStreet.length) return null;
+  const D=routePick(onStreet);
+
+  const places={}, used=new Set();
+  const name=id=>{
+    if(!places[id]){
+      const free=ROUTE_PLACES.filter(p=>!used.has(p.name));
+      if(!free.length) return null;
+      const p=routePick(free); places[id]=p.name; used.add(p.name);
+    }
+    return places[id];
+  };
+
+  // Where the place is.
+  const rels=[];
+  D.ring.forEach(a=>rels.push({rel:'next',a:a}));
+  routeOpp(D.id).forEach(a=>rels.push({rel:'opposite',a:a}));
+  if(stage>0&&!D.corner) rels.push({rel:'between',a:D.ring[0],b:D.ring[1]});
+  if(stage>0&&D.corner) routeOpp(D.id).forEach(a=>rels.push({rel:'corner',a:a}));
+  if(!rels.length) return null;
+  // Later stages lean on the newer words rather than always "next to".
+  const fresh=rels.filter(r=>stage>0?r.rel==='corner'||r.rel==='between':true);
+  const rel=routePick(fresh.length&&Math.random()<.6?fresh:rels);
+  name(rel.a); if(rel.b) name(rel.b);
+  // Any other plain building the words would also fit gets a name of its
+  // own, so the words fit one building only: "next to the bank" works when
+  // the bank's other neighbour is the school.
+  routeMatches(rel,places).filter(id=>id!==D.id).forEach(name);
+
+  // How each turn is told.
+  const steps=[];
+  turnAt.forEach((t,i)=>{
+    const from=i===0?1:turnAt[i-1].idx+1;
+    let n=0;
+    for(let j=from;j<=t.idx;j++) if(routeAhead(path[j],routeTurn(t.h,t.dir))) n++;
+    const ways=[];
+    if(!routeAhead(t.node,t.h)) ways.push({how:'end'});
+    if(n<=3&&(stage>0||n===1)) ways.push({how:'count',n:n});
+    const corners=Object.values(routeLots()).filter(l=>l.corner===t.node&&l.id!==D.id);
+    if(corners.length) ways.push({how:'lot',lot:routePick(corners).id});
+    if(!ways.length) return;
+    const way=ways[0].how==='end'&&Math.random()<.5?ways[0]:routePick(ways);
+    if(way.how==='lot') name(way.lot);
+    // "Go past" names something on the way to the first turn.
+    if(i===0&&stage===2&&t.idx>from&&Math.random()<.7){
+      const segs=new Set(), mids=new Set();
+      for(let j=from;j<=t.idx;j++){
+        if(j>from) segs.add(routeSeg(path[j-1],path[j]));
+        if(j<t.idx) mids.add(path[j]);
+      }
+      const by=Object.values(routeLots()).filter(l=>l.id!==D.id&&l.id!==way.lot
+        &&(segs.has(l.segKey)&&l.corner!==t.node||mids.has(l.corner)));
+      if(by.length){ const p=routePick(by); name(p.id); steps.push({do:'past',lot:p.id}); }
+    }
+    steps.push(Object.assign({do:'turn',dir:t.dir},way));
+  });
+  if(steps.filter(s=>s.do==='turn').length!==turns) return null;
+  // "Go straight ahead" first, unless the first thing is a turn at the first
+  // corner, or "Go past", which already says it.
+  if(!turns||(turnAt[0].idx>1&&steps[0].do!=='past')) steps.unshift({do:'ahead'});
+
+  // The rest of the map: enough names to read, enough plain buildings that
+  // the place words are needed.
+  const target=9+Math.floor(Math.random()*3);
+  const spare=shuffle(Object.keys(routeLots()).filter(id=>id!==D.id&&!places[id]));
+  while(Object.keys(places).length<target&&spare.length) name(spare.pop());
+  const destName=routePick(ROUTE_PLACES.filter(p=>!used.has(p.name))).name;
+
+  // Check the question against its own words.
+  const found=routeMatches(rel,places);
+  if(found.length!==1||found[0]!==D.id) return null;
+  const walked=routeFollow(steps,places,D.id);
+  if(!walked||walked.join(' ')!==path.join(' ')) return null;
+
+  const sentences=steps.map((s,i)=>{
+    const t=routeStepText(s,places);
+    // The second turn reads on from the first.
+    return s.do==='turn'&&i>0&&steps.slice(0,i).some(x=>x.do==='turn')?'Then '+t[0].toLowerCase()+t.slice(1):t;
+  });
+  sentences.push('The '+destName+' is '+routeRelText(rel,places)+'.');
+  const text=sentences.join(' ');
+  return {type:'route', stage:stage, places:places, dest:D.id, destName:destName,
+    route:path, steps:steps, rel:rel, question:text, say:text,
+    answer:path.join(' ')+' @'+D.id};
+}
+function genRouteQuestions(n,from){
+  const out=[];
+  for(let i=0;i<(n||10);i++){
+    const stage=from==null?i%3:Math.max(0,Math.min(2,+from||0));
+    let q=null;
+    for(let t=0;t<300&&!q;t++) q=routeBuild(stage);
+    if(q) out.push(q);
+  }
+  return out;
+}
+
+/* ── Marking ──
+   The answer is the corners the line went through and the building it
+   ended in: "S N12 N11 @L011". A line that ran past the door to the far
+   corner and came back into the building from there went the same way, so
+   that last corner is dropped before comparing. */
+function routeParse(ans){
+  const s=String(ans==null?'':ans).trim();
+  if(!s) return null;
+  const at=s.indexOf('@');
+  return {nodes:(at<0?s:s.slice(0,at)).trim().split(/\s+/).filter(Boolean),
+          lot:at<0?'':s.slice(at+1).trim()};
+}
+function routeCanon(nodes,lot){
+  const L=routeLots()[lot];
+  if(L&&nodes.length>=2&&routeSeg(nodes[nodes.length-2],nodes[nodes.length-1])===L.segKey)
+    return nodes.slice(0,-1);
+  return nodes;
+}
+/* way: the right way to the right place. place: the right place by another
+   way. street: the right way, and the right street, but the wrong building,
+   which is the place words missed and the directions followed. */
+function routeVerdict(q,ans){
+  const a=routeParse(ans);
+  if(!a) return 'blank';
+  const way=routeCanon(a.nodes,a.lot).join(' ')===q.route.join(' ');
+  if(a.lot===q.dest) return way?'way':'place';
+  const L=routeLots()[a.lot], D=routeLots()[q.dest];
+  if(way&&L&&D&&L.segKey===D.segKey) return 'street';
+  return 'wrong';
+}
+function routeTier(q,ans){
+  const v=routeVerdict(q,ans);
+  return v==='way'?'correct':(v==='place'||v==='street')?'partial':'wrong';
+}
+const ROUTE_VERDICT_TEXT={way:'The right way',place:'Right place, another way',
+  street:'Right street, wrong building',wrong:'Wrong place',blank:'Nothing drawn'};
+
+/* ── Drawing the map ──
+   One drawing for every screen: the learner's map while they draw, the
+   answer on their result screen, and the projector in a class game. */
+function routeEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function routeLabel(L,name,cls){
+  const p=routePlace(name), cx=L.mid[0], words=name.split(' ');
+  const two=words.length>1, tall=L.h>ROUTE_DEEP;
+  const iconY=L.y+(two?(tall?15:10):(tall?19:14));
+  let out='<text class="rm-icon" x="'+cx+'" y="'+iconY+'"'+(two?' style="font-size:12px"':'')+'>'+(p?p.icon:'')+'</text>';
+  const lines=two?words:[name];
+  const first=L.y+(two?(tall?31:25):(tall?38:31));
+  lines.forEach((w,i)=>{
+    // Long words are squeezed to the building rather than spilling over it.
+    const fit=w.length*6>ROUTE_LOT-3?' textLength="'+(ROUTE_LOT-4)+'" lengthAdjust="spacingAndGlyphs"':'';
+    out+='<text class="rm-name'+(cls?' '+cls:'')+'" x="'+cx+'" y="'+(first+i*10)+'"'+fit+'>'+routeEsc(w)+'</text>';
+  });
+  return out;
+}
+function routePoints(nodes,lot){
+  const pts=nodes.map(routeXY), L=routeLots()[lot];
+  if(L){ pts.push(L.door); pts.push(L.mid); }
+  return pts;
+}
+function routeD(pts){ return pts.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join(' '); }
+/* opt.reveal shows the place and the right way; opt.mine is a learner's
+   answer to draw over it. */
+function routeMapInner(q,opt){
+  opt=opt||{};
+  const places=q.places||{}, lots=routeLots();
+  let s='<rect class="rm-bg" x="0" y="0" width="'+ROUTE_W+'" height="'+ROUTE_H+'" rx="14"/>';
+  ROUTE_Y.forEach(y=>{ s+='<line class="rm-road" x1="0" y1="'+y+'" x2="'+ROUTE_W+'" y2="'+y+'"/>'; });
+  ROUTE_X.forEach(x=>{ s+='<line class="rm-road" x1="'+x+'" y1="0" x2="'+x+'" y2="'+ROUTE_Y[2]+'"/>'; });
+  s+='<line class="rm-road" x1="'+ROUTE_START[0]+'" y1="'+ROUTE_Y[2]+'" x2="'+ROUTE_START[0]+'" y2="'+ROUTE_H+'"/>';
+  // Trees in the middle of each block, so a block reads as a block.
+  for(let bc=0;bc<2;bc++) for(let br=0;br<2;br++){
+    const x=ROUTE_X[bc]+ROUTE_INSET+ROUTE_LOT+ROUTE_GAP+3, y=ROUTE_Y[br]+ROUTE_INSET+ROUTE_DEEP+ROUTE_GAP+3;
+    s+='<rect class="rm-green" x="'+x+'" y="'+y+'" width="'+(ROUTE_LOT-6)+'" height="'+(ROUTE_X[1]-ROUTE_X[0]-2*ROUTE_INSET-2*(ROUTE_DEEP+ROUTE_GAP)-6)+'" rx="8"/>';
+  }
+  Object.values(lots).forEach(L=>{
+    const named=places[L.id], dest=opt.reveal&&L.id===q.dest;
+    s+='<rect class="rm-lot'+(named?' named':'')+(dest?' dest':'')+'" x="'+L.x+'" y="'+L.y+'" width="'+L.w+'" height="'+L.h+'" rx="4"/>';
+    if(named) s+=routeLabel(L,named);
+    else if(dest) s+=routeLabel(L,q.destName,'dest');
+  });
+  if(opt.reveal) s+='<path class="rm-right" d="'+routeD(routePoints(q.route,q.dest))+'"/>';
+  if(opt.mine){
+    const a=routeParse(opt.mine);
+    if(a&&a.nodes.length) s+='<path class="rm-ink" d="'+routeD(routePoints(a.nodes,a.lot))+'"/>';
+  }
+  if(opt.ink) s+='<path class="rm-ink" id="route-ink" d=""/><circle class="rm-end" id="route-end" r="0" cx="0" cy="0"/>';
+  // You are here: a dot, and an arrow for the way you are facing.
+  const [sx,sy]=ROUTE_START;
+  s+='<path class="rm-face" d="M'+sx+' '+(sy-27)+' l-8 11 h16 z"/>'
+    +'<circle class="rm-dot" id="route-dot" cx="'+sx+'" cy="'+sy+'" r="9"/>'
+    +'<text class="rm-here" x="'+(sx+16)+'" y="'+(sy+4)+'">You are here</text>';
+  return s;
+}
+function routeMapSvg(q,opt,cls){
+  return '<svg class="'+(cls||'route-static')+'" viewBox="0 0 '+ROUTE_W+' '+ROUTE_H+'" role="img" aria-label="Street map">'
+    +routeMapInner(q,opt)+'</svg>';
+}
+
 /* `from` names the stage, because the two stages name different words. Stage A
    is "extremely simple relative position words accompanied by gestures, e.g.
    up, down", and up and down is the whole of it; left, right, in front and
@@ -5664,6 +6130,7 @@ const GEN_BANKS={
   ordinals:     function(n,f){ return genOrdinalQuestions(n,f); },
   ordinals30:   function(n){ return genOrdinal30Questions(n); },
   position:     function(n,f){ return genPositionQuestions(n,f); },
+  route:        function(n,f){ return genRouteQuestions(n,f); },
   devices:      function(n,f){ return genDeviceQuestions(n,f); },
   digisymbols:  function(n){ return genSymbolQuestions(n); },
   prompts:      function(n,f){ return genPromptQuestions(n,f); },
@@ -5722,6 +6189,8 @@ function drawGen(type,n,from){
       keys.add(k); out.push(batch[i]);
     }
   }
+  // Directions get longer as a game goes on: short ones first.
+  if(type==='route') out.sort(function(a,b){ return a.stage-b.stage; });
   // Long enough to cover any game, and bounded so a session that never starts
   // a fresh one cannot grow it without end.
   if(genSeen.size>600) resetGenSeen();
@@ -5932,6 +6401,7 @@ function answerPace(q){
   if(q.type==='form') return 2;        // several fields, each dropped into place
   if(q.type==='shop') return 2;        // coins tapped out one at a time
   if(q.type==='clockset') return 1.5;  // two hands to drag
+  if(q.type==='route') return 2+.5*(q.stage||0);  // read it all, then draw it
   // Tapping one of four. Four sentences take longer to read than four words,
   // and at this level reading is the slow part.
   if(Array.isArray(q.choices)&&q.choices.length)
@@ -7027,15 +7497,16 @@ function playQuestion(){
   // Same rule as the learner's screen and as teacherSpeak: there is a button
   // when there is something behind it.
   const noAudio=!speechFor(q);
-  document.getElementById('q-badge').textContent=q.qword?'QUESTION WORD':q.type==='sentence'?'SENTENCE':q.type==='speak'?'SPEAKING':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='oddone'?'ODD ONE OUT':q.type==='phgap'?'MISSING SOUND':q.type==='phword'?'DECODE':q.type==='phbuild'?'BUILD THE WORD':q.type==='mc'?'MULTIPLE CHOICE':q.type==='clockset'?'CLOCK':q.type==='shop'?'MONEY':q.type==='form'?'FORM':'WORD';
-  document.getElementById('q-hint').textContent=q.type==='speak'?(isMcQ?'Students hear the question and tap the answer':'Students hear the question and build their answer with word tiles'):q.type==='phgap'?'Students hear the sounds and tap the missing one':q.type==='phword'?'Students hear the sounds and tap the word':q.type==='phbuild'?'Students put the sounds in order to build the word':q.type==='oddone'?'Students tap the picture that is different':q.type==='clockset'?'Students drag the clock hands to this time':q.type==='shop'?'Students tap coins to make this amount':q.type==='form'?'Students put each answer in the right box':q.type==='mc'?'Students tap the correct answer':(q.type==='unscramble'||q.type==='gramscramble')?(isMcQ?(q.type==='unscramble'?'Students listen and tap the sentence in the right order':'Students tap the sentence in the right order'):'Students arrange word tiles'):q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='translate'?'Students type the English sentence':'';
+  document.getElementById('q-badge').textContent=q.qword?'QUESTION WORD':q.type==='sentence'?'SENTENCE':q.type==='speak'?'SPEAKING':q.type==='unscramble'?'UNSCRAMBLE':q.type==='gramscramble'?'GRAMMAR':q.type==='translate'?'TRANSLATE':q.type==='letter'?'LETTER NAME':q.type==='oddone'?'ODD ONE OUT':q.type==='phgap'?'MISSING SOUND':q.type==='phword'?'DECODE':q.type==='phbuild'?'BUILD THE WORD':q.type==='mc'?'MULTIPLE CHOICE':q.type==='clockset'?'CLOCK':q.type==='shop'?'MONEY':q.type==='form'?'FORM':q.type==='route'?'DIRECTIONS':'WORD';
+  document.getElementById('q-hint').textContent=q.type==='speak'?(isMcQ?'Students hear the question and tap the answer':'Students hear the question and build their answer with word tiles'):q.type==='phgap'?'Students hear the sounds and tap the missing one':q.type==='phword'?'Students hear the sounds and tap the word':q.type==='phbuild'?'Students put the sounds in order to build the word':q.type==='oddone'?'Students tap the picture that is different':q.type==='clockset'?'Students drag the clock hands to this time':q.type==='shop'?'Students tap coins to make this amount':q.type==='form'?'Students put each answer in the right box':q.type==='route'?'Students draw the way on the map':q.type==='mc'?'Students tap the correct answer':(q.type==='unscramble'||q.type==='gramscramble')?(isMcQ?(q.type==='unscramble'?'Students listen and tap the sentence in the right order':'Students tap the sentence in the right order'):'Students arrange word tiles'):q.choices?'Students tap the matching picture':q.type==='sentence'?'Students type the missing word':q.type==='translate'?'Students type the English sentence':'';
   document.getElementById('ans-bars').innerHTML='';
   document.getElementById('reveal-btn').style.display='';
   document.getElementById('next-btn').style.display='none';
   document.getElementById('finish-btn').style.display='none';
   document.getElementById('end-now-btn').style.display='';
-  document.getElementById('q-emoji').innerHTML=q.icon||(q.type==='word'?emo(q.word):q.type==='letter'?q.letter:'');
-  document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='speak'?('🗣️ '+q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='oddone'?'🧩 Students tap the one that is different':q.type==='phgap'?('🔤 '+q.family+' — which sound is missing?'):q.type==='phword'?('🔊 '+q.family+' — students tap the word'):q.type==='phbuild'?('🔤 '+q.family+' — students build "'+q.word+'"'):(q.type==='clockset'||q.type==='shop'||q.type==='form')?q.question:'🔊 Listen and spell the word';
+  // Directions put the map on the projector, so the class can follow the words on it.
+  document.getElementById('q-emoji').innerHTML=q.type==='route'?routeMapSvg(q,{}):q.icon||(q.type==='word'?emo(q.word):q.type==='letter'?q.letter:'');
+  document.getElementById('q-text').textContent=q.type==='mc'?(q.icon&&!q.question?'🖼️ Students tap the matching word':q.question):q.type==='speak'?('🗣️ '+q.question):q.type==='sentence'?q.display:(q.type==='gramscramble'||q.type==='unscramble')?(isMcQ?(q.type==='unscramble'?'🔊 Students listen and tap the sentence in the right order':'👆 Students tap the sentence in the right order'):q.type==='gramscramble'?'📝 Students arrange the words in order':'🔊 Students listen and arrange the words'):q.type==='translate'?'🌐 Students see this in their own language':q.type==='letter'?'🔊 Students hear a letter name':q.type==='oddone'?'🧩 Students tap the one that is different':q.type==='phgap'?('🔤 '+q.family+' — which sound is missing?'):q.type==='phword'?('🔊 '+q.family+' — students tap the word'):q.type==='phbuild'?('🔤 '+q.family+' — students build "'+q.word+'"'):(q.type==='clockset'||q.type==='shop'||q.type==='form'||q.type==='route')?q.question:'🔊 Listen and spell the word';
   document.getElementById('hear-btn').style.display=noAudio?'none':'';
   renderTeacherOptions(q,false);
   // Resolve this question's time budget once (translate and speaking rounds,
@@ -7147,6 +7618,23 @@ function listenForAnswers(){
 
 function renderRevealResults(answers,q){
   const bars=document.getElementById('ans-bars');
+  if(q.type==='route'){
+    // Grouped by what each line did, so the class can see whether it was the
+    // directions or the place words that went wrong.
+    const groups={way:[],place:[],street:[],wrong:[]};
+    Object.values(answers).forEach(ans=>{
+      if(!ans||!ans.name) return;
+      const v=routeVerdict(q,ans.answer);
+      (groups[v]||groups.wrong).push(ans);
+    });
+    const clr={way:'var(--green)',place:'var(--gold)',street:'var(--gold)',wrong:'var(--accent)'};
+    const ico={way:'✅',place:'🌟',street:'🌟',wrong:'❌'};
+    bars.innerHTML=['way','place','street','wrong'].filter(k=>k==='way'||k==='wrong'||groups[k].length).map(k=>
+      '<div class="rgroup"><div class="rgroup-label" style="color:'+clr[k]+'">'+ico[k]+' '+ROUTE_VERDICT_TEXT[k]+' ('+groups[k].length+')</div>'
+      +'<div class="rnames">'+(groups[k].length?groups[k].map(a=>'<span class="rname-chip '+(k==='wrong'?'no':'ok')+'">'+a.name+'</span>').join('')
+        :'<span style="color:var(--muted);font-size:.85rem;">No one</span>')+'</div></div>').join('');
+    return;
+  }
   if(q.type==='translate'){
     const correct=[],partial=[],wrong=[];
     Object.values(answers).forEach(ans=>{
@@ -7200,6 +7688,11 @@ function revealAnswers(){
           const r=translateScore(ans.answer,q.answer,ans.timeLeft||0);
           updates['players/'+pid+'/score']=prior+r.pts;
           updates['players/'+pid+'/lastPoints']=r.pts;
+        } else if(q.type==='route'){
+          // The same marking the learner's phone shows them, partly right included.
+          const pts=spellPoints(routeTier(q,ans.answer),ans.timeLeft);
+          updates['players/'+pid+'/score']=prior+pts;
+          updates['players/'+pid+'/lastPoints']=pts;
         } else {
           const isCorrect=normalize(ans.answer)===normalize(q.answer);
           if(isCorrect){
@@ -7227,7 +7720,8 @@ function revealAnswers(){
     :q.type==='translate'
     ?`<div class="reveal-word" style="font-size:clamp(.85rem,2.8vw,1.3rem);line-height:1.5">${revealWord}</div>`
     :`<div class="reveal-word">${revealWord}</div>`+(revealSentence?`<div class="reveal-sentence">${revealSentence}</div>`:'');
-  document.getElementById('q-emoji').innerHTML=q.icon||(q.type==='word'?emo(q.word):'');
+  document.getElementById('q-emoji').innerHTML=q.type==='route'?routeMapSvg(q,{reveal:true}):q.icon||(q.type==='word'?emo(q.word):'');
+  if(q.type==='route') document.getElementById('q-text').innerHTML='<div class="route-said">'+routeEsc(q.question)+'</div>';
   document.getElementById('q-hint').textContent='';
   document.getElementById('reveal-btn').style.display='none';
   const isLast=currentQIdx>=currentQuestions.length-1;
@@ -7929,15 +8423,15 @@ const BANK_SECTIONS=[
   {id:'*',          label:'✨ All games',        banks:null},
   {id:'letters',    label:'🔤 Letters & Sounds', banks:[...PHONICS_TYPES,'letter','casematch']},
   {id:'vocab',      label:'📚 Vocabulary',       banks:['days','months','weather','fruits','body','clothes','questionwords','sightwords','picword','devices','spelling','oddone','translate']},
-  {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','unscramble','speaking','digitaltime','ordinals','ordinals30','position','greetings','instructions']},
+  {id:'listening',  label:'👂 Listening',        banks:[...PHONICS_TYPES,'beginner','elementary','letter','unscramble','speaking','digitaltime','ordinals','ordinals30','position','greetings','instructions','route']},
   {id:'speaking',   label:'🗣️ Speaking',         banks:['speaking','questionwords','unscramble','greetings']},
-  {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary','tableread','direction','sightwords','picword','notice','prompts']},
+  {id:'reading',    label:'📖 Reading',          banks:['questionwords','gramscramble','signs','sms','forms','oddone','beginner','elementary','tableread','direction','sightwords','picword','notice','prompts','route']},
   {id:'writing',    label:'✍️ Writing',          banks:['wp1:gap','wp1:build','wp2:gap','wp2:build','spelling','numbers','numbers1120','numbers2199','forms','beginner','elementary','numeralwrite','copyword','punctuation','modelsentence']},
   {id:'grammar',    label:'🧩 Grammar',          banks:['questionwords','gramscramble','unscramble','punctuation']},
   {id:'numeracy',   label:'🔢 Numeracy',         banks:['numbers','numbers1120','numbers2199','clock','shop','target','numbertap','numeralwrite','addup','addmoney','ordering','placevalue','tableread','digitaltime','calendar','ordinals','ordinals30','position']},
   {id:'translation',label:'🌐 Translation',      banks:['translate']},
   {id:'digital',    label:'💻 Using a device',   banks:['devices','digisymbols','prompts','safeinfo','sms','forms','instructions']},
-  {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','notice','sms','forms','greetings','instructions','speaking','clock','digitaltime','calendar','shop','addmoney','tableread','prompts','safeinfo','translate']},
+  {id:'everyday',   label:'🏠 Everyday life',    banks:['signs','notice','sms','forms','greetings','instructions','speaking','clock','digitaltime','calendar','shop','addmoney','tableread','prompts','safeinfo','translate','route']},
 ];
 /* Every bank a learner can be dealt from "All games", read off the sections
    above so a game added to a section joins the top All with it.
@@ -9305,6 +9799,7 @@ const GAME_INFO={
   ordinals:    {skill:'numeracy', name:'First, Second, Third', blurb:'Which one is first, second or third.'},
   ordinals30:  {skill:'numeracy', name:'Ordinal Numbers', blurb:'First to thirtieth.'},
   position:    {skill:'numeracy', name:'Where Is It', blurb:'Up, down, left, right, in front, behind.'},
+  route:       {skill:'everyday', name:'Directions', blurb:'Read the directions. Draw the way on the map.'},
   /* The digital indicators had no game at all until now: the profile was
      reading them off how the learner happened to work the app. */
   devices:     {skill:'digital', name:'Devices', blurb:'Name a device and say what it is for.'},
@@ -9594,7 +10089,7 @@ const GAME_SLUG={
   numbertap:'tap-the-number',numeralwrite:'write-the-number',addup:'add-it-up',
   addmoney:'add-the-money',ordering:'put-in-order',placevalue:'tens-and-ones',
   tableread:'read-the-list',calendar:'find-the-date',ordinals:'first-second-third',ordinals30:'ordinal-numbers',
-  position:'where-is-it',digitaltime:'digital-time',devices:'devices',digisymbols:'screen-symbols',
+  position:'where-is-it',route:'directions',digitaltime:'digital-time',devices:'devices',digisymbols:'screen-symbols',
   prompts:'what-should-you-do',safeinfo:'safe-or-private',
 };
 function copySoloLink(){
@@ -9682,6 +10177,19 @@ function startSoloGame(){
    is the answer here, large, with the sound that was missing in green, and a
    wrong tap is shown crossed out underneath rather than in front of it. */
 function resultAnswerHtml(q,sub,correct,tier){
+  if(q&&q.type==='route'){
+    // The learner's line in red over the right way in green, and the place
+    // they were looking for named on the map.
+    const v=routeVerdict(q,sub);
+    const say={way:'The right way to the '+q.destName+'.',
+      place:'You found the '+q.destName+'. The green line is the way in the directions.',
+      street:'Right street. The '+q.destName+' is the green building.',
+      wrong:'The green line is the way to the '+q.destName+'.',
+      blank:'The green line is the way to the '+q.destName+'.'}[v];
+    return '<div class="route-result">'+routeMapSvg(q,{reveal:true,mine:sub})
+      +'<div class="route-verdict">'+say+'</div>'
+      +'<div class="route-key"><span><i class="k-mine"></i>Your way</span><span><i class="k-right"></i>The way</span></div></div>';
+  }
   if(q&&q.type==='phgap'&&q.word){
     const w=q.word, len=(correct||'').length;
     let at=q.gapAt!=null?q.gapAt:w.indexOf(correct);
@@ -9984,7 +10492,7 @@ function acsfCredit(step,tier,q,ans){
    what. */
 function acsfInputMode(q){
   if(!q) return null;
-  if(q.type==='clockset') return 'drag';
+  if(q.type==='clockset'||q.type==='route') return 'drag';
   if(q.type==='shop') return 'coins';
   if(q.type==='form') return 'chips';
   if(Array.isArray(q.choices)&&q.choices.length) return 'tap';
@@ -11339,6 +11847,7 @@ function questionShown(q){
     isClock?'CLOCK — drag the hands to the right time':
     isShop?(q.mode==='change'?'MONEY — tap coins to make your change':'MONEY — tap coins to pay the right amount'):
     isForm?'FORM — put each answer in the right box':
+    q.type==='route'?'DIRECTIONS: draw the way':
     isTile?(q.label||(q.type==='gramscramble'?'GRAMMAR — arrange words in order':q.type==='phbuild'?'BUILD THE WORD — put the sounds in order':q.type==='speak'?'SPEAKING — listen, then build your answer':'UNSCRAMBLE — arrange the word tiles')):
     isTranslate?'TRANSLATE — type the English sentence':
     q.type==='typein'?(q.label||'TYPE THE ANSWER'):
@@ -11385,13 +11894,14 @@ function showStudentQuestion(q,startedAt,dur){
   const isTranslate=!isMc&&q.type==='translate';
   // Widget rounds: each owns its own answer surface and writes the answer
   // into the hidden input, so submitAnswer() needs no branch for them.
-  const isClock=q.type==='clockset', isShop=q.type==='shop', isForm=q.type==='form';
-  const isWidget=isClock||isShop||isForm;
+  const isClock=q.type==='clockset', isShop=q.type==='shop', isForm=q.type==='form', isRoute=q.type==='route';
+  const isWidget=isClock||isShop||isForm||isRoute;
   document.getElementById('ans-input-section').style.display=(isMc||isTile||isWidget)?'none':'';
   document.getElementById('unscramble-section').style.display=isTile?'flex':'none';
   document.getElementById('clock-section').style.display=isClock?'flex':'none';
   document.getElementById('shop-section').style.display=isShop?'flex':'none';
   document.getElementById('form-section').style.display=isForm?'flex':'none';
+  document.getElementById('route-section').style.display=isRoute?'flex':'none';
   document.getElementById('mc-section').style.display=isMc?'grid':'none';
   document.getElementById('mc-section').classList.toggle('handwritten',!!q.handwritten);
   // Spelling rounds get the hint as well: this is where a learner who cannot
@@ -11443,6 +11953,7 @@ function showStudentQuestion(q,startedAt,dur){
   if(isClock) renderClockWidget();
   if(isShop)  renderShopWidget(q);
   if(isForm)  renderFormWidget(q);
+  if(isRoute) renderRouteWidget(q);
   showScreen('screen-student-answer');
   // Use the teacher-set budget broadcast with the question; fall back to the
   // local default (solo play, or an older host that didn't send one).
@@ -11629,6 +12140,130 @@ function clockUp(){ clockDrag=null; }
   // touch-action:none covers most browsers; iOS Safari can still rubber-band,
   // so cancel the touch outright while a hand is being dragged.
   svg.addEventListener('touchmove',e=>{ if(clockDrag) e.preventDefault(); },{passive:false});
+})();
+
+/* ══════════════ DIRECTIONS: THE MAP YOU DRAW ON ══════════════
+   The line starts at You are here and keeps to the streets: wherever the
+   finger goes, the line follows the nearest street out of the corner it has
+   reached, and takes the next corner when the finger gets there. Drawing back
+   along the line rubs it out, which is the undo. To finish, the finger goes
+   into a building that faces the street the line is on.
+   The answer is written into the hidden input as the corners passed and the
+   building reached ("S N12 N11 @L011"), and stays empty until something is
+   drawn, so Submit over an untouched map is not an attempt. */
+let routeQ=null, routeLine=['S'], routeTip=null, routeIn=null, routeDrawing=false, routeNudgeT=null;
+function renderRouteWidget(q){
+  routeQ=q; routeLine=['S']; routeTip=null; routeIn=null; routeDrawing=false;
+  document.getElementById('route-svg').innerHTML=routeMapInner(q,{ink:true});
+  routeHint(false);
+  routeApply();
+}
+function routeClear(){
+  if(answered||!routeQ) return;
+  routeLine=['S']; routeTip=null; routeIn=null;
+  routeApply();
+}
+function routeHint(nudge){
+  const el=document.getElementById('route-hint');
+  el.textContent=nudge?'Start at the blue dot':'Draw from the blue dot';
+  el.classList.toggle('nudge',!!nudge);
+  const dot=document.getElementById('route-dot');
+  if(dot) dot.classList.toggle('nudge',!!nudge);
+  clearTimeout(routeNudgeT);
+  if(nudge) routeNudgeT=setTimeout(()=>routeHint(false),1800);
+}
+function routeEndXY(){
+  const L=routeIn&&routeLots()[routeIn];
+  if(L) return L.mid;
+  if(routeTip) return [routeTip.x,routeTip.y];
+  return routeXY(routeLine[routeLine.length-1]);
+}
+function routeApply(){
+  const pts=routeLine.map(routeXY);
+  if(routeTip) pts.push([routeTip.x,routeTip.y]);
+  const L=routeIn&&routeLots()[routeIn];
+  if(L){ pts.push(L.door); pts.push(L.mid); }
+  const ink=document.getElementById('route-ink'), end=document.getElementById('route-end');
+  const drawn=pts.length>1;
+  if(ink) ink.setAttribute('d',drawn?routeD(pts):'');
+  if(end){
+    const e=pts[pts.length-1];
+    end.setAttribute('cx',e[0]); end.setAttribute('cy',e[1]); end.setAttribute('r',drawn?7:0);
+  }
+  document.getElementById('student-ans-input').value=
+    drawn?routeLine.join(' ')+(routeIn?' @'+routeIn:''):'';
+}
+function routePt(e){
+  const svg=document.getElementById('route-svg');
+  const ctm=svg.getScreenCTM&&svg.getScreenCTM();
+  if(ctm&&svg.createSVGPoint){
+    const p=svg.createSVGPoint(); p.x=e.clientX; p.y=e.clientY;
+    const q=p.matrixTransform(ctm.inverse());
+    return [q.x,q.y];
+  }
+  const r=svg.getBoundingClientRect();
+  return [(e.clientX-r.left)/r.width*ROUTE_W,(e.clientY-r.top)/r.height*ROUTE_H];
+}
+/* A building the line can go into from this corner: one facing a street
+   that starts here, with the finger well inside it rather than brushing its
+   edge on the way past. */
+function routeLotAt(p,at){
+  const m=6;
+  return Object.values(routeLots()).find(L=>(L.seg[0]===at||L.seg[1]===at)
+    &&p[0]>L.x+m&&p[0]<L.x+L.w-m&&p[1]>L.y+m&&p[1]<L.y+L.h-m)||null;
+}
+function routeMoveTo(p){
+  for(let g=0;g<8;g++){
+    const at=routeLine[routeLine.length-1], A=routeXY(at);
+    const lot=routeLotAt(p,at);
+    if(lot){ routeIn=lot.id; routeTip=null; break; }
+    routeIn=null;
+    let best=null;
+    routeNbrs(at).forEach(n=>{
+      const B=routeXY(n), dx=B[0]-A[0], dy=B[1]-A[1];
+      let t=((p[0]-A[0])*dx+(p[1]-A[1])*dy)/(dx*dx+dy*dy);
+      t=Math.max(0,Math.min(1,t));
+      const x=A[0]+t*dx, y=A[1]+t*dy, d=Math.hypot(p[0]-x,p[1]-y);
+      if(!best||d<best.d) best={n:n,t:t,d:d,x:x,y:y};
+    });
+    // At the corner, or nowhere near a street: the line waits where it is.
+    if(!best||best.d>48||best.t<.12){ routeTip=null; break; }
+    const prev=routeLine[routeLine.length-2];
+    // Back the way it came: rub out that piece and look again from there.
+    if(best.n===prev){ routeLine.pop(); continue; }
+    // A line does not cross itself.
+    if(routeLine.indexOf(best.n)>=0){ routeTip=null; break; }
+    if(best.t>.88){ routeLine.push(best.n); routeTip=null; continue; }
+    routeTip={x:best.x,y:best.y}; break;
+  }
+  routeApply();
+}
+function routeDown(e){
+  if(answered||!routeQ) return;
+  const p=routePt(e), end=routeEndXY(), last=routeXY(routeLine[routeLine.length-1]);
+  // The line is picked up at its end, or at You are here to start it.
+  if(Math.hypot(p[0]-end[0],p[1]-end[1])>36&&Math.hypot(p[0]-last[0],p[1]-last[1])>36){
+    routeHint(true); return;
+  }
+  routeDrawing=true;
+  try{ document.getElementById('route-svg').setPointerCapture(e.pointerId); }catch(err){}
+  e.preventDefault();
+  routeMoveTo(p);
+}
+function routeMove(e){
+  if(!routeDrawing) return;
+  routeMoveTo(routePt(e));
+  e.preventDefault();
+}
+function routeUp(){ routeDrawing=false; }
+(function bindRoute(){
+  const svg=document.getElementById('route-svg');
+  if(!svg) return;
+  svg.addEventListener('pointerdown',routeDown);
+  svg.addEventListener('pointermove',routeMove);
+  svg.addEventListener('pointerup',routeUp);
+  svg.addEventListener('pointercancel',routeUp);
+  svg.addEventListener('touchmove',e=>{ if(routeDrawing) e.preventDefault(); },{passive:false});
 })();
 
 /* ══════════════ REAL VIEWPORT HEIGHT ══════════════
@@ -12507,6 +13142,7 @@ function typeinTier(q,ans){
      `correct` is the answer as the round published it, which is q.answer by
    another road. */
 function answerTier(q,ans,correct){
+  if(q&&q.type==='route') return routeTier(q,ans);
   if(isOpenQ(q)) return (ans||'').trim()?'correct':'wrong';
   const want=(correct===undefined||correct===null)?(q&&q.answer):correct;
   return typeinTier(q,ans)||(normalize(ans)===normalize(want)?'correct':'wrong');

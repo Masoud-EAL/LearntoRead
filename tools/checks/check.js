@@ -580,6 +580,120 @@ check('prices', 'a shop round names something its price would buy', async ctx =>
   if (out.gaps.length) bad('prices: nothing in the shop costs ' + out.gaps.join(', '));
 });
 
+/* Directions are only fair if the words lead to one place. Every question is
+   built and then checked against its own words before it is dealt; this runs
+   the same two readings over hundreds more, and then draws on the real map
+   with a finger, because a line that snaps to the wrong street is a wrong
+   answer the learner did not give. */
+check('routes', 'directions lead to one place, and the map marks the line that was drawn', async ctx => {
+  const out = await ctx.page.evaluate(() => {
+    const bad = [], words = {}, steps = {};
+    const lots = Object.values(routeLots());
+    // Buildings do not overlap each other or the roads.
+    lots.forEach(a => {
+      lots.forEach(b => {
+        if (a.id < b.id && a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h)
+          bad.push(a.id + ' overlaps ' + b.id);
+      });
+      ROUTE_X.forEach(x => { if (a.x < x + 10 && x - 10 < a.x + a.w) bad.push(a.id + ' sits on a road'); });
+      ROUTE_Y.forEach(y => { if (a.y < y + 10 && y - 10 < a.y + a.h) bad.push(a.id + ' sits on a road'); });
+    });
+    for (const from of [0, 1, 2, undefined]) {
+      const qs = GEN_BANKS.route(100, from);
+      if (qs.length !== 100) bad.push('round ' + from + ' dealt ' + qs.length + ' of 100');
+      qs.forEach(q => {
+        const said = q.question;
+        // The words walk to the street the place is on, by the way the answer takes.
+        const walked = routeFollow(q.steps, q.places, q.dest);
+        if (!walked || walked.join(' ') !== q.route.join(' ')) bad.push('the words lead elsewhere: ' + said);
+        // The place words fit one plain building, the right one.
+        const fit = routeMatches(q.rel, q.places);
+        if (fit.length !== 1 || fit[0] !== q.dest) bad.push('the place words fit ' + fit.length + ' buildings: ' + said);
+        if (q.places[q.dest]) bad.push('the place is named on the map: ' + said);
+        if (Object.values(q.places).indexOf(q.destName) >= 0) bad.push(q.destName + ' is on the map as well: ' + said);
+        if (new Set(Object.values(q.places)).size !== Object.keys(q.places).length) bad.push('a name twice on one map');
+        Object.values(q.places).concat(q.destName).forEach(n => { if (!routePlace(n) || !routePlace(n).icon) bad.push('no picture for ' + n); });
+        // Every landmark the words name is on the map.
+        q.steps.forEach(s => { if (s.lot && !q.places[s.lot]) bad.push('the words name a building with no name: ' + said); });
+        if (/\u2014|\u2013/.test(said)) bad.push('a dash in: ' + said);
+        if (q.say !== said) bad.push('what is heard is not what is shown: ' + said);
+        // Marking: its own answer is right, and nothing drawn is nothing.
+        if (answerTier(q, q.answer) !== 'correct') bad.push('its own answer is not marked right: ' + said);
+        if (answerTier(q, '') !== 'wrong' || answerGiven(q, '')) bad.push('an empty map is marked as an answer');
+        // Past the door to the far corner and back in is the same way.
+        const D = routeLots()[q.dest], far = D.seg.find(n => n !== q.route[q.route.length - 1]);
+        if (answerTier(q, q.route.concat(far).join(' ') + ' @' + q.dest) !== 'correct') bad.push('in from the far corner is not marked right');
+        // The right way to the wrong building on the right street is half right.
+        lots.filter(l => l.segKey === D.segKey && l.id !== q.dest).forEach(l => {
+          if (routeVerdict(q, q.route.join(' ') + ' @' + l.id) !== 'street') bad.push('the wrong building on the right street is not part marked');
+        });
+        words[q.rel.rel] = (words[q.rel.rel] || 0) + 1;
+        q.steps.forEach(s => { const k = s.do === 'turn' ? s.how : s.do; steps[k] = (steps[k] || 0) + 1; });
+      });
+    }
+    // A game off the picker starts short and gets longer.
+    const st = getQuestions('route', 10).map(q => q.stage);
+    if (st.join() !== st.slice().sort().join() || st[0] !== 0 || st[st.length - 1] !== 2)
+      bad.push('a game does not run short to long: ' + st.join(','));
+    ['next', 'opposite', 'between', 'corner'].forEach(w => { if (!words[w]) bad.push('no question uses "' + w + '"'); });
+    ['ahead', 'past', 'end', 'lot', 'count'].forEach(w => { if (!steps[w]) bad.push('no question uses the "' + w + '" step'); });
+    return { bad: [...new Set(bad)], words: words, steps: steps };
+  });
+  say('  400 questions: place words ' + JSON.stringify(out.words) + ', steps ' + JSON.stringify(out.steps));
+  out.bad.slice(0, 10).forEach(x => bad('routes: ' + x));
+
+  // Now with a finger on the real map, on a phone-sized screen.
+  const page = await openApp(ctx.browser, ctx.base, 'route');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => { soloSelectedType = 'route'; soloMode = true; startSoloGame(); });
+  await page.waitForSelector('#screen-student-answer.active', { timeout: 15000 });
+  const screen = (pts) => page.evaluate(pts => {
+    const svg = document.getElementById('route-svg'), m = svg.getScreenCTM();
+    return pts.map(([x, y]) => { const p = svg.createSVGPoint(); p.x = x; p.y = y; const r = p.matrixTransform(m); return [r.x, r.y]; });
+  }, pts);
+  const draw = async (pts, wobble) => {
+    const s = await screen(pts);
+    await page.mouse.move(s[0][0], s[0][1]); await page.mouse.down();
+    for (let i = 1; i < s.length; i++) {
+      for (let k = 1; k <= 10; k++) {
+        await page.mouse.move(s[i - 1][0] + (s[i][0] - s[i - 1][0]) * k / 10 + (k % 2 ? wobble : -wobble),
+                              s[i - 1][1] + (s[i][1] - s[i - 1][1]) * k / 10 + (k % 2 ? -wobble : wobble));
+      }
+    }
+    await page.mouse.up();
+    return page.evaluate(() => document.getElementById('student-ans-input').value);
+  };
+  const results = [];
+  for (const how of ['right', 'nothing', 'back']) {
+    const q = await page.evaluate(() => currentStudentQ);
+    const pts = await page.evaluate(q => routePoints(q.route, q.dest), q);
+    let got;
+    if (how === 'right') got = await draw(pts, 5);
+    else if (how === 'nothing') got = await page.evaluate(() => document.getElementById('student-ans-input').value);
+    else {
+      // Out along the way and all the way back again rubs the line out.
+      const there = await draw(pts.slice(0, pts.length - 2), 0);
+      if (there === '') results.push('a line along the streets wrote nothing');
+      got = await draw(pts.slice(0, pts.length - 2).reverse(), 0);
+    }
+    const want = how === 'right' ? q.answer : '';
+    if (got !== want) results.push(how + ': the map wrote "' + got + '", wanted "' + want + '" for: ' + q.question);
+    await page.click('#student-submit-btn');
+    await page.waitForSelector('#screen-student-result.active', { timeout: 5000 });
+    const pts2 = await page.textContent('#result-points');
+    const map = await page.evaluate(() => !!document.querySelector('#result-word svg .rm-right'));
+    if (!map) results.push(how + ': the result does not show the way on the map');
+    if (how === 'right' && !/points 🎯/.test(pts2)) results.push('the right line was not marked right: ' + pts2);
+    if (how !== 'right' && !/No points/.test(pts2)) results.push(how + ' was given points: ' + pts2);
+    await page.evaluate(() => soloNextQuestion());
+    await page.waitForSelector('#screen-student-answer.active', { timeout: 5000 });
+  }
+  say('  drew the right way, nothing, and out and back on the real map');
+  results.forEach(x => bad('routes: ' + x));
+  page.errs.forEach(x => bad('routes: ' + x));
+  await page.close();
+});
+
 check('money', 'an amount is marked as an amount, however it is written', async ctx => {
   const out = await ctx.page.evaluate(() => {
     const bad = [], seen = [];
@@ -725,6 +839,8 @@ check('blanks', 'pressing Submit over an untouched question is not an attempt', 
       [{ type: 'form' }, 'Ali | Hassan | ', true, 'form, chips placed'],
       [{ type: 'unscramble' }, '', false, 'tiles, none placed'],
       [{ type: 'clockset' }, '', false, 'clock, hands untouched'],
+      [{ type: 'route' }, '', false, 'map, nothing drawn'],
+      [{ type: 'route' }, 'S N12', true, 'map, a line drawn'],
       [{ type: 'mc' }, 'milk', true, 'an option tapped']
     ].map(p => ({ label: p[3], want: p[2], got: !!answerGiven(p[0], p[1]) }));
   });
