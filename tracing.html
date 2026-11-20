@@ -349,11 +349,10 @@ header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 
   box-shadow: 0 2px 10px rgba(0,0,0,0.12);
 }
 .home-chip:hover { border-color: var(--accent2); color: var(--accent2); }
-/* On a phone the wordmark would sit under the chip, and the chip already
-   names the site, so it gives up its line. */
+/* On a phone the title would sit under the corner buttons, so it starts
+   just below them. */
 @media (max-width: 600px) {
-  header { padding-top: 64px; }
-  header h1 { display: none; }
+  header { padding-top: 62px; }
 }
 
 #confettiCanvas { position: fixed; inset: 0; z-index: 49; pointer-events: none; display: none; }
@@ -1720,5 +1719,6 @@ if (startLang) { langSelect.value = startLang; WL_I18N.setLang(startLang); }
 loop();
 </script>
 
+<script src="site-menu.js" defer></script>
 </body>
 </html>
