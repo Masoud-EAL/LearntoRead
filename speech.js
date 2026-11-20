@@ -117,6 +117,8 @@ function whenVoicesReady(fn) {
 function speakUtterance(utt) {
   const s = window.speechSynthesis;
   if (!s) return;
+  // An iPhone on Silent mode says nothing here; tell the learner once a visit.
+  if (window.wlSilentTip) window.wlSilentTip();
   // The caller's handlers belong to whichever attempt finally speaks, not to
   // the ones that were tried and found hollow, or a button would stop looking
   // like it is playing while the next rung is still being tried.

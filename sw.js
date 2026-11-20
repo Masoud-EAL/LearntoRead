@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v58';
+const CACHE = 'learntoread-v59';
 
 // Core files — must all succeed or install fails
 const CORE = [
@@ -16,6 +16,7 @@ const CORE = [
   './game-page.css',
   './game-page.js',
   './site-menu.js',
+  './silent-tip.js',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
