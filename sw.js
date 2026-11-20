@@ -16,6 +16,7 @@ const CORE = [
   './game-page.css',
   './game-page.js',
   './site-menu.js',
+  './silent-tip.js',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',

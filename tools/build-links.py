@@ -246,6 +246,7 @@ PAGE = """<!DOCTYPE html>
     <a href="{teacher}">Teacher Game</a> · <a href="./">Home</a></p>
 </footer>
 <script src="game-page.js" defer></script>
+<script src="silent-tip.js" defer></script>
 <script src="site-menu.js" data-theme="dark" defer></script>
 </body>
 </html>
@@ -336,10 +337,12 @@ GUIDE = """<!DOCTYPE html>
       var u=new SpeechSynthesisUtterance(say.dataset.say);
       u.lang='en-AU'; u.rate=.9;
       speechSynthesis.speak(u);
+      if(window.wlSilentTip) window.wlSilentTip();
     }}catch(e){{}}
   }});
 }})();
 </script>
+<script src="silent-tip.js" defer></script>
 <script src="site-menu.js" data-theme="dark" defer></script>
 </body>
 </html>
