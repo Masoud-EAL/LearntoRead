@@ -349,10 +349,15 @@ header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 
   box-shadow: 0 2px 10px rgba(0,0,0,0.12);
 }
 .home-chip:hover { border-color: var(--accent2); color: var(--accent2); }
-/* On a phone the title would sit under the corner buttons, so it starts
-   just below them. */
+/* On a phone the title sits in the row between the two corner buttons,
+   level with them, rather than under them. */
 @media (max-width: 600px) {
-  header { padding-top: 62px; }
+  header { padding-top: 22px; }
+  header p { margin-top: 18px; }
+  .home-chip { padding: 7px 12px; }
+}
+@media (max-width: 370px) {
+  header h1 { font-size: 1.3rem; }
 }
 
 #confettiCanvas { position: fixed; inset: 0; z-index: 49; pointer-events: none; display: none; }
@@ -365,7 +370,7 @@ header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 
 </head>
 <body>
 
-<a class="home-chip" href="./" aria-label="WordLink home">🏠 WordLink</a>
+<a class="home-chip" href="./" aria-label="Home">🏠 Home</a>
 <header>
   <h1>Word<span>Link</span> ✏️</h1>
   <p id="headerSub">Write English letters — watch, then trace with your finger</p>

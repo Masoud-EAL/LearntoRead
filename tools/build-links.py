@@ -194,7 +194,7 @@ PAGE = """<!DOCTYPE html>
 <link rel="manifest" href="manifest.json">
 </head>
 <body style="--lx:{color};--lx-glow:{glow};">
-<header class="gp-bar"><a class="gp-home" href="./" aria-label="WordLink home">🏠 WordLink</a></header>
+<header class="gp-bar"><a class="gp-home" href="./" aria-label="Home">🏠 Home</a></header>
 <main>
   <!-- The start screen. It is the page a shared link opens, so it is the same
        card the app shows: one loud button, everything else quiet. A plain GET
@@ -284,7 +284,7 @@ GUIDE = """<!DOCTYPE html>
 <link rel="manifest" href="manifest.json">
 </head>
 <body style="--lx:var(--teal);--lx-glow:rgba(15,155,142,.30);">
-<header class="gp-bar"><a class="gp-home" href="./" aria-label="WordLink home">🏠 WordLink</a></header>
+<header class="gp-bar"><a class="gp-home" href="./" aria-label="Home">🏠 Home</a></header>
 <main>
   <section class="gp-launch">
     <p class="launch-skill">{label} · {level}</p>
