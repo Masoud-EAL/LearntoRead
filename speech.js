@@ -222,3 +222,58 @@ if (window.speechSynthesis) {
     document.addEventListener(ev, openSpeech);
   });
 }
+
+/* ── Sound with the iPhone's silent switch on ──
+   With the switch on, an iPhone mutes a web page's spoken words and Web
+   Audio the way it mutes a ringtone, so the 🔊 and Hear buttons did nothing
+   at all. A page can ask to be treated like a music player instead, which
+   plays through the switch:
+   - navigator.audioSession.type = 'playback' (Safari 17 and later);
+   - and, on any iPhone, a silent <audio> loop started from a tap. Media
+     elements ignore the switch and bring the page's other sound with them,
+     which matters for speech, since it is not certain the setting alone
+     reaches the speech engine.
+   It is set up on the first tap, kept going while the page is in view, and
+   paused when the page is hidden so nothing lingers on the lock screen. */
+(function () {
+  var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var playing = false, keeper = null;
+  function silentWavUrl() {
+    var n = 800, b = new Uint8Array(44 + n), v = new DataView(b.buffer);
+    function w(o, s) { for (var i = 0; i < s.length; i++) b[o + i] = s.charCodeAt(i); }
+    w(0, 'RIFF'); v.setUint32(4, 36 + n, true); w(8, 'WAVEfmt ');
+    v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, 8000, true); v.setUint32(28, 8000, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true);
+    w(36, 'data'); v.setUint32(40, n, true);
+    for (var i = 44; i < b.length; i++) b[i] = 128;
+    return URL.createObjectURL(new Blob([b], { type: 'audio/wav' }));
+  }
+  function go() {
+    try {
+      if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback';
+    } catch (e) {}
+    if (!ios || playing || document.visibilityState === 'hidden') return;
+    try {
+      if (!keeper) {
+        keeper = document.createElement('audio');
+        keeper.src = silentWavUrl();
+        keeper.loop = true;
+        keeper.setAttribute('playsinline', '');
+        keeper.setAttribute('x-webkit-airplay', 'deny');
+        // Paused by anything (another sound, the system): the next tap restarts it.
+        keeper.addEventListener('pause', function () { playing = false; });
+      }
+      // Outside a tap play() is refused; the next tap tries again.
+      var p = keeper.play();
+      if (p && p.then) p.then(function () { playing = true; }).catch(function () {});
+    } catch (e) {}
+  }
+  window.wlSoundThroughSilentSwitch = go;
+  ['pointerdown', 'touchend', 'keydown'].forEach(function (ev) {
+    document.addEventListener(ev, go, true);
+  });
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden' && keeper) { try { keeper.pause(); } catch (e) {} }
+  });
+})();

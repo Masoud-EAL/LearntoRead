@@ -340,6 +340,7 @@ GUIDE = """<!DOCTYPE html>
   }});
 }})();
 </script>
+<script src="speech.js" defer></script>
 <script src="site-menu.js" data-theme="dark" defer></script>
 </body>
 </html>
