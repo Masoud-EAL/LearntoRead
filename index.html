@@ -149,6 +149,25 @@
     white-space: nowrap;
   }
   .nav-tab:hover:not(.active) { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,0.12); }
+  /* The panel hangs from the tab row, not from the button, so it never runs
+     off the edge of a phone when the button wraps to the right. */
+  .top-nav { position: relative; }
+  .settings-menu { position: static; }
+  .settings-btn {
+    list-style: none; display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Fredoka One', cursive; font-size: 0.98rem; min-height: 44px;
+    padding: 6px 16px; border-radius: 36px; border: 2.5px dashed var(--light);
+    background: transparent; color: var(--mid); cursor: pointer; white-space: nowrap;
+  }
+  .settings-btn::-webkit-details-marker { display: none; }
+  .settings-menu[open] .settings-btn { border-style: solid; border-color: var(--accent2); color: var(--accent2); background: white; }
+  .settings-panel {
+    position: absolute; left: 0; right: 0; top: calc(100% + 8px); z-index: 150;
+    width: max-content; max-width: calc(100% - 24px); margin: 0 auto;
+    background: white; border: 2.5px solid var(--light); border-radius: 22px;
+    padding: 14px 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+  }
+  .settings-panel .lang-select { margin-left: 0; font-size: 0.95rem; padding: 10px 14px; min-height: 44px; }
   /* Mirrors the menu button in the opposite corner: sharing is a thing the
      person holding the phone does, not a step in the learning, so it sits out
      of the way of the page rather than in the middle of it. */
@@ -519,6 +538,7 @@
        The padding keeps the pills their old width; min-height buys the rest of
        the thumb back without another row of chrome. */
     .nav-tab { font-size:0.85rem; padding:6px 14px; min-height:44px; }
+    .settings-btn { font-size:0.85rem; padding:6px 14px; }
     .tile { width:58px; height:68px; font-size:2.1rem; }
     .alpha-grid { grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); }
     .alpha-letter { font-size:2rem; }
@@ -972,6 +992,7 @@
     display: flex; align-items: center; justify-content: center;
     gap: 10px; margin: 10px auto 0; padding: 0 16px; flex-wrap: wrap;
   }
+  .voice-selector-bar.settings-panel { margin: 0 auto; padding: 14px 16px; }
   .voice-selector-label {
     font-size: 0.82rem; font-weight: 700; color: var(--mid);
     text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
@@ -1329,10 +1350,15 @@
   <button class="nav-tab sec-words2"          onclick="showSection('wp2',this)">📗 Words 2</button>
   <button class="nav-tab sec-sentences"        onclick="showSection('sentences',this)">📝 Sentences</button>
   <button class="nav-tab sec-speaking"         onclick="showSection('speaking',this)">🗣️ Speaking</button>
-</div>
-
-
-<div class="voice-selector-bar" id="voiceSelectorBar">
+  <!-- Voice and translation are set once and then left alone, so they wait
+       behind one button at the end of the tab row instead of taking a row of
+       their own above the lesson. The button shows the language in use, so a
+       learner who wants their language back can see where it went. -->
+  <details class="settings-menu" id="settingsMenu">
+    <summary class="settings-btn" aria-label="Voice and translation">
+      <span aria-hidden="true">⚙️</span> <span id="settingsSummary">🌐 Off</span>
+    </summary>
+  <div class="voice-selector-bar settings-panel" id="voiceSelectorBar">
   <span class="voice-selector-label">🎙️ Voice:</span>
   <select class="voice-select" id="voiceSelect" onchange="onVoiceSelectChange()">
     <option value="female">Female</option>
@@ -1352,6 +1378,8 @@
     <option value="ur">🇵🇰 Urdu / اردو</option>
     <option value="vi">🇻🇳 Vietnamese / Tiếng Việt</option>
   </select>
+  </div>
+  </details>
 </div>
 
 <!-- SECTION 1 — ALPHABET -->
@@ -2300,6 +2328,7 @@ function copyToClipboard(text, done) {
 function setOverlayOpen(on) {
   document.body.style.overflow = on ? 'hidden' : '';
   document.body.classList.toggle('overlay-open', !!on);
+  if (on) backHistoryOpen(); else backHistoryClose();
 }
 
 const OVERLAY_CLOSERS = {
@@ -2321,10 +2350,91 @@ function closeAnyOverlay() {
 
 function openMenu() {
   document.getElementById('menuOverlay').classList.add('active');
+  backHistoryOpen();
 }
 function closeMenu() {
   document.getElementById('menuOverlay').classList.remove('active');
+  backHistoryClose();
 }
+
+/* ══════════════════════════════════════════
+   THE PHONE'S BACK BUTTON
+   The menu and the practice and test screens cover the whole page, so they
+   look like pages, and on a phone Back is how people leave a page. It used
+   to leave WordLink altogether, because nothing here was in the history.
+   Now opening any of them adds one history entry, and Back closes the one on
+   top instead. One entry covers everything open at once (the menu over a
+   test, say): if something is still open after Back, the entry goes back on.
+   Closing with the on-screen buttons takes the entry off again, so Back
+   never has to be pressed twice for nothing.
+══════════════════════════════════════════ */
+let backEntry = false;   // our entry is the current one
+let backSkipPop = false; // the next popstate is our own history.back()
+let backPopping = false; // closing because Back was pressed
+function backAnyOpen() {
+  if (document.getElementById('menuOverlay').classList.contains('active')) return true;
+  return Object.keys(OVERLAY_CLOSERS).some(function (id) {
+    var el = document.getElementById(id);
+    return el && el.classList.contains('active');
+  });
+}
+function backHistoryOpen() {
+  if (backEntry || backPopping) return;
+  try { history.pushState({ wlOverlay: 1 }, ''); backEntry = true; } catch (e) {}
+}
+function backHistoryClose() {
+  if (backPopping) return;
+  // Wait a moment: going from one screen straight to another closes one and
+  // opens the next in the same tap, and that should keep the entry.
+  setTimeout(function () {
+    if (backEntry && !backAnyOpen()) {
+      backEntry = false; backSkipPop = true;
+      try { history.back(); } catch (e) { backSkipPop = false; }
+    }
+  }, 0);
+}
+/* Choosing a section from the menu renames the current address while our
+   entry is on top; stepping off it would bring back the old name. */
+function backResyncUrl() {
+  var sec = document.querySelector('.section-page.active');
+  if (sec) syncSectionUrl(sec.id.replace(/^sec-/, ''));
+}
+window.addEventListener('popstate', function () {
+  if (backSkipPop) { backSkipPop = false; backResyncUrl(); return; }
+  if (!backEntry) return;
+  backEntry = false; backPopping = true;
+  try {
+    if (document.getElementById('menuOverlay').classList.contains('active')) closeMenu();
+    else closeAnyOverlay();
+  } finally { backPopping = false; }
+  if (backAnyOpen()) backHistoryOpen();
+  backResyncUrl();
+});
+
+/* The settings button says which translation is on, in the language's own
+   English name, so it reads "🌐 Dari" rather than an icon alone. */
+function updateSettingsSummary() {
+  var sel = document.getElementById('langSelect');
+  var out = document.getElementById('settingsSummary');
+  if (!sel || !out) return;
+  var opt = sel.options[sel.selectedIndex];
+  var name = (!sel.value || !opt) ? 'Off'
+    : opt.textContent.split('/')[0].replace(/[^A-Za-z ]/g, '').trim();
+  out.textContent = '🌐 ' + name;
+}
+(function () {
+  var menu = document.getElementById('settingsMenu');
+  if (!menu) return;
+  // A choice made is a choice done: close the panel so the change shows.
+  menu.addEventListener('change', function () {
+    updateSettingsSummary();
+    setTimeout(function () { menu.open = false; }, 150);
+  });
+  // A tap anywhere else closes it, as a menu would.
+  document.addEventListener('click', function (e) {
+    if (menu.open && !menu.contains(e.target)) menu.open = false;
+  });
+})();
 function menuGo(section, level) {
   closeAnyOverlay();
   // Find the matching top-nav tab (its onclick references the section name).
@@ -4617,6 +4727,7 @@ selectFamily('wp2', 0);
     const sel = document.getElementById('langSelect');
     if (sel) { sel.value = lang; onLangChange(); }
   }
+  updateSettingsSummary();
 
   // Last visited section.
   // Two tabs carry a class that doesn't match their section id — wp1/wp2

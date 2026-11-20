@@ -17,10 +17,16 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 a{color:var(--gold);}
 button,a,input,select{touch-action:manipulation;font:inherit;}
 
-.gp-bar{text-align:center;padding:18px 20px 4px;font-family:'Fredoka One',cursive;font-size:1.4rem;
-  letter-spacing:1px;}
-.gp-bar a{color:var(--accent);text-decoration:none;text-shadow:0 0 20px rgba(233,69,96,.5);}
-.gp-bar span{color:var(--gold);}
+/* The way home: the same pinned chip, in the same corner, as on game.html,
+   so it is where a learner expects it on every page and still there after
+   scrolling down to the notes. The bar keeps its height so nothing sits
+   under the chip at the top. */
+.gp-bar{height:64px;}
+.gp-home{position:fixed;top:12px;left:14px;z-index:100;display:inline-flex;align-items:center;gap:6px;
+  min-height:44px;padding:7px 16px;border-radius:50px;font-size:.9rem;font-weight:700;text-decoration:none;
+  color:var(--muted);background:rgba(13,13,26,.82);border:1px solid rgba(255,255,255,.14);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:all .15s;}
+.gp-home:hover{color:var(--text);background:rgba(40,40,70,.9);}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:'Fredoka One',cursive;
   font-size:1.1rem;padding:14px 28px;border-radius:50px;border:none;cursor:pointer;transition:all .18s;
@@ -128,7 +134,7 @@ select.game-input{background:var(--card);text-align:left;cursor:pointer;}
 .gp-foot p + p{margin-top:8px;}
 
 @media (max-width:600px){
-  .gp-bar{font-size:1.2rem;padding-top:14px;}
+  .gp-bar{height:60px;}
   .launch-medallion{width:92px;height:92px;font-size:3.2rem;}
   .gp-launch{gap:13px;}
 }

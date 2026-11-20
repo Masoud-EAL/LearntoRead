@@ -339,6 +339,23 @@ header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 
   background: transparent; color: var(--mid); box-shadow: none; font-size: 1.2rem;
 }
 
+/* The way home, pinned in the same corner as on every other page. */
+.home-chip {
+  position: fixed; top: 12px; left: 14px; z-index: 40;
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px;
+  padding: 7px 16px; border-radius: 50px; text-decoration: none;
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.9rem;
+  color: var(--mid); background: white; border: 2.5px solid var(--light);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+}
+.home-chip:hover { border-color: var(--accent2); color: var(--accent2); }
+/* On a phone the wordmark would sit under the chip, and the chip already
+   names the site, so it gives up its line. */
+@media (max-width: 600px) {
+  header { padding-top: 64px; }
+  header h1 { display: none; }
+}
+
 #confettiCanvas { position: fixed; inset: 0; z-index: 49; pointer-events: none; display: none; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -349,6 +366,7 @@ header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 
 </head>
 <body>
 
+<a class="home-chip" href="./" aria-label="WordLink home">🏠 WordLink</a>
 <header>
   <h1>Word<span>Link</span> ✏️</h1>
   <p id="headerSub">Write English letters — watch, then trace with your finger</p>

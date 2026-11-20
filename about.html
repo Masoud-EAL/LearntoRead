@@ -138,12 +138,24 @@
     color: var(--mid); font-weight: 600; border-top: 2px solid var(--light);
     margin-top: 10px;
   }
+/* The way home, pinned in the same corner as on every other page. */
+  .home-chip {
+    position: fixed; top: 12px; left: 14px; z-index: 60;
+    display: inline-flex; align-items: center; gap: 6px; min-height: 44px;
+    padding: 7px 16px; border-radius: 50px; text-decoration: none;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.9rem;
+    color: var(--mid); background: white; border: 2.5px solid var(--light);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  }
+  .home-chip:hover { border-color: var(--accent2); color: var(--accent2); }
+  @media (max-width: 600px) { header { padding-top: 66px; } }
   footer a { color: var(--accent2); }
   footer strong { color: var(--accent1); }
 </style>
 </head>
 <body>
 
+<a class="home-chip" href="./" aria-label="WordLink home">🏠 WordLink</a>
 <header>
   <h1>About Word<span>Link</span></h1>
   <p>Free reading and phonics practice for adults learning English</p>

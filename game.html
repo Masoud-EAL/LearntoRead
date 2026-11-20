@@ -414,6 +414,8 @@ body:has(#screen-solo-setup.active) .back-btn{position:absolute;}
    site — so the wordmark stands down and gives its row to the categories. */
 @media (max-width:600px){
   #screen-solo-setup > .logo-bar{display:none;}
+  /* The same on the first screen: the wordmark sat under both chips. */
+  #screen-home > .logo-bar,#screen-student-home > .logo-bar{display:none;}
   /* :not() for the same reason as the padding rule above — this is the column's
      clearance under the fixed chips, and on the bar it would stack 52px of dead
      space on top of Start and swallow the Back button underneath it. */
@@ -1910,7 +1912,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 <!-- Only the teacher sees this, and only while a final reveal is running. -->
 <button id="lb-skip" onclick="skipReveal()">Skip ▶</button>
 <button class="music-btn" id="music-btn" onclick="toggleMusic()">🎵 Music: On</button>
-<a href="index.html" class="back-btn">← WordLink</a>
+<a href="./" class="back-btn" aria-label="WordLink home">🏠 WordLink</a>
 
 <!-- HOME -->
 <div class="screen active" id="screen-home">
