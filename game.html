@@ -6591,48 +6591,8 @@ let musicResumeType=null;
 let musicStarted=false,pendingAudioStart=null;
 const MASTER_VOL=0.38;
 
-/* An iPhone with its silent switch on mutes Web Audio, the way it mutes a
-   ringtone, so the music and sound effects played nothing even with
-   Music: On. Telling Safari this page plays sound the way a music app does
-   lets it through the switch. Safari 17 and later have audioSession for
-   this; on an older iPhone, a silent looping <audio> element does the same
-   job, because media elements ignore the switch and take the page's sound
-   with them. Called from inside the tap that starts audio. */
-let silentSwitchDone=false,silentKeeper=null;
-function playThroughSilentSwitch(){
-  if(silentSwitchDone) return;
-  try{
-    if(navigator.audioSession){ navigator.audioSession.type='playback'; silentSwitchDone=true; return; }
-  }catch(e){}
-  const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||
-    (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-  if(!ios){ silentSwitchDone=true; return; }
-  // Outside a tap, play() is refused; the next tap tries again.
-  if(silentKeeper){
-    const p=silentKeeper.play();
-    if(p&&p.then) p.then(()=>{ silentSwitchDone=true; }).catch(()=>{});
-    return;
-  }
-  try{
-    // 0.1 s of silence, 8 kHz 8-bit mono.
-    const n=800, b=new Uint8Array(44+n), v=new DataView(b.buffer);
-    const w=(o,s)=>{ for(let i=0;i<s.length;i++) b[o+i]=s.charCodeAt(i); };
-    w(0,'RIFF'); v.setUint32(4,36+n,true); w(8,'WAVEfmt ');
-    v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
-    v.setUint32(24,8000,true); v.setUint32(28,8000,true); v.setUint16(32,1,true); v.setUint16(34,8,true);
-    w(36,'data'); v.setUint32(40,n,true); b.fill(128,44);
-    const a=document.createElement('audio');
-    a.src=URL.createObjectURL(new Blob([b],{type:'audio/wav'}));
-    a.loop=true; a.setAttribute('playsinline',''); a.setAttribute('x-webkit-airplay','deny');
-    silentKeeper=a;
-    const p=a.play();
-    if(p&&p.then) p.then(()=>{ silentSwitchDone=true; }).catch(()=>{});
-  }catch(e){}
-}
-
 function getCtx(){
   if(!audioCtx){
-    playThroughSilentSwitch();
     audioCtx=new(window.AudioContext||window.webkitAudioContext)();
     /* iOS parks the context in 'interrupted' after a call or a screen lock, and
        audio focus can be lost on Android without the page ever being hidden. When
@@ -7273,7 +7233,6 @@ function unlockAudio(){
   if(s) startScreenMusic(s.id);
 }
 ['pointerdown','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,unlockAudio));
-['pointerdown','touchend','keydown'].forEach(ev=>document.addEventListener(ev,playThroughSilentSwitch));
 
 /* Leaving the app suspends the AudioContext but not the page's timers. The
    looping tracks reschedule themselves on a timer and anchor each bar to
