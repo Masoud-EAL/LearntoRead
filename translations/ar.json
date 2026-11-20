@@ -447,7 +447,11 @@
     "they": "هم",
     "them": "هم / إياهم",
     "then": "ثم",
-    "there": "هناك"
+    "there": "هناك",
+    "door": "باب",
+    "milk": "حليب",
+    "rice": "أرز",
+    "tea": "شاي"
   },
   "sentences": {
     "My name is David.": "اسمي ديفيد.",

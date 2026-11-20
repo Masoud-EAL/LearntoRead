@@ -60,17 +60,18 @@
    "play": "▶ Start Tracing Words",
    "name": "Tracing Words",
    "seo": "Tracing Words: Trace Each Letter of a Word | Free, No Sign Up",
-   "meta": "Free word tracing for adults learning English. Trace short words like cat, sun and bus one letter at a time with your finger. No sign up.",
+   "meta": "Free word tracing for adults learning English. Trace everyday words like cat, milk, phone and Monday one letter at a time with your finger. No sign up.",
    "sub": "Trace a word, one letter at a time.",
-   "blurb": "For learners who can already trace single letters. Short picture words like cat, sun and cup are traced left to right, so the letters connect to a meaning.",
-   "about": "Word tracing for adults who can already trace single letters. The learner sees a short picture word, such as cat, dog, sun, bus, cup, pen, bed, hat, egg or box, and traces its letters from left to right with a finger. Every word has three letters or fewer, so a first word can be finished in one short session. Seeing the picture next to the word links the letters to a meaning.",
+   "blurb": "For learners who can already trace single letters. Everyday picture words, from cat and bus to milk, phone, seven and Monday, are traced left to right, so the letters connect to a meaning.",
+   "about": "Word tracing for adults who can already trace single letters. The words come in five sets, in order: short words (cat, bus, map), things at home (key, door, phone), food (milk, rice, bread), number words (one to ten) and the days of the week, which are the first words that start with a capital letter. The learner hears the word and sees its picture, then traces its letters from left to right with a finger. Each letter they finish appears above in their own handwriting, and the finished word is shown on one line, the way it would look on paper. After a set, a short check says a word and the learner taps it from three written words, so writing leads back to reading.",
    "how": [
-    "Look at the picture and the word.",
-    "Trace the first letter.",
-    "Trace the next letters, left to right.",
-    "Read the whole word when you finish."
+    "Choose a set: short words, home, food, numbers or days.",
+    "Listen to the word and look at the picture.",
+    "Trace the letters, left to right.",
+    "See the whole word in your handwriting.",
+    "After a set, tap the word you hear."
    ],
-   "cls": "Use this after the letter tracing page. Ask students to say each word aloud as they trace it, then write it on paper without the screen. The words are short and common, so they also work as a first set of words to read.",
+   "cls": "Use this after the letter tracing page, one set at a time. Ask students to say each word aloud as they trace it, then write it on paper without the screen. The read-back check at the end of a set shows quickly who can read the words they have written. The home and food words also work as a first set of words to read.",
    "good": [
     "tracing words",
     "trace the letters of a word",

@@ -447,7 +447,11 @@
     "they": "他们",
     "them": "他们",
     "then": "然后",
-    "there": "那里"
+    "there": "那里",
+    "door": "门",
+    "milk": "牛奶",
+    "rice": "米饭",
+    "tea": "茶"
   },
   "sentences": {
     "My name is David.": "我叫大卫。",

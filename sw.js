@@ -1,4 +1,4 @@
-const CACHE = 'learntoread-v54';
+const CACHE = 'learntoread-v55';
 
 // Core files — must all succeed or install fails
 const CORE = [

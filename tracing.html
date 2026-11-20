@@ -114,7 +114,7 @@ header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 
   font-family: var(--letterfont); font-weight: 700;
   font-size: 2rem; letter-spacing: 3px;
   margin-top: 12px; min-height: 42px;
-  display: flex; align-items: center; justify-content: center; gap: 2px;
+  display: flex; align-items: center; justify-content: center; gap: 0;
   color: var(--light);
 }
 .unit-strip .g { transition: color .2s, transform .2s; }
@@ -292,6 +292,53 @@ header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 
   background: white; color: var(--mid);
   border: 2.5px solid var(--light); box-shadow: none;
 }
+/* ── word sets (Words tab) ── */
+.set-row {
+  display: flex; flex-wrap: wrap; gap: 7px; justify-content: center;
+  margin-top: 16px; padding: 0 14px; max-width: 520px;
+}
+.set-chip {
+  font-family: 'Fredoka One', cursive; font-size: 0.9rem;
+  min-height: 44px; padding: 8px 14px; border-radius: 30px;
+  border: 2.5px solid var(--light); background: white; color: var(--mid);
+  cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.set-chip .n { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.75rem; opacity: 0.8; }
+.set-chip.active { background: var(--accent1); border-color: var(--accent1); color: white; box-shadow: 0 4px 12px rgba(244,132,95,0.4); }
+.set-chip.full:not(.active) { border-color: var(--accent4); }
+.set-chip.check { border-color: var(--accent2); color: var(--accent2); }
+
+/* In the Words tab the picture carries the meaning, so it is bigger. */
+.word-pill.big .emoji { font-size: 2.3rem; }
+
+/* The strip draws each letter on a little piece of the writing lines: the
+   learner's own ink once a letter is done, the guide shape before that. */
+.unit-strip canvas.g { display: block; }
+.unit-strip canvas.g.current { transform: none; }
+
+/* The finished word, in the learner's handwriting, on one line. */
+#celebInk { display: none; margin: 0 auto; }
+
+/* ── read-back check ── */
+.check-card { position: relative; min-width: 260px; max-width: 360px; width: calc(100% - 40px); padding: 26px 22px; }
+.check-card .q { font-weight: 800; color: var(--mid); font-size: 0.95rem; }
+.check-card .prog { font-weight: 800; color: var(--mid); font-size: 0.8rem; margin-top: 4px; }
+.check-opts { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.celebrate-card .check-opts button {
+  font-family: var(--letterfont); font-weight: 700; font-size: 1.6rem;
+  min-height: 60px; background: white; color: var(--dark);
+  border: 2.5px solid var(--light); box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+.celebrate-card .check-opts button.right { background: var(--teal); border-color: var(--teal); color: white; }
+.celebrate-card .check-opts button.wrong { background: #fbe3dc; border-color: var(--accent1); color: var(--mid); }
+.celebrate-card .check-hear { margin-top: 14px; background: var(--accent2); box-shadow: 0 4px 14px rgba(74,144,217,0.4); }
+.check-score { font-family: 'Fredoka One', cursive; font-size: 2.2rem; color: var(--teal); margin-top: 6px; }
+.celebrate-card .check-close {
+  position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; padding: 0;
+  background: transparent; color: var(--mid); box-shadow: none; font-size: 1.2rem;
+}
+
 #confettiCanvas { position: fixed; inset: 0; z-index: 49; pointer-events: none; display: none; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -352,23 +399,45 @@ header p { margin-top: 4px; font-size: 0.85rem; color: var(--mid); font-weight: 
   <button class="nav-arrow" id="nextBtn" aria-label="Next">›</button>
 </div>
 
+<div class="set-row" id="setRow" role="group" aria-label="Word sets" style="display:none;"></div>
+
 <div class="letter-grid" id="letterGrid"></div>
 
 <a class="back-link" href="index.html">← Back to WordLink</a>
 
 <p class="page-foot">Handwriting practice for adults learning English — trace the letters of
-  the alphabet, letter combinations, numbers and your own name.
+  the alphabet, letter combinations, everyday words, numbers and your own name.
   <a href="about.html">About WordLink</a> · <a href="trace-letters">How finger tracing works</a></p>
 
 <div class="celebrate" id="celebrate">
   <div class="celebrate-card">
     <div class="big-letter" id="celebLetter">a</div>
+    <canvas id="celebInk" aria-hidden="true"></canvas>
     <div class="word"><span id="celebWord">apple</span> <span class="emoji" id="celebEmoji">🍎</span></div>
     <div class="gloss" id="celebGloss" style="display:none;"></div>
     <div class="stars">⭐⭐⭐</div>
     <div class="btn-row">
       <button id="celebAgain" class="secondary">⟲ Trace again</button>
       <button id="celebNext">Next ›</button>
+    </div>
+  </div>
+</div>
+<div class="celebrate" id="checkBox" role="dialog" aria-label="Check your reading">
+  <div class="celebrate-card check-card">
+    <button class="check-close" id="checkClose" aria-label="Close">✕</button>
+    <div id="checkPlay">
+      <div class="q">🔊 Tap the word you hear</div>
+      <div class="prog" id="checkProg">1 / 5</div>
+      <div class="check-opts" id="checkOpts"></div>
+      <button class="check-hear" id="checkHear">🔊 Hear it again</button>
+    </div>
+    <div id="checkEnd" style="display:none;">
+      <div class="q">✔</div>
+      <div class="check-score" id="checkScore">5 / 5</div>
+      <div class="btn-row">
+        <button id="checkAgain" class="secondary">⟲ Again</button>
+        <button id="checkNext">Next ›</button>
+      </div>
     </div>
   </div>
 </div>
@@ -523,14 +592,39 @@ const COMBOS = [
   { text: 'ng', word: 'ring',  emoji: '💍' }
 ];
 
-/* Short, concrete, high-frequency nouns — all three letters or fewer so a
-   first word stays inside a single session. */
-const TRACE_WORDS = [
-  { text: 'cat', emoji: '🐱' }, { text: 'dog', emoji: '🐶' },
-  { text: 'sun', emoji: '☀️' }, { text: 'bus', emoji: '🚌' },
-  { text: 'cup', emoji: '🥤' }, { text: 'pen', emoji: '🖊️' },
-  { text: 'bed', emoji: '🛏️' }, { text: 'hat', emoji: '🎩' },
-  { text: 'egg', emoji: '🥚' }, { text: 'box', emoji: '📦' }
+/* Words come in sets, in the order a learner should meet them: short before
+   long, things you can picture before things you cannot, and capitals last.
+     1. Short words: three letters, sounded out as they are spelt (the CVC
+        families in phonics.js), so the letters and the word agree.
+     2. At home and 3. Food: three to six letters, everyday objects an adult
+        handles every day, each one a picture of the thing itself (the same
+        emoji game.html uses wherever it has one, so a word looks the same
+        everywhere).
+     4. Numbers: the words for the digits the Numbers tab already traces.
+     5. Days: the first words that start with a capital letter, which is
+        "upper and lower case in extremely familiar words" (PLB.06).
+   Stars are filed under the word itself, so the ten words this tab started
+   with keep the stars a learner already earned on them. */
+const entry = (text, emoji) => ({ text, emoji });
+const TRACE_SETS = [
+  { id: 'short', icon: '🔤', label: 'Short', words: [
+    entry('cat','🐱'), entry('dog','🐶'), entry('sun','☀️'), entry('bus','🚌'), entry('cup','🥤'),
+    entry('pen','🖊️'), entry('bed','🛏️'), entry('hat','🎩'), entry('egg','🥚'), entry('box','📦'),
+    entry('map','🗺️'), entry('van','🚐'), entry('mug','☕'), entry('pig','🐷'), entry('hen','🐓'),
+    entry('man','👨') ] },
+  { id: 'home', icon: '🏠', label: 'Home', words: [
+    entry('key','🔑'), entry('bin','🗑️'), entry('book','📚'), entry('door','🚪'), entry('soap','🧼'),
+    entry('bath','🛁'), entry('chair','🪑'), entry('clock','🕐'), entry('phone','📱'), entry('spoon','🥄') ] },
+  { id: 'food', icon: '🍞', label: 'Food', words: [
+    entry('tea','🍵'), entry('milk','🥛'), entry('rice','🍚'), entry('fish','🐟'), entry('meat','🥩'),
+    entry('cake','🎂'), entry('bread','🍞'), entry('apple','🍎'), entry('water','💧'), entry('juice','🧃'),
+    entry('banana','🍌') ] },
+  { id: 'numbers', icon: '🔢', label: 'Numbers', words: [
+    entry('one','1️⃣'), entry('two','2️⃣'), entry('three','3️⃣'), entry('four','4️⃣'), entry('five','5️⃣'),
+    entry('six','6️⃣'), entry('seven','7️⃣'), entry('eight','8️⃣'), entry('nine','9️⃣'), entry('ten','🔟') ] },
+  { id: 'days', icon: '🗓️', label: 'Days', words: [
+    entry('Monday','🗓️'), entry('Tuesday','🗓️'), entry('Wednesday','🗓️'), entry('Thursday','🗓️'),
+    entry('Friday','🗓️'), entry('Saturday','🗓️'), entry('Sunday','🗓️') ] }
 ];
 
 const DIGIT_WORDS = ['zero','one','two','three','four','five','six','seven','eight','nine'];
@@ -539,7 +633,7 @@ const DIGIT_EMOJI = ['0️⃣','1️⃣','2️⃣','3️⃣','4️⃣','5️⃣'
 const MODES = [
   { id: 'letters', label: '🔤 Letters',  sub: 'Write English letters — watch, then trace with your finger' },
   { id: 'combos',  label: '🔊 sh ch th', sub: 'Letter combinations — trace each letter in turn' },
-  { id: 'words',   label: '📖 Words',    sub: 'Words — trace each letter, left to right' },
+  { id: 'words',   label: '📖 Words',    sub: 'Words: listen, then trace each letter, left to right' },
   { id: 'name',    label: '🙋 My name',  sub: 'Your name — trace each letter in turn' },
   { id: 'digits',  label: '🔢 Numbers',  sub: 'Numbers — watch, then trace with your finger' }
 ];
@@ -681,6 +775,20 @@ function markDone(m, key) {
 const NAME_KEY = 'wl_trace_name';
 const savedName = () => (store.get(NAME_KEY) || '').trim();
 
+/* ── word sets ──
+   The set last opened is remembered; a first visit opens the first set with
+   a word still to do, so a returning learner lands where they left off. */
+const SET_KEY = 'wl_trace_set';
+const setDoneCount = s => { const d = loadDone('words'); return s.words.filter(x => d[x.text]).length; };
+const setComplete  = s => setDoneCount(s) === s.words.length;
+let setIdx = (() => {
+  const i = TRACE_SETS.findIndex(s => s.id === store.get(SET_KEY));
+  if (i >= 0) return i;
+  const open = TRACE_SETS.findIndex(s => !setComplete(s));
+  return open < 0 ? 0 : open;
+})();
+const curSet = () => TRACE_SETS[setIdx];
+
 const TOL = 8.5, START_TOL = 14, LOOKAHEAD = 12;
 
 /* ══════════════ CANVAS SETUP ══════════════ */
@@ -775,6 +883,9 @@ function drawInk() {
 }
 
 let demoPos = null; // [x,y] during demo animation
+let glyphInk = [];  // per glyph of the current unit: the learner's accepted strokes
+let introTok = 0;   // bumped to cancel a pending "say the word, then demo"
+let offerCheck = false; // the celebration's Next opens the read-back check
 
 function render() {
   ctx.clearRect(0, 0, W, H);
@@ -892,6 +1003,11 @@ document.addEventListener('touchmove', e => {
 }, { passive: false });
 
 function strokeComplete() {
+  /* Keep what the learner wrote, so the strip and the finish can show the
+     word in their own hand. A dot is kept as the single point it is. */
+  const done = strokes[strokeIdx];
+  if (done) (glyphInk[glyphIdx] = glyphInk[glyphIdx] || [])
+    .push(done.isDot ? [[done.x, done.y]] : ink.slice());
   ink = [];
   matchIdx = 0;
   strokeIdx++;
@@ -945,7 +1061,7 @@ function buildUnits(mode) {
     });
   }
   if (mode === 'combos') return COMBOS.map(c => makeUnit(c.text, c.word, c.emoji));
-  if (mode === 'words')  return TRACE_WORDS.map(w => makeUnit(w.text, w.text, w.emoji));
+  if (mode === 'words')  return curSet().words.map(w => makeUnit(w.text, w.text, w.emoji));
   if (mode === 'digits') return '0123456789'.split('').map((d, i) =>
     makeUnit(d, DIGIT_WORDS[i], DIGIT_EMOJI[i]));
   if (mode === 'name') {
@@ -963,13 +1079,27 @@ function loadUnit(i) {
   stopDemo();
   unitIdx = Math.max(0, Math.min(i, units.length - 1));
   glyphIdx = 0;
+  glyphInk = [];
   if (isLetters()) currentLetter = unit().key;
-  loadGlyph(true);
+  if (currentMode === 'words') {
+    /* Meaning first: the learner hears the word they are about to write
+       before the first letter is shown being written. The demo waits for the
+       word to finish, and is dropped if the learner has already started. */
+    loadGlyph(false);
+    const tok = ++introTok;
+    speak(unit().word, () => {
+      if (tok !== introTok || glyphIdx !== 0 || strokeIdx !== 0 || drawing || ink.length) return;
+      playDemo();
+    });
+  } else {
+    loadGlyph(true);
+  }
   updateGrid();
 }
 
 function loadGlyph(announce) {
   stopDemo();
+  introTok++;
   strokes = buildStrokes(curGlyph());
   strokeIdx = 0; matchIdx = 0; ink = []; drawing = false;
   updateHeader();
@@ -999,15 +1129,116 @@ function updateStrip() {
   wrap.innerHTML = '';
   if (u.glyphs.length < 2) { wrap.style.display = 'none'; return; }
   wrap.style.display = 'flex';
+  /* Every traceable letter is a small piece of the writing lines, so the
+     word reads as one line of handwriting: the learner's own ink for the
+     letters they have done, the orange guide for the one they are on, and a
+     faint guide for the rest. One scale for the whole word, shrunk to fit. */
+  const k = Math.min(0.62, (Math.min(window.innerWidth, 520) - 32) / wordLayout(u.text).total);
   let seen = 0;
   u.text.split('').forEach(ch => {
-    const s = document.createElement('span');
-    if (ch === ' ') { s.className = 'g space'; s.textContent = ' '; wrap.appendChild(s); return; }
-    if (!traceable(ch)) { s.className = 'g'; s.textContent = ch; wrap.appendChild(s); return; }
-    s.className = 'g' + (seen < glyphIdx ? ' done' : seen === glyphIdx ? ' current' : '');
-    s.textContent = ch;
+    if (ch === ' ') {
+      const s = document.createElement('span');
+      s.className = 'g space'; s.style.width = Math.round(SPACE_UNITS * k) + 'px';
+      wrap.appendChild(s); return;
+    }
+    if (!traceable(ch)) {
+      const s = document.createElement('span');
+      s.className = 'g'; s.textContent = ch; wrap.appendChild(s); return;
+    }
+    const state = seen < glyphIdx ? 'done' : seen === glyphIdx ? 'current' : 'todo';
+    const sp = glyphSpan(ch);
+    const cv = document.createElement('canvas');
+    cv.className = 'g ' + state;
+    const c = sizeCanvas(cv, (sp[1] - sp[0]) * k, INK_H * k);
+    paintLines(c, (sp[1] - sp[0]) * k, k);
+    paintGlyph(c, ch, state === 'done' ? glyphInk[seen] : null, 0, k,
+      state === 'done' ? '#2baa8a' : state === 'current' ? '#f4845f' : '#e3d8cc');
+    wrap.appendChild(cv);
     seen++;
-    wrap.appendChild(s);
+  });
+}
+
+/* ── handwriting on a line ──
+   Letters are placed left to right by the width of their own guide shape,
+   with a little room either side, so tall letters, the tails of g and y, and
+   the space between letters come out as they would on paper. */
+const INK_Y0 = 4, INK_H = 100, SPACE_UNITS = 22, LETTER_PAD = 6;
+const spanCache = {};
+function glyphSpan(ch) {
+  if (spanCache[ch]) return spanCache[ch];
+  let lo = 100, hi = 0;
+  buildStrokes(ch).forEach(st => st.pts.forEach(p => { lo = Math.min(lo, p[0]); hi = Math.max(hi, p[0]); }));
+  if (lo > hi) { lo = 40; hi = 60; }
+  return (spanCache[ch] = [lo - LETTER_PAD, hi + LETTER_PAD]);
+}
+function wordLayout(text) {
+  let x = 0;
+  const items = [];
+  text.split('').forEach(ch => {
+    if (ch === ' ') { x += SPACE_UNITS; return; }
+    if (!traceable(ch)) { items.push({ ch, x, text: true }); x += 30; return; }
+    const sp = glyphSpan(ch);
+    items.push({ ch, x, sp });
+    x += sp[1] - sp[0];
+  });
+  return { items, total: Math.max(x, 1) };
+}
+function sizeCanvas(cv, w, h) {
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = Math.ceil(w * dpr); cv.height = Math.ceil(h * dpr);
+  cv.style.width = w + 'px'; cv.style.height = h + 'px';
+  const c = cv.getContext('2d');
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return c;
+}
+function paintLines(c, w, k) {
+  c.save();
+  c.lineWidth = 1;
+  c.strokeStyle = '#e8ddd2';
+  c.beginPath(); c.moveTo(0, (LINES.base - INK_Y0) * k); c.lineTo(w, (LINES.base - INK_Y0) * k); c.stroke();
+  c.setLineDash([4, 4]); c.strokeStyle = '#d9ecff';
+  c.beginPath(); c.moveTo(0, (LINES.mid - INK_Y0) * k); c.lineTo(w, (LINES.mid - INK_Y0) * k); c.stroke();
+  c.restore();
+}
+/* Draws one letter at x offset `ox` (pixels): the learner's strokes when
+   `inkStrokes` is given, otherwise the guide shape. */
+function paintGlyph(c, ch, inkStrokes, ox, k, color) {
+  const sp = glyphSpan(ch);
+  const X = x => ox + (x - sp[0]) * k, Y = y => (y - INK_Y0) * k;
+  const paths = inkStrokes || buildStrokes(ch).map(st => st.isDot ? [[st.x, st.y]] : st.pts);
+  const lw = Math.max(1.5, 2.6 * k);
+  c.save();
+  c.strokeStyle = color; c.fillStyle = color; c.lineWidth = lw;
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  paths.forEach(pts => {
+    if (pts.length === 1) {
+      c.beginPath(); c.arc(X(pts[0][0]), Y(pts[0][1]), lw * 0.9, 0, Math.PI * 2); c.fill();
+      return;
+    }
+    c.beginPath(); c.moveTo(X(pts[0][0]), Y(pts[0][1]));
+    for (let i = 1; i < pts.length; i++) c.lineTo(X(pts[i][0]), Y(pts[i][1]));
+    c.stroke();
+  });
+  c.restore();
+}
+/* The whole finished word on one canvas, for the celebration card. */
+function drawWordInk(cv, u) {
+  const lay = wordLayout(u.text);
+  const k = Math.min(1, (Math.min(window.innerWidth - 110, 320)) / lay.total);
+  const w = lay.total * k, c = sizeCanvas(cv, w, INK_H * k);
+  paintLines(c, w, k);
+  let gi = 0;
+  lay.items.forEach(it => {
+    if (it.text) {
+      c.save();
+      c.fillStyle = '#2baa8a'; c.font = `700 ${Math.round(46 * k)}px Andika, Nunito, sans-serif`;
+      c.textBaseline = 'alphabetic';
+      c.fillText(it.ch, it.x * k, (LINES.base - INK_Y0) * k);
+      c.restore();
+      return;
+    }
+    paintGlyph(c, it.ch, glyphInk[gi] || null, it.x * k, k, '#2baa8a');
+    gi++;
   });
 }
 
@@ -1030,7 +1261,18 @@ function updatePips() {
 
 function letterComplete() {
   const u = unit();
+  const words = currentMode === 'words';
+  const wasFull = words && setComplete(curSet());
   markDone(currentMode, u.star);
+  /* Finishing the last word of a set leads into reading those words back. */
+  offerCheck = words && !wasFull && setComplete(curSet());
+  document.getElementById('celebNext').textContent = offerCheck ? '🔊 Check ›' : 'Next ›';
+  if (words) renderSetRow();
+  const multi = u.glyphs.length > 1;
+  document.getElementById('celebLetter').style.display = multi ? 'none' : '';
+  const celebInk = document.getElementById('celebInk');
+  celebInk.style.display = multi ? 'block' : 'none';
+  if (multi) drawWordInk(celebInk, u);
   updateStrip();
   updateGrid();
   playFanfare();
@@ -1053,6 +1295,7 @@ document.getElementById('celebAgain').addEventListener('click', () => {
 document.getElementById('celebNext').addEventListener('click', () => {
   document.getElementById('celebrate').classList.remove('show');
   stopConfetti();
+  if (offerCheck) { offerCheck = false; openCheck(); return; }
   stepLetter(1);
 });
 
@@ -1064,6 +1307,7 @@ function stopDemo() {
 
 function playDemo() {
   stopDemo();
+  introTok++;
   ink = []; matchIdx = 0;
   const startAt = strokeIdx < strokes.length ? strokeIdx : 0;
   if (strokeIdx >= strokes.length) { strokeIdx = 0; updatePips(); }
@@ -1092,18 +1336,33 @@ document.getElementById('watchBtn').addEventListener('click', playDemo);
    and no fallback, so a phone without the Australian voice heard nothing here
    at all, ever. speech.js owns the ladder down to whatever English the phone
    does have, and owns waking an engine the browser paused. */
-function speak(text) {
+/* `onDone`, when given, runs once the words have been said, or after a
+   generous wait for an engine that never reports the end, or straight away
+   when there is no speech at all, so whatever comes next is never stuck. */
+function speak(text, onDone) {
+  let fired = false, timer = null;
+  const done = () => {
+    if (fired) return;
+    fired = true; clearTimeout(timer);
+    if (onDone) onDone();
+  };
+  if (onDone) timer = setTimeout(done, Math.max(2500, text.length * 150));
   try {
     const u = new SpeechSynthesisUtterance(text);
+    if (onDone) { u.onend = done; u.onerror = done; }
     u.rate = 0.8;
     applyVoice(u);
     // Letter names have always been said at the engine's own pitch here, and
     // a tracing page has no voice picker to change it with.
     u.pitch = 1;
     speakUtterance(u);
-  } catch (e) { /* TTS unavailable */ }
+    if (!window.speechSynthesis) done();
+  } catch (e) { done(); /* TTS unavailable */ }
 }
-document.getElementById('hearBtn').addEventListener('click', () => speak(spokenName()));
+/* In the Words tab the word is the thing being learnt, so Hear says it;
+   each letter's name is still said as it is shown being written. */
+document.getElementById('hearBtn').addEventListener('click', () =>
+  speak(currentMode === 'words' ? unit().word : spokenName()));
 document.getElementById('wordPill').addEventListener('click', () => {
   const u = unit();
   if (!u.glyphs.length) return;
@@ -1180,6 +1439,12 @@ function stopConfetti() {
 function stepLetter(dir) {
   const ni = unitIdx + dir;
   if (ni >= 0 && ni < units.length) { loadUnit(ni); return; }
+  if (currentMode === 'words') {
+    /* Past the end of a set is the start of the next one (and back). */
+    const n = TRACE_SETS.length;
+    selectSet((setIdx + (dir > 0 ? 1 : -1) + n) % n, dir < 0);
+    return;
+  }
   if (isLetters()) {
     const nextCase = currentCase === 'lower' ? 'upper' : 'lower';
     const wrapLetter = dir > 0 ? ALPHABET[0] : ALPHABET[ALPHABET.length - 1];
@@ -1217,6 +1482,120 @@ function updateGrid() {
   });
 }
 
+/* ══════════════ WORD SETS ══════════════ */
+function renderSetRow() {
+  const row = document.getElementById('setRow');
+  row.innerHTML = '';
+  TRACE_SETS.forEach((st, i) => {
+    const b = document.createElement('button');
+    const n = setDoneCount(st), all = st.words.length;
+    b.className = 'set-chip' + (i === setIdx ? ' active' : '') + (n === all ? ' full' : '');
+    [st.icon, st.label, n + '/' + all].forEach((t, j) => {
+      const sp = document.createElement('span');
+      if (j === 2) sp.className = 'n';
+      sp.textContent = t;
+      b.appendChild(sp);
+    });
+    b.setAttribute('aria-label', `${st.label}: ${n} of ${all} done`);
+    b.addEventListener('click', () => selectSet(i));
+    row.appendChild(b);
+  });
+  const c = document.createElement('button');
+  c.className = 'set-chip check';
+  c.textContent = '🔊 Check';
+  c.setAttribute('aria-label', 'Check: tap the word you hear');
+  c.addEventListener('click', openCheck);
+  row.appendChild(c);
+}
+function selectSet(i, atEnd) {
+  setIdx = i;
+  store.set(SET_KEY, curSet().id);
+  units = buildUnits('words');
+  renderSetRow();
+  loadUnit(atEnd ? units.length - 1 : 0);
+}
+
+/* ══════════════ READ-BACK CHECK ══════════════
+   After writing a set, the learner reads it back: a word is said and they
+   tap it from three written words of the same set. The options carry no
+   pictures and are not read aloud, or the check would be of listening and
+   pictures rather than reading. Nothing is stored; it is practice. */
+const CHECK_ROUNDS = 5;
+let chk = null;
+function shuffled(a) {
+  const b = a.slice();
+  for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; }
+  return b;
+}
+function openCheck() {
+  stopDemo(); introTok++;
+  if (chk) clearTimeout(chk.timer);
+  const pool = curSet().words.map(x => x.text);
+  chk = { words: shuffled(pool).slice(0, CHECK_ROUNDS), pool, i: 0, score: 0, locked: false, timer: null };
+  document.getElementById('checkPlay').style.display = '';
+  document.getElementById('checkEnd').style.display = 'none';
+  document.getElementById('checkBox').classList.add('show');
+  checkRound(true);
+}
+function checkRound(first) {
+  const ans = chk.words[chk.i];
+  const opts = shuffled([ans].concat(shuffled(chk.pool.filter(x => x !== ans)).slice(0, 2)));
+  document.getElementById('checkProg').textContent = (chk.i + 1) + ' / ' + chk.words.length;
+  const wrap = document.getElementById('checkOpts');
+  wrap.innerHTML = '';
+  opts.forEach(o => {
+    const b = document.createElement('button');
+    b.textContent = o;
+    b.dataset.word = o;
+    b.addEventListener('click', () => checkAnswer(b, ans));
+    wrap.appendChild(b);
+  });
+  chk.locked = false;
+  if (first) speak('Tap the word you hear.', () => { if (chk && chk.i === 0) speak(ans); });
+  else speak(ans);
+}
+function checkAnswer(b, ans) {
+  if (!chk || chk.locked) return;
+  chk.locked = true;
+  if (b.dataset.word === ans) {
+    b.classList.add('right'); chk.score++; playTick();
+    chk.timer = setTimeout(checkNextRound, 900);
+  } else {
+    b.classList.add('wrong'); playWrong();
+    [...document.querySelectorAll('#checkOpts button')].forEach(x => {
+      if (x.dataset.word === ans) x.classList.add('right');
+    });
+    chk.timer = setTimeout(() => {
+      speak(ans);
+      chk.timer = setTimeout(checkNextRound, 1850);
+    }, 350);
+  }
+}
+function checkNextRound() {
+  chk.i++;
+  if (chk.i < chk.words.length) { checkRound(false); return; }
+  document.getElementById('checkPlay').style.display = 'none';
+  document.getElementById('checkEnd').style.display = '';
+  document.getElementById('checkScore').textContent = chk.score + ' / ' + chk.words.length;
+  const next = TRACE_SETS[setIdx + 1];
+  document.getElementById('checkNext').textContent = next ? next.icon + ' Next ›' : '✔ Done';
+  if (chk.score === chk.words.length) playFanfare();
+}
+function closeCheck() {
+  if (chk) clearTimeout(chk.timer);
+  chk = null;
+  document.getElementById('checkBox').classList.remove('show');
+}
+document.getElementById('checkHear').addEventListener('click', () => {
+  if (chk && chk.i < chk.words.length) speak(chk.words[chk.i]);
+});
+document.getElementById('checkClose').addEventListener('click', closeCheck);
+document.getElementById('checkAgain').addEventListener('click', openCheck);
+document.getElementById('checkNext').addEventListener('click', () => {
+  closeCheck();
+  if (setIdx + 1 < TRACE_SETS.length) selectSet(setIdx + 1);
+});
+
 /* ══════════════ MODE SWITCHING ══════════════ */
 function setMode(mode) {
   currentMode = mode;
@@ -1225,6 +1604,9 @@ function setMode(mode) {
   document.getElementById('headerSub').textContent = meta.sub;
   document.getElementById('caseToggle').style.display = isLetters() ? '' : 'none';
   document.getElementById('nameSetup').style.display = mode === 'name' ? 'flex' : 'none';
+  document.getElementById('setRow').style.display = mode === 'words' ? 'flex' : 'none';
+  document.getElementById('wordPill').classList.toggle('big', mode === 'words');
+  if (mode === 'words') renderSetRow();
   [...document.querySelectorAll('.mode-tab')].forEach(b =>
     b.classList.toggle('active', b.dataset.mode === mode));
 
@@ -1306,6 +1688,9 @@ buildModeTabs();
 /* ?mode=letters|combos|words|name|digits so the mode can be linked to
    directly; falls back to letters for anything unrecognised. */
 const wantedMode = new URLSearchParams(location.search).get('mode');
+/* ?mode=words&set=food opens one word set directly. */
+const wantedSet = TRACE_SETS.findIndex(st => st.id === new URLSearchParams(location.search).get('set'));
+if (wantedSet >= 0) setIdx = wantedSet;
 const nameInput = document.getElementById('nameInput');
 if (savedName()) nameInput.value = savedName();
 setMode(MODES.some(m => m.id === wantedMode) ? wantedMode : 'letters');
