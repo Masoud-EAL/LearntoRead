@@ -2,13 +2,18 @@
 
    With Silent mode on, an iPhone mutes the device voice that reads every
    word in WordLink, and no page can change that. The learner presses 🔊,
-   hears nothing, and has no way to know why. So on an iPhone or iPad, the
-   first time a play button is pressed in a visit, a small card says so,
-   mostly in pictures: 🔕 ➜ 🔔. The page cannot tell whether Silent mode is
-   actually on, so the card says "Can't hear?" rather than "you are on
-   silent", and it shows once per visit, never on every press.
+   hears nothing, and has no way to know why.
 
-   speech.js calls window.wlSilentTip() for every word it speaks; the
+   Safari does not let a page read the silent switch, so the card waits for
+   the sign of not hearing: the same button pressed for the same words twice
+   within 5 seconds. Then, on an iPhone or iPad only, a small card says so,
+   mostly in pictures: 🔕 ➜ 🔔, "Can't hear?", at most once per visit.
+   Speech the app starts by itself (a word read out after Next, a question
+   arriving in a class game) is not a press and is not counted; matching the
+   button as well as the words keeps "Next reads the word, then Hear once"
+   from looking like a repeat.
+
+   speech.js calls window.wlSilentTip(text) for every word it speaks; the
    read-aloud buttons on the game and guide pages call it too. The card
    never blocks the page: it sits at the bottom, closes on a tap, and goes
    by itself. */
@@ -19,6 +24,18 @@
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   var KEY = 'wl_silent_tip_shown';
   var shownHere = false;
+  var REPEAT_MS = 5000, TAP_MS = 1000;
+  var lastTap = null;    // { el, t }: the last thing tapped
+  var lastPress = null;  // { el, text, t }: the last tap that asked for words
+
+  // A tap on the letter or the label inside a card is a tap on the card: the
+  // same list of tappable things the pages give their touch styles to.
+  var TAPPABLE = 'button, a, .alpha-card, .tappable, [onclick], [role="button"]';
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    var el = (t && t.closest && t.closest(TAPPABLE)) || t;
+    lastTap = { el: el, t: Date.now() };
+  }, true);
 
   function alreadyShown() {
     if (shownHere) return true;
@@ -79,9 +96,16 @@
     timer = setTimeout(hide, 8000);
   }
 
-  window.wlSilentTip = function () {
+  window.wlSilentTip = function (text) {
     if (!apple || alreadyShown()) return;
-    markShown();
-    show();
+    var now = Date.now();
+    if (!lastTap || now - lastTap.t > TAP_MS) return;   // not from a press
+    var press = { el: lastTap.el, text: String(text || ''), t: now };
+    var prev = lastPress;
+    lastPress = press;
+    if (prev && prev.el === press.el && prev.text === press.text && press.t - prev.t <= REPEAT_MS) {
+      markShown();
+      show();
+    }
   };
 })();
