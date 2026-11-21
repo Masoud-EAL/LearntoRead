@@ -337,7 +337,7 @@ GUIDE = """<!DOCTYPE html>
       var u=new SpeechSynthesisUtterance(say.dataset.say);
       u.lang='en-AU'; u.rate=.9;
       speechSynthesis.speak(u);
-      if(window.wlSilentTip) window.wlSilentTip();
+      if(window.wlSilentTip) window.wlSilentTip(say.dataset.say);
     }}catch(e){{}}
   }});
 }})();
