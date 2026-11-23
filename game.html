@@ -1343,10 +1343,15 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
    learner's line is the app's red; the right way, on the answer screens, is
    green and dotted so the two can be told apart where they run together. */
 .route-section{display:none;flex-direction:column;align-items:center;gap:clamp(3px,calc(var(--vh,1vh)*1),8px);width:100%;}
-#route-svg{display:block;height:min(calc(var(--vh,1vh)*48),calc((100vw - 28px)*1.11),540px);width:auto;max-width:100%;
+#route-svg{display:block;height:min(calc(var(--vh,1vh)*48),calc((100vw - 28px)*1.079),540px);width:auto;max-width:100%;
   touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:crosshair;}
 .route-tools{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;}
-.route-tools .btn{padding:6px 14px;}
+.s-route-clear{display:none;margin-left:8px;background:transparent;border-color:rgba(255,255,255,.35);color:var(--muted);}
+#screen-student-answer[data-qtype="route"] .s-route-clear{display:inline-flex;}
+/* The hint line under the map is the only thing in its row, so where it is
+   hidden the row goes too. */
+:root[data-app-h~="lt620"] #screen-student-answer .route-tools{display:none;}
+#screen-student-answer .route-tools.nudge{display:flex!important;}
 .route-hint{font-size:.88rem;color:var(--muted);font-weight:700;}
 /* A nudge is shown even where the resting line is hidden to save the row. */
 .route-hint.nudge{color:var(--gold);display:inline!important;}
@@ -1354,14 +1359,18 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 /* Square ends, so two roads meeting at the edge of the map make a whole corner. */
 .rm-road{stroke:#c3c8ce;stroke-width:20;stroke-linecap:square;}
 .rm-green{fill:#cfe0bd;}
-.rm-lot{fill:#d8d1c7;stroke:#b4a99b;stroke-width:1;}
-.rm-lot.named{fill:#fffdf8;stroke:#7a6f65;stroke-width:1.3;}
+.rm-lot{fill:#e6e0d7;stroke:#a89c8d;stroke-width:1.2;stroke-dasharray:3 2.5;}
+.rm-lot.named{fill:#fffdf8;stroke:#7a6f65;stroke-width:1.3;stroke-dasharray:none;}
 /* The building the line has gone into. */
-.rm-lot.on,.rm-lot.named.on{fill:#fde4e9;stroke:#e94560;stroke-width:3;}
-.rm-lot.dest{fill:#e3f7ea;stroke:#00a152;stroke-width:3;}
-.rm-icon{font-size:17px;text-anchor:middle;dominant-baseline:central;}
-.rm-name{font-family:'Nunito',sans-serif;font-weight:800;font-size:10.5px;fill:#2d2a26;text-anchor:middle;}
+.rm-lot.on,.rm-lot.named.on{fill:#fde4e9;stroke:#e94560;stroke-width:3;stroke-dasharray:none;}
+.rm-lot.dest{fill:#e3f7ea;stroke:#00a152;stroke-width:3;stroke-dasharray:none;}
+.rm-icon{font-size:19px;text-anchor:middle;dominant-baseline:central;}
+.rm-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:12.5px;fill:#1f1c19;text-anchor:middle;}
 .rm-name.dest{fill:#00782f;}
+.rm-name.pick{fill:#b8173a;}
+.rm-icon.pick{opacity:.85;}
+.rm-ask{font-family:'Nunito',sans-serif;font-weight:900;font-size:20px;fill:#8f8272;text-anchor:middle;dominant-baseline:central;pointer-events:none;}
+#route-pick{pointer-events:none;}
 .rm-ink{fill:none;stroke:#e94560;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;opacity:.92;}
 .rm-end{fill:#e94560;stroke:#fff;stroke-width:2.5;}
 .rm-right{fill:none;stroke:#00a152;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 11;}
@@ -1370,8 +1379,8 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .rm-dot.nudge,.rm-end.nudge{animation:rmPulse .5s ease-in-out 3;}
 @keyframes rmPulse{50%{transform:scale(1.6);}}
 .rm-face{fill:#2f7fd6;}
-.rm-here{font-family:'Nunito',sans-serif;font-weight:900;font-size:12px;fill:#1d4f8a;}
-.route-static{display:block;height:min(calc(var(--vh,1vh)*40),calc((100vw - 40px)*1.11),380px);width:auto;max-width:100%;margin:0 auto;}
+.rm-here{font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;fill:#1d4f8a;}
+.route-static{display:block;height:min(calc(var(--vh,1vh)*46),calc((100vw - 32px)*1.079),460px);width:auto;max-width:100%;margin:0 auto;}
 /* The answer here is a map, which is taller than a word. The party popper
    and the gaps give way so Next stays on the screen without scrolling. */
 #screen-student-result[data-round="route"]{gap:8px;padding-top:14px;padding-bottom:14px;}
@@ -1389,15 +1398,26 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 /* The directions are the longest prompt in the app, and the map below them
    cannot give way, so the words run a size smaller than other rounds. */
 #screen-student-answer[data-qtype="route"] .s-q-text{font-size:clamp(.95rem,calc(var(--vh,1vh)*2.7),1.35rem);line-height:1.35;}
-:root[data-app-h~="lt620"] #screen-student-answer #route-svg{height:min(calc(var(--vh,1vh)*45),calc((100vw - 24px)*1.11));}
+:root[data-app-h~="lt620"] #screen-student-answer #route-svg{height:min(calc(var(--vh,1vh)*45),calc((100vw - 24px)*1.079));}
 :root[data-app-h~="lt620"] #screen-student-answer .route-hint{display:none;}
-:root[data-app-h~="lt500"] #screen-student-answer #route-svg{height:min(calc(var(--vh,1vh)*42),calc((100vw - 20px)*1.11));}
+:root[data-app-h~="lt500"] #screen-student-answer #route-svg{height:min(calc(var(--vh,1vh)*42),calc((100vw - 20px)*1.079));}
+/* Upright, the map takes all the height the directions and Submit leave, so
+   on a phone it is as wide as the screen and the names on it can be read.
+   It never goes under about two fifths of the screen: past that the
+   directions above it give way and scroll. The round's label goes, because
+   the map and the spoken directions already say what to do. */
+@media not all and (max-height:520px) and (min-aspect-ratio:1/1){
+  #screen-student-answer[data-qtype="route"] > .route-section{flex:1 1 0;overflow:visible;
+    min-height:min(calc(var(--vh,1vh)*42),calc((100vw - 24px)*1.079));}
+  #screen-student-answer[data-qtype="route"] #route-svg{flex:1 1 0;min-height:0;width:100%;max-width:720px;}
+  #screen-student-answer[data-qtype="route"] .s-q-type{display:none;}
+}
 /* Sideways. On the answer screen the map sits beside the directions and takes
    the height: written here, after the short-screen sizes and as specific as
    they are, because a phone on its side is also a short screen and those
    sizes were winning. On the result screen the map goes beside the score. */
 @media (max-height:520px) and (min-aspect-ratio:1/1){
-  :root[data-app-h] #screen-student-answer #route-svg{height:min(calc(var(--vh,1vh)*60),calc(46vw*1.11),460px);}
+  :root[data-app-h] #screen-student-answer #route-svg{height:min(calc(var(--vh,1vh)*60),calc(46vw*1.079),460px);}
   #screen-student-result[data-round="route"].active{display:grid;grid-template-columns:auto minmax(0,1fr);
     align-content:center;align-items:center;justify-items:center;column-gap:18px;row-gap:4px;padding:8px 16px;}
   #screen-student-result[data-round="route"] > *{grid-column:2;}
@@ -2444,6 +2464,9 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
     <div id="s-q-emoji" style="font-size:3.2rem;line-height:1;margin:6px 0 10px;text-align:center;min-height:1em;"></div>
     <div class="s-q-text" id="s-q-text">…</div>
     <button class="s-hear-btn" id="s-hear-btn" onclick="studentReplay()">🔊 Hear it again</button>
+    <!-- Directions only. It sits beside Hear it again rather than under the
+         map, so the map gets that row. -->
+    <button class="s-hear-btn s-route-clear" id="route-clear" onclick="routeClear()">↺ Start again</button>
   </div>
   <div id="hint-wrap" style="display:none;width:100%;max-width:500px;text-align:center;">
     <button class="btn btn-ghost btn-sm" id="hint-btn" onclick="showHint()">💡 Hint</button>
@@ -2491,10 +2514,9 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
   <!-- Directions: draw the way on the map. Writes the corners passed and the
        building reached into #student-ans-input. -->
   <div class="route-section" id="route-section" style="display:none;">
-    <svg id="route-svg" viewBox="0 0 356 396" aria-label="Street map: draw the way"></svg>
+    <svg id="route-svg" viewBox="0 0 356 384" aria-label="Street map: draw the way"></svg>
     <div class="route-tools">
       <span class="route-hint" id="route-hint">Draw from the blue dot</span>
-      <button class="btn btn-ghost btn-sm" id="route-clear" onclick="routeClear()">↺ Start again</button>
     </div>
   </div>
   <button class="submit-btn" id="student-submit-btn" onclick="submitAnswer()">✓ Submit</button>
@@ -4228,8 +4250,10 @@ const POSITIONS=[
    sides of the block. If any of that fails the question is thrown away and
    built again. The routes check in tools/checks runs the same functions. */
 const ROUTE_X=[18,178,338], ROUTE_Y=[18,178,338];
-const ROUTE_W=356, ROUTE_H=396, ROUTE_HOME_Y=374, ROUTE_BLOCK=160;
-const ROUTE_INSET=13, ROUTE_LOT=42, ROUTE_GAP=4, ROUTE_DEEP=38;
+/* The buildings fill as much of each block as the roads leave, because on a
+   phone the map is a few centimetres wide and the names on it have to be read. */
+const ROUTE_W=356, ROUTE_H=384, ROUTE_HOME_Y=366, ROUTE_BLOCK=160;
+const ROUTE_INSET=12, ROUTE_LOT=44, ROUTE_GAP=2, ROUTE_DEEP=40;
 const ROUTE_UP=[0,-1];
 /* Places a learner goes to, by the name they are called in Australia, each
    with a picture every phone has had for years. Two-word names are drawn on
@@ -4589,14 +4613,15 @@ function routeEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'
 function routeLabel(L,name,cls){
   const p=routePlace(name), cx=L.mid[0], words=name.split(' ');
   const two=words.length>1, tall=L.h>ROUTE_DEEP;
-  const iconY=L.y+(two?(tall?15:10):(tall?19:14));
-  let out='<text class="rm-icon" x="'+cx+'" y="'+iconY+'"'+(two?' style="font-size:12px"':'')+'>'+(p?p.icon:'')+'</text>';
+  const iconY=L.y+(two?(tall?13:9):(tall?17:13));
+  let out='<text class="rm-icon'+(cls?' '+cls:'')+'" x="'+cx+'" y="'+iconY+'"'+(two?' style="font-size:14px"':'')+'>'+(p?p.icon:'')+'</text>';
   const lines=two?words:[name];
-  const first=L.y+(two?(tall?31:25):(tall?38:31));
+  const first=L.y+(two?(tall?31:25):(tall?40:34));
+  const size=two?11.5:12.5;
   lines.forEach((w,i)=>{
     // Long words are squeezed to the building rather than spilling over it.
-    const fit=w.length*6>ROUTE_LOT-3?' textLength="'+(ROUTE_LOT-4)+'" lengthAdjust="spacingAndGlyphs"':'';
-    out+='<text class="rm-name'+(cls?' '+cls:'')+'" x="'+cx+'" y="'+(first+i*10)+'"'+fit+'>'+routeEsc(w)+'</text>';
+    const fit=w.length*size*.6>ROUTE_LOT-4?' textLength="'+(ROUTE_LOT-4)+'" lengthAdjust="spacingAndGlyphs"':'';
+    out+='<text class="rm-name'+(cls?' '+cls:'')+'" x="'+cx+'" y="'+(first+i*11.5)+'"'+(two?' style="font-size:11.5px"':'')+fit+'>'+routeEsc(w)+'</text>';
   });
   return out;
 }
@@ -4648,7 +4673,14 @@ function routeMapInner(q,opt){
       +' x="'+L.x+'" y="'+L.y+'" width="'+L.w+'" height="'+L.h+'" rx="4"/>';
     if(named) s+=routeLabel(L,named);
     else if(dest) s+=routeLabel(L,q.destName,'dest');
+    /* A building with no name is a place nobody has said yet, and the place
+       being looked for is one of them. A question mark says so without words:
+       without it a learner read the blank buildings as walls, not places. */
+    else if(!opt.reveal&&!picked) s+='<text class="rm-ask"'+(opt.ink?' id="route-ask-'+L.id+'"':'')+' x="'+L.mid[0]+'" y="'+L.mid[1]+'">?</text>';
+    else if(picked) s+=routeLabel(L,q.destName,'pick');
   });
+  // The building the line goes into, named as the place it is meant to be.
+  if(opt.ink) s+='<g id="route-pick"></g>';
   if(mine&&mine.nodes.length) s+='<path class="rm-ink" d="'+routeD(routeInk(mine.nodes,mine.lot,home))+'"/>';
   // Over the learner's line, and dotted, so both show where they run together.
   if(opt.reveal) s+='<path class="rm-right" d="'+routeD(routeInk(q.route,q.dest,home,q.via))+'"/>';
@@ -4656,9 +4688,9 @@ function routeMapInner(q,opt){
   // You are here: a dot, and an arrow for the way you are facing. The words
   // go on whichever side has room.
   const rightSide=sx>ROUTE_W*.7;
-  s+='<path class="rm-face" d="M'+sx+' '+(sy-27)+' l-8 11 h16 z"/>'
+  s+='<path class="rm-face" d="M'+sx+' '+(sy-24)+' l-8 11 h16 z"/>'
     +'<circle class="rm-dot"'+(opt.ink?' id="route-dot"':'')+' cx="'+sx+'" cy="'+sy+'" r="9"/>'
-    +'<text class="rm-here" x="'+(rightSide?sx-16:sx+16)+'" y="'+(sy+4)+'"'+(rightSide?' text-anchor="end"':'')+'>You are here</text>';
+    +'<text class="rm-here" x="'+(rightSide?sx-16:sx+16)+'" y="'+(sy+5)+'"'+(rightSide?' text-anchor="end"':'')+'>You are here</text>';
   return s;
 }
 function routeMapSvg(q,opt,cls){
@@ -12299,6 +12331,7 @@ function routeHint(nudge){
   if(!el) return;
   el.textContent=nudge||(!routeDrawn()?'Draw from the blue dot':routeIn?'Press Submit':'Draw or tap into the building');
   el.classList.toggle('nudge',!!nudge);
+  if(el.parentNode) el.parentNode.classList.toggle('nudge',!!nudge);
   // The thing to press pulses with it: the dot, or the end of the line.
   const mark=document.getElementById(routeDrawn()?'route-end':'route-dot');
   ['route-end','route-dot'].forEach(id=>{ const m=document.getElementById(id); if(m) m.classList.remove('nudge'); });
@@ -12337,7 +12370,18 @@ function routeApply(){
     end.setAttribute('cx',e[0]); end.setAttribute('cy',e[1]); end.setAttribute('r',drawn&&!L?7:0);
   }
   [].forEach.call(svg.querySelectorAll('.rm-lot.on'),r=>r.classList.remove('on'));
-  if(L){ const r=document.getElementById('route-lot-'+L.id); if(r) r.classList.add('on'); }
+  [].forEach.call(svg.querySelectorAll('.rm-ask'),a=>a.style.display='');
+  const pick=document.getElementById('route-pick');
+  if(pick) pick.innerHTML='';
+  if(L){
+    const r=document.getElementById('route-lot-'+L.id); if(r) r.classList.add('on');
+    // A blank building, once chosen, wears the name of the place being
+    // looked for: "you are saying the cinema is here".
+    if(!(routeQ.places||{})[L.id]){
+      const a=document.getElementById('route-ask-'+L.id); if(a) a.style.display='none';
+      if(pick) pick.innerHTML=routeLabel(L,routeQ.destName,'pick');
+    }
+  }
   document.getElementById('student-ans-input').value=
     drawn?routeLine.join(' ')+(routeIn?' @'+routeIn:''):'';
   if(!document.getElementById('route-hint').classList.contains('nudge')) routeHint();
