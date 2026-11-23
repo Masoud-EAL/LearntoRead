@@ -6,13 +6,8 @@
 
    Safari does not let a page read the silent switch, so the card waits for
    the sign of not hearing: the same button pressed for the same words twice
-   within 10 seconds. Then, on an iPhone or iPad only, a small card says so,
-   mostly in pictures: 🔕 ➜ 🔔, "Can't hear?".
-   It can come back, in a game as much as on the page before it: once a
-   visit was too few, because a learner who saw it on the home page and
-   left Silent on heard nothing in every game after and was never told
-   again. It waits 30 seconds between showings, and once the learner
-   closes it with ✕ it does not come back that visit.
+   within 5 seconds. Then, on an iPhone or iPad only, a small card says so,
+   mostly in pictures: 🔕 ➜ 🔔, "Can't hear?", at most once per visit.
    Speech the app starts by itself (a word read out after Next, a question
    arriving in a class game) is not a press and is not counted; matching the
    button as well as the words keeps "Next reads the word, then Hear once"
@@ -27,12 +22,9 @@
 
   var apple = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  var KEY = 'wl_silent_tip_closed', AT = 'wl_silent_tip_at';
-  /* Ten seconds, not five: a directions sentence takes longer than five to
-     say, and a learner who heard nothing often waits about that long before
-     trying again. */
-  var REPEAT_MS = 10000, TAP_MS = 1000, AGAIN_MS = 30000;
-  var lastShown = 0, closedHere = false;
+  var KEY = 'wl_silent_tip_shown';
+  var shownHere = false;
+  var REPEAT_MS = 5000, TAP_MS = 1000;
   var lastTap = null;    // { el, t }: the last thing tapped
   var lastPress = null;  // { el, text, t }: the last tap that asked for words
 
@@ -45,20 +37,13 @@
     lastTap = { el: el, t: Date.now() };
   }, true);
 
-  function store(k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} }
-  function read(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
-  function tooSoon() {
-    if (closedHere || read(KEY) === '1') return true;
-    var at = Math.max(lastShown, parseInt(read(AT), 10) || 0);
-    return Date.now() - at < AGAIN_MS;
+  function alreadyShown() {
+    if (shownHere) return true;
+    try { return sessionStorage.getItem(KEY) === '1'; } catch (e) { return false; }
   }
   function markShown() {
-    lastShown = Date.now();
-    store(AT, String(lastShown));
-  }
-  function markClosed() {
-    closedHere = true;
-    store(KEY, '1');
+    shownHere = true;
+    try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
   }
 
   var css = [
@@ -78,15 +63,9 @@
 
   function show() {
     if (!document.body) return;
-    // It can show more than once now: one stylesheet, and one card at a time.
-    if (!document.getElementById('wl-silent-tip-css')) {
-      var style = document.createElement('style');
-      style.id = 'wl-silent-tip-css';
-      style.textContent = css;
-      document.head.appendChild(style);
-    }
-    var old = document.querySelector('.wl-silent-tip');
-    if (old && old.parentNode) old.parentNode.removeChild(old);
+    var style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
 
     var card = document.createElement('div');
     card.className = 'wl-silent-tip';
@@ -113,20 +92,18 @@
       setTimeout(function () { if (card.parentNode) card.parentNode.removeChild(card); }, 300);
     }
     card.addEventListener('click', hide);
-    close.addEventListener('click', markClosed);
     requestAnimationFrame(function () { card.classList.add('show'); });
     timer = setTimeout(hide, 8000);
   }
 
   window.wlSilentTip = function (text) {
-    if (!apple || tooSoon()) return;
+    if (!apple || alreadyShown()) return;
     var now = Date.now();
     if (!lastTap || now - lastTap.t > TAP_MS) return;   // not from a press
     var press = { el: lastTap.el, text: String(text || ''), t: now };
     var prev = lastPress;
     lastPress = press;
     if (prev && prev.el === press.el && prev.text === press.text && press.t - prev.t <= REPEAT_MS) {
-      lastPress = null;   // a third press is a fresh start, not another repeat
       markShown();
       show();
     }
