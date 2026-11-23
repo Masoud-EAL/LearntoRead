@@ -1367,10 +1367,7 @@ select.game-input{cursor:pointer;background:var(--card);color:var(--text);}
 .rm-icon{font-size:19px;text-anchor:middle;dominant-baseline:central;}
 .rm-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:12.5px;fill:#1f1c19;text-anchor:middle;}
 .rm-name.dest{fill:#00782f;}
-.rm-name.pick{fill:#b8173a;}
-.rm-icon.pick{opacity:.85;}
 .rm-ask{font-family:'Nunito',sans-serif;font-weight:900;font-size:20px;fill:#8f8272;text-anchor:middle;dominant-baseline:central;pointer-events:none;}
-#route-pick{pointer-events:none;}
 .rm-ink{fill:none;stroke:#e94560;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;opacity:.92;}
 .rm-end{fill:#e94560;stroke:#fff;stroke-width:2.5;}
 .rm-right{fill:none;stroke:#00a152;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 11;}
@@ -4676,11 +4673,11 @@ function routeMapInner(q,opt){
     /* A building with no name is a place nobody has said yet, and the place
        being looked for is one of them. A question mark says so without words:
        without it a learner read the blank buildings as walls, not places. */
-    else if(!opt.reveal&&!picked) s+='<text class="rm-ask"'+(opt.ink?' id="route-ask-'+L.id+'"':'')+' x="'+L.mid[0]+'" y="'+L.mid[1]+'">?</text>';
-    else if(picked) s+=routeLabel(L,q.destName,'pick');
+    /* The building a line goes into is never named after the place: named
+       wrongly it teaches the wrong building, and named while drawing it tells
+       the answer. The place is named only where it really is, after Submit. */
+    else if(!opt.reveal) s+='<text class="rm-ask" x="'+L.mid[0]+'" y="'+L.mid[1]+'">?</text>';
   });
-  // The building the line goes into, named as the place it is meant to be.
-  if(opt.ink) s+='<g id="route-pick"></g>';
   if(mine&&mine.nodes.length) s+='<path class="rm-ink" d="'+routeD(routeInk(mine.nodes,mine.lot,home))+'"/>';
   // Over the learner's line, and dotted, so both show where they run together.
   if(opt.reveal) s+='<path class="rm-right" d="'+routeD(routeInk(q.route,q.dest,home,q.via))+'"/>';
@@ -12370,18 +12367,7 @@ function routeApply(){
     end.setAttribute('cx',e[0]); end.setAttribute('cy',e[1]); end.setAttribute('r',drawn&&!L?7:0);
   }
   [].forEach.call(svg.querySelectorAll('.rm-lot.on'),r=>r.classList.remove('on'));
-  [].forEach.call(svg.querySelectorAll('.rm-ask'),a=>a.style.display='');
-  const pick=document.getElementById('route-pick');
-  if(pick) pick.innerHTML='';
-  if(L){
-    const r=document.getElementById('route-lot-'+L.id); if(r) r.classList.add('on');
-    // A blank building, once chosen, wears the name of the place being
-    // looked for: "you are saying the cinema is here".
-    if(!(routeQ.places||{})[L.id]){
-      const a=document.getElementById('route-ask-'+L.id); if(a) a.style.display='none';
-      if(pick) pick.innerHTML=routeLabel(L,routeQ.destName,'pick');
-    }
-  }
+  if(L){ const r=document.getElementById('route-lot-'+L.id); if(r) r.classList.add('on'); }
   document.getElementById('student-ans-input').value=
     drawn?routeLine.join(' ')+(routeIn?' @'+routeIn:''):'';
   if(!document.getElementById('route-hint').classList.contains('nudge')) routeHint();
